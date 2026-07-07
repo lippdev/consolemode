@@ -305,7 +305,7 @@ function Start-MonitorTimer {
     }
 
     $script:MonitorTimer = New-Object System.Windows.Forms.Timer
-    $script:MonitorTimer.Interval = 2000
+    $script:MonitorTimer.Interval = 1000
     $script:MonitorTimer.Add_Tick({
         $result = Update-ConsoleMonitorLoop
         if ($result -eq "exit") {
@@ -316,7 +316,12 @@ function Start-MonitorTimer {
             Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Modo console encerrado. Setup restaurado." -Color ([System.Drawing.Color]::DarkGreen)
         }
         elseif ($result -eq "running") {
-            Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Modo console ativo. Pressione ESC nas cortinas pretas ou use Restaurar." -Color ([System.Drawing.Color]::DarkBlue)
+            $statusMsg = if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
+                "Modo console ativo (Xbox). Ao sair, o setup sera restaurado automaticamente."
+            } else {
+                "Modo console ativo. Pressione ESC nas cortinas pretas ou use Restaurar."
+            }
+            Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message $statusMsg -Color ([System.Drawing.Color]::DarkBlue)
         }
     })
     $script:MonitorTimer.Start()

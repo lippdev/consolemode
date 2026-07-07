@@ -172,6 +172,7 @@ $Script:ConsoleState = @{
     MoveCount      = 0
     HasAppeared    = $false
     ModeLaunched   = $false
+    LaunchTime     = $null
     AbsenceCount   = 0
     FocusMonitor   = $null
     HideMonitors   = @()
@@ -629,8 +630,27 @@ function Start-BigPictureMode {
 }
 
 function Start-XboxMode {
-    Start-Sleep -Milliseconds 500
     [NativeHelpers]::SendWinF11()
+}
+
+function Test-XboxModeActive {
+    foreach ($procName in @('XboxGameCallableUI', 'GamingApp', 'XboxPcApp')) {
+        $procs = Get-Process -Name $procName -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowHandle -ne 0 }
+        foreach ($p in $procs) {
+            $area = [NativeHelpers]::GetWindowArea($p.MainWindowHandle)
+            if ($area -gt 250000) { return $true }
+        }
+    }
+
+    $windows = [NativeHelpers]::GetAllVisibleWindows()
+    foreach ($w in $windows) {
+        if ($w.Area -lt 250000) { continue }
+        if ($w.Title -match 'Xbox|Game Pass|Gaming|Modo Xbox') { return $true }
+        if ($w.ClassName -eq 'ApplicationFrameWindow' -and $w.Title -match 'Xbox') { return $true }
+    }
+
+    return $false
 }
 
 function Test-BigPictureActive {
@@ -642,26 +662,6 @@ function Test-BigPictureActive {
         if ($area -gt 200000) { return $true }
     }
     return $false
-}
-
-function Test-XboxModeActive {
-    $xboxProcesses = @(
-        "GamingApp",
-        "XboxPcApp",
-        "XboxApp",
-        "GameBar",
-        "ApplicationFrameHost"
-    )
-
-    foreach ($procName in $xboxProcesses) {
-        $proc = Get-Process -Name $procName -ErrorAction SilentlyContinue |
-            Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -match "Xbox|Gaming|Full.?screen" } |
-            Select-Object -First 1
-        if ($proc) { return $true }
-    }
-
-    $found = [NativeHelpers]::SearchXboxWindows()
-    return $found
 }
 
 function Test-FullscreenModeActive {
@@ -699,6 +699,7 @@ function Start-ConsoleMode {
     $Script:ConsoleState.MoveCount = 0
     $Script:ConsoleState.HasAppeared = $false
     $Script:ConsoleState.ModeLaunched = $false
+    $Script:ConsoleState.LaunchTime = $null
     $Script:ConsoleState.AbsenceCount = 0
 
     $focusMode = Get-ConsoleMonitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
@@ -712,19 +713,24 @@ function Start-ConsoleMode {
         }
     }
 
-    Enable-Monitors -MonitorNames @($FocusMonitor)
-    Start-Sleep -Seconds 1
+    if (-not $focusMode) {
+        Enable-Monitors -MonitorNames @($FocusMonitor)
+        Start-Sleep -Milliseconds 200
+    }
+
     Set-PrimaryMonitor -MonitorName $FocusMonitor
-    Start-Sleep -Seconds 1
 
     if ($focusMode -and $focusMode.Frequency) {
         Set-MonitorMode -MonitorName $FocusMonitor -Width $focusMode.Width -Height $focusMode.Height -Frequency $focusMode.Frequency -Colors $focusMode.Colors
-        Start-Sleep -Milliseconds 500
+    }
+
+    switch ($FullscreenMode) {
+        "bigPicture" { Start-BigPictureMode }
+        "xboxMode"   { Start-XboxMode }
     }
 
     if ($HideStrategy -eq "disconnect" -and $HideMonitors.Count -gt 0) {
         Disable-MonitorsWindows -MonitorNames $HideMonitors
-        Start-Sleep -Milliseconds 500
     }
     elseif ($HideStrategy -eq "blackCurtain" -and $HideMonitors.Count -gt 0) {
         Show-BlackCurtains -MonitorNames $HideMonitors
@@ -737,13 +743,9 @@ function Start-ConsoleMode {
         Set-ConsoleAudioOutput -FriendlyId $AudioDeviceId
     }
 
-    switch ($FullscreenMode) {
-        "bigPicture" { Start-BigPictureMode }
-        "xboxMode"   { Start-XboxMode }
-    }
-
     $Script:ConsoleState.IsActive = $true
     $Script:ConsoleState.ModeLaunched = $true
+    $Script:ConsoleState.LaunchTime = Get-Date
 }
 
 function Update-ConsoleMonitorLoop {
@@ -755,7 +757,15 @@ function Update-ConsoleMonitorLoop {
     $mode = $Script:ConsoleState.FullscreenMode
     $isActive = Test-FullscreenModeActive -Mode $mode
 
-    if ($isActive) { $Script:ConsoleState.HasAppeared = $true }
+    if ($mode -eq "xboxMode" -and -not $Script:ConsoleState.HasAppeared -and $Script:ConsoleState.LaunchTime) {
+        $elapsed = ((Get-Date) - $Script:ConsoleState.LaunchTime).TotalSeconds
+        if ($elapsed -ge 2 -or $isActive) {
+            $Script:ConsoleState.HasAppeared = $true
+        }
+    }
+    elseif ($isActive) {
+        $Script:ConsoleState.HasAppeared = $true
+    }
 
     if ($mode -eq "bigPicture" -and $Script:ConsoleState.MoveCount -lt 12) {
         $bpHandles = Get-BigPictureWindowHandles
@@ -773,7 +783,7 @@ function Update-ConsoleMonitorLoop {
         }
     }
 
-    $absenceThreshold = if ($mode -eq "bigPicture") { 3 } else { 5 }
+    $absenceThreshold = if ($mode -eq "bigPicture") { 3 } else { 2 }
 
     if ($isActive) {
         $Script:ConsoleState.AbsenceCount = 0
@@ -804,6 +814,7 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.MoveCount = 0
     $Script:ConsoleState.HasAppeared = $false
     $Script:ConsoleState.ModeLaunched = $false
+    $Script:ConsoleState.LaunchTime = $null
     $Script:ConsoleState.AbsenceCount = 0
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }
