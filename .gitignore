@@ -1,0 +1,14 @@
+# Backups gerados em runtime
+backup_monitores.cfg
+backup_audio.txt
+
+# Ferramentas de terceiros (baixar separadamente - ver README)
+MultiMonitorTool.exe
+MultiMonitorTool.chm
+SoundVolumeView.exe
+SoundVolumeView.chm
+readme.txt
+
+# Temporarios
+*.csv
+_test_*.ps1

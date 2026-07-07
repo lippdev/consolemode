@@ -1,0 +1,10 @@
+{
+    "focusMonitor":  "\\\\.\\DISPLAY3",
+    "hideMonitors":  [
+
+                     ],
+    "hideStrategy":  "blackCurtain",
+    "fullscreenMode":  "bigPicture",
+    "audioDeviceId":  "NVIDIA High Definition Audio\\Device\\LG TV SSCR2\\Render",
+    "audioDeviceName":  "LG TV SSCR2 (NVIDIA High Definition Audio)"
+}
