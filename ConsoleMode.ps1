@@ -123,14 +123,20 @@ function Build-MonitorPanel {
         $display = "$($monitor.Name)"
         if ($monitor.MonitorName) { $display += " - $($monitor.MonitorName)" }
         $display += " ($($monitor.Resolution))"
-        if ($monitor.IsPrimary) { $display += " [Primario atual]" }
+        if ($monitor.IsPrimary -and $monitor.IsActive) { $display += " [Primario atual]" }
+        if (-not $monitor.IsActive) { $display += " [Desconectado]" }
 
         $radio = New-Object System.Windows.Forms.RadioButton
         $radio.Text = ""
         $radio.Tag = $monitor.Name
         $radio.Location = New-Object System.Drawing.Point(($colFoco + 15), $y)
         $radio.Size = New-Object System.Drawing.Size(20, 20)
-        $radio.Checked = ($monitor.Name -eq $SavedFocus) -or (($SavedFocus -eq "") -and $firstMonitor)
+        if ($SavedFocus) {
+            $radio.Checked = ($monitor.Name -eq $SavedFocus)
+        }
+        elseif ($firstMonitor) {
+            $radio.Checked = $true
+        }
         $Panel.Controls.Add($radio)
 
         $check = New-Object System.Windows.Forms.CheckBox
@@ -139,16 +145,20 @@ function Build-MonitorPanel {
         $check.Location = New-Object System.Drawing.Point(($colHide + 20), $y)
         $check.Size = New-Object System.Drawing.Size(20, 20)
         $check.Checked = $SavedHide -contains $monitor.Name
+        $check.Enabled = $monitor.IsActive
         $Panel.Controls.Add($check)
 
         $nameLabel = New-Label -Text $display -X $colName -Y ($y + 2) -W 420 -H 18
+        if (-not $monitor.IsActive) {
+            $nameLabel.ForeColor = [System.Drawing.Color]::Gray
+        }
         $Panel.Controls.Add($nameLabel)
 
         $y += 28
         $firstMonitor = $false
     }
 
-    $hint = New-Label -Text "Dica: se nao marcar nenhum em 'Esconder', todos os outros serao escondidos automaticamente." -X $colFoco -Y ($y + 4) -W 600 -H 30
+    $hint = New-Label -Text "Dica: desconectados aparecem em cinza e serao reativados ao iniciar. Sem marcar 'Esconder', os demais ativos serao desconectados." -X $colFoco -Y ($y + 4) -W 600 -H 30
     $hint.ForeColor = [System.Drawing.Color]::DimGray
     $Panel.Controls.Add($hint)
 }
@@ -489,7 +499,7 @@ function Show-ConsoleModeGui {
         $hideMonitors = @($selection.HideMonitors | Where-Object { $_ -ne $selection.FocusMonitor })
         if ($hideMonitors.Count -eq 0) {
             $allMonitors = Get-ConsoleMonitors
-            $hideMonitors = @($allMonitors | Where-Object { $_.Name -ne $selection.FocusMonitor } | ForEach-Object { $_.Name })
+            $hideMonitors = @($allMonitors | Where-Object { $_.Name -ne $selection.FocusMonitor -and $_.IsActive } | ForEach-Object { $_.Name })
         }
 
         try {

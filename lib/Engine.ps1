@@ -219,37 +219,47 @@ function Get-ConsoleMonitors {
     $csvPath = Join-Path $env:TEMP "consolemode_monitors.csv"
 
     try {
-        Invoke-Mmt -Arguments @("/scomma", "`"$csvPath`"") | Out-Null
+        Invoke-Mmt -Arguments @("/HideInactiveMonitors", "0", "/scomma", "`"$csvPath`"") | Out-Null
         if (-not (Test-Path -LiteralPath $csvPath)) {
             return @()
         }
 
         $rows = Import-Csv -LiteralPath $csvPath -Encoding UTF8
         $monitors = foreach ($row in $rows) {
-            if ($row.Active -ne "Yes" -or $row.Disconnected -eq "Yes") { continue }
+            if ([string]::IsNullOrWhiteSpace($row.Name)) { continue }
+
+            $isActive = ($row.Active -eq "Yes")
+            $isDisconnected = ($row.Disconnected -eq "Yes") -or (-not $isActive)
+
+            $resolution = $row.Resolution
+            if ([string]::IsNullOrWhiteSpace($resolution)) {
+                $resolution = if ($row.'Maximum Resolution') { $row.'Maximum Resolution' } else { "N/A" }
+            }
 
             $width = $null
             $height = $null
-            if ($row.Resolution -match '(\d+)\s*[Xx]\s*(\d+)') {
+            if ($resolution -match '(\d+)\s*[Xx]\s*(\d+)') {
                 $width = [int]$Matches[1]
                 $height = [int]$Matches[2]
             }
 
             [PSCustomObject]@{
-                Name       = $row.Name
-                Resolution = $row.Resolution
-                Width      = $width
-                Height     = $height
-                Frequency  = $row.Frequency
-                Colors     = $row.Colors
-                IsPrimary  = ($row.Primary -eq "Yes")
-                MonitorName = $row.'Monitor Name'
-                ShortId    = $row.'Short Monitor ID'
-                LeftTop    = $row.'Left-Top'
+                Name            = $row.Name
+                Resolution      = $resolution
+                Width           = $width
+                Height          = $height
+                Frequency       = $row.Frequency
+                Colors          = $row.Colors
+                IsPrimary       = ($row.Primary -eq "Yes")
+                IsActive        = $isActive
+                IsDisconnected  = $isDisconnected
+                MonitorName     = $row.'Monitor Name'
+                ShortId         = $row.'Short Monitor ID'
+                LeftTop         = $row.'Left-Top'
             }
         }
 
-        return @($monitors)
+        return @($monitors | Sort-Object { -not $_.IsActive }, Name)
     }
     finally {
         Remove-Item -LiteralPath $csvPath -Force -ErrorAction SilentlyContinue
@@ -713,9 +723,10 @@ function Start-ConsoleMode {
         }
     }
 
-    if (-not $focusMode) {
+    if (-not $focusMode -or -not $focusMode.IsActive) {
         Enable-Monitors -MonitorNames @($FocusMonitor)
-        Start-Sleep -Milliseconds 200
+        Start-Sleep -Milliseconds 300
+        $focusMode = Get-ConsoleMonitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
     }
 
     Set-PrimaryMonitor -MonitorName $FocusMonitor
