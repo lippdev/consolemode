@@ -156,13 +156,7 @@ if (-not ([System.Management.Automation.PSTypeName]'NativeHelpers').Type) {
     Add-Type -TypeDefinition $nativeSource
 }
 
-$Script:AppRoot = Split-Path -Parent $PSScriptRoot
-$Script:MmtPath = Join-Path $Script:AppRoot "MultiMonitorTool.exe"
-$Script:SvvPath = Join-Path $Script:AppRoot "SoundVolumeView.exe"
-$Script:ConfigPath = Join-Path $Script:AppRoot "config.json"
-$Script:BackupMonitorConfig = Join-Path $Script:AppRoot "backup_monitores.cfg"
-$Script:BackupMonitorMeta = Join-Path $Script:AppRoot "backup_monitores_meta.json"
-$Script:BackupAudioFile = Join-Path $Script:AppRoot "backup_audio.txt"
+# Paths definidos por lib/Paths.ps1 via Initialize-ConsoleAppLayout / Set-ConsoleEnginePaths
 
 $Script:ConsoleState = @{
     IsActive       = $false
@@ -306,7 +300,11 @@ function Get-ConsoleAudioDevices {
     $devices = @()
 
     try {
-        Invoke-Svv -Arguments @("/scomma", "`"$csvPath`"") | Out-Null
+        Invoke-Svv -Arguments @(
+            "/ShowDisabledDevices", "1",
+            "/ShowUnpluggedDevices", "1",
+            "/scomma", "`"$csvPath`""
+        ) | Out-Null
         if (-not (Test-Path -LiteralPath $csvPath)) {
             $Script:AudioDevicesCache = @()
             return @()
@@ -319,7 +317,9 @@ function Get-ConsoleAudioDevices {
             if ([string]::IsNullOrWhiteSpace($friendlyId)) { continue }
             if ($row.Type -ne 'Device') { continue }
             if ($row.Direction -ne 'Render') { continue }
-            if ($row.'Device State' -and $row.'Device State' -notmatch 'Active') { continue }
+
+            $deviceState = [string]$row.'Device State'
+            $isActive = ($deviceState -match 'Active') -or [string]::IsNullOrWhiteSpace($deviceState)
 
             $friendlyName = $row.Name
             $driverName = $row.'Device Name'
@@ -334,14 +334,19 @@ function Get-ConsoleAudioDevices {
                 $displayName = $friendlyName
             }
 
+            if (-not $isActive) {
+                $displayName += " [Desabilitado]"
+            }
+
             [PSCustomObject]@{
                 Name       = $displayName
                 FriendlyId = $friendlyId
                 IsDefault  = ($row.Default -match 'Render')
+                IsActive   = $isActive
             }
         }
 
-        $devices = @($devices | Sort-Object Name -Unique)
+        $devices = @($devices | Sort-Object { -not $_.IsActive }, Name -Unique)
     }
     catch {
         $devices = @()
@@ -678,7 +683,10 @@ function Disable-MonitorsDdc {
 function Set-ConsoleAudioOutput {
     param([Parameter(Mandatory)][string]$FriendlyId)
 
+    Invoke-Svv -Arguments @("/Enable", "`"$FriendlyId`"") | Out-Null
     Invoke-Svv -Arguments @("/SetDefault", "`"$FriendlyId`"", "all") | Out-Null
+    $Script:CachedDefaultAudioId = $FriendlyId
+    $Script:AudioDevicesCache = $null
 }
 
 function Restore-ConsoleAudioOutput {
