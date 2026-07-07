@@ -11,6 +11,38 @@ $script:MonitorRows = @()
 $script:MonitorTimer = $null
 $script:TrayIcon = $null
 
+function Move-FormToPrimaryScreen {
+    param([System.Windows.Forms.Form]$Form)
+
+    $targetScreen = $null
+    $monitors = Get-ConsoleMonitors
+    $primaryName = ($monitors | Where-Object { $_.IsPrimary } | Select-Object -First 1).Name
+
+    if ($primaryName) {
+        $targetScreen = Get-ScreenByDeviceName -DeviceName $primaryName
+    }
+    if (-not $targetScreen) {
+        $targetScreen = [System.Windows.Forms.Screen]::PrimaryScreen
+    }
+    if (-not $targetScreen) { return }
+
+    $wa = $targetScreen.WorkingArea
+    $x = $wa.X + [Math]::Max(0, ($wa.Width - $Form.Width) / 2)
+    $y = $wa.Y + [Math]::Max(0, ($wa.Height - $Form.Height) / 2)
+
+    $Form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
+    $Form.Location = New-Object System.Drawing.Point([int]$x, [int]$y)
+}
+
+function Show-FormOnPrimary {
+    param([System.Windows.Forms.Form]$Form)
+
+    $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
+    Move-FormToPrimaryScreen -Form $Form
+    $Form.Show()
+    $Form.Activate()
+}
+
 function New-Label {
     param([string]$Text, [int]$X, [int]$Y, [int]$W = 200, [int]$H = 20)
     $lbl = New-Object System.Windows.Forms.Label
@@ -150,6 +182,16 @@ function Populate-AudioCombo {
     $Combo.SelectedIndex = $selectedIndex
 }
 
+function Get-HideStrategyFromCombo {
+    param([System.Windows.Forms.ComboBox]$Combo)
+
+    switch ($Combo.SelectedIndex) {
+        1 { return "blackCurtain" }
+        2 { return "turnOff" }
+        default { return "disconnect" }
+    }
+}
+
 function Save-FromGui {
     param($Form, $MonitorPanel, $HideStrategyCombo, $ModeBigPicture, $AudioCombo, $StatusLabel)
 
@@ -164,7 +206,7 @@ function Save-FromGui {
         return $false
     }
 
-    $hideStrategy = if ($HideStrategyCombo.SelectedIndex -eq 1) { "turnOff" } else { "blackCurtain" }
+    $hideStrategy = Get-HideStrategyFromCombo -Combo $HideStrategyCombo
     $fullscreenMode = if ($ModeBigPicture.Checked) { "bigPicture" } else { "xboxMode" }
     $audioItem = $AudioCombo.SelectedItem
     $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
@@ -226,9 +268,7 @@ function Initialize-TrayIcon {
     $showItem = New-Object System.Windows.Forms.ToolStripMenuItem
     $showItem.Text = "Mostrar janela"
     $showItem.Add_Click({
-        $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-        $Form.Show()
-        $Form.Activate()
+        Show-FormOnPrimary -Form $Form
     })
     [void]$menu.Items.Add($showItem)
 
@@ -246,9 +286,7 @@ function Initialize-TrayIcon {
 
     $script:TrayIcon.ContextMenuStrip = $menu
     $script:TrayIcon.Add_DoubleClick({
-        $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-        $Form.Show()
-        $Form.Activate()
+        Show-FormOnPrimary -Form $Form
     })
 }
 
@@ -274,8 +312,7 @@ function Start-MonitorTimer {
             $script:MonitorTimer.Stop()
             Stop-ConsoleMode
             Set-GuiEnabled -Form $Form -Enabled $true -StartButton $StartButton -RestoreButton $RestoreButton -SaveButton $SaveButton
-            $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-            $Form.Show()
+            Show-FormOnPrimary -Form $Form
             Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Modo console encerrado. Setup restaurado." -Color ([System.Drawing.Color]::DarkGreen)
         }
         elseif ($result -eq "running") {
@@ -302,10 +339,16 @@ function Show-ConsoleModeGui {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Console Mode - Big Picture / Modo Xbox"
     $form.Size = New-Object System.Drawing.Size(680, 620)
-    $form.StartPosition = "CenterScreen"
+    $form.MinimumSize = New-Object System.Drawing.Size(680, 620)
+    $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
     $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedDialog
     $form.MaximizeBox = $false
     $form.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+    Move-FormToPrimaryScreen -Form $form
+
+    $form.Add_Shown({
+        Move-FormToPrimaryScreen -Form $form
+    })
 
     $form.Add_FormClosing({
         param($sender, $e)
@@ -359,9 +402,14 @@ function Show-ConsoleModeGui {
     $hideStrategyCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
     $hideStrategyCombo.Location = New-Object System.Drawing.Point(15, 30)
     $hideStrategyCombo.Size = New-Object System.Drawing.Size(280, 25)
-    [void]$hideStrategyCombo.Items.Add("Cortinas pretas (recomendado)")
-    [void]$hideStrategyCombo.Items.Add("Desligar via DDC/CI (TurnOff)")
-    $hideStrategyCombo.SelectedIndex = if ($config.hideStrategy -eq "turnOff") { 1 } else { 0 }
+    [void]$hideStrategyCombo.Items.Add("Desconectar monitores (recomendado)")
+    [void]$hideStrategyCombo.Items.Add("Cortinas pretas")
+    [void]$hideStrategyCombo.Items.Add("Desligar fisicamente (DDC/CI)")
+    $hideStrategyCombo.SelectedIndex = switch ($config.hideStrategy) {
+        "blackCurtain" { 1 }
+        "turnOff" { 2 }
+        default { 0 }
+    }
     $hideGroup.Controls.Add($hideStrategyCombo)
 
     $modeGroup = New-Object System.Windows.Forms.GroupBox
@@ -429,7 +477,7 @@ function Show-ConsoleModeGui {
         }
 
         $selection = Get-GuiSelections -MonitorPanel $monitorPanel
-        $hideStrategy = if ($hideStrategyCombo.SelectedIndex -eq 1) { "turnOff" } else { "blackCurtain" }
+        $hideStrategy = Get-HideStrategyFromCombo -Combo $hideStrategyCombo
         $fullscreenMode = if ($modeBigPicture.Checked) { "bigPicture" } else { "xboxMode" }
         $audioItem = $audioCombo.SelectedItem
         $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
@@ -475,8 +523,7 @@ function Show-ConsoleModeGui {
         Request-ConsoleModeExit
         Stop-ConsoleMode
         Set-GuiEnabled -Form $form -Enabled $true -StartButton $btnStart -RestoreButton $btnRestore -SaveButton $btnSave
-        $form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-        $form.Show()
+        Show-FormOnPrimary -Form $form
         Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Setup restaurado manualmente." -Color ([System.Drawing.Color]::DarkGreen)
     })
     $form.Controls.Add($btnRestore)
@@ -499,8 +546,7 @@ function Show-ConsoleModeGui {
         Request-ConsoleModeExit
         Stop-ConsoleMode
         Set-GuiEnabled -Form $form -Enabled $true -StartButton $btnStart -RestoreButton $btnRestore -SaveButton $btnSave
-        $form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-        $form.Show()
+        Show-FormOnPrimary -Form $form
         Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Setup restaurado pela bandeja." -Color ([System.Drawing.Color]::DarkGreen)
     }
 

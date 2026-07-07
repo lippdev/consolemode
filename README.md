@@ -29,8 +29,9 @@ Sem esse arquivo, o app funciona normalmente, mas a troca de saida de audio fica
 2. Marque o **monitor de foco** (TV/console) com o radio button
 3. Marque os monitores que deseja **esconder** (checkbox)
 4. Escolha a estrategia:
-   - **Cortinas pretas** (recomendado) - overlays pretos nos monitores
-   - **Desligar via DDC/CI** - desliga fisicamente os monitores (requer suporte DDC/CI)
+   - **Desconectar monitores** (recomendado) - desativa no Windows, como se o PC nao os usasse (nao desliga fisicamente)
+   - **Cortinas pretas** - overlays pretos nos monitores (monitores continuam ligados)
+   - **Desligar fisicamente (DDC/CI)** - apaga o painel via hardware (requer suporte DDC/CI)
 5. Escolha o modo de tela cheia:
    - **Steam Big Picture**
    - **Modo Xbox** (envia Win+F11)

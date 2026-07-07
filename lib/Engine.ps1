@@ -27,6 +27,94 @@ public class NativeHelpers {
     [DllImport("user32.dll")]
     public static extern bool IsWindowVisible(IntPtr hWnd);
 
+    [DllImport("user32.dll")]
+    public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [DllImport("user32.dll")]
+    public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    public static long GetWindowArea(IntPtr hWnd) {
+        RECT r;
+        if (!GetWindowRect(hWnd, out r)) return 0;
+        long w = r.Right - r.Left;
+        long h = r.Bottom - r.Top;
+        if (w <= 0 || h <= 0) return 0;
+        return w * h;
+    }
+
+    public static System.Collections.Generic.List<WindowMatch> AllMatches = new System.Collections.Generic.List<WindowMatch>();
+
+    public class WindowMatch {
+        public IntPtr Handle;
+        public string Title;
+        public string ClassName;
+        public long Area;
+    }
+
+    private static bool CollectAllCallback(IntPtr hWnd, IntPtr lParam) {
+        if (!IsWindowVisible(hWnd)) return true;
+        StringBuilder t = new StringBuilder(512);
+        GetWindowText(hWnd, t, t.Capacity);
+        StringBuilder c = new StringBuilder(256);
+        GetClassName(hWnd, c, c.Capacity);
+        long area = GetWindowArea(hWnd);
+        if (area <= 0) return true;
+        AllMatches.Add(new WindowMatch {
+            Handle = hWnd,
+            Title = t.ToString(),
+            ClassName = c.ToString(),
+            Area = area
+        });
+        return true;
+    }
+
+    public static WindowMatch[] GetAllVisibleWindows() {
+        AllMatches = new System.Collections.Generic.List<WindowMatch>();
+        EnumWindows(CollectAllCallback, IntPtr.Zero);
+        return AllMatches.ToArray();
+    }
+
+    public static System.Collections.Generic.List<IntPtr> Matched = new System.Collections.Generic.List<IntPtr>();
+    private static string _titleSub;
+    private static string _classSub;
+
+    private static bool CollectCallback(IntPtr hWnd, IntPtr lParam) {
+        if (!IsWindowVisible(hWnd)) return true;
+        StringBuilder t = new StringBuilder(512);
+        GetWindowText(hWnd, t, t.Capacity);
+        StringBuilder c = new StringBuilder(256);
+        GetClassName(hWnd, c, c.Capacity);
+        string title = t.ToString();
+        string cls = c.ToString();
+        bool match = false;
+        if (!string.IsNullOrEmpty(_titleSub) && title.IndexOf(_titleSub, StringComparison.OrdinalIgnoreCase) >= 0) match = true;
+        if (!string.IsNullOrEmpty(_classSub) && cls.Equals(_classSub, StringComparison.OrdinalIgnoreCase)) match = true;
+        if (match) Matched.Add(hWnd);
+        return true;
+    }
+
+    public static IntPtr[] FindWindows(string titleSub, string classExact) {
+        Matched = new System.Collections.Generic.List<IntPtr>();
+        _titleSub = titleSub;
+        _classSub = classExact;
+        EnumWindows(CollectCallback, IntPtr.Zero);
+        return Matched.ToArray();
+    }
+
     public static bool FoundXboxWindow = false;
 
     public static bool EnumWindowCallback(IntPtr hWnd, IntPtr lParam) {
@@ -81,11 +169,13 @@ $Script:ConsoleState = @{
     CurtainForms   = [System.Collections.ArrayList]@()
     BackupAudioId  = $null
     SteamMoved     = $false
+    MoveCount      = 0
+    HasAppeared    = $false
     ModeLaunched   = $false
     AbsenceCount   = 0
     FocusMonitor   = $null
     HideMonitors   = @()
-    HideStrategy   = "blackCurtain"
+    HideStrategy   = "disconnect"
     FullscreenMode = "bigPicture"
     AudioDeviceId  = $null
 }
@@ -137,9 +227,20 @@ function Get-ConsoleMonitors {
         $monitors = foreach ($row in $rows) {
             if ($row.Active -ne "Yes" -or $row.Disconnected -eq "Yes") { continue }
 
+            $width = $null
+            $height = $null
+            if ($row.Resolution -match '(\d+)\s*[Xx]\s*(\d+)') {
+                $width = [int]$Matches[1]
+                $height = [int]$Matches[2]
+            }
+
             [PSCustomObject]@{
                 Name       = $row.Name
                 Resolution = $row.Resolution
+                Width      = $width
+                Height     = $height
+                Frequency  = $row.Frequency
+                Colors     = $row.Colors
                 IsPrimary  = ($row.Primary -eq "Yes")
                 MonitorName = $row.'Monitor Name'
                 ShortId    = $row.'Short Monitor ID'
@@ -209,30 +310,14 @@ function Get-ConsoleAudioDevices {
 function Get-DefaultAudioDeviceId {
     if (-not (Test-SoundVolumeViewAvailable)) { return $null }
 
-    $stdoutPath = Join-Path $env:TEMP "consolemode_default_audio.txt"
     try {
-        Start-Process -FilePath $Script:SvvPath -ArgumentList @("/Stdout") -Wait -WindowStyle Hidden -RedirectStandardOutput $stdoutPath | Out-Null
-        if (-not (Test-Path -LiteralPath $stdoutPath)) { return $null }
-
-        $lines = Get-Content -LiteralPath $stdoutPath -Encoding UTF8
-        foreach ($line in $lines) {
-            if ($line -match 'Default.*Render' -or $line -match '\(Default\)') {
-                $parts = $line -split '\s{2,}'
-                if ($parts.Count -ge 2) {
-                    return $parts[-1].Trim()
-                }
-            }
-        }
-
         $devices = Get-ConsoleAudioDevices
         $default = $devices | Where-Object { $_.IsDefault } | Select-Object -First 1
-        return $default.FriendlyId
+        if ($default) { return $default.FriendlyId }
+        return $null
     }
     catch {
         return $null
-    }
-    finally {
-        Remove-Item -LiteralPath $stdoutPath -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -241,7 +326,7 @@ function Get-ConsoleConfig {
         return [PSCustomObject]@{
             focusMonitor   = ""
             hideMonitors   = @()
-            hideStrategy   = "blackCurtain"
+            hideStrategy   = "disconnect"
             fullscreenMode = "bigPicture"
             audioDeviceId  = ""
             audioDeviceName = ""
@@ -253,7 +338,7 @@ function Get-ConsoleConfig {
         return [PSCustomObject]@{
             focusMonitor    = [string]$raw.focusMonitor
             hideMonitors    = @($raw.hideMonitors)
-            hideStrategy    = if ($raw.hideStrategy) { [string]$raw.hideStrategy } else { "blackCurtain" }
+            hideStrategy    = if ($raw.hideStrategy) { [string]$raw.hideStrategy } else { "disconnect" }
             fullscreenMode  = if ($raw.fullscreenMode) { [string]$raw.fullscreenMode } else { "bigPicture" }
             audioDeviceId   = [string]$raw.audioDeviceId
             audioDeviceName = [string]$raw.audioDeviceName
@@ -263,7 +348,7 @@ function Get-ConsoleConfig {
         return [PSCustomObject]@{
             focusMonitor    = ""
             hideMonitors    = @()
-            hideStrategy    = "blackCurtain"
+            hideStrategy    = "disconnect"
             fullscreenMode  = "bigPicture"
             audioDeviceId   = ""
             audioDeviceName = ""
@@ -308,6 +393,24 @@ function Set-PrimaryMonitor {
     Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
 }
 
+function Set-MonitorMode {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [int]$Width,
+        [int]$Height,
+        [string]$Frequency,
+        [string]$Colors
+    )
+
+    $spec = "Name=$MonitorName"
+    if ($Width -gt 0) { $spec += " Width=$Width" }
+    if ($Height -gt 0) { $spec += " Height=$Height" }
+    if ($Frequency) { $spec += " DisplayFrequency=$Frequency" }
+    if ($Colors) { $spec += " BitsPerPixel=$Colors" }
+
+    Invoke-Mmt -Arguments @("/SetMonitors", "`"$spec`"") | Out-Null
+}
+
 function Enable-Monitors {
     param([Parameter(Mandatory)][string[]]$MonitorNames)
 
@@ -315,6 +418,18 @@ function Enable-Monitors {
         Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
         Invoke-Mmt -Arguments @("/enable", "`"$name`"") | Out-Null
     }
+}
+
+function Disable-MonitorsWindows {
+    param([Parameter(Mandatory)][string[]]$MonitorNames)
+
+    if ($MonitorNames.Count -eq 0) { return }
+
+    $args = @("/disable")
+    foreach ($name in $MonitorNames) {
+        $args += "`"$name`""
+    }
+    Invoke-Mmt -Arguments $args | Out-Null
 }
 
 function Disable-MonitorsDdc {
@@ -346,10 +461,32 @@ function Restore-ConsoleAudioOutput {
 function Get-ScreenByDeviceName {
     param([Parameter(Mandatory)][string]$DeviceName)
 
-    $normalized = $DeviceName -replace '\\\\\.\\', ''
     foreach ($screen in [System.Windows.Forms.Screen]::AllScreens) {
-        if ($screen.DeviceName -match [regex]::Escape($normalized)) {
+        if ($screen.DeviceName -eq $DeviceName) {
             return $screen
+        }
+    }
+
+    $normalized = ($DeviceName -replace '\\\\\.\\', '').Trim()
+    foreach ($screen in [System.Windows.Forms.Screen]::AllScreens) {
+        $screenNorm = ($screen.DeviceName -replace '\\\\\.\\', '').Trim()
+        if ($screenNorm -eq $normalized) {
+            return $screen
+        }
+    }
+    return $null
+}
+
+function Get-RectFromMonitorInfo {
+    param($Monitor)
+
+    if (-not $Monitor -or -not $Monitor.LeftTop) { return $null }
+
+    if ($Monitor.LeftTop -match '(-?\d+)\s*,\s*(-?\d+)') {
+        $x = [int]$Matches[1]
+        $y = [int]$Matches[2]
+        if ($Monitor.Width -and $Monitor.Height) {
+            return New-Object System.Drawing.Rectangle($x, $y, [int]$Monitor.Width, [int]$Monitor.Height)
         }
     }
     return $null
@@ -365,17 +502,22 @@ function Show-BlackCurtains {
     foreach ($monitorName in $MonitorNames) {
         $screen = Get-ScreenByDeviceName -DeviceName $monitorName
         if (-not $screen) { continue }
+        $rect = $screen.Bounds
 
         $form = New-Object System.Windows.Forms.Form
         $form.BackColor = [System.Drawing.Color]::Black
         $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
-        $form.WindowState = [System.Windows.Forms.FormWindowState]::Maximized
+        $form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
         $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
-        $form.Location = $screen.Bounds.Location
-        $form.Size = $screen.Bounds.Size
         $form.TopMost = $true
         $form.ShowInTaskbar = $false
         $form.KeyPreview = $true
+
+        $rectObj = $rect
+        $form.Add_Shown({
+            $this.SetBounds($rectObj.X, $rectObj.Y, $rectObj.Width, $rectObj.Height)
+            $this.TopMost = $true
+        }.GetNewClosure())
 
         $form.Add_KeyDown({
             param($sender, $e)
@@ -384,7 +526,9 @@ function Show-BlackCurtains {
             }
         })
 
+        $form.SetBounds($rect.X, $rect.Y, $rect.Width, $rect.Height)
         $form.Show()
+        $form.SetBounds($rect.X, $rect.Y, $rect.Width, $rect.Height)
         [void]$Script:ConsoleState.CurtainForms.Add($form)
     }
 }
@@ -402,37 +546,81 @@ function Close-BlackCurtains {
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }
 
-function Move-ProcessWindowToMonitor {
-    param(
-        [Parameter(Mandatory)][string]$ProcessName,
-        [Parameter(Mandatory)][string]$MonitorName,
-        [string]$TitlePattern = ""
-    )
+function Get-BigPictureWindowHandles {
+    $all = [NativeHelpers]::GetAllVisibleWindows()
+    if ($all.Count -eq 0) { return @() }
 
-    $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
-    if (-not $screen) { return $false }
-
-    $processes = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue | Where-Object {
-        $_.MainWindowHandle -ne 0 -and (
-            [string]::IsNullOrWhiteSpace($TitlePattern) -or
-            $_.MainWindowTitle -match $TitlePattern
-        )
+    $candidates = $all | Where-Object {
+        $_.ClassName -eq 'SDL_app' -or
+        $_.Title -match 'Big Picture|Steam Big Picture'
     }
 
-    $target = $processes | Select-Object -First 1
-    if (-not $target) { return $false }
+    if ($candidates.Count -eq 0) {
+        $steamProcs = Get-Process -Name "steamwebhelper" -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowHandle -ne 0 }
+        foreach ($p in $steamProcs) {
+            $area = [NativeHelpers]::GetWindowArea($p.MainWindowHandle)
+            if ($area -gt 0) {
+                $candidates += [PSCustomObject]@{
+                    Handle = $p.MainWindowHandle
+                    Title = $p.MainWindowTitle
+                    ClassName = ''
+                    Area = $area
+                }
+            }
+        }
+    }
 
-    $bounds = $screen.Bounds
-    [NativeHelpers]::SetWindowPos(
-        $target.MainWindowHandle,
-        [IntPtr]::Zero,
-        $bounds.X,
-        $bounds.Y,
-        $bounds.Width,
-        $bounds.Height,
-        0x0040
-    ) | Out-Null
+    if ($candidates.Count -eq 0) { return @() }
 
+    $best = $candidates | Sort-Object {
+        $score = $_.Area
+        if ($_.Title -match 'Big Picture') { $score += 1000000000 }
+        if ($_.Title -match 'Steam') { $score += 100000000 }
+        $score
+    } -Descending | Select-Object -First 1
+
+    return @($best.Handle)
+}
+
+function Get-MonitorRect {
+    param([Parameter(Mandatory)][string]$MonitorName)
+
+    $monitorInfo = Get-ConsoleMonitors | Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
+    $rect = Get-RectFromMonitorInfo -Monitor $monitorInfo
+    if ($rect) { return $rect }
+
+    $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
+    if ($screen) { return $screen.Bounds }
+    return $null
+}
+
+function Move-BigPictureViaMmt {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [Parameter(Mandatory)][System.Drawing.Rectangle]$Rect
+    )
+
+    $args = @(
+        "/MoveWindow", "`"$MonitorName`"",
+        "Process", "`"steamwebhelper`"",
+        "/WindowLeft", $Rect.X,
+        "/WindowTop", $Rect.Y,
+        "/WindowWidth", $Rect.Width,
+        "/WindowHeight", $Rect.Height
+    )
+    Invoke-Mmt -Arguments $args | Out-Null
+}
+
+function Move-BigPictureToMonitor {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName
+    )
+
+    $rect = Get-MonitorRect -MonitorName $MonitorName
+    if (-not $rect) { return $false }
+
+    Move-BigPictureViaMmt -MonitorName $MonitorName -Rect $rect
     return $true
 }
 
@@ -446,11 +634,14 @@ function Start-XboxMode {
 }
 
 function Test-BigPictureActive {
-    $steamProcess = Get-Process -Name "steamwebhelper" -ErrorAction SilentlyContinue |
-        Where-Object { $_.MainWindowTitle -match "Steam" -or $_.MainWindowHandle -ne 0 } |
-        Select-Object -First 1
+    $handles = Get-BigPictureWindowHandles
+    if ($handles.Count -eq 0) { return $false }
 
-    return [bool]$steamProcess
+    foreach ($h in $handles) {
+        $area = [NativeHelpers]::GetWindowArea($h)
+        if ($area -gt 200000) { return $true }
+    }
+    return $false
 }
 
 function Test-XboxModeActive {
@@ -487,8 +678,8 @@ function Start-ConsoleMode {
     param(
         [Parameter(Mandatory)][string]$FocusMonitor,
         [string[]]$HideMonitors = @(),
-        [ValidateSet("blackCurtain", "turnOff")]
-        [string]$HideStrategy = "blackCurtain",
+        [ValidateSet("disconnect", "blackCurtain", "turnOff")]
+        [string]$HideStrategy = "disconnect",
         [ValidateSet("bigPicture", "xboxMode")]
         [string]$FullscreenMode = "bigPicture",
         [string]$AudioDeviceId = ""
@@ -505,8 +696,12 @@ function Start-ConsoleMode {
     $Script:ConsoleState.AudioDeviceId = $AudioDeviceId
     $Script:ConsoleState.ShouldExit = $false
     $Script:ConsoleState.SteamMoved = $false
+    $Script:ConsoleState.MoveCount = 0
+    $Script:ConsoleState.HasAppeared = $false
     $Script:ConsoleState.ModeLaunched = $false
     $Script:ConsoleState.AbsenceCount = 0
+
+    $focusMode = Get-ConsoleMonitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
 
     Save-MonitorBackup
 
@@ -522,7 +717,16 @@ function Start-ConsoleMode {
     Set-PrimaryMonitor -MonitorName $FocusMonitor
     Start-Sleep -Seconds 1
 
-    if ($HideStrategy -eq "blackCurtain" -and $HideMonitors.Count -gt 0) {
+    if ($focusMode -and $focusMode.Frequency) {
+        Set-MonitorMode -MonitorName $FocusMonitor -Width $focusMode.Width -Height $focusMode.Height -Frequency $focusMode.Frequency -Colors $focusMode.Colors
+        Start-Sleep -Milliseconds 500
+    }
+
+    if ($HideStrategy -eq "disconnect" -and $HideMonitors.Count -gt 0) {
+        Disable-MonitorsWindows -MonitorNames $HideMonitors
+        Start-Sleep -Milliseconds 500
+    }
+    elseif ($HideStrategy -eq "blackCurtain" -and $HideMonitors.Count -gt 0) {
         Show-BlackCurtains -MonitorNames $HideMonitors
     }
     elseif ($HideStrategy -eq "turnOff" -and $HideMonitors.Count -gt 0) {
@@ -551,33 +755,33 @@ function Update-ConsoleMonitorLoop {
     $mode = $Script:ConsoleState.FullscreenMode
     $isActive = Test-FullscreenModeActive -Mode $mode
 
-    if ($mode -eq "bigPicture") {
-        if ($isActive -and -not $Script:ConsoleState.SteamMoved) {
-            $moved = Move-ProcessWindowToMonitor -ProcessName "steamwebhelper" -MonitorName $Script:ConsoleState.FocusMonitor -TitlePattern "Steam"
-            if ($moved) {
-                $Script:ConsoleState.SteamMoved = $true
-            }
-        }
+    if ($isActive) { $Script:ConsoleState.HasAppeared = $true }
 
-        if ($isActive) {
-            $Script:ConsoleState.AbsenceCount = 0
-        }
-        elseif ($Script:ConsoleState.ModeLaunched) {
-            $Script:ConsoleState.AbsenceCount++
-            if ($Script:ConsoleState.AbsenceCount -ge 3) {
-                return "exit"
+    if ($mode -eq "bigPicture" -and $Script:ConsoleState.MoveCount -lt 12) {
+        $bpHandles = Get-BigPictureWindowHandles
+        if ($bpHandles.Count -gt 0) {
+            $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor
+            $Script:ConsoleState.MoveCount++
+            if ($moved) { $Script:ConsoleState.SteamMoved = $true }
+
+            foreach ($h in $bpHandles) {
+                if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
+                    $Script:ConsoleState.HasAppeared = $true
+                    break
+                }
             }
         }
     }
-    else {
-        if ($isActive) {
-            $Script:ConsoleState.AbsenceCount = 0
-        }
-        elseif ($Script:ConsoleState.ModeLaunched) {
-            $Script:ConsoleState.AbsenceCount++
-            if ($Script:ConsoleState.AbsenceCount -ge 5) {
-                return "exit"
-            }
+
+    $absenceThreshold = if ($mode -eq "bigPicture") { 3 } else { 5 }
+
+    if ($isActive) {
+        $Script:ConsoleState.AbsenceCount = 0
+    }
+    elseif ($Script:ConsoleState.HasAppeared) {
+        $Script:ConsoleState.AbsenceCount++
+        if ($Script:ConsoleState.AbsenceCount -ge $absenceThreshold) {
+            return "exit"
         }
     }
 
@@ -597,6 +801,8 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.IsActive = $false
     $Script:ConsoleState.ShouldExit = $false
     $Script:ConsoleState.SteamMoved = $false
+    $Script:ConsoleState.MoveCount = 0
+    $Script:ConsoleState.HasAppeared = $false
     $Script:ConsoleState.ModeLaunched = $false
     $Script:ConsoleState.AbsenceCount = 0
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
