@@ -10,6 +10,7 @@ $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:MonitorRows = @()
 $script:MonitorTimer = $null
 $script:TrayIcon = $null
+$script:LoadedMonitors = @()
 
 function Move-FormToPrimaryScreen {
     param([System.Windows.Forms.Form]$Form)
@@ -350,6 +351,7 @@ function Show-ConsoleModeGui {
 
     $config = Get-ConsoleConfig
     $monitors = Get-ConsoleMonitors
+    $script:LoadedMonitors = $monitors
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Console Mode - Big Picture / Modo Xbox"
@@ -498,20 +500,24 @@ function Show-ConsoleModeGui {
         $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
         $hideMonitors = @($selection.HideMonitors | Where-Object { $_ -ne $selection.FocusMonitor })
         if ($hideMonitors.Count -eq 0) {
-            $allMonitors = Get-ConsoleMonitors
-            $hideMonitors = @($allMonitors | Where-Object { $_.Name -ne $selection.FocusMonitor -and $_.IsActive } | ForEach-Object { $_.Name })
+            $hideMonitors = @($script:LoadedMonitors | Where-Object { $_.Name -ne $selection.FocusMonitor -and $_.IsActive } | ForEach-Object { $_.Name })
         }
 
+        $focusInfo = $script:LoadedMonitors | Where-Object { $_.Name -eq $selection.FocusMonitor } | Select-Object -First 1
+
         try {
+            Set-GuiEnabled -Form $form -Enabled $false -StartButton $btnStart -RestoreButton $btnRestore -SaveButton $btnSave
+            $form.WindowState = [System.Windows.Forms.FormWindowState]::Minimized
+            [System.Windows.Forms.Application]::DoEvents()
+
             Start-ConsoleMode `
                 -FocusMonitor $selection.FocusMonitor `
                 -HideMonitors $hideMonitors `
                 -HideStrategy $hideStrategy `
                 -FullscreenMode $fullscreenMode `
-                -AudioDeviceId $audioId
+                -AudioDeviceId $audioId `
+                -FocusMonitorInfo $focusInfo
 
-            Set-GuiEnabled -Form $form -Enabled $false -StartButton $btnStart -RestoreButton $btnRestore -SaveButton $btnSave
-            $form.WindowState = [System.Windows.Forms.FormWindowState]::Minimized
             Start-MonitorTimer -Form $form -StatusLabel $statusLabel -StartButton $btnStart -RestoreButton $btnRestore -SaveButton $btnSave
             Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Modo console iniciado..." -Color ([System.Drawing.Color]::DarkBlue)
         }
@@ -548,7 +554,9 @@ function Show-ConsoleModeGui {
     $btnRefresh.Location = New-Object System.Drawing.Point(520, 505)
     $btnRefresh.Size = New-Object System.Drawing.Size(135, 32)
     $btnRefresh.Add_Click({
-        $monitors = Get-ConsoleMonitors
+        Clear-ConsoleDeviceCache
+        $monitors = Get-ConsoleMonitors -ForceRefresh
+        $script:LoadedMonitors = $monitors
         $cfg = Get-ConsoleConfig
         Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors
         Populate-AudioCombo -Combo $audioCombo -SavedAudioId $cfg.audioDeviceId
