@@ -19,6 +19,7 @@ Turn your Windows PC into a **game console** with one click: hide extra monitors
 - **Steam Big Picture (recommended)** — automatic restore when you exit (Windows window event hook)
 - **Xbox mode (Alpha)** — sends Win+F11; **manual restore only** (tray or *Restore now*)
 - **Optional FPS limit (RTSS)** — global frame cap via RivaTuner during console mode (anti-tearing)
+- **Per-monitor resolution & refresh rate** — optional display mode per screen in step 1 (restored from backup on exit)
 - Portable executable (`ConsoleMode.exe`) or PowerShell dev mode
 - System tray icon to restore or reopen the app
 
@@ -77,6 +78,17 @@ Optional anti-tearing helper in **step 1 (Monitors)** of the wizard:
 3. Choose a global FPS cap (e.g. 60 for a 60 Hz TV)
 
 The limit applies to **all GPU apps** while console mode is active and is **restored automatically** when you exit or click *Restore now*. This is not per-monitor (RTSS limitation) and does not replace VSync.
+
+## Display mode (resolution & Hz)
+
+In **step 1 (Monitors)**, each connected display has a **Resolution / Hz** dropdown:
+
+1. Default **(Keep current)** leaves that monitor unchanged
+2. Pick a mode from the list (Windows `EnumDisplaySettings` — modes your GPU/driver report)
+3. On **Start console mode**, selected modes are applied before hiding other monitors
+4. On exit or **Restore now**, the previous layout is restored from the MMT backup saved at start
+
+Typical use: set your TV to **3840×2160 @ 60 Hz** while keeping a high-refresh desktop monitor unchanged until you exit.
 
 Validate without compiling:
 
@@ -146,6 +158,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: esconda moni
 - **Steam Big Picture (recomendado)** — restauração automática ao sair
 - **Modo Xbox (Alpha)** — envia Win+F11; **restauração manual** (bandeja ou *Restaurar agora*)
 - **Limite de FPS opcional (RTSS)** — cap global via RivaTuner durante o modo console (anti-tearing)
+- **Resolução e Hz por monitor** — modo de exibição opcional no passo 1 (restaurado do backup ao sair)
 - Executável portátil (`ConsoleMode.exe`) ou modo desenvolvimento via PowerShell
 - Ícone na bandeja para restaurar ou reabrir o app
 
@@ -177,6 +190,17 @@ powershell -ExecutionPolicy Bypass -File .\build\Get-RtssCli.ps1
 ```
 
 Config e backups ficam em `ConsoleMode_Data/`.
+
+### Resolução e Hz
+
+No **passo 1 (Monitores)**, cada tela conectada tem um menu **Resolução / Hz**:
+
+1. **(Manter atual)** — não altera aquele monitor
+2. Escolha um modo da lista (modos reportados pelo Windows/driver)
+3. Ao **Iniciar modo console**, os modos selecionados são aplicados antes de esconder os outros monitores
+4. Ao sair ou em **Restaurar agora**, o layout anterior volta pelo backup MMT salvo no início
+
+Exemplo: TV em **3840×2160 @ 60 Hz** enquanto o monitor desktop continua em alta taxa até você sair.
 
 ### Restaurar o setup
 

@@ -214,6 +214,105 @@ public class NativeHelpers {
         BigPictureExitRequested = false;
         return true;
     }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct DEVMODE {
+        private const int CCHDEVICENAME = 32;
+        private const int CCHFORMNAME = 32;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+        public string dmDeviceName;
+        public short dmSpecVersion;
+        public short dmDriverVersion;
+        public short dmSize;
+        public short dmDriverExtra;
+        public int dmFields;
+        public int dmPositionX;
+        public int dmPositionY;
+        public int dmDisplayOrientation;
+        public int dmDisplayFixedOutput;
+        public short dmColor;
+        public short dmDuplex;
+        public short dmYResolution;
+        public short dmTTOption;
+        public short dmCollate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
+        public string dmFormName;
+        public short dmLogPixels;
+        public int dmBitsPerPel;
+        public int dmPelsWidth;
+        public int dmPelsHeight;
+        public int dmDisplayFlags;
+        public int dmDisplayFrequency;
+        public int dmICMMethod;
+        public int dmICMIntent;
+        public int dmMediaType;
+        public int dmDitherType;
+        public int dmReserved1;
+        public int dmReserved2;
+        public int dmPanningWidth;
+        public int dmPanningHeight;
+    }
+
+    public const int ENUM_CURRENT_SETTINGS = -1;
+
+    [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+    public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+
+    public class DisplayModeInfo {
+        public int Width;
+        public int Height;
+        public int Frequency;
+        public int BitsPerPel;
+        public string Key;
+        public string Text;
+    }
+
+    private static DisplayModeInfo BuildDisplayModeInfo(int width, int height, int frequency, int bitsPerPel, string suffix) {
+        string freqPart = frequency > 0 ? (" @ " + frequency + " Hz") : "";
+        return new DisplayModeInfo {
+            Width = width,
+            Height = height,
+            Frequency = frequency,
+            BitsPerPel = bitsPerPel,
+            Key = width + "x" + height + "@" + frequency,
+            Text = width + " x " + height + freqPart + suffix
+        };
+    }
+
+    public static DisplayModeInfo[] EnumerateDisplayModes(string deviceName) {
+        var list = new System.Collections.Generic.List<DisplayModeInfo>();
+        var seen = new System.Collections.Generic.HashSet<string>();
+        int i = 0;
+        DEVMODE dm = new DEVMODE();
+        dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+        while (EnumDisplaySettings(deviceName, i, ref dm)) {
+            if (dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && (dm.dmBitsPerPel == 32 || dm.dmBitsPerPel == 24 || dm.dmBitsPerPel == 16)) {
+                string key = dm.dmPelsWidth + "x" + dm.dmPelsHeight + "@" + dm.dmDisplayFrequency;
+                if (!seen.Contains(key)) {
+                    seen.Add(key);
+                    list.Add(BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel, ""));
+                }
+            }
+            i++;
+            dm = new DEVMODE();
+            dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+        }
+        list.Sort((a, b) => {
+            int cmp = b.Width.CompareTo(a.Width);
+            if (cmp != 0) return cmp;
+            cmp = b.Height.CompareTo(a.Height);
+            if (cmp != 0) return cmp;
+            return b.Frequency.CompareTo(a.Frequency);
+        });
+        return list.ToArray();
+    }
+
+    public static DisplayModeInfo GetCurrentDisplayMode(string deviceName) {
+        DEVMODE dm = new DEVMODE();
+        dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+        if (!EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm)) return null;
+        return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel, " (atual)");
+    }
 }
 "@
 if (-not ([System.Management.Automation.PSTypeName]'NativeHelpers').Type) {
@@ -260,11 +359,13 @@ $Script:ConsoleState = @{
 $Script:MonitorListCache = $null
 $Script:AudioDevicesCache = $null
 $Script:CachedDefaultAudioId = $null
+$Script:DisplayModesCache = @{}
 
 function Clear-ConsoleDeviceCache {
     $Script:MonitorListCache = $null
     $Script:AudioDevicesCache = $null
     $Script:CachedDefaultAudioId = $null
+    $Script:DisplayModesCache = @{}
 }
 
 function Test-MultiMonitorToolAvailable {
@@ -461,6 +562,61 @@ function Get-DefaultAudioDeviceId {
     }
 }
 
+function ConvertFrom-ConfigMonitorModes {
+    param($Raw)
+
+    $result = @{}
+    if (-not $Raw) { return $result }
+
+    foreach ($prop in $Raw.PSObject.Properties) {
+        $entry = $prop.Value
+        if (-not $entry) { continue }
+        if ($entry.useCurrent -eq $true) { continue }
+
+        $width = 0
+        $height = 0
+        $frequency = 0
+        [void][int]::TryParse([string]$entry.width, [ref]$width)
+        [void][int]::TryParse([string]$entry.height, [ref]$height)
+        [void][int]::TryParse([string]$entry.frequency, [ref]$frequency)
+
+        if ($width -gt 0 -and $height -gt 0) {
+            $result[[string]$prop.Name] = @{
+                Width     = $width
+                Height    = $height
+                Frequency = $frequency
+            }
+        }
+    }
+
+    return $result
+}
+
+function ConvertTo-ConfigMonitorModes {
+    param([hashtable]$MonitorModes)
+
+    $result = [ordered]@{}
+    if (-not $MonitorModes) { return $result }
+
+    foreach ($name in ($MonitorModes.Keys | Sort-Object)) {
+        $mode = $MonitorModes[$name]
+        if (-not $mode) { continue }
+
+        $width = [int]$mode.Width
+        $height = [int]$mode.Height
+        $frequency = [int]$mode.Frequency
+        if ($width -le 0 -or $height -le 0) { continue }
+
+        $result[$name] = [ordered]@{
+            width     = $width
+            height    = $height
+            frequency = $frequency
+        }
+    }
+
+    return $result
+}
+
 function Get-ConsoleConfig {
     if (-not (Test-Path -LiteralPath $Script:ConfigPath)) {
         return [PSCustomObject]@{
@@ -472,6 +628,7 @@ function Get-ConsoleConfig {
             audioDeviceName = ""
             audioAutoSwitch = $false
             fpsLimit        = 0
+            monitorModes    = @{}
         }
     }
 
@@ -486,6 +643,7 @@ function Get-ConsoleConfig {
             audioDeviceName = [string]$raw.audioDeviceName
             audioAutoSwitch = [bool]($raw.audioAutoSwitch -eq $true)
             fpsLimit        = if ($null -ne $raw.fpsLimit) { [int]$raw.fpsLimit } else { 0 }
+            monitorModes    = ConvertFrom-ConfigMonitorModes -Raw $raw.monitorModes
         }
     }
     catch {
@@ -498,6 +656,7 @@ function Get-ConsoleConfig {
             audioDeviceName = ""
             audioAutoSwitch = $false
             fpsLimit        = 0
+            monitorModes    = @{}
         }
     }
 }
@@ -511,7 +670,8 @@ function Set-ConsoleConfig {
         [string]$AudioDeviceId,
         [string]$AudioDeviceName,
         [bool]$AudioAutoSwitch = $false,
-        [int]$FpsLimit = 0
+        [int]$FpsLimit = 0,
+        [hashtable]$MonitorModes = @{}
     )
 
     $config = [ordered]@{
@@ -523,9 +683,10 @@ function Set-ConsoleConfig {
         audioDeviceName = $AudioDeviceName
         audioAutoSwitch = $AudioAutoSwitch
         fpsLimit        = $FpsLimit
+        monitorModes    = ConvertTo-ConfigMonitorModes -MonitorModes $MonitorModes
     }
 
-    $config | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $Script:ConfigPath -Encoding UTF8
+    $config | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $Script:ConfigPath -Encoding UTF8
 }
 
 function Save-MonitorBackup {
@@ -734,6 +895,100 @@ function Get-ParsedDisplayFrequency {
     $value = 0
     [void][int]::TryParse($Frequency, [ref]$value)
     return $value
+}
+
+function Get-MonitorDisplayModes {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [switch]$ForceRefresh
+    )
+
+    if (-not $ForceRefresh -and $Script:DisplayModesCache.ContainsKey($MonitorName)) {
+        return $Script:DisplayModesCache[$MonitorName]
+    }
+
+    $modes = @()
+    try {
+        $nativeModes = [NativeHelpers]::EnumerateDisplayModes($MonitorName)
+        foreach ($mode in $nativeModes) {
+            $modes += [PSCustomObject]@{
+                Width     = [int]$mode.Width
+                Height    = [int]$mode.Height
+                Frequency = [int]$mode.Frequency
+                BitsPerPel = [int]$mode.BitsPerPel
+                Key       = [string]$mode.Key
+                Text      = [string]$mode.Text
+            }
+        }
+    }
+    catch {
+        $modes = @()
+    }
+
+    $Script:DisplayModesCache[$MonitorName] = $modes
+    return $modes
+}
+
+function Get-MonitorModeLabel {
+    param($Mode)
+
+    if (-not $Mode) { return "(manter atual)" }
+
+    $width = [int]$Mode.Width
+    $height = [int]$Mode.Height
+    $frequency = [int]$Mode.Frequency
+    if ($width -le 0 -or $height -le 0) { return "(manter atual)" }
+
+    if ($frequency -gt 0) {
+        return "$width x $height @ $frequency Hz"
+    }
+    return "$width x $height"
+}
+
+function Apply-ConfiguredMonitorModes {
+    param(
+        [hashtable]$MonitorModes,
+        [Parameter(Mandatory)][string]$FocusMonitor
+    )
+
+    if (-not $MonitorModes -or $MonitorModes.Count -eq 0) { return }
+
+    $monitors = Get-ConsoleMonitors -ForceRefresh
+    $otherNames = @($MonitorModes.Keys | Where-Object { $_ -ne $FocusMonitor })
+
+    foreach ($name in $otherNames) {
+        $mode = $MonitorModes[$name]
+        if (-not $mode) { continue }
+
+        $monitor = $monitors | Where-Object { $_.Name -eq $name -and $_.IsActive } | Select-Object -First 1
+        if (-not $monitor) { continue }
+
+        Set-MonitorMode `
+            -MonitorName $name `
+            -Width ([int]$mode.Width) `
+            -Height ([int]$mode.Height) `
+            -Frequency ([string]$mode.Frequency) `
+            -Colors $monitor.Colors
+        Start-Sleep -Milliseconds 350
+    }
+
+    if ($MonitorModes.ContainsKey($FocusMonitor)) {
+        $focusMode = $MonitorModes[$FocusMonitor]
+        $focusInfo = $monitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
+        $colors = if ($focusInfo) { $focusInfo.Colors } else { $null }
+
+        Set-PrimaryAndMonitorMode `
+            -MonitorName $FocusMonitor `
+            -Width ([int]$focusMode.Width) `
+            -Height ([int]$focusMode.Height) `
+            -Frequency ([string]$focusMode.Frequency) `
+            -Colors $colors
+        Start-Sleep -Milliseconds 400
+        return
+    }
+
+    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Start-Sleep -Milliseconds 400
 }
 
 function Update-FocusMonitorRect {
@@ -1330,7 +1585,8 @@ function Start-ConsoleMode {
         [switch]$AudioAutoSwitch,
         [string]$AudioDeviceHint = "",
         $FocusMonitorInfo = $null,
-        [int]$FpsLimit = 0
+        [int]$FpsLimit = 0,
+        [hashtable]$MonitorModes = @{}
     )
 
     if ($Script:ConsoleState.IsActive) {
@@ -1398,8 +1654,13 @@ function Start-ConsoleMode {
         $focusMode = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
     }
 
-    Set-PrimaryMonitor -MonitorName $FocusMonitor
-    Start-Sleep -Milliseconds 400
+    if ($MonitorModes -and $MonitorModes.Count -gt 0) {
+        Apply-ConfiguredMonitorModes -MonitorModes $MonitorModes -FocusMonitor $FocusMonitor
+    }
+    else {
+        Set-PrimaryMonitor -MonitorName $FocusMonitor
+        Start-Sleep -Milliseconds 400
+    }
 
     if ($HideStrategy -eq "disconnect" -and $HideMonitors.Count -gt 0) {
         Disable-MonitorsWindows -MonitorNames $HideMonitors

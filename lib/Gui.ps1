@@ -243,6 +243,107 @@ function Get-MonitorSecondaryLabel {
     return ($parts -join " · ")
 }
 
+function Initialize-MonitorModeCombo {
+    param(
+        [System.Windows.Forms.ComboBox]$Combo,
+        $Monitor,
+        $SavedMode = $null
+    )
+
+    $Combo.Items.Clear()
+    [void]$Combo.Items.Add([PSCustomObject]@{
+        Text       = "(Manter atual)"
+        UseCurrent = $true
+        Width      = 0
+        Height     = 0
+        Frequency  = 0
+    })
+
+    if (-not $Monitor.IsActive) {
+        $Combo.SelectedIndex = 0
+        $Combo.Enabled = $false
+        return
+    }
+
+    $Combo.Enabled = $true
+    $modes = @(Get-MonitorDisplayModes -MonitorName $Monitor.Name)
+    $matched = $false
+
+    foreach ($mode in $modes) {
+        [void]$Combo.Items.Add([PSCustomObject]@{
+            Text       = [string]$mode.Text
+            UseCurrent = $false
+            Width      = [int]$mode.Width
+            Height     = [int]$mode.Height
+            Frequency  = [int]$mode.Frequency
+        })
+
+        if ($SavedMode -and -not $matched) {
+            if ([int]$mode.Width -eq [int]$SavedMode.Width -and
+                [int]$mode.Height -eq [int]$SavedMode.Height -and
+                [int]$mode.Frequency -eq [int]$SavedMode.Frequency) {
+                $matched = $true
+            }
+        }
+    }
+
+    if ($SavedMode -and [int]$SavedMode.Width -gt 0 -and [int]$SavedMode.Height -gt 0 -and -not $matched) {
+        $label = Get-MonitorModeLabel -Mode $SavedMode
+        [void]$Combo.Items.Add([PSCustomObject]@{
+            Text       = "$label (salvo)"
+            UseCurrent = $false
+            Width      = [int]$SavedMode.Width
+            Height     = [int]$SavedMode.Height
+            Frequency  = [int]$SavedMode.Frequency
+        })
+        $Combo.SelectedIndex = $Combo.Items.Count - 1
+        return
+    }
+
+    if ($SavedMode -and [int]$SavedMode.Width -gt 0 -and [int]$SavedMode.Height -gt 0) {
+        for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
+            $item = $Combo.Items[$i]
+            if ($item.UseCurrent) { continue }
+            if ([int]$item.Width -eq [int]$SavedMode.Width -and
+                [int]$item.Height -eq [int]$SavedMode.Height -and
+                [int]$item.Frequency -eq [int]$SavedMode.Frequency) {
+                $Combo.SelectedIndex = $i
+                return
+            }
+        }
+    }
+
+    $Combo.SelectedIndex = 0
+}
+
+function Get-MonitorModeFromCombo {
+    param([System.Windows.Forms.ComboBox]$Combo)
+
+    $item = $Combo.SelectedItem
+    if (-not $item -or $item.UseCurrent) { return $null }
+
+    return @{
+        Width     = [int]$item.Width
+        Height    = [int]$item.Height
+        Frequency = [int]$item.Frequency
+    }
+}
+
+function Get-MonitorModesFromPanel {
+    param([System.Windows.Forms.Panel]$MonitorPanel)
+
+    $modes = @{}
+    foreach ($control in $MonitorPanel.Controls) {
+        if ($control -is [System.Windows.Forms.ComboBox] -and $control.Name -eq "MonitorModeCombo" -and $control.Tag) {
+            $mode = Get-MonitorModeFromCombo -Combo $control
+            if ($mode) {
+                $modes[[string]$control.Tag] = $mode
+            }
+        }
+    }
+    return $modes
+}
+
 $script:FpsPresetValues = @(30, 48, 50, 59, 60, 72, 75, 90, 120, 144)
 $script:FpsCustomComboValue = -1
 
@@ -361,6 +462,7 @@ function Get-GuiSelections {
     return @{
         FocusMonitor = $focusMonitor
         HideMonitors = @($hideMonitors)
+        MonitorModes = Get-MonitorModesFromPanel -MonitorPanel $MonitorPanel
     }
 }
 
@@ -461,7 +563,8 @@ function Build-MonitorPanel {
         [System.Windows.Forms.Panel]$Panel,
         [array]$Monitors,
         [string]$SavedFocus,
-        [string[]]$SavedHide
+        [string[]]$SavedHide,
+        [hashtable]$SavedMonitorModes = @{}
     )
 
     $Panel.Controls.Clear()
@@ -473,8 +576,9 @@ function Build-MonitorPanel {
     }
 
     $colFoco = 10
-    $colHide = 70
-    $colName = 140
+    $colHide = 55
+    $colName = 110
+    $colMode = 340
 
     $hdrFoco = New-Label -Text "Foco" -X $colFoco -Y 4 -W 50 -H 18 `
         -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
@@ -484,9 +588,13 @@ function Build-MonitorPanel {
         -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
     $Panel.Controls.Add($hdrHide)
 
-    $hdrName = New-Label -Text "Monitor" -X $colName -Y 4 -W 420 -H 18 `
+    $hdrName = New-Label -Text "Monitor" -X $colName -Y 4 -W 220 -H 18 `
         -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
     $Panel.Controls.Add($hdrName)
+
+    $hdrMode = New-Label -Text "Resolução / Hz" -X $colMode -Y 4 -W 280 -H 18 `
+        -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
+    $Panel.Controls.Add($hdrMode)
 
     $y = 26
     $firstMonitor = $true
@@ -516,19 +624,32 @@ function Build-MonitorPanel {
         $check.Enabled = $monitor.IsActive
         $Panel.Controls.Add($check)
 
-        $nameLabel = New-Label -Text $friendly -X $colName -Y $y -W 420 -H 16 `
+        $nameLabel = New-Label -Text $friendly -X $colName -Y $y -W 220 -H 16 `
             -Font (New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold))
         if (-not $monitor.IsActive) {
             $nameLabel.ForeColor = $script:Theme.Muted
         }
         $Panel.Controls.Add($nameLabel)
 
-        $subLabel = New-Label -Text $secondary -X ($colName + 2) -Y ($y + 16) -W 420 -H 14
+        $subLabel = New-Label -Text $secondary -X ($colName + 2) -Y ($y + 16) -W 220 -H 14
         $subLabel.ForeColor = $script:Theme.Muted
         $subLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8)
         $Panel.Controls.Add($subLabel)
 
-        $y += 38
+        $modeCombo = New-Object System.Windows.Forms.ComboBox
+        $modeCombo.Name = "MonitorModeCombo"
+        $modeCombo.Tag = $monitor.Name
+        $modeCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+        $modeCombo.Location = New-Object System.Drawing.Point($colMode, ($y + 2))
+        $modeCombo.Size = New-Object System.Drawing.Size(290, 28)
+        $modeCombo.DisplayMember = "Text"
+        $savedMode = if ($SavedMonitorModes -and $SavedMonitorModes.ContainsKey($monitor.Name)) {
+            $SavedMonitorModes[$monitor.Name]
+        } else { $null }
+        Initialize-MonitorModeCombo -Combo $modeCombo -Monitor $monitor -SavedMode $savedMode
+        $Panel.Controls.Add($modeCombo)
+
+        $y += 44
         $firstMonitor = $false
     }
 }
@@ -685,6 +806,7 @@ function Get-WizardSelections {
         AudioDeviceHint = $audioHint
         FocusMonitorInfo = $focusInfo
         FpsLimit       = $fpsLimit
+        MonitorModes   = $selection.MonitorModes
     }
 }
 
@@ -711,7 +833,8 @@ function Save-FromWizard {
         -AudioDeviceId $data.AudioDeviceId `
         -AudioDeviceName $data.AudioDeviceName `
         -AudioAutoSwitch $data.AudioAutoSwitch `
-        -FpsLimit $data.FpsLimit
+        -FpsLimit $data.FpsLimit `
+        -MonitorModes $data.MonitorModes
 
     Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuração salva." -Color $script:Theme.Success
     return $true
@@ -737,8 +860,14 @@ function Update-ReviewPanel {
 
     $fpsText = Get-FpsLimitLabel -FpsLimit $data.FpsLimit
 
+    $focusModeText = "(manter atual)"
+    if ($data.MonitorModes -and $data.MonitorModes.ContainsKey($data.FocusMonitor)) {
+        $focusModeText = Get-MonitorModeLabel -Mode $data.MonitorModes[$data.FocusMonitor]
+    }
+
     $ReviewLabel.Text = @(
         "Monitor de foco: $($data.FocusLabel)"
+        "Modo do foco: $focusModeText"
         "Esconder: $hideText"
         "Estratégia: $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
         "Modo: $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
@@ -1019,7 +1148,9 @@ function Show-ConsoleModeGui {
     $monitorPanel.AutoScroll = $true
     $step1.Controls.Add($monitorPanel)
 
-    Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors -SavedFocus $config.focusMonitor -SavedHide $config.hideMonitors
+    Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors `
+        -SavedFocus $config.focusMonitor -SavedHide $config.hideMonitors `
+        -SavedMonitorModes $config.monitorModes
     $initialFocus = if ($config.focusMonitor) { $config.focusMonitor } else { ($monitors | Select-Object -First 1).Name }
     Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $initialFocus
 
@@ -1075,7 +1206,7 @@ function Show-ConsoleModeGui {
         $fpsCustomNumeric.Visible = $isCustom
     })
 
-    $hint1 = New-Label -Text "Desconectados (cinza) serão reativados ao iniciar. Sem marcar Esconder, os demais ativos serão desconectados." `
+    $hint1 = New-Label -Text "Escolha resolução/Hz por monitor (opcional). Desconectados (cinza) serão reativados ao iniciar." `
         -X 235 -Y 258 -W 420 -H 30
     $hint1.ForeColor = $script:Theme.Muted
     $hint1.Font = New-Object System.Drawing.Font("Segoe UI", 8)
@@ -1304,7 +1435,11 @@ function Show-ConsoleModeGui {
         $monitors = Get-ConsoleMonitors -ForceRefresh
         $script:LoadedMonitors = $monitors
         $cfg = Get-ConsoleConfig
-        Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors
+        $currentModes = Get-MonitorModesFromPanel -MonitorPanel $monitorPanel
+        $savedModes = if ($currentModes.Count -gt 0) { $currentModes } else { $cfg.monitorModes }
+        Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors `
+            -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors `
+            -SavedMonitorModes $savedModes
         Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit ([int]$cfg.fpsLimit)
         Populate-AudioCombo -Combo $audioCombo `
             -SavedAudioId $cfg.audioDeviceId `
@@ -1345,7 +1480,8 @@ function Show-ConsoleModeGui {
                 -AudioAutoSwitch:$data.AudioAutoSwitch `
                 -AudioDeviceHint $data.AudioDeviceHint `
                 -FocusMonitorInfo $data.FocusMonitorInfo `
-                -FpsLimit $data.FpsLimit
+                -FpsLimit $data.FpsLimit `
+                -MonitorModes $data.MonitorModes
 
             if ($data.FpsLimit -gt 0 -and -not $Script:ConsoleState.RtssLimitApplied) {
                 [System.Windows.Forms.MessageBox]::Show(
