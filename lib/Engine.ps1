@@ -426,9 +426,10 @@ function Get-ConsoleMonitors {
             $isActive = ($row.Active -eq "Yes")
             $isDisconnected = ($row.Disconnected -eq "Yes") -or (-not $isActive)
 
+            $maxResolution = [string]$row.'Maximum Resolution'
             $resolution = $row.Resolution
             if ([string]::IsNullOrWhiteSpace($resolution)) {
-                $resolution = if ($row.'Maximum Resolution') { $row.'Maximum Resolution' } else { "N/A" }
+                $resolution = if ($maxResolution) { $maxResolution } else { "N/A" }
             }
 
             $width = $null
@@ -438,9 +439,23 @@ function Get-ConsoleMonitors {
                 $height = [int]$Matches[2]
             }
 
+            $maxWidth = $null
+            $maxHeight = $null
+            if ($maxResolution -match '(\d+)\s*[Xx]\s*(\d+)') {
+                $maxWidth = [int]$Matches[1]
+                $maxHeight = [int]$Matches[2]
+            }
+            if ((-not $maxWidth -or -not $maxHeight) -and $width -gt 0 -and $height -gt 0) {
+                $maxWidth = $width
+                $maxHeight = $height
+            }
+
             [PSCustomObject]@{
                 Name            = $row.Name
                 Resolution      = $resolution
+                MaximumResolution = $maxResolution
+                MaxWidth        = $maxWidth
+                MaxHeight       = $maxHeight
                 Width           = $width
                 Height          = $height
                 Frequency       = $row.Frequency
@@ -897,9 +912,184 @@ function Get-ParsedDisplayFrequency {
     return $value
 }
 
+function ConvertTo-MonitorDisplayMode {
+    param(
+        [int]$Width,
+        [int]$Height,
+        [int]$Frequency,
+        [string]$Suffix = ""
+    )
+
+    $freqPart = if ($Frequency -gt 0) { " @ $Frequency Hz" } else { "" }
+    return [PSCustomObject]@{
+        Width      = $Width
+        Height     = $Height
+        Frequency  = $Frequency
+        BitsPerPel = 32
+        Key        = "${Width}x${Height}@${Frequency}"
+        Text       = "$Width x $Height$freqPart$Suffix"
+        FromCache  = ($Suffix -match 'cache')
+    }
+}
+
+function Get-MonitorDisplayModeKey {
+    param(
+        [int]$Width,
+        [int]$Height,
+        [int]$Frequency
+    )
+    return "${Width}x${Height}@${Frequency}"
+}
+
+function Merge-MonitorDisplayModeLists {
+    param(
+        [array]$Primary,
+        [array]$Secondary,
+        [string]$SecondarySuffix = ""
+    )
+
+    $merged = [System.Collections.ArrayList]@()
+    $seen = @{}
+
+    foreach ($list in @($Primary, $Secondary)) {
+        if (-not $list) { continue }
+        foreach ($mode in $list) {
+            $key = Get-MonitorDisplayModeKey -Width ([int]$mode.Width) -Height ([int]$mode.Height) -Frequency ([int]$mode.Frequency)
+            if ($seen.ContainsKey($key)) { continue }
+            $seen[$key] = $true
+
+            $suffix = ""
+            if ($SecondarySuffix -and $list -eq $Secondary) { $suffix = $SecondarySuffix }
+            [void]$merged.Add((ConvertTo-MonitorDisplayMode `
+                -Width ([int]$mode.Width) `
+                -Height ([int]$mode.Height) `
+                -Frequency ([int]$mode.Frequency) `
+                -Suffix $suffix))
+        }
+    }
+
+    return @($merged | Sort-Object { -$_.Width }, { -$_.Height }, { -$_.Frequency })
+}
+
+function Get-PersistedMonitorModesCache {
+    if (-not $Script:MonitorModesCacheFile -or -not (Test-Path -LiteralPath $Script:MonitorModesCacheFile)) {
+        return @{}
+    }
+
+    try {
+        $raw = Get-Content -LiteralPath $Script:MonitorModesCacheFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $cache = @{}
+        foreach ($prop in $raw.PSObject.Properties) {
+            $entries = @()
+            foreach ($entry in @($prop.Value)) {
+                $width = 0; $height = 0; $frequency = 0
+                [void][int]::TryParse([string]$entry.width, [ref]$width)
+                [void][int]::TryParse([string]$entry.height, [ref]$height)
+                [void][int]::TryParse([string]$entry.frequency, [ref]$frequency)
+                if ($width -gt 0 -and $height -gt 0) {
+                    $entries += ConvertTo-MonitorDisplayMode -Width $width -Height $height -Frequency $frequency
+                }
+            }
+            if ($entries.Count -gt 0) {
+                $cache[[string]$prop.Name] = $entries
+            }
+        }
+        return $cache
+    }
+    catch {
+        return @{}
+    }
+}
+
+function Save-PersistedMonitorModesCache {
+    param([hashtable]$Cache)
+
+    if (-not $Script:MonitorModesCacheFile) { return }
+
+    $output = [ordered]@{}
+    foreach ($name in ($Cache.Keys | Sort-Object)) {
+        $modes = @($Cache[$name] | ForEach-Object {
+            [ordered]@{
+                width     = [int]$_.Width
+                height    = [int]$_.Height
+                frequency = [int]$_.Frequency
+            }
+        })
+        if ($modes.Count -gt 0) {
+            $output[$name] = $modes
+        }
+    }
+
+    $output | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $Script:MonitorModesCacheFile -Encoding UTF8
+}
+
+function Update-PersistedMonitorModesCache {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [Parameter(Mandatory)][array]$Modes
+    )
+
+    if ($Modes.Count -eq 0) { return }
+
+    $cache = Get-PersistedMonitorModesCache
+    $cache[$MonitorName] = @($Modes | ForEach-Object {
+        ConvertTo-MonitorDisplayMode -Width ([int]$_.Width) -Height ([int]$_.Height) -Frequency ([int]$_.Frequency)
+    })
+    Save-PersistedMonitorModesCache -Cache $cache
+}
+
+function Get-FallbackMonitorDisplayModes {
+    param($Monitor)
+
+    $resolutions = [System.Collections.ArrayList]@()
+    $maxW = 0; $maxH = 0
+    if ($Monitor) {
+        if ($Monitor.MaxWidth) { [void][int]::TryParse([string]$Monitor.MaxWidth, [ref]$maxW) }
+        if ($Monitor.MaxHeight) { [void][int]::TryParse([string]$Monitor.MaxHeight, [ref]$maxH) }
+        if ($maxW -le 0 -and $Monitor.Width) { [void][int]::TryParse([string]$Monitor.Width, [ref]$maxW) }
+        if ($maxH -le 0 -and $Monitor.Height) { [void][int]::TryParse([string]$Monitor.Height, [ref]$maxH) }
+    }
+
+    if ($maxW -gt 0 -and $maxH -gt 0) {
+        [void]$resolutions.Add(@{ Width = $maxW; Height = $maxH })
+        if ($maxW -ge 3840 -and $maxH -ge 2160) {
+            [void]$resolutions.Add(@{ Width = 2560; Height = 1440 })
+            [void]$resolutions.Add(@{ Width = 1920; Height = 1080 })
+        }
+        elseif ($maxW -ge 2560 -and $maxH -ge 1440) {
+            [void]$resolutions.Add(@{ Width = 1920; Height = 1080 })
+        }
+    }
+    else {
+        [void]$resolutions.Add(@{ Width = 3840; Height = 2160 })
+        [void]$resolutions.Add(@{ Width = 2560; Height = 1440 })
+        [void]$resolutions.Add(@{ Width = 1920; Height = 1080 })
+    }
+
+    $refreshRates = @(24, 30, 50, 59, 60, 75, 100, 120, 144, 165, 240, 300)
+    $modes = [System.Collections.ArrayList]@()
+    $seen = @{}
+
+    foreach ($res in $resolutions) {
+        foreach ($hz in $refreshRates) {
+            if ($res.Width -ge 3840 -and $hz -gt 120) { continue }
+            if ($res.Width -ge 2560 -and $hz -gt 165) { continue }
+
+            $key = Get-MonitorDisplayModeKey -Width $res.Width -Height $res.Height -Frequency $hz
+            if ($seen.ContainsKey($key)) { continue }
+            $seen[$key] = $true
+            [void]$modes.Add((ConvertTo-MonitorDisplayMode `
+                -Width $res.Width -Height $res.Height -Frequency $hz -Suffix " (estimado)"))
+        }
+    }
+
+    return @($modes)
+}
+
 function Get-MonitorDisplayModes {
     param(
         [Parameter(Mandatory)][string]$MonitorName,
+        $Monitor = $null,
         [switch]$ForceRefresh
     )
 
@@ -907,22 +1097,34 @@ function Get-MonitorDisplayModes {
         return $Script:DisplayModesCache[$MonitorName]
     }
 
-    $modes = @()
+    $liveModes = @()
     try {
         $nativeModes = [NativeHelpers]::EnumerateDisplayModes($MonitorName)
         foreach ($mode in $nativeModes) {
-            $modes += [PSCustomObject]@{
-                Width     = [int]$mode.Width
-                Height    = [int]$mode.Height
-                Frequency = [int]$mode.Frequency
-                BitsPerPel = [int]$mode.BitsPerPel
-                Key       = [string]$mode.Key
-                Text      = [string]$mode.Text
-            }
+            $liveModes += ConvertTo-MonitorDisplayMode `
+                -Width ([int]$mode.Width) `
+                -Height ([int]$mode.Height) `
+                -Frequency ([int]$mode.Frequency)
         }
     }
     catch {
-        $modes = @()
+        $liveModes = @()
+    }
+
+    if ($liveModes.Count -gt 0) {
+        Update-PersistedMonitorModesCache -MonitorName $MonitorName -Modes $liveModes
+    }
+
+    $persistedCache = Get-PersistedMonitorModesCache
+    $cachedModes = if ($persistedCache.ContainsKey($MonitorName)) { @($persistedCache[$MonitorName]) } else { @() }
+
+    $modes = Merge-MonitorDisplayModeLists -Primary $liveModes -Secondary $cachedModes -SecondarySuffix " (cache)"
+    if ($modes.Count -eq 0) {
+        $modes = Get-FallbackMonitorDisplayModes -Monitor $Monitor
+    }
+    elseif ($liveModes.Count -eq 0 -and $Monitor -and -not $Monitor.IsActive) {
+        $fallbackModes = Get-FallbackMonitorDisplayModes -Monitor $Monitor
+        $modes = Merge-MonitorDisplayModeLists -Primary $modes -Secondary $fallbackModes -SecondarySuffix " (estimado)"
     }
 
     $Script:DisplayModesCache[$MonitorName] = $modes

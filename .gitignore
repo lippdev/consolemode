@@ -5,6 +5,7 @@ backup_monitores.cfg
 backup_monitores_meta.json
 backup_audio.txt
 backup_rtss_fps.json
+monitor_modes_cache.json
 
 # Build
 dist/

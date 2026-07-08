@@ -84,7 +84,7 @@ The limit applies to **all GPU apps** while console mode is active and is **rest
 In **step 1 (Monitors)**, each connected display has a **Resolution / Hz** dropdown:
 
 1. Default **(Keep current)** leaves that monitor unchanged
-2. Pick a mode from the list (Windows `EnumDisplaySettings` — modes your GPU/driver report)
+2. Pick a mode from the list (live modes, **cached** from last connection, or **estimated** from max resolution when disconnected)
 3. On **Start console mode**, selected modes are applied before hiding other monitors
 4. On exit or **Restore now**, the previous layout is restored from the MMT backup saved at start
 
@@ -196,7 +196,7 @@ Config e backups ficam em `ConsoleMode_Data/`.
 No **passo 1 (Monitores)**, cada tela conectada tem um menu **Resolução / Hz**:
 
 1. **(Manter atual)** — não altera aquele monitor
-2. Escolha um modo da lista (modos reportados pelo Windows/driver)
+2. Escolha um modo da lista (ao vivo, **cache** da última conexão ou **estimado** pela resolução máxima quando desconectado)
 3. Ao **Iniciar modo console**, os modos selecionados são aplicados antes de esconder os outros monitores
 4. Ao sair ou em **Restaurar agora**, o layout anterior volta pelo backup MMT salvo no início
 

@@ -268,5 +268,6 @@ function Set-ConsoleEnginePaths {
     $Script:BackupMonitorMeta = Join-Path $dataDir "backup_monitores_meta.json"
     $Script:BackupAudioFile = Join-Path $dataDir "backup_audio.txt"
     $Script:BackupRtssFpsFile = Join-Path $dataDir "backup_rtss_fps.json"
+    $Script:MonitorModesCacheFile = Join-Path $dataDir "monitor_modes_cache.json"
     $Script:AppRoot = $dataDir
 }
