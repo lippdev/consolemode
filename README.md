@@ -18,6 +18,7 @@ Turn your Windows PC into a **game console** with one click: hide extra monitors
 - Audio option to **use output when connected** (e.g. TV HDMI when it powers on)
 - **Steam Big Picture (recommended)** — automatic restore when you exit (Windows window event hook)
 - **Xbox mode (Alpha)** — sends Win+F11; **manual restore only** (tray or *Restore now*)
+- **Optional FPS limit (RTSS)** — global frame cap via RivaTuner during console mode (anti-tearing)
 - Portable executable (`ConsoleMode.exe`) or PowerShell dev mode
 - System tray icon to restore or reopen the app
 
@@ -26,6 +27,7 @@ Turn your Windows PC into a **game console** with one click: hide extra monitors
 - Windows 10 or 11
 - [Steam](https://store.steampowered.com/) (Big Picture mode — recommended path)
 - Xbox Game Bar on Windows 11 (optional, experimental; Win+F11 shortcut)
+- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) (optional; FPS limit feature — install via MSI Afterburner)
 - PowerShell 5.1+ **for development/build only** — the `.exe` does not require PowerShell
 
 ## Quick start (executable)
@@ -47,6 +49,9 @@ cd consolemode
 # 2. Download NirSoft tools (automated)
 powershell -ExecutionPolicy Bypass -File .\build\Get-NirSoftTools.ps1
 
+# 2b. Download rtss-cli for FPS limit (optional)
+powershell -ExecutionPolicy Bypass -File .\build\Get-RtssCli.ps1
+
 # 3. Run
 .\IniciarConsoleMode.bat
 # or
@@ -61,7 +66,17 @@ In dev mode, config and backups are stored in `ConsoleMode_Data/`.
 powershell -ExecutionPolicy Bypass -File .\build\Build-ConsoleMode.ps1
 ```
 
-Output: `dist/ConsoleMode.exe` (NirSoft tools and icon embedded).
+Output: `dist/ConsoleMode.exe` (NirSoft tools, `rtss-cli`, and icon embedded when available).
+
+## FPS limit (RTSS)
+
+Optional anti-tearing helper in **step 1 (Monitors)** of the wizard:
+
+1. Install **RivaTuner Statistics Server** (ships with [MSI Afterburner](https://www.msi.com/Landing/afterburner/graphics-cards))
+2. Keep RTSS running (Console Mode can try to start it)
+3. Choose a global FPS cap (e.g. 60 for a 60 Hz TV)
+
+The limit applies to **all GPU apps** while console mode is active and is **restored automatically** when you exit or click *Restore now*. This is not per-monitor (RTSS limitation) and does not replace VSync.
 
 Validate without compiling:
 
@@ -80,11 +95,13 @@ consolemode/
 ├── lib/
 │   ├── Encoding.ps1         # UTF-8
 │   ├── Paths.ps1            # Portable paths (dev / exe)
+│   ├── Rtss.ps1             # RTSS / FPS limit
 │   ├── Engine.ps1           # Monitors, audio, restore
 │   └── Gui.ps1              # WinForms wizard
 └── build/
     ├── Build-ConsoleMode.ps1
-    └── Get-NirSoftTools.ps1
+    ├── Get-NirSoftTools.ps1
+    └── Get-RtssCli.ps1
 ```
 
 ## Restoring your setup
@@ -104,6 +121,7 @@ Other options:
 - Multi-monitor layouts vary widely; restore may need a retry on some setups
 - Xbox mode does not detect when fullscreen closes — you must restore manually
 - Monitor/audio switching relies on [NirSoft](https://www.nirsoft.net/) tools bundled at build time
+- FPS limit requires user-installed RTSS; cap is global, not per display
 - PS2EXE builds may be flagged by antivirus software
 
 ## License
@@ -127,6 +145,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: esconda moni
 - Áudio com opção **usar ao conectar** (HDMI da TV quando ligar)
 - **Steam Big Picture (recomendado)** — restauração automática ao sair
 - **Modo Xbox (Alpha)** — envia Win+F11; **restauração manual** (bandeja ou *Restaurar agora*)
+- **Limite de FPS opcional (RTSS)** — cap global via RivaTuner durante o modo console (anti-tearing)
 - Executável portátil (`ConsoleMode.exe`) ou modo desenvolvimento via PowerShell
 - Ícone na bandeja para restaurar ou reabrir o app
 
@@ -135,6 +154,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: esconda moni
 - Windows 10 ou 11
 - [Steam](https://store.steampowered.com/) (modo Big Picture — caminho recomendado)
 - Modo Xbox no Windows 11 (opcional, experimental; atalho Win+F11)
+- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) (opcional; limite de FPS — via MSI Afterburner)
 - PowerShell 5.1+ **apenas para desenvolvimento/build** — o `.exe` não exige PowerShell instalado
 
 ### Uso rápido (executável)
@@ -152,6 +172,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: esconda moni
 git clone https://github.com/lippdev/consolemode.git
 cd consolemode
 powershell -ExecutionPolicy Bypass -File .\build\Get-NirSoftTools.ps1
+powershell -ExecutionPolicy Bypass -File .\build\Get-RtssCli.ps1
 .\IniciarConsoleMode.bat
 ```
 
@@ -171,6 +192,7 @@ Também: **ESC** nas cortinas pretas; menu da bandeja a qualquer momento.
 - Layouts de monitores variam; em alguns setups a restauração pode precisar de nova tentativa
 - Modo Xbox não detecta o fechamento do fullscreen — restaure manualmente
 - Monitores/áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no build
+- Limite de FPS exige RTSS instalado pelo usuário; o cap é global, não por monitor
 - Builds PS2EXE podem ser sinalizados por antivírus
 
 ### Licença

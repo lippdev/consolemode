@@ -251,6 +251,9 @@ $Script:ConsoleState = @{
     BigPictureWatchActive = $false
     RestoreInProgress = $false
     AudioWatchComplete = $false
+    FpsLimit = 0
+    RtssBackup = $null
+    RtssLimitApplied = $false
 }
 
 $Script:MonitorListCache = $null
@@ -467,6 +470,7 @@ function Get-ConsoleConfig {
             audioDeviceId   = ""
             audioDeviceName = ""
             audioAutoSwitch = $false
+            fpsLimit        = 0
         }
     }
 
@@ -480,6 +484,7 @@ function Get-ConsoleConfig {
             audioDeviceId   = [string]$raw.audioDeviceId
             audioDeviceName = [string]$raw.audioDeviceName
             audioAutoSwitch = [bool]($raw.audioAutoSwitch -eq $true)
+            fpsLimit        = if ($null -ne $raw.fpsLimit) { [int]$raw.fpsLimit } else { 0 }
         }
     }
     catch {
@@ -491,6 +496,7 @@ function Get-ConsoleConfig {
             audioDeviceId   = ""
             audioDeviceName = ""
             audioAutoSwitch = $false
+            fpsLimit        = 0
         }
     }
 }
@@ -503,7 +509,8 @@ function Set-ConsoleConfig {
         [string]$FullscreenMode,
         [string]$AudioDeviceId,
         [string]$AudioDeviceName,
-        [bool]$AudioAutoSwitch = $false
+        [bool]$AudioAutoSwitch = $false,
+        [int]$FpsLimit = 0
     )
 
     $config = [ordered]@{
@@ -514,6 +521,7 @@ function Set-ConsoleConfig {
         audioDeviceId   = $AudioDeviceId
         audioDeviceName = $AudioDeviceName
         audioAutoSwitch = $AudioAutoSwitch
+        fpsLimit        = $FpsLimit
     }
 
     $config | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $Script:ConfigPath -Encoding UTF8
@@ -1312,7 +1320,8 @@ function Start-ConsoleMode {
         [string]$AudioDeviceId = "",
         [switch]$AudioAutoSwitch,
         [string]$AudioDeviceHint = "",
-        $FocusMonitorInfo = $null
+        $FocusMonitorInfo = $null,
+        [int]$FpsLimit = 0
     )
 
     if ($Script:ConsoleState.IsActive) {
@@ -1340,6 +1349,9 @@ function Start-ConsoleMode {
     $Script:ConsoleState.CachedXboxHandle = [IntPtr]::Zero
     $Script:ConsoleState.AudioWatchComplete = $false
     $Script:ConsoleState.BigPictureWatchActive = $false
+    $Script:ConsoleState.FpsLimit = $FpsLimit
+    $Script:ConsoleState.RtssBackup = $null
+    $Script:ConsoleState.RtssLimitApplied = $false
     Stop-BigPictureExitWatch
 
     $focusMode = $FocusMonitorInfo
@@ -1412,6 +1424,13 @@ function Start-ConsoleMode {
         Initialize-ConsoleAudioWatch
         if (-not $AudioAutoSwitch -and -not $Script:ConsoleState.AudioPendingTarget -and [string]::IsNullOrWhiteSpace($AudioDeviceId)) {
             Complete-ConsoleAudioWatch
+        }
+    }
+
+    if ($FpsLimit -gt 0) {
+        $rtssResult = Enable-ConsoleFpsLimit -FpsLimit $FpsLimit
+        if (-not $rtssResult.Success) {
+            Write-Warning $rtssResult.Message
         }
     }
 
@@ -1496,6 +1515,7 @@ function Stop-ConsoleMode {
         Close-BlackCurtains
         Restore-MonitorBackup
         Restore-ConsoleAudioOutput
+        Restore-RtssFpsSettings
         Clear-ConsoleDeviceCache
     }
     finally {
@@ -1524,6 +1544,9 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.CachedXboxHandle = [IntPtr]::Zero
     $Script:ConsoleState.AudioWatchComplete = $false
     $Script:ConsoleState.BigPictureWatchActive = $false
+    $Script:ConsoleState.FpsLimit = 0
+    $Script:ConsoleState.RtssBackup = $null
+    $Script:ConsoleState.RtssLimitApplied = $false
     Stop-BigPictureExitWatch
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }

@@ -46,6 +46,7 @@ $Script:EntryRoot = $ScriptRoot
 Initialize-ConsoleEncoding
 
 . (Join-Path $ScriptRoot "lib\Paths.ps1")
+. (Join-Path $ScriptRoot "lib\Rtss.ps1")
 . (Join-Path $ScriptRoot "lib\Engine.ps1")
 Initialize-ConsoleAppLayout
 . (Join-Path $ScriptRoot "lib\Gui.ps1")

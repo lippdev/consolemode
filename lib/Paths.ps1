@@ -177,7 +177,7 @@ function Initialize-ConsoleAppLayout {
         }
     }
 
-    $toolNames = @("MultiMonitorTool.exe", "SoundVolumeView.exe")
+    $toolNames = @("MultiMonitorTool.exe", "SoundVolumeView.exe", "rtss-cli.exe")
     foreach ($toolName in $toolNames) {
         $destPath = Join-Path $toolsDir $toolName
         if (Test-Path -LiteralPath $destPath) { continue }
@@ -202,7 +202,7 @@ function Initialize-ConsoleAppLayout {
         Move-Item -LiteralPath $legacyConfig -Destination $dataConfig -Force -ErrorAction SilentlyContinue
     }
 
-    foreach ($legacyFile in @("backup_monitores.cfg", "backup_monitores_meta.json", "backup_audio.txt")) {
+    foreach ($legacyFile in @("backup_monitores.cfg", "backup_monitores_meta.json", "backup_audio.txt", "backup_rtss_fps.json")) {
         $legacyPath = Join-Path $exeDir $legacyFile
         $dataPath = Join-Path $dataDir $legacyFile
         if ((Test-Path -LiteralPath $legacyPath) -and -not (Test-Path -LiteralPath $dataPath)) {
@@ -222,8 +222,10 @@ function Set-ConsoleEnginePaths {
     if ($devMode) {
         $rootMmt = Join-Path $exeDir "MultiMonitorTool.exe"
         $rootSvv = Join-Path $exeDir "SoundVolumeView.exe"
+        $rootRtssCli = Join-Path $exeDir "rtss-cli.exe"
         $toolsMmt = Join-Path $toolsDir "MultiMonitorTool.exe"
         $toolsSvv = Join-Path $toolsDir "SoundVolumeView.exe"
+        $toolsRtssCli = Join-Path $toolsDir "rtss-cli.exe"
 
         if (Test-Path -LiteralPath $rootMmt) {
             $Script:MmtPath = $rootMmt
@@ -244,15 +246,27 @@ function Set-ConsoleEnginePaths {
         else {
             $Script:SvvPath = $rootSvv
         }
+
+        if (Test-Path -LiteralPath $rootRtssCli) {
+            $Script:RtssCliPath = $rootRtssCli
+        }
+        elseif (Test-Path -LiteralPath $toolsRtssCli) {
+            $Script:RtssCliPath = $toolsRtssCli
+        }
+        else {
+            $Script:RtssCliPath = $toolsRtssCli
+        }
     }
     else {
         $Script:MmtPath = Join-Path $toolsDir "MultiMonitorTool.exe"
         $Script:SvvPath = Join-Path $toolsDir "SoundVolumeView.exe"
+        $Script:RtssCliPath = Join-Path $toolsDir "rtss-cli.exe"
     }
 
     $Script:ConfigPath = Join-Path $dataDir "config.json"
     $Script:BackupMonitorConfig = Join-Path $dataDir "backup_monitores.cfg"
     $Script:BackupMonitorMeta = Join-Path $dataDir "backup_monitores_meta.json"
     $Script:BackupAudioFile = Join-Path $dataDir "backup_audio.txt"
+    $Script:BackupRtssFpsFile = Join-Path $dataDir "backup_rtss_fps.json"
     $Script:AppRoot = $dataDir
 }

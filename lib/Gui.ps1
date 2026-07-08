@@ -242,6 +242,106 @@ function Get-MonitorSecondaryLabel {
     return ($parts -join " · ")
 }
 
+$script:FpsPresetValues = @(30, 48, 50, 59, 60, 72, 75, 90, 120, 144)
+$script:FpsCustomComboValue = -1
+
+function Initialize-FpsLimitCombo {
+    param([System.Windows.Forms.ComboBox]$Combo)
+
+    $Combo.Items.Clear()
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "(Não limitar)"; Value = 0 })
+    foreach ($fps in $script:FpsPresetValues) {
+        [void]$Combo.Items.Add([PSCustomObject]@{ Text = "$fps FPS"; Value = $fps })
+    }
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Personalizado"; Value = $script:FpsCustomComboValue })
+    $Combo.DisplayMember = "Text"
+}
+
+function Select-FpsLimitInCombo {
+    param(
+        [System.Windows.Forms.ComboBox]$Combo,
+        [System.Windows.Forms.NumericUpDown]$CustomNumeric,
+        [int]$SavedLimit
+    )
+
+    if ($SavedLimit -le 0) {
+        $Combo.SelectedIndex = 0
+        $CustomNumeric.Visible = $false
+        return
+    }
+
+    $selectedIndex = 0
+    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
+        if ([int]$Combo.Items[$i].Value -eq $SavedLimit) {
+            $selectedIndex = $i
+            $CustomNumeric.Visible = $false
+            $Combo.SelectedIndex = $selectedIndex
+            return
+        }
+    }
+
+    $CustomNumeric.Value = [Math]::Max(1, [Math]::Min(360, $SavedLimit))
+    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
+        if ([int]$Combo.Items[$i].Value -eq $script:FpsCustomComboValue) {
+            $Combo.SelectedIndex = $i
+            break
+        }
+    }
+    $CustomNumeric.Visible = $true
+}
+
+function Get-FpsLimitFromControls {
+    param(
+        [System.Windows.Forms.ComboBox]$Combo,
+        [System.Windows.Forms.NumericUpDown]$CustomNumeric
+    )
+
+    $item = $Combo.SelectedItem
+    if (-not $item) { return 0 }
+    $value = [int]$item.Value
+    if ($value -eq $script:FpsCustomComboValue) {
+        return [int]$CustomNumeric.Value
+    }
+    return $value
+}
+
+function Update-FpsLimitStatusLabel {
+    param([System.Windows.Forms.Label]$StatusLabel)
+
+    if (Test-ConsoleRtssReady) {
+        $StatusLabel.Text = "Requer RivaTuner em execução. Limite global durante o modo console (restaurado ao sair)."
+        $StatusLabel.ForeColor = $script:Theme.Muted
+    }
+    elseif (Test-RtssInstalled) {
+        $StatusLabel.Text = "RTSS instalado, mas rtss-cli ausente. Execute build\Get-RtssCli.ps1."
+        $StatusLabel.ForeColor = $script:Theme.Warning
+    }
+    else {
+        $StatusLabel.Text = "Instale RivaTuner Statistics Server (MSI Afterburner) para usar limite de FPS."
+        $StatusLabel.ForeColor = $script:Theme.Warning
+    }
+}
+
+function Suggest-FpsLimitForFocus {
+    param(
+        [System.Windows.Forms.ComboBox]$Combo,
+        [System.Windows.Forms.NumericUpDown]$CustomNumeric,
+        [string]$FocusMonitorName,
+        [int]$CurrentSavedLimit
+    )
+
+    if ($CurrentSavedLimit -gt 0) { return }
+
+    $monitor = $script:LoadedMonitors | Where-Object { $_.Name -eq $FocusMonitorName } | Select-Object -First 1
+    if (-not $monitor -or -not $monitor.Frequency) { return }
+
+    $hz = 0
+    if (-not [int]::TryParse([string]$monitor.Frequency, [ref]$hz)) { return }
+    if ($hz -le 0) { return }
+
+    Select-FpsLimitInCombo -Combo $Combo -CustomNumeric $CustomNumeric -SavedLimit $hz
+}
+
 function Get-GuiSelections {
     param([System.Windows.Forms.Panel]$MonitorPanel)
 
@@ -528,7 +628,9 @@ function Get-WizardSelections {
         $MonitorPanel,
         $HideStrategyCombo,
         $ModeBigPicture,
-        $AudioCombo
+        $AudioCombo,
+        $FpsLimitCombo = $null,
+        $FpsCustomNumeric = $null
     )
 
     $selection = Get-GuiSelections -MonitorPanel $MonitorPanel
@@ -564,6 +666,11 @@ function Get-WizardSelections {
         $audioHint = $focusInfo.MonitorName
     }
 
+    $fpsLimit = 0
+    if ($FpsLimitCombo -and $FpsCustomNumeric) {
+        $fpsLimit = Get-FpsLimitFromControls -Combo $FpsLimitCombo -CustomNumeric $FpsCustomNumeric
+    }
+
     return @{
         FocusMonitor   = $selection.FocusMonitor
         FocusLabel     = $focusLabel
@@ -576,6 +683,7 @@ function Get-WizardSelections {
         AudioAutoSwitch = $audioAutoSwitch
         AudioDeviceHint = $audioHint
         FocusMonitorInfo = $focusInfo
+        FpsLimit       = $fpsLimit
     }
 }
 
@@ -601,7 +709,8 @@ function Save-FromWizard {
         -FullscreenMode $data.FullscreenMode `
         -AudioDeviceId $data.AudioDeviceId `
         -AudioDeviceName $data.AudioDeviceName `
-        -AudioAutoSwitch $data.AudioAutoSwitch
+        -AudioAutoSwitch $data.AudioAutoSwitch `
+        -FpsLimit $data.FpsLimit
 
     Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuração salva." -Color $script:Theme.Success
     return $true
@@ -625,12 +734,15 @@ function Update-ReviewPanel {
         "(não mudar)"
     }
 
+    $fpsText = Get-FpsLimitLabel -FpsLimit $data.FpsLimit
+
     $ReviewLabel.Text = @(
         "Monitor de foco: $($data.FocusLabel)"
         "Esconder: $hideText"
         "Estratégia: $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
         "Modo: $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
         "Áudio: $audioText"
+        "Limite de FPS: $fpsText"
     ) -join [Environment]::NewLine
 }
 
@@ -934,7 +1046,7 @@ function Show-ConsoleModeGui {
     $monitorPanel = New-Object System.Windows.Forms.Panel
     $monitorPanel.Name = "monitorPanel"
     $monitorPanel.Location = New-Object System.Drawing.Point(5, 80)
-    $monitorPanel.Size = New-Object System.Drawing.Size(650, 250)
+    $monitorPanel.Size = New-Object System.Drawing.Size(650, 165)
     $monitorPanel.AutoScroll = $true
     $step1.Controls.Add($monitorPanel)
 
@@ -942,7 +1054,7 @@ function Show-ConsoleModeGui {
     $initialFocus = if ($config.focusMonitor) { $config.focusMonitor } else { ($monitors | Select-Object -First 1).Name }
     Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $initialFocus
 
-    $btnHideOthers = New-StyledButton -Text "Esconder todos exceto o foco" -X 5 -Y 340 -W 220 -H 30
+    $btnHideOthers = New-StyledButton -Text "Esconder todos exceto o foco" -X 5 -Y 252 -W 220 -H 30
     $btnHideOthers.Add_Click({
         $sel = Get-GuiSelections -MonitorPanel $monitorPanel
         foreach ($control in $monitorPanel.Controls) {
@@ -954,8 +1066,48 @@ function Show-ConsoleModeGui {
     })
     $step1.Controls.Add($btnHideOthers)
 
+    $fpsGroup = New-Object System.Windows.Forms.GroupBox
+    $fpsGroup.Text = "Limite de FPS (anti-tearing)"
+    $fpsGroup.Location = New-Object System.Drawing.Point(5, 288)
+    $fpsGroup.Size = New-Object System.Drawing.Size(650, 100)
+    $step1.Controls.Add($fpsGroup)
+
+    $fpsLimitCombo = New-Object System.Windows.Forms.ComboBox
+    $fpsLimitCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+    $fpsLimitCombo.Location = New-Object System.Drawing.Point(15, 28)
+    $fpsLimitCombo.Size = New-Object System.Drawing.Size(220, 28)
+    $fpsGroup.Controls.Add($fpsLimitCombo)
+    Initialize-FpsLimitCombo -Combo $fpsLimitCombo
+
+    $fpsCustomNumeric = New-Object System.Windows.Forms.NumericUpDown
+    $fpsCustomNumeric.Location = New-Object System.Drawing.Point(245, 28)
+    $fpsCustomNumeric.Size = New-Object System.Drawing.Size(80, 28)
+    $fpsCustomNumeric.Minimum = 1
+    $fpsCustomNumeric.Maximum = 360
+    $fpsCustomNumeric.Value = 60
+    $fpsCustomNumeric.Visible = $false
+    $fpsGroup.Controls.Add($fpsCustomNumeric)
+
+    $fpsLimitStatus = New-Label -Text "" -X 15 -Y 58 -W 620 -H 36
+    $fpsLimitStatus.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $fpsGroup.Controls.Add($fpsLimitStatus)
+    Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
+
+    $savedFpsLimit = if ($null -ne $config.fpsLimit) { [int]$config.fpsLimit } else { 0 }
+    Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit $savedFpsLimit
+    if ($savedFpsLimit -le 0) {
+        Suggest-FpsLimitForFocus -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric `
+            -FocusMonitorName $initialFocus -CurrentSavedLimit $savedFpsLimit
+    }
+
+    $fpsLimitCombo.Add_SelectedIndexChanged({
+        $item = $fpsLimitCombo.SelectedItem
+        $isCustom = ($item -and [int]$item.Value -eq $script:FpsCustomComboValue)
+        $fpsCustomNumeric.Visible = $isCustom
+    })
+
     $hint1 = New-Label -Text "Desconectados (cinza) serão reativados ao iniciar. Sem marcar Esconder, os demais ativos serão desconectados." `
-        -X 235 -Y 346 -W 420 -H 30
+        -X 235 -Y 258 -W 420 -H 30
     $hint1.ForeColor = $script:Theme.Muted
     $hint1.Font = New-Object System.Drawing.Font("Segoe UI", 8)
     $step1.Controls.Add($hint1)
@@ -966,6 +1118,9 @@ function Show-ConsoleModeGui {
                 $sel = Get-GuiSelections -MonitorPanel $monitorPanel
                 if ($sel.FocusMonitor) {
                     Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
+                    $currentFps = Get-FpsLimitFromControls -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric
+                    Suggest-FpsLimitForFocus -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric `
+                        -FocusMonitorName $sel.FocusMonitor -CurrentSavedLimit $currentFps
                 }
             })
         }
@@ -1094,7 +1249,7 @@ function Show-ConsoleModeGui {
         -Font (New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold))
     $step4.Controls.Add($reviewTitle)
 
-    $reviewLabel = New-Label -Text "" -X 5 -Y 45 -W 650 -H 120
+    $reviewLabel = New-Label -Text "" -X 5 -Y 45 -W 650 -H 140
     $reviewLabel.Font = New-Object System.Drawing.Font("Segoe UI", 10)
     $step4.Controls.Add($reviewLabel)
 
@@ -1103,6 +1258,8 @@ function Show-ConsoleModeGui {
         HideStrategyCombo  = $hideStrategyCombo
         ModeBigPicture     = $modeBigPicture
         AudioCombo         = $audioCombo
+        FpsLimitCombo      = $fpsLimitCombo
+        FpsCustomNumeric   = $fpsCustomNumeric
     }
     Update-ReviewPanel -ReviewLabel $reviewLabel -WizardData $wizardData
 
@@ -1179,6 +1336,7 @@ function Show-ConsoleModeGui {
         $script:LoadedMonitors = $monitors
         $cfg = Get-ConsoleConfig
         Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors
+        Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit ([int]$cfg.fpsLimit)
         Populate-AudioCombo -Combo $audioCombo `
             -SavedAudioId $cfg.audioDeviceId `
             -SavedAudioName $cfg.audioDeviceName `
@@ -1186,6 +1344,7 @@ function Show-ConsoleModeGui {
         $sel = Get-GuiSelections -MonitorPanel $monitorPanel
         $focus = if ($sel.FocusMonitor) { $sel.FocusMonitor } else { ($monitors | Select-Object -First 1).Name }
         Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $focus
+        Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
         Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Listas atualizadas." -Color $script:Theme.Success
     })
 
@@ -1216,7 +1375,17 @@ function Show-ConsoleModeGui {
                 -AudioDeviceId $data.AudioDeviceId `
                 -AudioAutoSwitch:$data.AudioAutoSwitch `
                 -AudioDeviceHint $data.AudioDeviceHint `
-                -FocusMonitorInfo $data.FocusMonitorInfo
+                -FocusMonitorInfo $data.FocusMonitorInfo `
+                -FpsLimit $data.FpsLimit
+
+            if ($data.FpsLimit -gt 0 -and -not $Script:ConsoleState.RtssLimitApplied) {
+                [System.Windows.Forms.MessageBox]::Show(
+                    "O limite de FPS nao foi aplicado (RTSS ausente ou indisponivel).`nO modo console continuara normalmente.",
+                    "Console Mode",
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Warning
+                ) | Out-Null
+            }
 
             Show-ConsoleActiveView -Form $form -WizardContext $wizardContext
             Set-ActiveConsoleMessaging -ActiveDesc $activeDesc -Form $form -StatusLabel $statusLabel `

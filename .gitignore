@@ -4,6 +4,7 @@ config.json
 backup_monitores.cfg
 backup_monitores_meta.json
 backup_audio.txt
+backup_rtss_fps.json
 
 # Build
 dist/
@@ -14,6 +15,7 @@ MultiMonitorTool.exe
 MultiMonitorTool.chm
 SoundVolumeView.exe
 SoundVolumeView.chm
+rtss-cli.exe
 readme.txt
 
 # Temporarios

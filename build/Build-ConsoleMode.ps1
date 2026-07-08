@@ -14,6 +14,7 @@ $assetsDir = Join-Path $root "assets"
 $entryPs1 = Join-Path $root "ConsoleMode.ps1"
 $mmt = Join-Path $root "MultiMonitorTool.exe"
 $svv = Join-Path $root "SoundVolumeView.exe"
+$rtssCli = Join-Path $root "ConsoleMode_Data\tools\rtss-cli.exe"
 $outputExe = Join-Path $distDir "ConsoleMode.exe"
 
 function Get-BuildIconPath {
@@ -25,13 +26,19 @@ function Get-BuildIconPath {
 }
 
 function Get-BuildEmbedFiles {
+    $rtssResolved = Resolve-BuildToolPath -FileName "rtss-cli.exe"
     $embed = @{
         '.\lib\Encoding.ps1'    = (Join-Path $root "lib\Encoding.ps1")
         '.\lib\Paths.ps1'        = (Join-Path $root "lib\Paths.ps1")
+        '.\lib\Rtss.ps1'         = (Join-Path $root "lib\Rtss.ps1")
         '.\lib\Engine.ps1'       = (Join-Path $root "lib\Engine.ps1")
         '.\lib\Gui.ps1'          = (Join-Path $root "lib\Gui.ps1")
         '.\MultiMonitorTool.exe' = $mmt
         '.\SoundVolumeView.exe'  = $svv
+    }
+
+    if ($rtssResolved) {
+        $embed['.\rtss-cli.exe'] = $rtssResolved
     }
 
     $iconFile = Join-Path $assetsDir "icon.ico"
@@ -82,6 +89,22 @@ function Resolve-BuildToolPath {
     return $null
 }
 
+function Ensure-RtssCli {
+    $resolved = Resolve-BuildToolPath -FileName "rtss-cli.exe"
+    if ($resolved) {
+        $script:BuildRtssCliPath = $resolved
+        return
+    }
+
+    Write-Host "rtss-cli ausente. Baixando..."
+    & (Join-Path $PSScriptRoot "Get-RtssCli.ps1")
+
+    $script:BuildRtssCliPath = Resolve-BuildToolPath -FileName "rtss-cli.exe"
+    if (-not $script:BuildRtssCliPath) {
+        Write-Warning "rtss-cli nao encontrado. Limite de FPS RTSS ficara indisponivel no exe ate baixar com build\Get-RtssCli.ps1"
+    }
+}
+
 function Ensure-NirSoftTools {
     $mmtResolved = Resolve-BuildToolPath -FileName "MultiMonitorTool.exe"
     $svvResolved = Resolve-BuildToolPath -FileName "SoundVolumeView.exe"
@@ -117,6 +140,7 @@ function Test-BuildInputs {
     }
 
     Ensure-NirSoftTools
+    Ensure-RtssCli
     $script:mmt = $script:BuildMmtPath
     $script:svv = $script:BuildSvvPath
 
@@ -194,6 +218,7 @@ function Test-DevLaunch {
     . (Join-Path $root "lib\Encoding.ps1")
     Initialize-ConsoleEncoding
     . (Join-Path $root "lib\Paths.ps1")
+    . (Join-Path $root "lib\Rtss.ps1")
     . (Join-Path $root "lib\Engine.ps1")
     Initialize-ConsoleAppLayout
     if (-not $Script:MmtPath) { throw "MmtPath nao definido" }
