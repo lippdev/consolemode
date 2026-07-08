@@ -150,6 +150,69 @@ public class NativeHelpers {
         keybd_event(VK_F11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
     }
+
+    public static bool IsWindowStillVisible(IntPtr hWnd) {
+        if (hWnd == IntPtr.Zero) return false;
+        if (!IsWindowVisible(hWnd)) return false;
+        return GetWindowArea(hWnd) > 0;
+    }
+
+    public delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+    [DllImport("user32.dll")]
+    public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindow(IntPtr hWnd);
+
+    private const uint EVENT_OBJECT_DESTROY = 0x8001;
+    private const uint WINEVENT_OUTOFCONTEXT = 0;
+
+    private static IntPtr _bpHook = IntPtr.Zero;
+    private static IntPtr _bpWatched = IntPtr.Zero;
+    private static WinEventDelegate _bpCallback;
+
+    public static bool BigPictureExitRequested = false;
+    public static bool BigPictureWatchActive = false;
+
+    public static bool StartBigPictureExitWatch(IntPtr hwnd) {
+        StopBigPictureExitWatch();
+        if (hwnd == IntPtr.Zero || !IsWindow(hwnd)) return false;
+
+        _bpWatched = hwnd;
+        BigPictureExitRequested = false;
+        _bpCallback = new WinEventDelegate(BigPictureWinEventProc);
+        _bpHook = SetWinEventHook(EVENT_OBJECT_DESTROY, EVENT_OBJECT_DESTROY, IntPtr.Zero, _bpCallback, 0, 0, WINEVENT_OUTOFCONTEXT);
+        BigPictureWatchActive = (_bpHook != IntPtr.Zero);
+        return BigPictureWatchActive;
+    }
+
+    public static void StopBigPictureExitWatch() {
+        if (_bpHook != IntPtr.Zero) {
+            UnhookWinEvent(_bpHook);
+            _bpHook = IntPtr.Zero;
+        }
+        _bpWatched = IntPtr.Zero;
+        _bpCallback = null;
+        BigPictureExitRequested = false;
+        BigPictureWatchActive = false;
+    }
+
+    private static void BigPictureWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime) {
+        if (hwnd != _bpWatched) return;
+        if (eventType == EVENT_OBJECT_DESTROY) {
+            BigPictureExitRequested = true;
+        }
+    }
+
+    public static bool ConsumeBigPictureExitRequest() {
+        if (!BigPictureExitRequested) return false;
+        BigPictureExitRequested = false;
+        return true;
+    }
 }
 "@
 if (-not ([System.Management.Automation.PSTypeName]'NativeHelpers').Type) {
@@ -183,6 +246,11 @@ $Script:ConsoleState = @{
     LastAudioPoll  = $null
     LastAudioSwitchName = $null
     AudioPendingTarget = $false
+    CachedBigPictureHandle = [IntPtr]::Zero
+    CachedXboxHandle = [IntPtr]::Zero
+    BigPictureWatchActive = $false
+    RestoreInProgress = $false
+    AudioWatchComplete = $false
 }
 
 $Script:MonitorListCache = $null
@@ -581,56 +649,40 @@ function Disable-FocusMonitorAfterRestore {
 function Restore-MonitorBackup {
     if (-not (Test-Path -LiteralPath $Script:BackupMonitorConfig)) { return }
 
-    $previousCursor = [System.Windows.Forms.Cursor]::Current
-    [System.Windows.Forms.Cursor]::Current = [System.Windows.Forms.Cursors]::WaitCursor
+    $ctx = Get-MonitorRestoreContext
+    $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
+    $monitorsToEnable = @()
 
-    try {
-        $ctx = Get-MonitorRestoreContext
-        $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
-        $monitorsToEnable = @()
-
-        if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
-            $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-        }
-        elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
-            foreach ($name in $ctx.HideMonitors) {
-                Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
-            }
-            $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-        }
-
-        if ($monitorsToEnable.Count -gt 0 -and $ctx.HideStrategy -eq "disconnect") {
-            $enableArgs = @("/enable")
-            foreach ($name in $monitorsToEnable) {
-                $enableArgs += "`"$name`""
-            }
-            Invoke-Mmt -Arguments $enableArgs | Out-Null
-            Start-Sleep -Milliseconds 180
-        }
-        elseif ($monitorsToEnable.Count -gt 0) {
-            Start-Sleep -Milliseconds 120
-        }
-
-        foreach ($i in 1..2) {
-            Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
-            if ($i -eq 1) { Start-Sleep -Milliseconds 150 }
-        }
-
-        if ($ctx.OriginalPrimary) {
-            $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
-            Set-PrimaryMonitorFromBackupSpec -MonitorName $ctx.OriginalPrimary -Spec $primarySpec
-            Start-Sleep -Milliseconds 120
-        }
-
-        if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
-            Disable-FocusMonitorAfterRestore -MonitorName $ctx.FocusMonitor
-            if ($ctx.OriginalPrimary) {
-                Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
-            }
-        }
+    if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
+        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
     }
-    finally {
-        [System.Windows.Forms.Cursor]::Current = $previousCursor
+    elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
+        foreach ($name in $ctx.HideMonitors) {
+            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+        }
+        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
+    }
+
+    if ($monitorsToEnable.Count -gt 0 -and $ctx.HideStrategy -eq "disconnect") {
+        $enableArgs = @("/enable")
+        foreach ($name in $monitorsToEnable) {
+            $enableArgs += "`"$name`""
+        }
+        Invoke-Mmt -Arguments $enableArgs | Out-Null
+    }
+
+    Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
+
+    if ($ctx.OriginalPrimary) {
+        $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
+        Set-PrimaryMonitorFromBackupSpec -MonitorName $ctx.OriginalPrimary -Spec $primarySpec
+    }
+
+    if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
+        Invoke-Mmt -Arguments @("/disable", "`"$($ctx.FocusMonitor)`"") | Out-Null
+        if ($ctx.OriginalPrimary) {
+            Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
+        }
     }
 }
 
@@ -676,18 +728,22 @@ function Get-ParsedDisplayFrequency {
 }
 
 function Update-FocusMonitorRect {
-    param([string]$MonitorName = $Script:ConsoleState.FocusMonitor)
+    param(
+        [string]$MonitorName = $Script:ConsoleState.FocusMonitor,
+        [switch]$AllowMmtFallback
+    )
 
     if ([string]::IsNullOrWhiteSpace($MonitorName)) { return $false }
 
-    Start-Sleep -Milliseconds 300
     $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
     if ($screen) {
         $Script:ConsoleState.FocusMonitorRect = $screen.Bounds
         return $true
     }
 
-    $monitorInfo = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
+    if (-not $AllowMmtFallback) { return $false }
+
+    $monitorInfo = Get-ConsoleMonitors | Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
     $rect = Get-RectFromMonitorInfo -Monitor $monitorInfo
     if ($rect) {
         $Script:ConsoleState.FocusMonitorRect = $rect
@@ -837,6 +893,61 @@ function Initialize-ConsoleAudioWatch {
     $Script:ConsoleState.LastAudioPoll = Get-Date
 }
 
+function Get-ConsoleMonitorPollDelayMs {
+    if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
+        return 10000
+    }
+    if ($Script:ConsoleState.BigPictureWatchActive) {
+        if (Test-ConsoleAudioWatchNeeded) { return 10000 }
+        return 45000
+    }
+    if (-not $Script:ConsoleState.HasAppeared) { return 2000 }
+    if (Test-ConsoleAudioWatchNeeded) { return 5000 }
+    return 8000
+}
+
+function Test-ConsoleBigPictureWatchActive {
+    return [bool]$Script:ConsoleState.BigPictureWatchActive
+}
+
+function Register-BigPictureExitWatch {
+    param([IntPtr]$Handle)
+
+    if ($Handle -eq [IntPtr]::Zero) { return $false }
+    $started = [NativeHelpers]::StartBigPictureExitWatch($Handle)
+    $Script:ConsoleState.BigPictureWatchActive = $started
+    return $started
+}
+
+function Stop-BigPictureExitWatch {
+    [NativeHelpers]::StopBigPictureExitWatch()
+    $Script:ConsoleState.BigPictureWatchActive = $false
+}
+
+function Test-BigPictureExitSignaled {
+    if (-not $Script:ConsoleState.BigPictureWatchActive) { return $false }
+    if ([NativeHelpers]::ConsumeBigPictureExitRequest()) { return $true }
+
+    $handle = $Script:ConsoleState.CachedBigPictureHandle
+    if ($handle -ne [IntPtr]::Zero -and -not [NativeHelpers]::IsWindowStillVisible($handle)) {
+        return $true
+    }
+    return $false
+}
+
+function Test-ConsoleAudioWatchNeeded {
+    if (-not (Test-SoundVolumeViewAvailable)) { return $false }
+    if ($Script:ConsoleState.AudioWatchComplete) { return $false }
+    if ($Script:ConsoleState.AudioAutoSwitch) { return $true }
+    if ($Script:ConsoleState.AudioPendingTarget) { return $true }
+    return $false
+}
+
+function Complete-ConsoleAudioWatch {
+    $Script:ConsoleState.AudioWatchComplete = $true
+    $Script:ConsoleState.AudioPendingTarget = $false
+}
+
 function Update-ConsoleAudioAutoSwitch {
     # Aguarda nova saida de audio ativa (ex.: HDMI da TV ao ligar) e troca para ela.
     if (-not $Script:ConsoleState.AudioAutoSwitch) { return $null }
@@ -845,7 +956,8 @@ function Update-ConsoleAudioAutoSwitch {
     $now = Get-Date
     if ($Script:ConsoleState.LastAudioPoll) {
         $elapsed = ($now - $Script:ConsoleState.LastAudioPoll).TotalSeconds
-        if ($elapsed -lt 2) { return $null }
+        $minInterval = if ($Script:ConsoleState.HasAppeared) { 8 } else { 3 }
+        if ($elapsed -lt $minInterval) { return $null }
     }
     $Script:ConsoleState.LastAudioPoll = $now
 
@@ -878,6 +990,7 @@ function Update-ConsoleAudioAutoSwitch {
 
     $displayName = ($pick.Name -replace '\s*\[Desabilitado\]\s*$', '').Trim()
     $Script:ConsoleState.LastAudioSwitchName = $displayName
+    Complete-ConsoleAudioWatch
     return $displayName
 }
 
@@ -890,7 +1003,8 @@ function Update-ConsolePendingAudioDevice {
     $now = Get-Date
     if ($Script:ConsoleState.LastAudioPoll) {
         $elapsed = ($now - $Script:ConsoleState.LastAudioPoll).TotalSeconds
-        if ($elapsed -lt 2) { return $null }
+        $minInterval = if ($Script:ConsoleState.HasAppeared) { 8 } else { 3 }
+        if ($elapsed -lt $minInterval) { return $null }
     }
     $Script:ConsoleState.LastAudioPoll = $now
 
@@ -909,6 +1023,7 @@ function Update-ConsolePendingAudioDevice {
 
     $displayName = ($target.Name -replace '\s*\[Desabilitado\]\s*$', '').Trim()
     $Script:ConsoleState.LastAudioSwitchName = $displayName
+    Complete-ConsoleAudioWatch
     return $displayName
 }
 
@@ -1116,32 +1231,62 @@ function Start-XboxMode {
 }
 
 function Test-XboxModeActive {
+    if ($Script:ConsoleState.CachedXboxHandle -ne [IntPtr]::Zero) {
+        if ([NativeHelpers]::IsWindowStillVisible($Script:ConsoleState.CachedXboxHandle)) {
+            $area = [NativeHelpers]::GetWindowArea($Script:ConsoleState.CachedXboxHandle)
+            if ($area -gt 250000) { return $true }
+        }
+        $Script:ConsoleState.CachedXboxHandle = [IntPtr]::Zero
+    }
+
     foreach ($procName in @('XboxGameCallableUI', 'GamingApp', 'XboxPcApp')) {
         $procs = Get-Process -Name $procName -ErrorAction SilentlyContinue |
             Where-Object { $_.MainWindowHandle -ne 0 }
         foreach ($p in $procs) {
             $area = [NativeHelpers]::GetWindowArea($p.MainWindowHandle)
-            if ($area -gt 250000) { return $true }
+            if ($area -gt 250000) {
+                $Script:ConsoleState.CachedXboxHandle = $p.MainWindowHandle
+                return $true
+            }
         }
     }
 
-    $windows = [NativeHelpers]::GetAllVisibleWindows()
-    foreach ($w in $windows) {
-        if ($w.Area -lt 250000) { continue }
-        if ($w.Title -match 'Xbox|Game Pass|Gaming|Modo Xbox') { return $true }
-        if ($w.ClassName -eq 'ApplicationFrameWindow' -and $w.Title -match 'Xbox') { return $true }
+    if (-not $Script:ConsoleState.HasAppeared) {
+        $windows = [NativeHelpers]::GetAllVisibleWindows()
+        foreach ($w in $windows) {
+            if ($w.Area -lt 250000) { continue }
+            if ($w.Title -match 'Xbox|Game Pass|Gaming|Modo Xbox') {
+                $Script:ConsoleState.CachedXboxHandle = $w.Handle
+                return $true
+            }
+            if ($w.ClassName -eq 'ApplicationFrameWindow' -and $w.Title -match 'Xbox') {
+                $Script:ConsoleState.CachedXboxHandle = $w.Handle
+                return $true
+            }
+        }
     }
 
     return $false
 }
 
 function Test-BigPictureActive {
+    if ($Script:ConsoleState.CachedBigPictureHandle -ne [IntPtr]::Zero) {
+        if ([NativeHelpers]::IsWindowStillVisible($Script:ConsoleState.CachedBigPictureHandle)) {
+            $area = [NativeHelpers]::GetWindowArea($Script:ConsoleState.CachedBigPictureHandle)
+            if ($area -gt 200000) { return $true }
+        }
+        $Script:ConsoleState.CachedBigPictureHandle = [IntPtr]::Zero
+    }
+
     $handles = Get-BigPictureWindowHandles
     if ($handles.Count -eq 0) { return $false }
 
     foreach ($h in $handles) {
         $area = [NativeHelpers]::GetWindowArea($h)
-        if ($area -gt 200000) { return $true }
+        if ($area -gt 200000) {
+            $Script:ConsoleState.CachedBigPictureHandle = $h
+            return $true
+        }
     }
     return $false
 }
@@ -1191,6 +1336,11 @@ function Start-ConsoleMode {
     $Script:ConsoleState.ModeLaunched = $false
     $Script:ConsoleState.LaunchTime = $null
     $Script:ConsoleState.AbsenceCount = 0
+    $Script:ConsoleState.CachedBigPictureHandle = [IntPtr]::Zero
+    $Script:ConsoleState.CachedXboxHandle = [IntPtr]::Zero
+    $Script:ConsoleState.AudioWatchComplete = $false
+    $Script:ConsoleState.BigPictureWatchActive = $false
+    Stop-BigPictureExitWatch
 
     $focusMode = $FocusMonitorInfo
     if (-not $focusMode) {
@@ -1244,13 +1394,14 @@ function Start-ConsoleMode {
 
     Set-PrimaryMonitor -MonitorName $FocusMonitor
     Start-Sleep -Milliseconds 500
-    Update-FocusMonitorRect -MonitorName $FocusMonitor | Out-Null
+    Update-FocusMonitorRect -MonitorName $FocusMonitor -AllowMmtFallback | Out-Null
 
     if ($AudioDeviceId -and (Test-SoundVolumeViewAvailable)) {
         $audioDevices = Get-ConsoleAudioDevices -ForceRefresh
         $targetAudio = $audioDevices | Where-Object { $_.FriendlyId -eq $AudioDeviceId } | Select-Object -First 1
         if ($targetAudio -and $targetAudio.IsActive) {
             Set-ConsoleAudioOutput -FriendlyId $AudioDeviceId
+            Complete-ConsoleAudioWatch
         }
         else {
             $Script:ConsoleState.AudioPendingTarget = $true
@@ -1259,12 +1410,15 @@ function Start-ConsoleMode {
 
     if (Test-SoundVolumeViewAvailable) {
         Initialize-ConsoleAudioWatch
+        if (-not $AudioAutoSwitch -and -not $Script:ConsoleState.AudioPendingTarget -and [string]::IsNullOrWhiteSpace($AudioDeviceId)) {
+            Complete-ConsoleAudioWatch
+        }
     }
 
     switch ($FullscreenMode) {
         "bigPicture" {
             Start-Sleep -Milliseconds 400
-            Update-FocusMonitorRect -MonitorName $FocusMonitor | Out-Null
+            Update-FocusMonitorRect -MonitorName $FocusMonitor -AllowMmtFallback | Out-Null
             Start-BigPictureMode
         }
         "xboxMode"   { Start-XboxMode }
@@ -1279,27 +1433,30 @@ function Update-ConsoleMonitorLoop {
     if (-not $Script:ConsoleState.IsActive) { return "inactive" }
     if ($Script:ConsoleState.ShouldExit) { return "exit" }
 
-    [System.Windows.Forms.Application]::DoEvents()
-
     $mode = $Script:ConsoleState.FullscreenMode
-    $isActive = Test-FullscreenModeActive -Mode $mode
 
-    if ($mode -eq "xboxMode" -and -not $Script:ConsoleState.HasAppeared -and $Script:ConsoleState.LaunchTime) {
-        $elapsed = ((Get-Date) - $Script:ConsoleState.LaunchTime).TotalSeconds
-        if ($elapsed -ge 2 -or $isActive) {
-            $Script:ConsoleState.HasAppeared = $true
+    if ($mode -eq "xboxMode") {
+        if (Test-ConsoleAudioWatchNeeded) {
+            if ($Script:ConsoleState.AudioAutoSwitch) {
+                Update-ConsoleAudioAutoSwitch | Out-Null
+            }
+            else {
+                Update-ConsolePendingAudioDevice | Out-Null
+            }
         }
-    }
-    elseif ($isActive) {
-        $Script:ConsoleState.HasAppeared = $true
+        return "running"
     }
 
-    if ($mode -eq "bigPicture") {
+    if (Test-BigPictureExitSignaled) {
+        return "exit"
+    }
+
+    if (-not $Script:ConsoleState.HasAppeared) {
         $bpHandles = Get-BigPictureWindowHandles
         if ($bpHandles.Count -gt 0) {
             Update-FocusMonitorRect -MonitorName $Script:ConsoleState.FocusMonitor | Out-Null
             $bpArea = [NativeHelpers]::GetWindowArea($bpHandles[0])
-            if ($bpArea -lt 250000 -and $Script:ConsoleState.MoveCount -lt 4) {
+            if ($bpArea -lt 250000 -and $Script:ConsoleState.MoveCount -lt 3) {
                 $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor
                 $Script:ConsoleState.MoveCount++
                 if ($moved) { $Script:ConsoleState.SteamMoved = $true }
@@ -1307,14 +1464,16 @@ function Update-ConsoleMonitorLoop {
 
             foreach ($h in $bpHandles) {
                 if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
+                    $Script:ConsoleState.CachedBigPictureHandle = $h
                     $Script:ConsoleState.HasAppeared = $true
+                    Register-BigPictureExitWatch -Handle $h | Out-Null
                     break
                 }
             }
         }
     }
 
-    if ($Script:ConsoleState.IsActive -and (Test-SoundVolumeViewAvailable)) {
+    if (Test-ConsoleAudioWatchNeeded) {
         if ($Script:ConsoleState.AudioAutoSwitch) {
             Update-ConsoleAudioAutoSwitch | Out-Null
         }
@@ -1323,34 +1482,25 @@ function Update-ConsoleMonitorLoop {
         }
     }
 
-    $absenceThreshold = if ($mode -eq "bigPicture") { 3 } else { 2 }
-
-    if ($isActive) {
-        $Script:ConsoleState.AbsenceCount = 0
-    }
-    elseif ($Script:ConsoleState.HasAppeared) {
-        $Script:ConsoleState.AbsenceCount++
-        if ($Script:ConsoleState.AbsenceCount -ge $absenceThreshold) {
-            return "exit"
-        }
-    }
-
     return "running"
 }
 
 function Stop-ConsoleMode {
+    if ($Script:ConsoleState.RestoreInProgress) { return }
     if (-not $Script:ConsoleState.IsActive -and $Script:ConsoleState.CurtainForms.Count -eq 0) {
         return
     }
 
-    if ($Script:ConsoleState.IsActive) {
-        Start-Sleep -Milliseconds 300
+    $Script:ConsoleState.RestoreInProgress = $true
+    try {
+        Close-BlackCurtains
+        Restore-MonitorBackup
+        Restore-ConsoleAudioOutput
+        Clear-ConsoleDeviceCache
     }
-
-    Close-BlackCurtains
-    Restore-MonitorBackup
-    Restore-ConsoleAudioOutput
-    Clear-ConsoleDeviceCache
+    finally {
+        $Script:ConsoleState.RestoreInProgress = $false
+    }
 
     $Script:ConsoleState.IsActive = $false
     $Script:ConsoleState.ShouldExit = $false
@@ -1370,6 +1520,11 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.LastAudioPoll = $null
     $Script:ConsoleState.LastAudioSwitchName = $null
     $Script:ConsoleState.AudioPendingTarget = $false
+    $Script:ConsoleState.CachedBigPictureHandle = [IntPtr]::Zero
+    $Script:ConsoleState.CachedXboxHandle = [IntPtr]::Zero
+    $Script:ConsoleState.AudioWatchComplete = $false
+    $Script:ConsoleState.BigPictureWatchActive = $false
+    Stop-BigPictureExitWatch
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }
 
