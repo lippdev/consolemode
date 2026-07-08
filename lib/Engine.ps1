@@ -153,6 +153,7 @@ public class NativeHelpers {
 
     public static bool IsWindowStillVisible(IntPtr hWnd) {
         if (hWnd == IntPtr.Zero) return false;
+        if (!IsWindow(hWnd)) return false;
         if (!IsWindowVisible(hWnd)) return false;
         return GetWindowArea(hWnd) > 0;
     }
@@ -903,15 +904,11 @@ function Initialize-ConsoleAudioWatch {
 
 function Get-ConsoleMonitorPollDelayMs {
     if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
-        return 10000
+        return 5000
     }
-    if ($Script:ConsoleState.BigPictureWatchActive) {
-        if (Test-ConsoleAudioWatchNeeded) { return 10000 }
-        return 45000
-    }
-    if (-not $Script:ConsoleState.HasAppeared) { return 2000 }
-    if (Test-ConsoleAudioWatchNeeded) { return 5000 }
-    return 8000
+    if (-not $Script:ConsoleState.HasAppeared) { return 1500 }
+    if (Test-ConsoleAudioWatchNeeded) { return 4000 }
+    return 2000
 }
 
 function Test-ConsoleBigPictureWatchActive {
@@ -933,13 +930,25 @@ function Stop-BigPictureExitWatch {
 }
 
 function Test-BigPictureExitSignaled {
-    if (-not $Script:ConsoleState.BigPictureWatchActive) { return $false }
     if ([NativeHelpers]::ConsumeBigPictureExitRequest()) { return $true }
 
     $handle = $Script:ConsoleState.CachedBigPictureHandle
     if ($handle -ne [IntPtr]::Zero -and -not [NativeHelpers]::IsWindowStillVisible($handle)) {
         return $true
     }
+
+    if ($Script:ConsoleState.HasAppeared) {
+        if (Test-BigPictureActive) {
+            $Script:ConsoleState.AbsenceCount = 0
+        }
+        else {
+            $Script:ConsoleState.AbsenceCount++
+            if ($Script:ConsoleState.AbsenceCount -ge 2) {
+                return $true
+            }
+        }
+    }
+
     return $false
 }
 
@@ -1506,7 +1515,9 @@ function Update-ConsoleMonitorLoop {
 
 function Stop-ConsoleMode {
     if ($Script:ConsoleState.RestoreInProgress) { return }
+
     if (-not $Script:ConsoleState.IsActive -and $Script:ConsoleState.CurtainForms.Count -eq 0) {
+        Restore-RtssFpsSettings
         return
     }
 

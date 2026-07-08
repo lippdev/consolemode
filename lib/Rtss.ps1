@@ -147,10 +147,11 @@ function Set-RtssGlobalFpsLimit {
 }
 
 function Restore-RtssFpsSettings {
-    if (-not $Script:ConsoleState.RtssLimitApplied) { return }
+    $hasBackupFile = ($Script:BackupRtssFpsFile -and (Test-Path -LiteralPath $Script:BackupRtssFpsFile))
+    if (-not $Script:ConsoleState.RtssLimitApplied -and -not $hasBackupFile) { return }
 
     $backup = $Script:ConsoleState.RtssBackup
-    if (-not $backup -and $Script:BackupRtssFpsFile -and (Test-Path -LiteralPath $Script:BackupRtssFpsFile)) {
+    if (-not $backup -and $hasBackupFile) {
         try {
             $backup = Get-Content -LiteralPath $Script:BackupRtssFpsFile -Raw -Encoding UTF8 | ConvertFrom-Json
         }
@@ -176,6 +177,9 @@ function Restore-RtssFpsSettings {
             Invoke-RtssCli -Arguments @('limit:set', $limit.ToString()) | Out-Null
             Invoke-RtssCli -Arguments @('limiter:set', $(if ($limiterOn) { '1' } else { '0' })) | Out-Null
         }
+        else {
+            Invoke-RtssCli -Arguments @('limiter:set', '0') | Out-Null
+        }
     }
     catch {
         Write-Warning "Nao foi possivel restaurar configuracoes do RTSS: $_"
@@ -183,7 +187,7 @@ function Restore-RtssFpsSettings {
     finally {
         $Script:ConsoleState.RtssLimitApplied = $false
         $Script:ConsoleState.RtssBackup = $null
-        if ($Script:BackupRtssFpsFile -and (Test-Path -LiteralPath $Script:BackupRtssFpsFile)) {
+        if ($hasBackupFile) {
             Remove-Item -LiteralPath $Script:BackupRtssFpsFile -Force -ErrorAction SilentlyContinue
         }
     }

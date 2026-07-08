@@ -9,8 +9,7 @@ $script:AllowFormClosePrompt = $false
 $script:ConsoleUiLocked = $false
 $script:MonitorLoopBusy = $false
 $script:LastStatusMessage = ""
-$script:MonitorCancel = $false
-$script:MonitorThread = $null
+$script:ConsoleMonitorTimer = $null
 $script:AudioOnConnectId = "__on_connect__"
 $script:AudioOnConnectLabel = "Usar áudio ao conectar (TV/monitor)"
 $script:Theme = @{
@@ -74,11 +73,13 @@ function Move-FormToPrimaryScreen {
     $Form.Location = New-Object System.Drawing.Point([int]$x, [int]$y)
 }
 
-function Minimize-ConsoleForm {
+function Hide-ConsoleFormForActiveMode {
     param([System.Windows.Forms.Form]$Form)
 
     $Form.ShowInTaskbar = $false
-    $Form.WindowState = [System.Windows.Forms.FormWindowState]::Minimized
+    $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
+    $Form.Location = New-Object System.Drawing.Point(-32000, -32000)
+    $Form.Hide()
 }
 
 function Show-ConsoleActiveView {
@@ -88,7 +89,7 @@ function Show-ConsoleActiveView {
     )
 
     Set-WizardEnabled @WizardContext -Enabled $false
-    Minimize-ConsoleForm -Form $Form
+    Hide-ConsoleFormForActiveMode -Form $Form
 }
 
 function Show-FormOnPrimary {
@@ -609,7 +610,7 @@ function Set-ActiveConsoleMessaging {
             -Color $script:Theme.Warning -Force
     }
     else {
-        $ActiveDesc.Text = "O app fica minimizado na bandeja. Ao sair do Big Picture, o setup é restaurado automaticamente."
+        $ActiveDesc.Text = "O app fica oculto na bandeja. Ao sair do Big Picture, monitores, áudio e FPS são restaurados automaticamente."
         Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
             -Message "Modo console ativo. Ao sair do Big Picture, tudo será restaurado." `
             -Color $script:Theme.Accent -Force
@@ -807,11 +808,11 @@ function Initialize-TrayIcon {
 }
 
 function Stop-MonitorWorker {
-    $script:MonitorCancel = $true
-    if ($script:MonitorThread -and $script:MonitorThread.IsAlive) {
-        $script:MonitorThread.Join(1500) | Out-Null
+    if ($script:ConsoleMonitorTimer) {
+        $script:ConsoleMonitorTimer.Stop()
+        $script:ConsoleMonitorTimer.Dispose()
+        $script:ConsoleMonitorTimer = $null
     }
-    $script:MonitorThread = $null
 }
 
 function Invoke-ConsoleMonitorExitUi {
@@ -839,69 +840,37 @@ function Start-MonitorTimer {
     )
 
     Stop-MonitorWorker
-    $script:MonitorCancel = $false
 
-    $formRef = $Form
-    $statusRef = $StatusLabel
-    $contextRef = $WizardContext
+    $script:ConsoleMonitorTimer = New-Object System.Windows.Forms.Timer
+    $script:ConsoleMonitorTimer.Interval = 1500
+    $script:ConsoleMonitorTimer.Add_Tick({
+        if ($script:MonitorLoopBusy) { return }
+        if (-not $Script:ConsoleState.IsActive) { return }
 
-    $script:MonitorThread = New-Object System.Threading.Thread(
-        [System.Threading.ParameterizedThreadStart]{
-            param($state)
-            $formLocal = $state[0]
-            $statusLocal = $state[1]
-            $contextLocal = $state[2]
-
-            while (-not $script:MonitorCancel -and $Script:ConsoleState.IsActive) {
-                if ($script:MonitorLoopBusy) {
-                    Start-Sleep -Milliseconds 250
-                    continue
-                }
-
-                $script:MonitorLoopBusy = $true
-                $result = "running"
-                try {
-                    $result = Update-ConsoleMonitorLoop
-                }
-                catch { }
-                finally {
-                    $script:MonitorLoopBusy = $false
-                }
-
-                if ($result -eq "exit") {
-                    if ($formLocal -and -not $formLocal.IsDisposed) {
-                        [void]$formLocal.BeginInvoke([Action]{
-                            Invoke-ConsoleMonitorExitUi -Form $formLocal -StatusLabel $statusLocal -WizardContext $contextLocal
-                        })
-                    }
-                    break
-                }
-
-                if ($result -eq "running" -and $Script:ConsoleState.LastAudioSwitchName) {
-                    if ($formLocal -and -not $formLocal.IsDisposed) {
-                        $audioName = $Script:ConsoleState.LastAudioSwitchName
-                        $Script:ConsoleState.LastAudioSwitchName = $null
-                        [void]$formLocal.BeginInvoke([Action]{
-                            Show-StatusMessage -Form $formLocal -StatusLabel $statusLocal `
-                                -Message "Áudio alterado para: $audioName." -Color $script:Theme.Accent -Force
-                        })
-                    }
-                }
-
-                $delay = Get-ConsoleMonitorPollDelayMs
-                $waited = 0
-                while ($waited -lt $delay -and -not $script:MonitorCancel -and $Script:ConsoleState.IsActive) {
-                    if ([NativeHelpers]::BigPictureExitRequested) { break }
-                    Start-Sleep -Milliseconds 200
-                    $waited += 200
-                }
+        $script:MonitorLoopBusy = $true
+        try {
+            $result = Update-ConsoleMonitorLoop
+            if ($result -eq "exit") {
+                $script:ConsoleMonitorTimer.Stop()
+                Invoke-ConsoleMonitorExitUi -Form $Form -StatusLabel $StatusLabel -WizardContext $WizardContext
+                return
             }
+
+            if ($result -eq "running" -and $Script:ConsoleState.LastAudioSwitchName) {
+                $audioName = $Script:ConsoleState.LastAudioSwitchName
+                $Script:ConsoleState.LastAudioSwitchName = $null
+                Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
+                    -Message "Áudio alterado para: $audioName." -Color $script:Theme.Accent -Force
+            }
+
+            $script:ConsoleMonitorTimer.Interval = [Math]::Max(1000, (Get-ConsoleMonitorPollDelayMs))
         }
-    )
-    $script:MonitorThread.IsBackground = $true
-    $script:MonitorThread.Priority = [System.Threading.ThreadPriority]::BelowNormal
-    $script:MonitorThread.Name = "ConsoleModeMonitor"
-    [void]$script:MonitorThread.Start(@($formRef, $statusRef, $contextRef))
+        catch { }
+        finally {
+            $script:MonitorLoopBusy = $false
+        }
+    })
+    $script:ConsoleMonitorTimer.Start()
 }
 
 function Show-WizardStep {
@@ -970,34 +939,34 @@ function Show-ConsoleModeGui {
         param($sender, $e)
 
         if (($Script:ConsoleState.IsActive -or $script:ConsoleUiLocked) -and -not $script:AllowFormClosePrompt) {
-            if ($e.CloseReason -eq [System.Windows.Forms.CloseReason]::UserClosing) {
+            $e.Cancel = $true
+
+            if ($e.CloseReason -eq [System.Windows.Forms.CloseReason]::UserClosing -and $sender.Visible) {
                 $answer = [System.Windows.Forms.MessageBox]::Show(
-                    "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter minimizado na bandeja.",
+                    "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter oculto na bandeja.",
                     "Console Mode",
                     [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
                     [System.Windows.Forms.MessageBoxIcon]::Question
                 )
                 if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
-                    $e.Cancel = $true
                     return
                 }
                 if ($answer -eq [System.Windows.Forms.DialogResult]::No) {
-                    $e.Cancel = $true
-                    Minimize-ConsoleForm -Form $sender
+                    Hide-ConsoleFormForActiveMode -Form $sender
                     return
                 }
                 Stop-MonitorWorker
                 Stop-ConsoleMode
                 $script:ConsoleUiLocked = $false
                 $script:AllowFormClosePrompt = $true
-                return
             }
-
-            $e.Cancel = $true
             return
         }
 
         Stop-MonitorWorker
+        if ($Script:ConsoleState.IsActive -or $Script:ConsoleState.RtssLimitApplied) {
+            Stop-ConsoleMode
+        }
         if ($script:TrayIcon) {
             $script:TrayIcon.Visible = $false
             $script:TrayIcon.Dispose()
@@ -1393,9 +1362,7 @@ function Show-ConsoleModeGui {
             if (Test-ConsoleWatchNeeded -FullscreenMode $data.FullscreenMode) {
                 Start-MonitorTimer -Form $form -StatusLabel $statusLabel -WizardContext $wizardContext
             }
-            if ($data.FullscreenMode -eq "xboxMode") {
-                $btnRestore.Enabled = $true
-            }
+            $btnRestore.Enabled = $true
         }
         catch {
             [System.Windows.Forms.MessageBox]::Show("Erro ao iniciar modo console:`n$_", "Console Mode") | Out-Null
