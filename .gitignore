@@ -1,17 +1,15 @@
-# Backups gerados em runtime
+# Runtime / dados do usuario
+ConsoleMode_Data/
+config.json
 backup_monitores.cfg
 backup_monitores_meta.json
 backup_audio.txt
-config.json
-
-# Dados portateis do executavel
-ConsoleMode_Data/
 
 # Build
 dist/
 build/ps2exe.ps1
 
-# Ferramentas de terceiros (baixar separadamente - ver README)
+# Ferramentas NirSoft (baixadas pelo build ou colocadas localmente em dev)
 MultiMonitorTool.exe
 MultiMonitorTool.chm
 SoundVolumeView.exe
@@ -21,3 +19,9 @@ readme.txt
 # Temporarios
 *.csv
 _test_*.ps1
+
+# IDE / OS
+.vs/
+.idea/
+Thumbs.db
+Desktop.ini

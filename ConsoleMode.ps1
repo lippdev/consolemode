@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # Console Mode - Ponto de entrada
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -41,6 +41,9 @@ function Resolve-ConsoleEntryRoot {
 
 $ScriptRoot = Resolve-ConsoleEntryRoot
 $Script:EntryRoot = $ScriptRoot
+
+. (Join-Path $ScriptRoot "lib\Encoding.ps1")
+Initialize-ConsoleEncoding
 
 . (Join-Path $ScriptRoot "lib\Paths.ps1")
 . (Join-Path $ScriptRoot "lib\Engine.ps1")

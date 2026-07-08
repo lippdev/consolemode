@@ -17,17 +17,16 @@ $svv = Join-Path $root "SoundVolumeView.exe"
 $outputExe = Join-Path $distDir "ConsoleMode.exe"
 
 function Get-BuildIconPath {
-    foreach ($name in @('icon.ico', 'ConsoleMode.ico')) {
-        $path = Join-Path $assetsDir $name
-        if (Test-Path -LiteralPath $path) {
-            return $path
-        }
+    $path = Join-Path $assetsDir "icon.ico"
+    if (Test-Path -LiteralPath $path) {
+        return $path
     }
     return $null
 }
 
 function Get-BuildEmbedFiles {
     $embed = @{
+        '.\lib\Encoding.ps1'    = (Join-Path $root "lib\Encoding.ps1")
         '.\lib\Paths.ps1'        = (Join-Path $root "lib\Paths.ps1")
         '.\lib\Engine.ps1'       = (Join-Path $root "lib\Engine.ps1")
         '.\lib\Gui.ps1'          = (Join-Path $root "lib\Gui.ps1")
@@ -35,11 +34,9 @@ function Get-BuildEmbedFiles {
         '.\SoundVolumeView.exe'  = $svv
     }
 
-    if (Test-Path -LiteralPath $assetsDir) {
-        foreach ($file in Get-ChildItem -LiteralPath $assetsDir -File) {
-            $key = ".\assets\$($file.Name)"
-            $embed[$key] = $file.FullName
-        }
+    $iconFile = Join-Path $assetsDir "icon.ico"
+    if (Test-Path -LiteralPath $iconFile) {
+        $embed['.\assets\icon.ico'] = $iconFile
     }
 
     return $embed
@@ -124,13 +121,26 @@ function Test-BuildInputs {
     $script:svv = $script:BuildSvvPath
 
     if (-not (Get-BuildIconPath)) {
-        & (Join-Path $PSScriptRoot "New-ConsoleModeIcon.ps1")
+        throw "assets\icon.ico nao encontrado. Coloque seu icone em assets\icon.ico"
+    }
+}
+
+function Ensure-SourceUtf8Bom {
+    $utf8Bom = New-Object System.Text.UTF8Encoding $true
+    $files = @(
+        (Join-Path $root "ConsoleMode.ps1")
+    ) + @(Get-ChildItem -LiteralPath (Join-Path $root "lib") -Filter "*.ps1" | ForEach-Object { $_.FullName })
+
+    foreach ($path in $files) {
+        $text = [System.IO.File]::ReadAllText($path)
+        [System.IO.File]::WriteAllText($path, $text, $utf8Bom)
     }
 }
 
 function Build-ConsoleModeExe {
     $ps2exeScript = Ensure-Ps2Exe
     Test-BuildInputs
+    Ensure-SourceUtf8Bom
 
     if (-not (Test-Path -LiteralPath $distDir)) {
         New-Item -ItemType Directory -Path $distDir -Force | Out-Null
@@ -138,7 +148,7 @@ function Build-ConsoleModeExe {
 
     $iconPath = Get-BuildIconPath
     if (-not $iconPath) {
-        throw "Nenhum icone encontrado em assets\ (icon.ico ou ConsoleMode.ico)"
+        throw "assets\icon.ico nao encontrado"
     }
 
     $embedFiles = Get-BuildEmbedFiles
@@ -181,6 +191,8 @@ function Test-DevLaunch {
     Write-Host "Teste dev: carregando modulos..."
     $Script:EntryRoot = $root
     $ScriptRoot = $root
+    . (Join-Path $root "lib\Encoding.ps1")
+    Initialize-ConsoleEncoding
     . (Join-Path $root "lib\Paths.ps1")
     . (Join-Path $root "lib\Engine.ps1")
     Initialize-ConsoleAppLayout

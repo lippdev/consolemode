@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # Console Mode - Motor de negocio
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -177,6 +177,12 @@ $Script:ConsoleState = @{
     HideStrategy   = "disconnect"
     FullscreenMode = "bigPicture"
     AudioDeviceId  = $null
+    AudioAutoSwitch = $false
+    AudioDeviceHint = $null
+    AudioBaselineActiveIds = @()
+    LastAudioPoll  = $null
+    LastAudioSwitchName = $null
+    AudioPendingTarget = $false
 }
 
 $Script:MonitorListCache = $null
@@ -203,7 +209,7 @@ function Invoke-Mmt {
     )
 
     if (-not (Test-MultiMonitorToolAvailable)) {
-        throw "MultiMonitorTool.exe nao encontrado em $Script:MmtPath"
+        throw "MultiMonitorTool.exe não encontrado em $Script:MmtPath"
     }
 
     $process = Start-Process -FilePath $Script:MmtPath -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
@@ -216,7 +222,7 @@ function Invoke-Svv {
     )
 
     if (-not (Test-SoundVolumeViewAvailable)) {
-        throw "SoundVolumeView.exe nao encontrado em $Script:SvvPath"
+        throw "SoundVolumeView.exe não encontrado em $Script:SvvPath"
     }
 
     $process = Start-Process -FilePath $Script:SvvPath -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
@@ -390,8 +396,9 @@ function Get-ConsoleConfig {
             hideMonitors   = @()
             hideStrategy   = "disconnect"
             fullscreenMode = "bigPicture"
-            audioDeviceId  = ""
+            audioDeviceId   = ""
             audioDeviceName = ""
+            audioAutoSwitch = $false
         }
     }
 
@@ -404,6 +411,7 @@ function Get-ConsoleConfig {
             fullscreenMode  = if ($raw.fullscreenMode) { [string]$raw.fullscreenMode } else { "bigPicture" }
             audioDeviceId   = [string]$raw.audioDeviceId
             audioDeviceName = [string]$raw.audioDeviceName
+            audioAutoSwitch = [bool]($raw.audioAutoSwitch -eq $true)
         }
     }
     catch {
@@ -414,6 +422,7 @@ function Get-ConsoleConfig {
             fullscreenMode  = "bigPicture"
             audioDeviceId   = ""
             audioDeviceName = ""
+            audioAutoSwitch = $false
         }
     }
 }
@@ -425,7 +434,8 @@ function Set-ConsoleConfig {
         [string]$HideStrategy,
         [string]$FullscreenMode,
         [string]$AudioDeviceId,
-        [string]$AudioDeviceName
+        [string]$AudioDeviceName,
+        [bool]$AudioAutoSwitch = $false
     )
 
     $config = [ordered]@{
@@ -435,6 +445,7 @@ function Set-ConsoleConfig {
         fullscreenMode  = $FullscreenMode
         audioDeviceId   = $AudioDeviceId
         audioDeviceName = $AudioDeviceName
+        audioAutoSwitch = $AudioAutoSwitch
     }
 
     $config | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $Script:ConfigPath -Encoding UTF8
@@ -442,6 +453,17 @@ function Set-ConsoleConfig {
 
 function Save-MonitorBackup {
     Invoke-Mmt -Arguments @("/SaveConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
+    return Get-ConsolePrimaryMonitorName
+}
+
+function Get-ConsolePrimaryMonitorName {
+    $monitors = Get-ConsoleMonitors -ForceRefresh
+    $primary = $monitors | Where-Object { $_.IsPrimary -and $_.IsActive } | Select-Object -First 1
+    if (-not $primary) {
+        $primary = $monitors | Where-Object { $_.IsPrimary } | Select-Object -First 1
+    }
+    if ($primary) { return $primary.Name }
+    return $null
 }
 
 function Save-MonitorBackupMeta {
@@ -509,7 +531,7 @@ function Get-MonitorRestoreContext {
         HideStrategy     = $Script:ConsoleState.HideStrategy
     }
 
-    if (-not $ctx.OriginalPrimary -and (Test-Path -LiteralPath $Script:BackupMonitorMeta)) {
+    if (Test-Path -LiteralPath $Script:BackupMonitorMeta) {
         try {
             $meta = Get-Content -LiteralPath $Script:BackupMonitorMeta -Raw -Encoding UTF8 | ConvertFrom-Json
             if ($meta.originalPrimary) { $ctx.OriginalPrimary = [string]$meta.originalPrimary }
@@ -524,57 +546,91 @@ function Get-MonitorRestoreContext {
     return $ctx
 }
 
+function Set-PrimaryMonitorFromBackupSpec {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [hashtable]$Spec
+    )
+
+    if ($Spec -and $Spec.Width -and $Spec.Height) {
+        $width = 0
+        $height = 0
+        [void][int]::TryParse($Spec.Width, [ref]$width)
+        [void][int]::TryParse($Spec.Height, [ref]$height)
+        if ($width -gt 0 -and $height -gt 0) {
+            $freq = $Spec.DisplayFrequency
+            if (-not $freq) { $freq = $Spec.Frequency }
+            Set-PrimaryAndMonitorMode -MonitorName $MonitorName `
+                -Width $width -Height $height `
+                -Frequency $freq -Colors $Spec.BitsPerPixel
+            return
+        }
+    }
+
+    Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
+}
+
+function Disable-FocusMonitorAfterRestore {
+    param([Parameter(Mandatory)][string]$MonitorName)
+
+    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
+    Start-Sleep -Milliseconds 120
+    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
+}
+
 function Restore-MonitorBackup {
     if (-not (Test-Path -LiteralPath $Script:BackupMonitorConfig)) { return }
 
-    $ctx = Get-MonitorRestoreContext
-    $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
-    $monitorsToEnable = [System.Collections.ArrayList]@()
+    $previousCursor = [System.Windows.Forms.Cursor]::Current
+    [System.Windows.Forms.Cursor]::Current = [System.Windows.Forms.Cursors]::WaitCursor
 
-    if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
-        foreach ($name in $ctx.HideMonitors) {
-            [void]$monitorsToEnable.Add($name)
+    try {
+        $ctx = Get-MonitorRestoreContext
+        $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
+        $monitorsToEnable = @()
+
+        if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
+            $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
+        }
+        elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
+            foreach ($name in $ctx.HideMonitors) {
+                Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+            }
+            $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
+        }
+
+        if ($monitorsToEnable.Count -gt 0 -and $ctx.HideStrategy -eq "disconnect") {
+            $enableArgs = @("/enable")
+            foreach ($name in $monitorsToEnable) {
+                $enableArgs += "`"$name`""
+            }
+            Invoke-Mmt -Arguments $enableArgs | Out-Null
+            Start-Sleep -Milliseconds 180
+        }
+        elseif ($monitorsToEnable.Count -gt 0) {
+            Start-Sleep -Milliseconds 120
+        }
+
+        foreach ($i in 1..2) {
+            Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
+            if ($i -eq 1) { Start-Sleep -Milliseconds 150 }
+        }
+
+        if ($ctx.OriginalPrimary) {
+            $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
+            Set-PrimaryMonitorFromBackupSpec -MonitorName $ctx.OriginalPrimary -Spec $primarySpec
+            Start-Sleep -Milliseconds 120
+        }
+
+        if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
+            Disable-FocusMonitorAfterRestore -MonitorName $ctx.FocusMonitor
+            if ($ctx.OriginalPrimary) {
+                Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
+            }
         }
     }
-    elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
-        foreach ($name in $ctx.HideMonitors) {
-            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
-            [void]$monitorsToEnable.Add($name)
-        }
-    }
-
-    foreach ($name in ($monitorsToEnable | Select-Object -Unique)) {
-        $spec = $backupSpecs[$name]
-        $width = 0
-        if ($spec -and $spec.Width) { [void][int]::TryParse($spec.Width, [ref]$width) }
-
-        if ($spec -and $width -gt 0) {
-            $px = 0
-            $py = 0
-            if ($spec.PositionX) { [void][int]::TryParse($spec.PositionX, [ref]$px) }
-            if ($spec.PositionY) { [void][int]::TryParse($spec.PositionY, [ref]$py) }
-            Invoke-Mmt -Arguments @("/EnableAtPosition", "`"$name`"", $px, $py) | Out-Null
-        }
-        else {
-            Invoke-Mmt -Arguments @("/enable", "`"$name`"") | Out-Null
-        }
-    }
-
-    if ($monitorsToEnable.Count -gt 0) {
-        Start-Sleep -Milliseconds 250
-    }
-
-    foreach ($i in 1..3) {
-        Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
-    }
-
-    if ($ctx.OriginalPrimary) {
-        Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
-    }
-
-    if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
-        Start-Sleep -Milliseconds 150
-        Invoke-Mmt -Arguments @("/disable", "`"$($ctx.FocusMonitor)`"") | Out-Null
+    finally {
+        [System.Windows.Forms.Cursor]::Current = $previousCursor
     }
 }
 
@@ -599,6 +655,48 @@ function Set-PrimaryMonitor {
     Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
 }
 
+function Test-ValidMonitorModeInfo {
+    param($Monitor)
+
+    if (-not $Monitor) { return $false }
+    $width = 0
+    $height = 0
+    if ($Monitor.Width) { [void][int]::TryParse([string]$Monitor.Width, [ref]$width) }
+    if ($Monitor.Height) { [void][int]::TryParse([string]$Monitor.Height, [ref]$height) }
+    return ($width -gt 0 -and $height -gt 0)
+}
+
+function Get-ParsedDisplayFrequency {
+    param([string]$Frequency)
+
+    if ([string]::IsNullOrWhiteSpace($Frequency)) { return 0 }
+    $value = 0
+    [void][int]::TryParse($Frequency, [ref]$value)
+    return $value
+}
+
+function Update-FocusMonitorRect {
+    param([string]$MonitorName = $Script:ConsoleState.FocusMonitor)
+
+    if ([string]::IsNullOrWhiteSpace($MonitorName)) { return $false }
+
+    Start-Sleep -Milliseconds 300
+    $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
+    if ($screen) {
+        $Script:ConsoleState.FocusMonitorRect = $screen.Bounds
+        return $true
+    }
+
+    $monitorInfo = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
+    $rect = Get-RectFromMonitorInfo -Monitor $monitorInfo
+    if ($rect) {
+        $Script:ConsoleState.FocusMonitorRect = $rect
+        return $true
+    }
+
+    return $false
+}
+
 function Set-PrimaryAndMonitorMode {
     param(
         [Parameter(Mandatory)][string]$MonitorName,
@@ -611,7 +709,8 @@ function Set-PrimaryAndMonitorMode {
     $spec = "Name=$MonitorName Primary=Yes"
     if ($Width -gt 0) { $spec += " Width=$Width" }
     if ($Height -gt 0) { $spec += " Height=$Height" }
-    if ($Frequency) { $spec += " DisplayFrequency=$Frequency" }
+    $freqValue = Get-ParsedDisplayFrequency -Frequency $Frequency
+    if ($freqValue -gt 0) { $spec += " DisplayFrequency=$freqValue" }
     if ($Colors) { $spec += " BitsPerPixel=$Colors" }
 
     Invoke-Mmt -Arguments @("/SetMonitors", "`"$spec`"") | Out-Null
@@ -629,7 +728,8 @@ function Set-MonitorMode {
     $spec = "Name=$MonitorName"
     if ($Width -gt 0) { $spec += " Width=$Width" }
     if ($Height -gt 0) { $spec += " Height=$Height" }
-    if ($Frequency) { $spec += " DisplayFrequency=$Frequency" }
+    $freqValue = Get-ParsedDisplayFrequency -Frequency $Frequency
+    if ($freqValue -gt 0) { $spec += " DisplayFrequency=$freqValue" }
     if ($Colors) { $spec += " BitsPerPixel=$Colors" }
 
     Invoke-Mmt -Arguments @("/SetMonitors", "`"$spec`"") | Out-Null
@@ -680,6 +780,138 @@ function Disable-MonitorsDdc {
     }
 }
 
+function Get-AudioDeviceMatchScore {
+    param(
+        $Device,
+        [string]$Hint,
+        $FocusMonitorInfo
+    )
+
+    $text = ($Device.Name -replace '\s*\[Desabilitado\]\s*$', '').Trim()
+    $score = 0
+
+    if ($Hint) {
+        foreach ($part in ($Hint -split '\s+|/|\\' | Where-Object { $_.Length -ge 3 })) {
+            if ($text -match [regex]::Escape($part)) { $score += 8 }
+        }
+    }
+    if ($FocusMonitorInfo -and $FocusMonitorInfo.MonitorName) {
+        foreach ($part in ($FocusMonitorInfo.MonitorName -split '\s+' | Where-Object { $_.Length -ge 3 })) {
+            if ($text -match [regex]::Escape($part)) { $score += 5 }
+        }
+    }
+    if ($text -match 'HDMI|Display|High Definition Audio|SSCR|TV') { $score += 1 }
+
+    return $score
+}
+
+function Select-NewConsoleAudioDevice {
+    param(
+        [array]$Candidates,
+        [string]$Hint,
+        $FocusMonitorInfo
+    )
+
+    if ($Candidates.Count -eq 0) { return $null }
+    if ($Candidates.Count -eq 1) { return $Candidates[0] }
+
+    $best = $null
+    $bestScore = -1
+    foreach ($device in $Candidates) {
+        $score = Get-AudioDeviceMatchScore -Device $device -Hint $Hint -FocusMonitorInfo $FocusMonitorInfo
+        if ($score -gt $bestScore) {
+            $bestScore = $score
+            $best = $device
+        }
+    }
+
+    if ($bestScore -le 0) { return $Candidates[0] }
+    return $best
+}
+
+function Initialize-ConsoleAudioWatch {
+    $devices = Get-ConsoleAudioDevices -ForceRefresh
+    $Script:ConsoleState.AudioBaselineActiveIds = @(
+        $devices | Where-Object { $_.IsActive } | ForEach-Object { $_.FriendlyId }
+    )
+    $Script:ConsoleState.LastAudioPoll = Get-Date
+}
+
+function Update-ConsoleAudioAutoSwitch {
+    # Aguarda nova saida de audio ativa (ex.: HDMI da TV ao ligar) e troca para ela.
+    if (-not $Script:ConsoleState.AudioAutoSwitch) { return $null }
+    if (-not (Test-SoundVolumeViewAvailable)) { return $null }
+
+    $now = Get-Date
+    if ($Script:ConsoleState.LastAudioPoll) {
+        $elapsed = ($now - $Script:ConsoleState.LastAudioPoll).TotalSeconds
+        if ($elapsed -lt 2) { return $null }
+    }
+    $Script:ConsoleState.LastAudioPoll = $now
+
+    $devices = Get-ConsoleAudioDevices -ForceRefresh
+    $newActive = @($devices | Where-Object {
+        $_.IsActive -and ($_.FriendlyId -notin $Script:ConsoleState.AudioBaselineActiveIds)
+    })
+
+    if ($newActive.Count -eq 0) { return $null }
+
+    $focusInfo = $null
+    if ($Script:ConsoleState.FocusMonitor) {
+        $focusInfo = $Script:MonitorListCache | Where-Object { $_.Name -eq $Script:ConsoleState.FocusMonitor } | Select-Object -First 1
+        if (-not $focusInfo) {
+            $focusInfo = Get-ConsoleMonitors | Where-Object { $_.Name -eq $Script:ConsoleState.FocusMonitor } | Select-Object -First 1
+        }
+    }
+
+    $pick = Select-NewConsoleAudioDevice -Candidates $newActive `
+        -Hint $Script:ConsoleState.AudioDeviceHint `
+        -FocusMonitorInfo $focusInfo
+
+    if (-not $pick) { return $null }
+
+    Set-ConsoleAudioOutput -FriendlyId $pick.FriendlyId
+    $Script:ConsoleState.AudioDeviceId = $pick.FriendlyId
+    if ($pick.FriendlyId -notin $Script:ConsoleState.AudioBaselineActiveIds) {
+        $Script:ConsoleState.AudioBaselineActiveIds += $pick.FriendlyId
+    }
+
+    $displayName = ($pick.Name -replace '\s*\[Desabilitado\]\s*$', '').Trim()
+    $Script:ConsoleState.LastAudioSwitchName = $displayName
+    return $displayName
+}
+
+function Update-ConsolePendingAudioDevice {
+    if ($Script:ConsoleState.AudioAutoSwitch) { return $null }
+    if ([string]::IsNullOrWhiteSpace($Script:ConsoleState.AudioDeviceId)) { return $null }
+    if (-not $Script:ConsoleState.AudioPendingTarget) { return $null }
+    if (-not (Test-SoundVolumeViewAvailable)) { return $null }
+
+    $now = Get-Date
+    if ($Script:ConsoleState.LastAudioPoll) {
+        $elapsed = ($now - $Script:ConsoleState.LastAudioPoll).TotalSeconds
+        if ($elapsed -lt 2) { return $null }
+    }
+    $Script:ConsoleState.LastAudioPoll = $now
+
+    $devices = Get-ConsoleAudioDevices -ForceRefresh
+    $target = $devices | Where-Object {
+        $_.FriendlyId -eq $Script:ConsoleState.AudioDeviceId -and $_.IsActive
+    } | Select-Object -First 1
+
+    if (-not $target) { return $null }
+
+    Set-ConsoleAudioOutput -FriendlyId $target.FriendlyId
+    $Script:ConsoleState.AudioPendingTarget = $false
+    if ($target.FriendlyId -notin $Script:ConsoleState.AudioBaselineActiveIds) {
+        $Script:ConsoleState.AudioBaselineActiveIds += $target.FriendlyId
+    }
+
+    $displayName = ($target.Name -replace '\s*\[Desabilitado\]\s*$', '').Trim()
+    $Script:ConsoleState.LastAudioSwitchName = $displayName
+    return $displayName
+}
+
 function Set-ConsoleAudioOutput {
     param([Parameter(Mandatory)][string]$FriendlyId)
 
@@ -697,7 +929,7 @@ function Restore-ConsoleAudioOutput {
         Invoke-Svv -Arguments @("/SetDefault", "`"$($Script:ConsoleState.BackupAudioId)`"", "all") | Out-Null
     }
     catch {
-        Write-Warning "Nao foi possivel restaurar o audio padrao: $_"
+        Write-Warning "Não foi possível restaurar o áudio padrão: $_"
     }
 }
 
@@ -829,12 +1061,12 @@ function Get-BigPictureWindowHandles {
 function Get-MonitorRect {
     param([Parameter(Mandatory)][string]$MonitorName)
 
+    $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
+    if ($screen) { return $screen.Bounds }
+
     if ($Script:ConsoleState.FocusMonitorRect -and $Script:ConsoleState.FocusMonitor -eq $MonitorName) {
         return $Script:ConsoleState.FocusMonitorRect
     }
-
-    $screen = Get-ScreenByDeviceName -DeviceName $MonitorName
-    if ($screen) { return $screen.Bounds }
 
     $monitorInfo = $Script:MonitorListCache | Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
     if (-not $monitorInfo) {
@@ -933,11 +1165,13 @@ function Start-ConsoleMode {
         [ValidateSet("bigPicture", "xboxMode")]
         [string]$FullscreenMode = "bigPicture",
         [string]$AudioDeviceId = "",
+        [switch]$AudioAutoSwitch,
+        [string]$AudioDeviceHint = "",
         $FocusMonitorInfo = $null
     )
 
     if ($Script:ConsoleState.IsActive) {
-        throw "O modo console ja esta ativo."
+        throw "O modo console já está ativo."
     }
 
     $Script:ConsoleState.FocusMonitor = $FocusMonitor
@@ -946,6 +1180,10 @@ function Start-ConsoleMode {
     $Script:ConsoleState.HideStrategy = $HideStrategy
     $Script:ConsoleState.FullscreenMode = $FullscreenMode
     $Script:ConsoleState.AudioDeviceId = $AudioDeviceId
+    $Script:ConsoleState.AudioAutoSwitch = [bool]$AudioAutoSwitch
+    $Script:ConsoleState.AudioDeviceHint = $AudioDeviceHint
+    $Script:ConsoleState.LastAudioSwitchName = $null
+    $Script:ConsoleState.AudioPendingTarget = $false
     $Script:ConsoleState.ShouldExit = $false
     $Script:ConsoleState.SteamMoved = $false
     $Script:ConsoleState.MoveCount = 0
@@ -963,19 +1201,18 @@ function Start-ConsoleMode {
     }
 
     $Script:ConsoleState.FocusWasInactive = (-not $focusMode -or -not $focusMode.IsActive)
-    $primaryMonitor = $Script:MonitorListCache | Where-Object { $_.IsPrimary -and $_.IsActive } | Select-Object -First 1
-    if (-not $primaryMonitor) {
-        $primaryMonitor = Get-ConsoleMonitors | Where-Object { $_.IsPrimary -and $_.IsActive } | Select-Object -First 1
-    }
-    $Script:ConsoleState.OriginalPrimary = if ($primaryMonitor) { $primaryMonitor.Name } else { $null }
 
-    Save-MonitorBackup
+    $savedPrimary = Save-MonitorBackup
+    $Script:ConsoleState.OriginalPrimary = if ($savedPrimary) { $savedPrimary } else { Get-ConsolePrimaryMonitorName }
+
     Save-MonitorBackupMeta `
         -OriginalPrimary $Script:ConsoleState.OriginalPrimary `
         -FocusWasInactive $Script:ConsoleState.FocusWasInactive `
         -FocusMonitor $FocusMonitor `
         -HideMonitors $HideMonitors `
         -HideStrategy $HideStrategy
+
+    $Script:ConsoleState.IsActive = $true
 
     if (Test-SoundVolumeViewAvailable) {
         $Script:ConsoleState.BackupAudioId = Get-DefaultAudioDeviceId
@@ -984,53 +1221,57 @@ function Start-ConsoleMode {
         }
     }
 
-    switch ($FullscreenMode) {
-        "bigPicture" { Start-BigPictureMode }
-        "xboxMode"   { Start-XboxMode }
-    }
-    $Script:ConsoleState.ModeLaunched = $true
-    $Script:ConsoleState.LaunchTime = Get-Date
-
     if (-not $focusMode -or -not $focusMode.IsActive) {
         Enable-Monitors -MonitorNames @($FocusMonitor) -WindowsEnable
-        if ($focusMode) {
-            $focusMode.IsActive = $true
-            $focusMode.IsDisconnected = $false
-        }
+        Start-Sleep -Milliseconds 500
+        $focusMode = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
     }
 
-    if ($focusMode -and $focusMode.Frequency) {
-        Set-PrimaryAndMonitorMode -MonitorName $FocusMonitor `
-            -Width $focusMode.Width -Height $focusMode.Height `
-            -Frequency $focusMode.Frequency -Colors $focusMode.Colors
-    }
-    else {
-        Set-PrimaryMonitor -MonitorName $FocusMonitor
-    }
-
-    $focusScreen = Get-ScreenByDeviceName -DeviceName $FocusMonitor
-    if ($focusScreen) {
-        $Script:ConsoleState.FocusMonitorRect = $focusScreen.Bounds
-    }
-    else {
-        $Script:ConsoleState.FocusMonitorRect = Get-RectFromMonitorInfo -Monitor $focusMode
-    }
+    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Start-Sleep -Milliseconds 400
 
     if ($HideStrategy -eq "disconnect" -and $HideMonitors.Count -gt 0) {
         Disable-MonitorsWindows -MonitorNames $HideMonitors
+        Start-Sleep -Milliseconds 500
     }
     elseif ($HideStrategy -eq "blackCurtain" -and $HideMonitors.Count -gt 0) {
         Show-BlackCurtains -MonitorNames $HideMonitors
     }
     elseif ($HideStrategy -eq "turnOff" -and $HideMonitors.Count -gt 0) {
         Disable-MonitorsDdc -MonitorNames $HideMonitors
+        Start-Sleep -Milliseconds 400
     }
+
+    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Start-Sleep -Milliseconds 500
+    Update-FocusMonitorRect -MonitorName $FocusMonitor | Out-Null
 
     if ($AudioDeviceId -and (Test-SoundVolumeViewAvailable)) {
-        Set-ConsoleAudioOutput -FriendlyId $AudioDeviceId
+        $audioDevices = Get-ConsoleAudioDevices -ForceRefresh
+        $targetAudio = $audioDevices | Where-Object { $_.FriendlyId -eq $AudioDeviceId } | Select-Object -First 1
+        if ($targetAudio -and $targetAudio.IsActive) {
+            Set-ConsoleAudioOutput -FriendlyId $AudioDeviceId
+        }
+        else {
+            $Script:ConsoleState.AudioPendingTarget = $true
+        }
     }
 
-    $Script:ConsoleState.IsActive = $true
+    if (Test-SoundVolumeViewAvailable) {
+        Initialize-ConsoleAudioWatch
+    }
+
+    switch ($FullscreenMode) {
+        "bigPicture" {
+            Start-Sleep -Milliseconds 400
+            Update-FocusMonitorRect -MonitorName $FocusMonitor | Out-Null
+            Start-BigPictureMode
+        }
+        "xboxMode"   { Start-XboxMode }
+    }
+    $Script:ConsoleState.ModeLaunched = $true
+    $Script:ConsoleState.LaunchTime = Get-Date
+
     $Script:MonitorListCache = $null
 }
 
@@ -1053,12 +1294,16 @@ function Update-ConsoleMonitorLoop {
         $Script:ConsoleState.HasAppeared = $true
     }
 
-    if ($mode -eq "bigPicture" -and $Script:ConsoleState.MoveCount -lt 12) {
+    if ($mode -eq "bigPicture") {
         $bpHandles = Get-BigPictureWindowHandles
         if ($bpHandles.Count -gt 0) {
-            $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor
-            $Script:ConsoleState.MoveCount++
-            if ($moved) { $Script:ConsoleState.SteamMoved = $true }
+            Update-FocusMonitorRect -MonitorName $Script:ConsoleState.FocusMonitor | Out-Null
+            $bpArea = [NativeHelpers]::GetWindowArea($bpHandles[0])
+            if ($bpArea -lt 250000 -and $Script:ConsoleState.MoveCount -lt 4) {
+                $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor
+                $Script:ConsoleState.MoveCount++
+                if ($moved) { $Script:ConsoleState.SteamMoved = $true }
+            }
 
             foreach ($h in $bpHandles) {
                 if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
@@ -1066,6 +1311,15 @@ function Update-ConsoleMonitorLoop {
                     break
                 }
             }
+        }
+    }
+
+    if ($Script:ConsoleState.IsActive -and (Test-SoundVolumeViewAvailable)) {
+        if ($Script:ConsoleState.AudioAutoSwitch) {
+            Update-ConsoleAudioAutoSwitch | Out-Null
+        }
+        else {
+            Update-ConsolePendingAudioDevice | Out-Null
         }
     }
 
@@ -1089,6 +1343,10 @@ function Stop-ConsoleMode {
         return
     }
 
+    if ($Script:ConsoleState.IsActive) {
+        Start-Sleep -Milliseconds 300
+    }
+
     Close-BlackCurtains
     Restore-MonitorBackup
     Restore-ConsoleAudioOutput
@@ -1105,6 +1363,13 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.FocusMonitorRect = $null
     $Script:ConsoleState.OriginalPrimary = $null
     $Script:ConsoleState.FocusWasInactive = $false
+    $Script:ConsoleState.AudioDeviceId = $null
+    $Script:ConsoleState.AudioAutoSwitch = $false
+    $Script:ConsoleState.AudioDeviceHint = $null
+    $Script:ConsoleState.AudioBaselineActiveIds = @()
+    $Script:ConsoleState.LastAudioPoll = $null
+    $Script:ConsoleState.LastAudioSwitchName = $null
+    $Script:ConsoleState.AudioPendingTarget = $false
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }
 

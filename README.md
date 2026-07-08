@@ -1,113 +1,93 @@
 # Console Mode
 
-App em PowerShell + WinForms que transforma o PC em um console de jogos. Esconde monitores nao utilizados, define o monitor de foco, troca a saida de audio e abre o **Steam Big Picture** ou o **Modo Xbox** (Win+F11). Ao fechar o modo escolhido, restaura automaticamente monitores e audio.
+Transforme seu PC Windows em um **console de jogos** com um clique: esconda monitores extras, foque na TV, ajuste o áudio e abra o **Steam Big Picture** ou o **Modo Xbox** (Win+F11). Ao sair, tudo é restaurado automaticamente.
 
-## Release portatil (recomendado)
+![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-1. Baixe ou gere `dist\ConsoleMode.exe` (veja [Como gerar o executavel](#como-gerar-o-executavel))
-2. Copie **apenas** `ConsoleMode.exe` para qualquer pasta
-3. Execute com duplo clique
+## Funcionalidades
 
-Na primeira execucao, o app cria ao lado do executavel:
-
-```
-ConsoleMode.exe
-ConsoleMode_Data/
-  tools/MultiMonitorTool.exe
-  tools/SoundVolumeView.exe
-  config.json
-  backup_monitores.cfg
-  ...
-```
-
-Nao precisa instalar. Configuracao e backups ficam em `ConsoleMode_Data`.
-
-> **Antivirus:** executaveis gerados com ps2exe podem gerar falso positivo. O codigo-fonte esta neste repositorio para auditoria.
+- Assistente em 4 passos (monitores → modo → áudio → iniciar)
+- Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
+- Áudio com opção **usar ao conectar** (HDMI da TV quando ligar)
+- Restauração automática ao fechar Big Picture / Modo Xbox
+- Executável portátil (`ConsoleMode.exe`) ou modo desenvolvimento via PowerShell
+- Ícone na bandeja para restaurar ou reabrir o app
 
 ## Requisitos
 
-- Windows 10/11
-- PowerShell 5.1 ou superior (apenas para desenvolvimento; o `.exe` nao exige PowerShell instalado para o usuario final)
-- Steam instalado (para modo Big Picture)
-- Windows 11 com Modo Xbox habilitado (para modo Xbox; atalho Win+F11)
+- Windows 10 ou 11
+- [Steam](https://store.steampowered.com/) (modo Big Picture)
+- Modo Xbox no Windows 11 (opcional; atalho Win+F11)
+- PowerShell 5.1+ **apenas para desenvolvimento/build** — o `.exe` não exige PowerShell instalado
 
-As ferramentas NirSoft (`MultiMonitorTool`, `SoundVolumeView`) vêm **embutidas no executavel** ou devem estar na pasta do projeto em modo dev.
+## Uso rápido (executável)
 
-## Como usar
+1. Gere ou baixe `dist/ConsoleMode.exe` (veja [Build](#build))
+2. Execute o arquivo — na primeira vez cria `ConsoleMode_Data/` ao lado dele
+3. Siga o assistente e clique em **Iniciar modo console**
 
-O app abre um **assistente em 4 passos**:
-
-1. **Monitores** — escolha o foco (TV/console), quais esconder e veja o diagrama do layout
-2. **Modo** — estrategia para esconder + Big Picture ou Modo Xbox
-3. **Audio** — saida de audio (ou "Nao mudar")
-4. **Iniciar** — revise o resumo e clique em **Iniciar modo console**
-
-Botoes uteis: **Salvar**, **Atualizar** (recarrega monitores/audio), **Restaurar agora**.
-
-## Restaurar o setup
-
-O app restaura automaticamente quando detecta o fechamento do Big Picture ou do Modo Xbox. Voce tambem pode restaurar manualmente:
-
-- Botao **Restaurar agora** na janela
-- Item **Restaurar setup** no icone da bandeja (system tray)
-- Tecla **ESC** em qualquer cortina preta
-
-A restauracao usa backup em `ConsoleMode_Data` (monitores + audio).
+> **Antivírus:** executáveis gerados com [PS2EXE](https://github.com/MScholtes/PS2EXE) podem gerar falso positivo. O código-fonte está aqui para auditoria.
 
 ## Desenvolvimento
 
-### Executar sem compilar
-
-1. Coloque `MultiMonitorTool.exe` e `SoundVolumeView.exe` na raiz do projeto
-2. Execute `IniciarConsoleMode.bat` ou:
-
 ```powershell
+# 1. Clone o repositório
+git clone https://github.com/lippdev/consolemode.git
+cd consolemode
+
+# 2. Baixe as ferramentas NirSoft (automático)
+powershell -ExecutionPolicy Bypass -File .\build\Get-NirSoftTools.ps1
+
+# 3. Execute
+.\IniciarConsoleMode.bat
+# ou
 powershell -ExecutionPolicy Bypass -File .\ConsoleMode.ps1
 ```
 
-Em dev, as ferramentas sao lidas da raiz; config e backups vao para `ConsoleMode_Data\`.
+Em dev, config e backups ficam em `ConsoleMode_Data/`.
 
-### Como gerar o executavel
-
-1. Baixe e coloque na raiz do projeto:
-   - [MultiMonitorTool](https://www.nirsoft.net/utils/multi_monitor_tool.html)
-   - [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html)
-2. Execute:
+## Build
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build\Build-ConsoleMode.ps1
 ```
 
-3. O executavel sera gerado em `dist\ConsoleMode.exe`
+Saída: `dist/ConsoleMode.exe` (ferramentas NirSoft e ícone embutidos).
 
-Testes do build:
+Validação sem compilar:
 
 ```powershell
-.\build\Build-ConsoleMode.ps1 -TestDev   # valida paths em modo dev
-.\build\Build-ConsoleMode.ps1 -TestExe   # valida layout do exe
+.\build\Build-ConsoleMode.ps1 -TestDev
+.\build\Build-ConsoleMode.ps1 -TestExe
 ```
 
-## Arquivos do projeto
+## Estrutura do projeto
 
-| Arquivo | Descricao |
-|---------|-----------|
-| `ConsoleMode.ps1` | Ponto de entrada |
-| `lib\Paths.ps1` | Paths portateis (dev vs exe) |
-| `lib\Engine.ps1` | Motor: monitores, audio, cortinas, monitoramento |
-| `lib\Gui.ps1` | Interface wizard WinForms |
-| `build\Build-ConsoleMode.ps1` | Gera `dist\ConsoleMode.exe` via ps2exe |
-| `assets/` | Identidade visual: `icon.ico`, logos PNG, etc. |
-| `IniciarConsoleMode.bat` | Atalho para desenvolvimento |
-| `AbrirBigPicture.bat` | Script legado (referencia) |
-| `telas_pretas.ps1` | Script legado (referencia) |
+```
+consolemode/
+├── ConsoleMode.ps1          # Entrada
+├── IniciarConsoleMode.bat   # Atalho dev
+├── assets/icon.ico          # Ícone do app
+├── lib/
+│   ├── Encoding.ps1         # UTF-8
+│   ├── Paths.ps1            # Paths portáteis (dev / exe)
+│   ├── Engine.ps1           # Monitores, áudio, restauração
+│   └── Gui.ps1              # Wizard WinForms
+└── build/
+    ├── Build-ConsoleMode.ps1
+    └── Get-NirSoftTools.ps1
+```
 
-## Modo Xbox
+## Restaurar o setup
 
-O Modo Xbox e acionado via atalho **Win+F11**. Requer Windows 11 com o recurso habilitado em Configuracoes > Jogos > Modo Xbox.
+- **Automático** — ao sair do Big Picture ou Modo Xbox (app fica na bandeja)
+- **Manual** — botão *Restaurar agora* ou menu da bandeja
+- **ESC** — nas cortinas pretas (estratégia cortinas)
 
-A deteccao de fechamento do Modo Xbox e best-effort. Se a restauracao automatica nao ocorrer, use **Restaurar agora**.
+## Licença
 
-## Licenca das dependencias
+Este projeto está sob a licença [MIT](LICENSE).
 
-- **MultiMonitorTool** e **SoundVolumeView** sao freeware da [NirSoft](https://www.nirsoft.net), redistribuidos embutidos no executavel portatil conforme termos do autor
-- Este projeto de automacao e de uso pessoal
+Dependências externas: veja [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

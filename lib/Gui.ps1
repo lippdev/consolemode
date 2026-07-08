@@ -1,50 +1,43 @@
-#Requires -Version 5.1
-# Console Mode - Interface grafica (wizard)
+﻿#Requires -Version 5.1
+# Console Mode - Interface gráfica (wizard)
 
 $script:MonitorTimer = $null
 $script:TrayIcon = $null
 $script:LoadedMonitors = @()
 $script:AppIcon = $null
 $script:WizardStep = 0
-$script:BrandAccent = [System.Drawing.Color]::FromArgb(62, 207, 160)
-$script:BrandDark = [System.Drawing.Color]::FromArgb(45, 45, 45)
-
-function Get-ConsoleAssetsDir {
-    return Join-Path (Get-ConsoleExeDir) "assets"
-}
-
-function Get-ConsoleBrandFilePath {
-    param([Parameter(Mandatory)][string[]]$FileNames)
-
-    $dir = Get-ConsoleAssetsDir
-    foreach ($name in $FileNames) {
-        $path = Join-Path $dir $name
-        if (Test-Path -LiteralPath $path) {
-            return $path
-        }
-    }
-    return $null
-}
-
-function Get-ConsoleBrandLogoPath {
-    return Get-ConsoleBrandFilePath -FileNames @(
-        'Console Mode.png',
-        'Console mode logo.png',
-        'Console mode png.png'
-    )
-}
-
-function Get-ConsoleAppIconPath {
-    return Get-ConsoleBrandFilePath -FileNames @(
-        'icon.ico',
-        'ConsoleMode.ico'
-    )
+$script:AllowFormClosePrompt = $false
+$script:ConsoleUiLocked = $false
+$script:KeepAppRunning = $false
+$script:PumpForm = $null
+$script:AudioOnConnectId = "__on_connect__"
+$script:AudioOnConnectLabel = "Usar áudio ao conectar (TV/monitor)"
+$script:Theme = @{
+    Bg      = [System.Drawing.Color]::FromArgb(28, 28, 30)
+    Surface = [System.Drawing.Color]::FromArgb(37, 37, 40)
+    Input   = [System.Drawing.Color]::FromArgb(50, 50, 54)
+    Border  = [System.Drawing.Color]::FromArgb(62, 62, 66)
+    Text    = [System.Drawing.Color]::FromArgb(230, 230, 230)
+    Muted   = [System.Drawing.Color]::FromArgb(150, 150, 155)
+    Accent  = [System.Drawing.Color]::FromArgb(62, 207, 160)
+    Success = [System.Drawing.Color]::FromArgb(78, 201, 176)
+    Warning = [System.Drawing.Color]::FromArgb(220, 180, 90)
 }
 
 function Get-ConsoleAppIcon {
     if ($script:AppIcon) { return $script:AppIcon }
 
-    $iconPath = Get-ConsoleAppIconPath
+    try {
+        $assembly = [Reflection.Assembly]::GetExecutingAssembly()
+        $location = $assembly.Location
+        if ($location -and (Test-Path -LiteralPath $location) -and $location -like '*.exe') {
+            $script:AppIcon = [System.Drawing.Icon]::ExtractAssociatedIcon($location)
+            if ($script:AppIcon) { return $script:AppIcon }
+        }
+    }
+    catch { }
+
+    $iconPath = Get-ConsoleIconPath
     if ($iconPath) {
         try {
             $script:AppIcon = New-Object System.Drawing.Icon($iconPath)
@@ -80,9 +73,45 @@ function Move-FormToPrimaryScreen {
     $Form.Location = New-Object System.Drawing.Point([int]$x, [int]$y)
 }
 
+function Hide-ConsoleForm {
+    param([System.Windows.Forms.Form]$Form)
+
+    $Form.ShowInTaskbar = $false
+    $Form.Hide()
+}
+
+function Ensure-ConsolePumpForm {
+    if ($script:PumpForm -and -not $script:PumpForm.IsDisposed) {
+        return $script:PumpForm
+    }
+
+    $pump = New-Object System.Windows.Forms.Form
+    $pump.Text = "Console Mode"
+    $pump.ShowInTaskbar = $false
+    $pump.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None
+    $pump.Size = New-Object System.Drawing.Size(1, 1)
+    $pump.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
+    $pump.Location = New-Object System.Drawing.Point(-20000, -20000)
+    $pump.Opacity = 0
+    $pump.Add_FormClosing({
+        param($sender, $e)
+        if ($Script:ConsoleState.IsActive -or $script:ConsoleUiLocked) {
+            $e.Cancel = $true
+        }
+    })
+    [void]$pump.Show()
+    $script:PumpForm = $pump
+    return $pump
+}
+
+function Stop-ConsoleMessageLoop {
+    $script:KeepAppRunning = $false
+}
+
 function Show-FormOnPrimary {
     param([System.Windows.Forms.Form]$Form)
 
+    $Form.ShowInTaskbar = $true
     $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
     Move-FormToPrimaryScreen -Form $Form
     $Form.Show()
@@ -102,8 +131,64 @@ function New-Label {
     $lbl.Text = $Text
     $lbl.Location = New-Object System.Drawing.Point($X, $Y)
     $lbl.Size = New-Object System.Drawing.Size($W, $H)
+    $lbl.BackColor = $script:Theme.Bg
+    $lbl.ForeColor = $script:Theme.Text
     if ($Font) { $lbl.Font = $Font }
     return $lbl
+}
+
+function Set-DarkThemeOnControl {
+    param(
+        [System.Windows.Forms.Control]$Control,
+        [switch]$IsSurface
+    )
+
+    $bg = if ($IsSurface) { $script:Theme.Surface } else { $script:Theme.Bg }
+
+    if ($Control -is [System.Windows.Forms.Form]) {
+        $Control.BackColor = $script:Theme.Bg
+        $Control.ForeColor = $script:Theme.Text
+    }
+    elseif ($Control -is [System.Windows.Forms.Panel]) {
+        $Control.BackColor = $bg
+        $Control.ForeColor = $script:Theme.Text
+    }
+    elseif ($Control -is [System.Windows.Forms.GroupBox]) {
+        $Control.BackColor = $script:Theme.Bg
+        $Control.ForeColor = $script:Theme.Accent
+    }
+    elseif ($Control -is [System.Windows.Forms.Label]) {
+        $Control.BackColor = $bg
+        if ($Control.ForeColor -eq [System.Drawing.Color]::Empty -or
+            $Control.ForeColor -eq [System.Drawing.SystemColors]::ControlText) {
+            $Control.ForeColor = $script:Theme.Text
+        }
+    }
+    elseif ($Control -is [System.Windows.Forms.Button]) {
+        if ($Control.BackColor -eq [System.Drawing.Color]::Empty -or
+            $Control.BackColor -eq [System.Drawing.SystemColors]::Control) {
+            $Control.BackColor = $script:Theme.Input
+            $Control.ForeColor = $script:Theme.Text
+            $Control.FlatAppearance.BorderColor = $script:Theme.Border
+        }
+        $Control.UseVisualStyleBackColor = $false
+    }
+    elseif ($Control -is [System.Windows.Forms.ComboBox]) {
+        $Control.BackColor = $script:Theme.Input
+        $Control.ForeColor = $script:Theme.Text
+        $Control.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    }
+    elseif ($Control -is [System.Windows.Forms.RadioButton] -or
+            $Control -is [System.Windows.Forms.CheckBox]) {
+        $Control.BackColor = $bg
+        $Control.ForeColor = $script:Theme.Text
+        $Control.UseVisualStyleBackColor = $false
+    }
+
+    foreach ($child in $Control.Controls) {
+        $childSurface = $IsSurface -or ($Control -is [System.Windows.Forms.GroupBox])
+        Set-DarkThemeOnControl -Control $child -IsSurface:($childSurface -or ($child -is [System.Windows.Forms.Panel]))
+    }
 }
 
 function New-StyledButton {
@@ -120,11 +205,17 @@ function New-StyledButton {
     $btn.Location = New-Object System.Drawing.Point($X, $Y)
     $btn.Size = New-Object System.Drawing.Size($W, $H)
     $btn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $btn.UseVisualStyleBackColor = $false
     if ($Primary) {
-        $btn.BackColor = $script:BrandAccent
-        $btn.ForeColor = [System.Drawing.Color]::White
+        $btn.BackColor = $script:Theme.Accent
+        $btn.ForeColor = [System.Drawing.Color]::FromArgb(28, 28, 30)
         $btn.FlatAppearance.BorderSize = 0
         $btn.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+    }
+    else {
+        $btn.BackColor = $script:Theme.Input
+        $btn.ForeColor = $script:Theme.Text
+        $btn.FlatAppearance.BorderColor = $script:Theme.Border
     }
     return $btn
 }
@@ -156,7 +247,7 @@ function Get-MonitorSecondaryLabel {
     $parts = @()
     if ($Monitor.Resolution) { $parts += $Monitor.Resolution }
     if ($Monitor.Frequency) { $parts += "$($Monitor.Frequency) Hz" }
-    if ($Monitor.IsPrimary -and $Monitor.IsActive) { $parts += "Primario" }
+    if ($Monitor.IsPrimary -and $Monitor.IsActive) { $parts += "Primário" }
     if (-not $Monitor.IsActive) { $parts += "Desconectado" }
     return ($parts -join " · ")
 }
@@ -190,7 +281,7 @@ function Build-MonitorLayoutDiagram {
     )
 
     $Panel.Controls.Clear()
-    $Panel.BackColor = [System.Drawing.Color]::FromArgb(245, 245, 245)
+    $Panel.BackColor = $script:Theme.Surface
 
     if ($Monitors.Count -eq 0) {
         $lbl = New-Label -Text "Nenhum monitor para exibir." -X 10 -Y 10 -W 300
@@ -251,15 +342,16 @@ function Build-MonitorLayoutDiagram {
         )
         $isFocus = ($m.Name -eq $FocusName)
         if ($isFocus) {
-            $box.BackColor = $script:BrandAccent
-            $box.ForeColor = [System.Drawing.Color]::White
+            $box.BackColor = $script:Theme.Accent
+            $box.ForeColor = [System.Drawing.Color]::FromArgb(28, 28, 30)
         }
         elseif (-not $m.IsActive) {
-            $box.BackColor = [System.Drawing.Color]::LightGray
+            $box.BackColor = [System.Drawing.Color]::FromArgb(55, 55, 58)
+            $box.ForeColor = $script:Theme.Muted
         }
         else {
-            $box.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 70)
-            $box.ForeColor = [System.Drawing.Color]::White
+            $box.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 74)
+            $box.ForeColor = $script:Theme.Text
         }
 
         $lbl = New-Object System.Windows.Forms.Label
@@ -336,12 +428,12 @@ function Build-MonitorPanel {
         $nameLabel = New-Label -Text $friendly -X $colName -Y $y -W 420 -H 16 `
             -Font (New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold))
         if (-not $monitor.IsActive) {
-            $nameLabel.ForeColor = [System.Drawing.Color]::Gray
+            $nameLabel.ForeColor = $script:Theme.Muted
         }
         $Panel.Controls.Add($nameLabel)
 
         $subLabel = New-Label -Text $secondary -X ($colName + 2) -Y ($y + 16) -W 420 -H 14
-        $subLabel.ForeColor = [System.Drawing.Color]::DimGray
+        $subLabel.ForeColor = $script:Theme.Muted
         $subLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8)
         $Panel.Controls.Add($subLabel)
 
@@ -354,33 +446,28 @@ function Populate-AudioCombo {
     param(
         [System.Windows.Forms.ComboBox]$Combo,
         [string]$SavedAudioId,
-        [string]$SavedAudioName = ""
+        [string]$SavedAudioName = "",
+        [bool]$SavedAudioAutoSwitch = $false
     )
 
     $Combo.Items.Clear()
-    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "(Nao mudar)"; Id = "" })
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "(Não mudar)"; Id = "" })
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = $script:AudioOnConnectLabel; Id = $script:AudioOnConnectId })
 
     if (-not (Test-SoundVolumeViewAvailable)) {
         $Combo.SelectedIndex = 0
         return
     }
 
-    $devices = Get-ConsoleAudioDevices
+    $devices = @(Get-ConsoleAudioDevices | Where-Object { $_.IsActive })
     foreach ($device in $devices) {
         [void]$Combo.Items.Add([PSCustomObject]@{ Text = $device.Name; Id = $device.FriendlyId })
     }
 
-    if ($SavedAudioId -and -not ($devices | Where-Object { $_.FriendlyId -eq $SavedAudioId })) {
-        $label = if ($SavedAudioName) { $SavedAudioName } else { $SavedAudioId }
-        if ($label -notmatch '\[Desabilitado\]') {
-            $label += " [Desabilitado]"
-        }
-        [void]$Combo.Items.Add([PSCustomObject]@{ Text = $label; Id = $SavedAudioId })
-    }
-
     $selectedIndex = 0
+    $targetId = if ($SavedAudioAutoSwitch) { $script:AudioOnConnectId } else { $SavedAudioId }
     for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
-        if ($Combo.Items[$i].Id -eq $SavedAudioId) {
+        if ($Combo.Items[$i].Id -eq $targetId) {
             $selectedIndex = $i
             break
         }
@@ -428,6 +515,11 @@ function Get-WizardSelections {
     $audioItem = $AudioCombo.SelectedItem
     $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
     $audioName = if ($audioItem) { [string]$audioItem.Text } else { "" }
+    $audioAutoSwitch = ($audioId -eq $script:AudioOnConnectId -or $audioId -eq "__auto__")
+    if ($audioAutoSwitch) {
+        $audioId = ""
+        $audioName = $script:AudioOnConnectLabel
+    }
 
     $hideMonitors = @($selection.HideMonitors | Where-Object { $_ -ne $selection.FocusMonitor })
     if ($hideMonitors.Count -eq 0) {
@@ -445,6 +537,11 @@ function Get-WizardSelections {
         $hideLabels += if ($m) { Get-MonitorFriendlyLabel -Monitor $m } else { $name }
     }
 
+    $audioHint = ""
+    if ($focusInfo -and $focusInfo.MonitorName) {
+        $audioHint = $focusInfo.MonitorName
+    }
+
     return @{
         FocusMonitor   = $selection.FocusMonitor
         FocusLabel     = $focusLabel
@@ -454,6 +551,8 @@ function Get-WizardSelections {
         FullscreenMode = $fullscreenMode
         AudioDeviceId  = $audioId
         AudioDeviceName = $audioName
+        AudioAutoSwitch = $audioAutoSwitch
+        AudioDeviceHint = $audioHint
         FocusMonitorInfo = $focusInfo
     }
 }
@@ -479,9 +578,10 @@ function Save-FromWizard {
         -HideStrategy $data.HideStrategy `
         -FullscreenMode $data.FullscreenMode `
         -AudioDeviceId $data.AudioDeviceId `
-        -AudioDeviceName $data.AudioDeviceName
+        -AudioDeviceName $data.AudioDeviceName `
+        -AudioAutoSwitch $data.AudioAutoSwitch
 
-    Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuracao salva." -Color ([System.Drawing.Color]::DarkGreen)
+    Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuração salva." -Color $script:Theme.Success
     return $true
 }
 
@@ -493,14 +593,22 @@ function Update-ReviewPanel {
 
     $data = Get-WizardSelections @WizardData
     $hideText = if ($data.HideLabels.Count -gt 0) { $data.HideLabels -join ", " } else { "(nenhum)" }
-    $audioText = if ($data.AudioDeviceName) { $data.AudioDeviceName } else { "(nao mudar)" }
+    $audioText = if ($data.AudioAutoSwitch) {
+        $script:AudioOnConnectLabel
+    }
+    elseif ($data.AudioDeviceName) {
+        $data.AudioDeviceName
+    }
+    else {
+        "(não mudar)"
+    }
 
     $ReviewLabel.Text = @(
         "Monitor de foco: $($data.FocusLabel)"
         "Esconder: $hideText"
-        "Estrategia: $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
+        "Estratégia: $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
         "Modo: $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
-        "Audio: $audioText"
+        "Áudio: $audioText"
     ) -join [Environment]::NewLine
 }
 
@@ -552,8 +660,11 @@ function Initialize-TrayIcon {
     $exitItem.Text = "Sair"
     $exitItem.Add_Click({
         if ($Script:ConsoleState.IsActive) { Stop-ConsoleMode }
+        $script:ConsoleUiLocked = $false
         $script:TrayIcon.Visible = $false
         $script:TrayIcon.Dispose()
+        $script:AllowFormClosePrompt = $true
+        Stop-ConsoleMessageLoop
         $Form.Close()
     })
     [void]$menu.Items.Add($exitItem)
@@ -574,6 +685,7 @@ function Start-MonitorTimer {
         $script:MonitorTimer.Dispose()
     }
 
+    Ensure-ConsolePumpForm | Out-Null
     $script:MonitorTimer = New-Object System.Windows.Forms.Timer
     $script:MonitorTimer.Interval = 1000
     $script:MonitorTimer.Add_Tick({
@@ -581,18 +693,23 @@ function Start-MonitorTimer {
         if ($result -eq "exit") {
             $script:MonitorTimer.Stop()
             Stop-ConsoleMode
+            $script:ConsoleUiLocked = $false
             Set-WizardEnabled @WizardContext -Enabled $true
             Show-FormOnPrimary -Form $Form
             Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
-                -Message "Modo console encerrado. Setup restaurado." -Color ([System.Drawing.Color]::DarkGreen)
+                -Message "Modo console encerrado. Setup restaurado." -Color $script:Theme.Success
         }
         elseif ($result -eq "running") {
             $statusMsg = if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
-                "Modo console ativo (Xbox). Ao sair, o setup sera restaurado automaticamente."
+                "Modo console ativo (Xbox). Ao sair, o setup será restaurado automaticamente."
             } else {
                 "Modo console ativo. Pressione ESC nas cortinas pretas ou use Restaurar."
             }
-            Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message $statusMsg -Color ([System.Drawing.Color]::DarkBlue)
+            if ($Script:ConsoleState.LastAudioSwitchName) {
+                $statusMsg = "Áudio alterado para: $($Script:ConsoleState.LastAudioSwitchName). $statusMsg"
+                $Script:ConsoleState.LastAudioSwitchName = $null
+            }
+            Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message $statusMsg -Color $script:Theme.Accent
         }
     })
     $script:MonitorTimer.Start()
@@ -617,11 +734,11 @@ function Show-WizardStep {
     for ($i = 0; $i -lt $ProgressLabels.Count; $i++) {
         if ($i -eq $Step) {
             $ProgressLabels[$i].Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-            $ProgressLabels[$i].ForeColor = $script:BrandAccent
+            $ProgressLabels[$i].ForeColor = $script:Theme.Accent
         }
         else {
             $ProgressLabels[$i].Font = New-Object System.Drawing.Font("Segoe UI", 9)
-            $ProgressLabels[$i].ForeColor = [System.Drawing.Color]::DimGray
+            $ProgressLabels[$i].ForeColor = $script:Theme.Muted
         }
     }
 
@@ -634,7 +751,7 @@ function Show-WizardStep {
 function Show-ConsoleModeGui {
     if (-not (Test-MultiMonitorToolAvailable)) {
         [System.Windows.Forms.MessageBox]::Show(
-            "MultiMonitorTool.exe nao encontrado.`n`nEm desenvolvimento: coloque na pasta do projeto.`nNo executavel: sera extraido em ConsoleMode_Data\tools na primeira execucao.",
+            "MultiMonitorTool.exe não encontrado.`n`nEm desenvolvimento: coloque na pasta do projeto.`nNo executável: será extraído em ConsoleMode_Data\tools na primeira execução.",
             "Console Mode - Erro",
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Error
@@ -654,62 +771,64 @@ function Show-ConsoleModeGui {
     $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedDialog
     $form.MaximizeBox = $false
     $form.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
-    $form.BackColor = [System.Drawing.Color]::White
+    $form.BackColor = $script:Theme.Bg
+    $form.ForeColor = $script:Theme.Text
     $form.Icon = Get-ConsoleAppIcon
     Move-FormToPrimaryScreen -Form $form
     $form.Add_Shown({ Move-FormToPrimaryScreen -Form $form })
 
     $form.Add_FormClosing({
         param($sender, $e)
-        if ($Script:ConsoleState.IsActive) {
-            $answer = [System.Windows.Forms.MessageBox]::Show(
-                "O modo console esta ativo. Deseja restaurar o setup antes de sair?",
-                "Console Mode",
-                [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
-                [System.Windows.Forms.MessageBoxIcon]::Question
-            )
-            if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
-                $e.Cancel = $true
+
+        if (($Script:ConsoleState.IsActive -or $script:ConsoleUiLocked) -and -not $script:AllowFormClosePrompt) {
+            if ($sender.Visible -and $e.CloseReason -eq [System.Windows.Forms.CloseReason]::UserClosing) {
+                $answer = [System.Windows.Forms.MessageBox]::Show(
+                    "O modo console está ativo. Deseja restaurar o setup antes de sair?",
+                    "Console Mode",
+                    [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
+                    [System.Windows.Forms.MessageBoxIcon]::Question
+                )
+                if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
+                    $e.Cancel = $true
+                    return
+                }
+                if ($answer -eq [System.Windows.Forms.DialogResult]::Yes) {
+                    if ($script:MonitorTimer) { $script:MonitorTimer.Stop() }
+                    Stop-ConsoleMode
+                    $script:ConsoleUiLocked = $false
+                }
+                $script:AllowFormClosePrompt = $true
+                Stop-ConsoleMessageLoop
                 return
             }
-            if ($answer -eq [System.Windows.Forms.DialogResult]::Yes) {
-                if ($script:MonitorTimer) { $script:MonitorTimer.Stop() }
-                Stop-ConsoleMode
-            }
+
+            $e.Cancel = $true
+            return
         }
+
+        Stop-ConsoleMessageLoop
         if ($script:TrayIcon) {
             $script:TrayIcon.Visible = $false
             $script:TrayIcon.Dispose()
         }
+        if ($script:PumpForm -and -not $script:PumpForm.IsDisposed) {
+            $script:PumpForm.Close()
+            $script:PumpForm.Dispose()
+            $script:PumpForm = $null
+        }
     })
 
-    $headerY = 12
-    $progressY = 78
+    $titleLbl = New-Label -Text "Console Mode" -X 20 -Y 14 -W 300 -H 28 `
+        -Font (New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold))
+    $titleLbl.ForeColor = $script:Theme.Accent
+    $form.Controls.Add($titleLbl)
 
-    $logoPath = Get-ConsoleBrandLogoPath
-    if ($logoPath) {
-        $logoBox = New-Object System.Windows.Forms.PictureBox
-        $logoBox.Location = New-Object System.Drawing.Point(20, $headerY)
-        $logoBox.Size = New-Object System.Drawing.Size(300, 54)
-        $logoBox.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::Zoom
-        $logoBox.BackColor = [System.Drawing.Color]::White
-        try {
-            $logoBox.Image = [System.Drawing.Image]::FromFile($logoPath)
-        }
-        catch { }
-        $form.Controls.Add($logoBox)
-    }
-    else {
-        $titleLbl = New-Label -Text "Console Mode" -X 20 -Y $headerY -W 300 -H 28 `
-            -Font (New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold))
-        $titleLbl.ForeColor = $script:BrandDark
-        $form.Controls.Add($titleLbl)
-    }
-
-    $subtitleLbl = New-Label -Text "Transforme seu PC em console de jogos em poucos passos." -X 20 -Y 48 -W 660 -H 20
-    $subtitleLbl.ForeColor = [System.Drawing.Color]::DimGray
+    $subtitleLbl = New-Label -Text "Transforme seu PC em console de jogos em poucos passos." -X 20 -Y 44 -W 660 -H 20
+    $subtitleLbl.ForeColor = $script:Theme.Muted
     $form.Controls.Add($subtitleLbl)
-    $stepTitles = @("1. Monitores", "2. Modo", "3. Audio", "Iniciar")
+
+    $progressY = 72
+    $stepTitles = @("1. Monitores", "2. Modo", "3. Áudio", "Iniciar")
     $progressLabels = @()
     $px = 20
     foreach ($title in $stepTitles) {
@@ -722,7 +841,7 @@ function Show-ConsoleModeGui {
     $linePanel = New-Object System.Windows.Forms.Panel
     $linePanel.Location = New-Object System.Drawing.Point(20, ($progressY + 22))
     $linePanel.Size = New-Object System.Drawing.Size(660, 2)
-    $linePanel.BackColor = [System.Drawing.Color]::LightGray
+    $linePanel.BackColor = $script:Theme.Border
     $form.Controls.Add($linePanel)
 
     $contentTop = $progressY + 36
@@ -761,9 +880,9 @@ function Show-ConsoleModeGui {
     })
     $step1.Controls.Add($btnHideOthers)
 
-    $hint1 = New-Label -Text "Desconectados (cinza) serao reativados ao iniciar. Sem marcar Esconder, os demais ativos serao desconectados." `
+    $hint1 = New-Label -Text "Desconectados (cinza) serão reativados ao iniciar. Sem marcar Esconder, os demais ativos serão desconectados." `
         -X 235 -Y 346 -W 420 -H 30
-    $hint1.ForeColor = [System.Drawing.Color]::DimGray
+    $hint1.ForeColor = $script:Theme.Muted
     $hint1.Font = New-Object System.Drawing.Font("Segoe UI", 8)
     $step1.Controls.Add($hint1)
 
@@ -804,13 +923,13 @@ function Show-ConsoleModeGui {
     }
     $hideGroup.Controls.Add($hideStrategyCombo)
 
-    $hideDesc = New-Label -Text "Desconectar: desativa no Windows (rapido). Cortinas: overlay preto. DDC/CI: apaga o painel via hardware." `
+    $hideDesc = New-Label -Text "Desconectar: desativa no Windows (rápido). Cortinas: overlay preto. DDC/CI: apaga o painel via hardware." `
         -X 15 -Y 65 -W 610 -H 40
-    $hideDesc.ForeColor = [System.Drawing.Color]::DimGray
+    $hideDesc.ForeColor = $script:Theme.Muted
     $hideDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
     $hideGroup.Controls.Add($hideDesc)
     $tt = New-Object System.Windows.Forms.ToolTip
-    $tt.SetToolTip($hideStrategyCombo, "Desconectar e o mais confiavel para a maioria dos setups com 3 monitores.")
+    $tt.SetToolTip($hideStrategyCombo, "Desconectar é o mais confiável para a maioria dos setups com 3 monitores.")
 
     $modeGroup = New-Object System.Windows.Forms.GroupBox
     $modeGroup.Text = "Modo de tela cheia"
@@ -826,7 +945,7 @@ function Show-ConsoleModeGui {
     $modeGroup.Controls.Add($modeBigPicture)
 
     $bpDesc = New-Label -Text "Abre a Steam em modo Big Picture no monitor de foco." -X 35 -Y 58 -W 580 -H 18
-    $bpDesc.ForeColor = [System.Drawing.Color]::DimGray
+    $bpDesc.ForeColor = $script:Theme.Muted
     $bpDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
     $modeGroup.Controls.Add($bpDesc)
 
@@ -844,9 +963,9 @@ function Show-ConsoleModeGui {
     $form.Controls.Add($step3)
 
     $audioGroup = New-Object System.Windows.Forms.GroupBox
-    $audioGroup.Text = "Saida de audio"
+    $audioGroup.Text = "Saída de áudio"
     $audioGroup.Location = New-Object System.Drawing.Point(5, 10)
-    $audioGroup.Size = New-Object System.Drawing.Size(650, 100)
+    $audioGroup.Size = New-Object System.Drawing.Size(650, 115)
     $step3.Controls.Add($audioGroup)
 
     $audioCombo = New-Object System.Windows.Forms.ComboBox
@@ -855,17 +974,32 @@ function Show-ConsoleModeGui {
     $audioCombo.Size = New-Object System.Drawing.Size(610, 28)
     $audioCombo.DisplayMember = "Text"
     $audioGroup.Controls.Add($audioCombo)
-    Populate-AudioCombo -Combo $audioCombo -SavedAudioId $config.audioDeviceId -SavedAudioName $config.audioDeviceName
+    Populate-AudioCombo -Combo $audioCombo `
+        -SavedAudioId $config.audioDeviceId `
+        -SavedAudioName $config.audioDeviceName `
+        -SavedAudioAutoSwitch $config.audioAutoSwitch
 
-    $audioHint = New-Label -Text "Dispositivos desabilitados (ex.: audio da TV desconectada) aparecem com [Desabilitado] e serao ativados ao iniciar." `
-        -X 5 -Y 125 -W 650 -H 36
-    $audioHint.ForeColor = [System.Drawing.Color]::DimGray
+    if (-not $config.audioDeviceId -and -not $config.audioAutoSwitch) {
+        $focusForAudio = $monitors | Where-Object { $_.Name -eq $config.focusMonitor } | Select-Object -First 1
+        if ($focusForAudio -and -not $focusForAudio.IsActive) {
+            for ($i = 0; $i -lt $audioCombo.Items.Count; $i++) {
+                if ($audioCombo.Items[$i].Id -eq $script:AudioOnConnectId) {
+                    $audioCombo.SelectedIndex = $i
+                    break
+                }
+            }
+        }
+    }
+
+    $audioHint = New-Label -Text "Use ""$($script:AudioOnConnectLabel)"" quando a TV ainda não está ligada. Ao ligá-la, o Windows mostra o áudio HDMI como nova saída e o app troca para ela automaticamente." `
+        -X 5 -Y 125 -W 650 -H 40
+    $audioHint.ForeColor = $script:Theme.Muted
     $audioHint.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
     $step3.Controls.Add($audioHint)
 
     if (-not (Test-SoundVolumeViewAvailable)) {
-        $audioWarn = New-Label -Text "SoundVolumeView nao encontrado - troca de audio desabilitada." -X 5 -Y 165 -W 650 -H 20
-        $audioWarn.ForeColor = [System.Drawing.Color]::DarkOrange
+        $audioWarn = New-Label -Text "SoundVolumeView não encontrado — troca de áudio desabilitada." -X 5 -Y 165 -W 650 -H 20
+        $audioWarn.ForeColor = $script:Theme.Warning
         $step3.Controls.Add($audioWarn)
     }
 
@@ -901,17 +1035,17 @@ function Show-ConsoleModeGui {
         -Font (New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold))
     $panelActive.Controls.Add($activeTitle)
 
-    $activeDesc = New-Label -Text "O app esta na bandeja. Ao sair do Big Picture ou Modo Xbox, tudo sera restaurado automaticamente." `
+    $activeDesc = New-Label -Text "O app está na bandeja. Ao sair do Big Picture ou Modo Xbox, tudo será restaurado automaticamente." `
         -X 5 -Y 55 -W 650 -H 50
-    $activeDesc.ForeColor = [System.Drawing.Color]::DimGray
+    $activeDesc.ForeColor = $script:Theme.Muted
     $panelActive.Controls.Add($activeDesc)
 
     $statusLabel = New-Label -Text "Pronto." -X 20 -Y 520 -W 660 -H 36
-    $statusLabel.ForeColor = [System.Drawing.Color]::DimGray
+    $statusLabel.ForeColor = $script:Theme.Muted
     $form.Controls.Add($statusLabel)
 
     $btnBack = New-StyledButton -Text "< Voltar" -X 20 -Y 565 -W 100 -H 34
-    $btnNext = New-StyledButton -Text "Proximo >" -X 490 -Y 565 -W 100 -H 34
+    $btnNext = New-StyledButton -Text "Próximo >" -X 490 -Y 565 -W 100 -H 34
     $btnStart = New-StyledButton -Text "Iniciar modo console" -X 430 -Y 555 -W 250 -H 44 -Primary
     $btnStart.Visible = $false
 
@@ -965,20 +1099,36 @@ function Show-ConsoleModeGui {
         $script:LoadedMonitors = $monitors
         $cfg = Get-ConsoleConfig
         Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors
-        Populate-AudioCombo -Combo $audioCombo -SavedAudioId $cfg.audioDeviceId -SavedAudioName $cfg.audioDeviceName
+        Populate-AudioCombo -Combo $audioCombo `
+            -SavedAudioId $cfg.audioDeviceId `
+            -SavedAudioName $cfg.audioDeviceName `
+            -SavedAudioAutoSwitch $cfg.audioAutoSwitch
         $sel = Get-GuiSelections -MonitorPanel $monitorPanel
         $focus = if ($sel.FocusMonitor) { $sel.FocusMonitor } else { ($monitors | Select-Object -First 1).Name }
         Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $focus
-        Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Listas atualizadas." -Color ([System.Drawing.Color]::DarkGreen)
+        Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Listas atualizadas." -Color $script:Theme.Success
     })
+
+    $restoreAction = {
+        if ($script:MonitorTimer) { $script:MonitorTimer.Stop() }
+        Request-ConsoleModeExit
+        Stop-ConsoleMode
+        $script:ConsoleUiLocked = $false
+        Set-WizardEnabled @wizardContext -Enabled $true
+        Show-FormOnPrimary -Form $form
+        Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Setup restaurado." -Color $script:Theme.Success
+    }
 
     $startConsoleAction = {
         if (-not (Save-FromWizard -Form $form -WizardData $wizardData -StatusLabel $statusLabel)) { return }
 
         $data = Get-WizardSelections @wizardData
         try {
+            $script:ConsoleUiLocked = $true
+            Ensure-ConsolePumpForm | Out-Null
             Set-WizardEnabled @wizardContext -Enabled $false
-            $form.WindowState = [System.Windows.Forms.FormWindowState]::Minimized
+            Hide-ConsoleForm -Form $form
+            Initialize-TrayIcon -Form $form -OnRestore $restoreAction
             [System.Windows.Forms.Application]::DoEvents()
 
             Start-ConsoleMode `
@@ -987,28 +1137,22 @@ function Show-ConsoleModeGui {
                 -HideStrategy $data.HideStrategy `
                 -FullscreenMode $data.FullscreenMode `
                 -AudioDeviceId $data.AudioDeviceId `
+                -AudioAutoSwitch:$data.AudioAutoSwitch `
+                -AudioDeviceHint $data.AudioDeviceHint `
                 -FocusMonitorInfo $data.FocusMonitorInfo
 
             Start-MonitorTimer -Form $form -StatusLabel $statusLabel -WizardContext $wizardContext
-            Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Modo console iniciado..." -Color ([System.Drawing.Color]::DarkBlue)
         }
         catch {
             [System.Windows.Forms.MessageBox]::Show("Erro ao iniciar modo console:`n$_", "Console Mode") | Out-Null
             Stop-ConsoleMode
+            $script:ConsoleUiLocked = $false
             Set-WizardEnabled @wizardContext -Enabled $true
+            Show-FormOnPrimary -Form $form
         }
     }
 
     $btnStart.Add_Click($startConsoleAction)
-
-    $restoreAction = {
-        if ($script:MonitorTimer) { $script:MonitorTimer.Stop() }
-        Request-ConsoleModeExit
-        Stop-ConsoleMode
-        Set-WizardEnabled @wizardContext -Enabled $true
-        Show-FormOnPrimary -Form $form
-        Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Setup restaurado." -Color ([System.Drawing.Color]::DarkGreen)
-    }
 
     $btnRestore.Add_Click($restoreAction)
     Initialize-TrayIcon -Form $form -OnRestore $restoreAction
@@ -1016,5 +1160,14 @@ function Show-ConsoleModeGui {
     Show-WizardStep -Step 0 -StepPanels $stepPanels -ProgressLabels $progressLabels `
         -BtnBack $btnBack -BtnNext $btnNext -BtnStart $btnStart -ReviewPanel $step4
 
-    [void]$form.ShowDialog()
+    Set-DarkThemeOnControl -Control $form
+
+    Ensure-ConsolePumpForm | Out-Null
+    $script:KeepAppRunning = $true
+    [void]$form.Show()
+
+    while ($script:KeepAppRunning) {
+        [System.Windows.Forms.Application]::DoEvents()
+        Start-Sleep -Milliseconds 25
+    }
 }

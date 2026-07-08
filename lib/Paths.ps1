@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # Console Mode - Resolucao de paths (dev, ps2exe e dados portateis)
 
 $Script:ConsolePaths = @{
@@ -113,6 +113,37 @@ function Move-ConsoleToolFile {
     }
 }
 
+function Get-ConsoleAssetsDir {
+    return Join-Path (Get-ConsoleExeDir) "assets"
+}
+
+function Get-ConsoleIconPath {
+    $candidates = [System.Collections.ArrayList]@()
+
+    if ($Script:EntryRoot) {
+        [void]$candidates.Add((Join-Path $Script:EntryRoot "assets\icon.ico"))
+    }
+
+    [void]$candidates.Add((Join-Path (Get-ConsoleAssetsDir) "icon.ico"))
+
+    $exeDir = Get-ConsoleExeDir
+    if ($exeDir) {
+        [void]$candidates.Add((Join-Path $exeDir "assets\icon.ico"))
+    }
+
+    $seen = @{}
+    foreach ($path in $candidates) {
+        if ([string]::IsNullOrWhiteSpace($path)) { continue }
+        if ($seen.ContainsKey($path)) { continue }
+        $seen[$path] = $true
+        if (Test-Path -LiteralPath $path) {
+            return $path
+        }
+    }
+
+    return $null
+}
+
 function Initialize-ConsoleAppLayout {
     $exeDir = Get-ConsoleExeDir
     $dataDir = Get-ConsoleDataDir
@@ -125,6 +156,25 @@ function Initialize-ConsoleAppLayout {
     }
     if (-not (Test-Path -LiteralPath $toolsDir)) {
         New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null
+    }
+
+    $assetsDir = Get-ConsoleAssetsDir
+    if (-not (Test-Path -LiteralPath $assetsDir)) {
+        New-Item -ItemType Directory -Path $assetsDir -Force | Out-Null
+    }
+
+    if ($devMode) {
+        $sourceIcon = $null
+        if ($Script:EntryRoot) {
+            $sourceIcon = Join-Path $Script:EntryRoot "assets\icon.ico"
+        }
+        if (-not $sourceIcon -or -not (Test-Path -LiteralPath $sourceIcon)) {
+            $sourceIcon = Join-Path $exeDir "assets\icon.ico"
+        }
+        $destIcon = Join-Path $assetsDir "icon.ico"
+        if ($sourceIcon -and (Test-Path -LiteralPath $sourceIcon) -and ($sourceIcon -ne $destIcon)) {
+            Copy-Item -LiteralPath $sourceIcon -Destination $destIcon -Force -ErrorAction SilentlyContinue
+        }
     }
 
     $toolNames = @("MultiMonitorTool.exe", "SoundVolumeView.exe")
