@@ -333,6 +333,35 @@ if (-not ([System.Management.Automation.PSTypeName]'NativeHelpers').Type) {
     Add-Type -TypeDefinition $nativeSource
 }
 
+function Get-WindowsDisplayNumberMapFromMmtRows {
+    param([array]$Rows)
+
+    $map = @{}
+    if (-not $Rows -or $Rows.Count -eq 0) { return $map }
+
+    $activeRows = [System.Collections.ArrayList]@()
+    $inactiveRows = [System.Collections.ArrayList]@()
+    foreach ($row in $Rows) {
+        if ([string]::IsNullOrWhiteSpace($row.Name)) { continue }
+        if ($row.Active -eq 'Yes') {
+            [void]$activeRows.Add($row)
+        }
+        else {
+            [void]$inactiveRows.Add($row)
+        }
+    }
+
+    $number = 1
+    foreach ($row in (@($activeRows) + @($inactiveRows))) {
+        if (-not $map.ContainsKey($row.Name)) {
+            $map[$row.Name] = $number
+            $number++
+        }
+    }
+
+    return $map
+}
+
 # Paths definidos por lib/Paths.ps1 via Initialize-ConsoleAppLayout / Set-ConsoleEnginePaths
 
 $Script:ConsoleState = @{
@@ -416,6 +445,7 @@ function Invoke-Svv {
     return $process.ExitCode
 }
 
+
 function Get-ConsoleMonitors {
     param([switch]$ForceRefresh)
 
@@ -434,6 +464,7 @@ function Get-ConsoleMonitors {
         }
 
         $rows = Import-Csv -LiteralPath $csvPath -Encoding UTF8
+        $winMap = Get-WindowsDisplayNumberMapFromMmtRows -Rows $rows
         $monitors = foreach ($row in $rows) {
             if ([string]::IsNullOrWhiteSpace($row.Name)) { continue }
 
@@ -464,9 +495,15 @@ function Get-ConsoleMonitors {
                 $maxHeight = $height
             }
 
+            $winNum = 0
+            if ($winMap.ContainsKey($row.Name)) {
+                $winNum = [int]$winMap[$row.Name]
+            }
+
             [PSCustomObject]@{
-                Name            = $row.Name
-                Resolution      = $resolution
+                Name                = $row.Name
+                WindowsDisplayNumber = $winNum
+                Resolution          = $resolution
                 MaximumResolution = $maxResolution
                 MaxWidth        = $maxWidth
                 MaxHeight       = $maxHeight
@@ -483,7 +520,9 @@ function Get-ConsoleMonitors {
             }
         }
 
-        $monitors = @($monitors | Sort-Object { -not $_.IsActive }, Name)
+        $monitors = @($monitors | Sort-Object {
+            if ($_.WindowsDisplayNumber -gt 0) { $_.WindowsDisplayNumber } else { 999 }
+        }, Name)
     }
     finally {
         Remove-Item -LiteralPath $csvPath -Force -ErrorAction SilentlyContinue
@@ -824,36 +863,6 @@ function Test-BackupMonitorSpecActive {
     return ($width -gt 0 -and $height -gt 0)
 }
 
-function Build-MmtSetMonitorsSpecFromBackupEntry {
-    param(
-        [hashtable]$Spec,
-        [switch]$AsPrimary
-    )
-
-    if (-not (Test-BackupMonitorSpecActive -Spec $Spec)) { return $null }
-
-    $parts = @("Name=$($Spec.Name)")
-    foreach ($key in @('BitsPerPixel', 'Width', 'Height', 'DisplayFlags', 'DisplayFrequency', 'DisplayOrientation', 'PositionX', 'PositionY')) {
-        if ($Spec.ContainsKey($key) -and -not [string]::IsNullOrWhiteSpace([string]$Spec[$key])) {
-            $parts += "$key=$($Spec[$key])"
-        }
-    }
-    if ($AsPrimary) { $parts += 'Primary=Yes' }
-    return ($parts -join ' ')
-}
-
-function Get-BackupActiveMonitorNames {
-    param([hashtable]$BackupSpecs)
-
-    $names = [System.Collections.ArrayList]@()
-    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
-        if (Test-BackupMonitorSpecActive -Spec $BackupSpecs[$name]) {
-            [void]$names.Add([string]$name)
-        }
-    }
-    return @($names)
-}
-
 function Get-BackupInactiveMonitorNames {
     param([hashtable]$BackupSpecs)
 
@@ -879,51 +888,6 @@ function Restore-SessionHideStrategyBeforeBackup {
     }
 }
 
-function Invoke-MmtSetMonitorsFromBackupSpecs {
-    param(
-        [hashtable]$BackupSpecs,
-        [string]$OriginalPrimary
-    )
-
-    $setArgs = @("/SetMonitors")
-    $hasSpecs = $false
-
-    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
-        $spec = $BackupSpecs[$name]
-        $asPrimary = ($OriginalPrimary -and $name -eq $OriginalPrimary)
-        if (-not $asPrimary -and $spec.Primary -match '^(Yes|1|True)$') {
-            $asPrimary = $true
-        }
-
-        $mmtSpec = Build-MmtSetMonitorsSpecFromBackupEntry -Spec $spec -AsPrimary:$asPrimary
-        if ($mmtSpec) {
-            $setArgs += "`"$mmtSpec`""
-            $hasSpecs = $true
-        }
-    }
-
-    if ($hasSpecs) {
-        Invoke-Mmt -Arguments $setArgs | Out-Null
-    }
-}
-
-function Disable-MonitorAfterRestore {
-    param([Parameter(Mandatory)][string]$MonitorName)
-
-    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
-    Start-Sleep -Milliseconds 200
-    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
-    Start-Sleep -Milliseconds 200
-}
-
-function Restore-MonitorsInactiveInBackup {
-    param([hashtable]$BackupSpecs)
-
-    foreach ($name in (Get-BackupInactiveMonitorNames -BackupSpecs $BackupSpecs)) {
-        Disable-MonitorAfterRestore -MonitorName $name
-    }
-}
-
 function Restore-MonitorBackup {
     if (-not (Test-Path -LiteralPath $Script:BackupMonitorConfig)) { return }
 
@@ -932,34 +896,33 @@ function Restore-MonitorBackup {
 
     Restore-SessionHideStrategyBeforeBackup -Context $ctx
 
-    $activeInBackup = Get-BackupActiveMonitorNames -BackupSpecs $backupSpecs
-    if ($activeInBackup.Count -gt 0) {
+    $allDeviceNames = @(
+        $backupSpecs.Values |
+            ForEach-Object { $_.Name } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            Select-Object -Unique
+    )
+
+    if ($allDeviceNames.Count -gt 0) {
         $enableArgs = @("/enable")
-        foreach ($name in $activeInBackup) {
-            $enableArgs += "`"$name`""
+        foreach ($deviceName in $allDeviceNames) {
+            $enableArgs += "`"$deviceName`""
         }
         Invoke-Mmt -Arguments $enableArgs | Out-Null
-        Start-Sleep -Milliseconds 400
+        Start-Sleep -Milliseconds 500
     }
 
     Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
     Start-Sleep -Milliseconds 500
 
-    $originalPrimary = $ctx.OriginalPrimary
-    if (-not $originalPrimary) {
-        foreach ($name in $activeInBackup) {
-            $spec = $backupSpecs[$name]
-            if ($spec.Primary -match '^(Yes|1|True)$') {
-                $originalPrimary = $name
-                break
-            }
+    foreach ($name in (Get-BackupInactiveMonitorNames -BackupSpecs $backupSpecs)) {
+        $spec = $backupSpecs[$name]
+        if ($spec -and $spec.Name) {
+            Invoke-Mmt -Arguments @("/disable", "`"$($spec.Name)`"") | Out-Null
         }
     }
 
-    Invoke-MmtSetMonitorsFromBackupSpecs -BackupSpecs $backupSpecs -OriginalPrimary $originalPrimary
-    Start-Sleep -Milliseconds 500
-
-    Restore-MonitorsInactiveInBackup -BackupSpecs $backupSpecs
+    Clear-ConsoleDeviceCache
 }
 
 function Set-MonitorCacheActive {
@@ -2126,6 +2089,7 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.RestoreInProgress = $true
     try {
         Close-BlackCurtains
+        Start-Sleep -Milliseconds 800
         Restore-MonitorBackup
         Restore-ConsoleAudioOutput
         Restore-RtssFpsSettings

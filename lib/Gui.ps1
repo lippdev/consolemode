@@ -232,11 +232,17 @@ function Show-StatusMessage {
 function Get-MonitorFriendlyLabel {
     param($Monitor)
 
-    $shortName = ($Monitor.Name -replace '\\\\\.\\', '').Trim()
-    if ($Monitor.MonitorName) {
-        return "$($Monitor.MonitorName) ($shortName)"
+    $winLabel = if ($Monitor.WindowsDisplayNumber -gt 0) {
+        "Monitor $($Monitor.WindowsDisplayNumber)"
     }
-    return $shortName
+    else {
+        ($Monitor.Name -replace '\\\\\.\\', '').Trim()
+    }
+
+    if ($Monitor.MonitorName) {
+        return "$($Monitor.MonitorName) ($winLabel)"
+    }
+    return $winLabel
 }
 
 function Get-MonitorSecondaryLabel {
@@ -553,11 +559,17 @@ function Build-MonitorLayoutDiagram {
         }
 
         $lbl = New-Object System.Windows.Forms.Label
-        $lbl.Text = (Get-MonitorFriendlyLabel -Monitor $m)
+        $diagramLabel = if ($m.WindowsDisplayNumber -gt 0) {
+            "$($m.WindowsDisplayNumber)"
+        }
+        else {
+            ($m.Name -replace '\\\\\.\\DISPLAY', '').Trim()
+        }
+        $lbl.Text = $diagramLabel
         $lbl.Dock = [System.Windows.Forms.DockStyle]::Fill
         $lbl.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
         $lbl.ForeColor = $box.ForeColor
-        $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 7.5)
+        $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
         $box.Controls.Add($lbl)
         $Panel.Controls.Add($box)
     }
