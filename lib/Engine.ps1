@@ -56,6 +56,20 @@ public class NativeHelpers {
         return w * h;
     }
 
+    public static bool IsWindowCenterOnRect(IntPtr hWnd, int left, int top, int width, int height) {
+        if (hWnd == IntPtr.Zero || width <= 0 || height <= 0) return false;
+        RECT r;
+        if (!GetWindowRect(hWnd, out r)) return false;
+        int cx = (r.Left + r.Right) / 2;
+        int cy = (r.Top + r.Bottom) / 2;
+        return cx >= left && cx < left + width && cy >= top && cy < top + height;
+    }
+
+    public static bool MoveWindowToRect(IntPtr hWnd, int left, int top, int width, int height) {
+        if (hWnd == IntPtr.Zero || width <= 0 || height <= 0) return false;
+        return MoveWindow(hWnd, left, top, width, height, true);
+    }
+
     public static System.Collections.Generic.List<WindowMatch> AllMatches = new System.Collections.Generic.List<WindowMatch>();
 
     public class WindowMatch {
@@ -799,36 +813,115 @@ function Get-MonitorRestoreContext {
     return $ctx
 }
 
-function Set-PrimaryMonitorFromBackupSpec {
+function Test-BackupMonitorSpecActive {
+    param([hashtable]$Spec)
+
+    if (-not $Spec) { return $false }
+    $width = 0
+    $height = 0
+    [void][int]::TryParse([string]$Spec.Width, [ref]$width)
+    [void][int]::TryParse([string]$Spec.Height, [ref]$height)
+    return ($width -gt 0 -and $height -gt 0)
+}
+
+function Build-MmtSetMonitorsSpecFromBackupEntry {
     param(
-        [Parameter(Mandatory)][string]$MonitorName,
-        [hashtable]$Spec
+        [hashtable]$Spec,
+        [switch]$AsPrimary
     )
 
-    if ($Spec -and $Spec.Width -and $Spec.Height) {
-        $width = 0
-        $height = 0
-        [void][int]::TryParse($Spec.Width, [ref]$width)
-        [void][int]::TryParse($Spec.Height, [ref]$height)
-        if ($width -gt 0 -and $height -gt 0) {
-            $freq = $Spec.DisplayFrequency
-            if (-not $freq) { $freq = $Spec.Frequency }
-            Set-PrimaryAndMonitorMode -MonitorName $MonitorName `
-                -Width $width -Height $height `
-                -Frequency $freq -Colors $Spec.BitsPerPixel
-            return
+    if (-not (Test-BackupMonitorSpecActive -Spec $Spec)) { return $null }
+
+    $parts = @("Name=$($Spec.Name)")
+    foreach ($key in @('BitsPerPixel', 'Width', 'Height', 'DisplayFlags', 'DisplayFrequency', 'DisplayOrientation', 'PositionX', 'PositionY')) {
+        if ($Spec.ContainsKey($key) -and -not [string]::IsNullOrWhiteSpace([string]$Spec[$key])) {
+            $parts += "$key=$($Spec[$key])"
+        }
+    }
+    if ($AsPrimary) { $parts += 'Primary=Yes' }
+    return ($parts -join ' ')
+}
+
+function Get-BackupActiveMonitorNames {
+    param([hashtable]$BackupSpecs)
+
+    $names = [System.Collections.ArrayList]@()
+    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
+        if (Test-BackupMonitorSpecActive -Spec $BackupSpecs[$name]) {
+            [void]$names.Add([string]$name)
+        }
+    }
+    return @($names)
+}
+
+function Get-BackupInactiveMonitorNames {
+    param([hashtable]$BackupSpecs)
+
+    $names = [System.Collections.ArrayList]@()
+    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
+        if (-not (Test-BackupMonitorSpecActive -Spec $BackupSpecs[$name])) {
+            [void]$names.Add([string]$name)
+        }
+    }
+    return @($names)
+}
+
+function Restore-SessionHideStrategyBeforeBackup {
+    param($Context)
+
+    if (-not $Context.HideMonitors -or $Context.HideMonitors.Count -eq 0) { return }
+
+    if ($Context.HideStrategy -eq "turnOff") {
+        foreach ($name in ($Context.HideMonitors | Select-Object -Unique)) {
+            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+        }
+        Start-Sleep -Milliseconds 300
+    }
+}
+
+function Invoke-MmtSetMonitorsFromBackupSpecs {
+    param(
+        [hashtable]$BackupSpecs,
+        [string]$OriginalPrimary
+    )
+
+    $setArgs = @("/SetMonitors")
+    $hasSpecs = $false
+
+    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
+        $spec = $BackupSpecs[$name]
+        $asPrimary = ($OriginalPrimary -and $name -eq $OriginalPrimary)
+        if (-not $asPrimary -and $spec.Primary -match '^(Yes|1|True)$') {
+            $asPrimary = $true
+        }
+
+        $mmtSpec = Build-MmtSetMonitorsSpecFromBackupEntry -Spec $spec -AsPrimary:$asPrimary
+        if ($mmtSpec) {
+            $setArgs += "`"$mmtSpec`""
+            $hasSpecs = $true
         }
     }
 
-    Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
+    if ($hasSpecs) {
+        Invoke-Mmt -Arguments $setArgs | Out-Null
+    }
 }
 
-function Disable-FocusMonitorAfterRestore {
+function Disable-MonitorAfterRestore {
     param([Parameter(Mandatory)][string]$MonitorName)
 
     Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
-    Start-Sleep -Milliseconds 120
+    Start-Sleep -Milliseconds 200
     Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
+    Start-Sleep -Milliseconds 200
+}
+
+function Restore-MonitorsInactiveInBackup {
+    param([hashtable]$BackupSpecs)
+
+    foreach ($name in (Get-BackupInactiveMonitorNames -BackupSpecs $BackupSpecs)) {
+        Disable-MonitorAfterRestore -MonitorName $name
+    }
 }
 
 function Restore-MonitorBackup {
@@ -836,39 +929,37 @@ function Restore-MonitorBackup {
 
     $ctx = Get-MonitorRestoreContext
     $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
-    $monitorsToEnable = @()
 
-    if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
-        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-    }
-    elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
-        foreach ($name in $ctx.HideMonitors) {
-            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
-        }
-        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-    }
+    Restore-SessionHideStrategyBeforeBackup -Context $ctx
 
-    if ($monitorsToEnable.Count -gt 0 -and $ctx.HideStrategy -eq "disconnect") {
+    $activeInBackup = Get-BackupActiveMonitorNames -BackupSpecs $backupSpecs
+    if ($activeInBackup.Count -gt 0) {
         $enableArgs = @("/enable")
-        foreach ($name in $monitorsToEnable) {
+        foreach ($name in $activeInBackup) {
             $enableArgs += "`"$name`""
         }
         Invoke-Mmt -Arguments $enableArgs | Out-Null
+        Start-Sleep -Milliseconds 400
     }
 
     Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
+    Start-Sleep -Milliseconds 500
 
-    if ($ctx.OriginalPrimary) {
-        $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
-        Set-PrimaryMonitorFromBackupSpec -MonitorName $ctx.OriginalPrimary -Spec $primarySpec
-    }
-
-    if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
-        Invoke-Mmt -Arguments @("/disable", "`"$($ctx.FocusMonitor)`"") | Out-Null
-        if ($ctx.OriginalPrimary) {
-            Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
+    $originalPrimary = $ctx.OriginalPrimary
+    if (-not $originalPrimary) {
+        foreach ($name in $activeInBackup) {
+            $spec = $backupSpecs[$name]
+            if ($spec.Primary -match '^(Yes|1|True)$') {
+                $originalPrimary = $name
+                break
+            }
         }
     }
+
+    Invoke-MmtSetMonitorsFromBackupSpecs -BackupSpecs $backupSpecs -OriginalPrimary $originalPrimary
+    Start-Sleep -Milliseconds 500
+
+    Restore-MonitorsInactiveInBackup -BackupSpecs $backupSpecs
 }
 
 function Set-MonitorCacheActive {
@@ -1147,50 +1238,66 @@ function Get-MonitorModeLabel {
     return "$width x $height"
 }
 
-function Apply-ConfiguredMonitorModes {
+function Get-MonitorPositionFromInfo {
+    param($Monitor)
+
+    if (-not $Monitor -or -not $Monitor.LeftTop) { return $null }
+    if ($Monitor.LeftTop -match '(-?\d+)\s*,\s*(-?\d+)') {
+        return @{
+            X = [int]$Matches[1]
+            Y = [int]$Matches[2]
+        }
+    }
+    return $null
+}
+
+function Test-WindowOnMonitorRect {
     param(
-        [hashtable]$MonitorModes,
-        [Parameter(Mandatory)][string]$FocusMonitor
+        [IntPtr]$Handle,
+        [System.Drawing.Rectangle]$MonitorRect
     )
 
-    if (-not $MonitorModes -or $MonitorModes.Count -eq 0) { return }
+    if ($Handle -eq [IntPtr]::Zero) { return $false }
+    return [NativeHelpers]::IsWindowCenterOnRect(
+        $Handle,
+        $MonitorRect.X,
+        $MonitorRect.Y,
+        $MonitorRect.Width,
+        $MonitorRect.Height
+    )
+}
 
+function Apply-FocusMonitorDisplayMode {
+    param(
+        [Parameter(Mandatory)][string]$FocusMonitor,
+        [hashtable]$MonitorModes
+    )
+
+    if (-not $MonitorModes -or -not $MonitorModes.ContainsKey($FocusMonitor)) { return }
+
+    $mode = $MonitorModes[$FocusMonitor]
     $monitors = Get-ConsoleMonitors -ForceRefresh
-    $otherNames = @($MonitorModes.Keys | Where-Object { $_ -ne $FocusMonitor })
-
-    foreach ($name in $otherNames) {
-        $mode = $MonitorModes[$name]
-        if (-not $mode) { continue }
-
-        $monitor = $monitors | Where-Object { $_.Name -eq $name -and $_.IsActive } | Select-Object -First 1
-        if (-not $monitor) { continue }
-
-        Set-MonitorMode `
-            -MonitorName $name `
-            -Width ([int]$mode.Width) `
-            -Height ([int]$mode.Height) `
-            -Frequency ([string]$mode.Frequency) `
-            -Colors $monitor.Colors
-        Start-Sleep -Milliseconds 350
+    $focusInfo = $monitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
+    $colors = if ($focusInfo) { $focusInfo.Colors } else { $null }
+    $position = Get-MonitorPositionFromInfo -Monitor $focusInfo
+    $posX = $null
+    $posY = $null
+    if ($position) {
+        $posX = [int]$position.X
+        $posY = [int]$position.Y
     }
 
-    if ($MonitorModes.ContainsKey($FocusMonitor)) {
-        $focusMode = $MonitorModes[$FocusMonitor]
-        $focusInfo = $monitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
-        $colors = if ($focusInfo) { $focusInfo.Colors } else { $null }
-
-        Set-PrimaryAndMonitorMode `
-            -MonitorName $FocusMonitor `
-            -Width ([int]$focusMode.Width) `
-            -Height ([int]$focusMode.Height) `
-            -Frequency ([string]$focusMode.Frequency) `
-            -Colors $colors
-        Start-Sleep -Milliseconds 400
-        return
-    }
-
-    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Set-PrimaryAndMonitorMode `
+        -MonitorName $FocusMonitor `
+        -Width ([int]$mode.Width) `
+        -Height ([int]$mode.Height) `
+        -Frequency ([string]$mode.Frequency) `
+        -Colors $colors `
+        -PositionX $posX `
+        -PositionY $posY
     Start-Sleep -Milliseconds 400
+    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Start-Sleep -Milliseconds 300
 }
 
 function Update-FocusMonitorRect {
@@ -1225,7 +1332,9 @@ function Set-PrimaryAndMonitorMode {
         [int]$Width,
         [int]$Height,
         [string]$Frequency,
-        [string]$Colors
+        [string]$Colors,
+        [Nullable[int]]$PositionX = $null,
+        [Nullable[int]]$PositionY = $null
     )
 
     $spec = "Name=$MonitorName Primary=Yes"
@@ -1234,6 +1343,8 @@ function Set-PrimaryAndMonitorMode {
     $freqValue = Get-ParsedDisplayFrequency -Frequency $Frequency
     if ($freqValue -gt 0) { $spec += " DisplayFrequency=$freqValue" }
     if ($Colors) { $spec += " BitsPerPixel=$Colors" }
+    if ($null -ne $PositionX) { $spec += " PositionX=$PositionX" }
+    if ($null -ne $PositionY) { $spec += " PositionY=$PositionY" }
 
     Invoke-Mmt -Arguments @("/SetMonitors", "`"$spec`"") | Out-Null
 }
@@ -1244,7 +1355,9 @@ function Set-MonitorMode {
         [int]$Width,
         [int]$Height,
         [string]$Frequency,
-        [string]$Colors
+        [string]$Colors,
+        [Nullable[int]]$PositionX = $null,
+        [Nullable[int]]$PositionY = $null
     )
 
     $spec = "Name=$MonitorName"
@@ -1253,6 +1366,8 @@ function Set-MonitorMode {
     $freqValue = Get-ParsedDisplayFrequency -Frequency $Frequency
     if ($freqValue -gt 0) { $spec += " DisplayFrequency=$freqValue" }
     if ($Colors) { $spec += " BitsPerPixel=$Colors" }
+    if ($null -ne $PositionX) { $spec += " PositionX=$PositionX" }
+    if ($null -ne $PositionY) { $spec += " PositionY=$PositionY" }
 
     Invoke-Mmt -Arguments @("/SetMonitors", "`"$spec`"") | Out-Null
 }
@@ -1686,13 +1801,24 @@ function Move-BigPictureViaMmt {
 
 function Move-BigPictureToMonitor {
     param(
-        [Parameter(Mandatory)][string]$MonitorName
+        [Parameter(Mandatory)][string]$MonitorName,
+        [IntPtr[]]$WindowHandles = @()
     )
 
     $rect = Get-MonitorRect -MonitorName $MonitorName
     if (-not $rect) { return $false }
 
     Move-BigPictureViaMmt -MonitorName $MonitorName -Rect $rect
+
+    if ($WindowHandles.Count -eq 0) {
+        $WindowHandles = Get-BigPictureWindowHandles
+    }
+
+    foreach ($handle in $WindowHandles) {
+        if ($handle -eq [IntPtr]::Zero) { continue }
+        [void][NativeHelpers]::MoveWindowToRect($handle, $rect.X, $rect.Y, $rect.Width, $rect.Height)
+    }
+
     return $true
 }
 
@@ -1856,13 +1982,8 @@ function Start-ConsoleMode {
         $focusMode = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
     }
 
-    if ($MonitorModes -and $MonitorModes.Count -gt 0) {
-        Apply-ConfiguredMonitorModes -MonitorModes $MonitorModes -FocusMonitor $FocusMonitor
-    }
-    else {
-        Set-PrimaryMonitor -MonitorName $FocusMonitor
-        Start-Sleep -Milliseconds 400
-    }
+    Set-PrimaryMonitor -MonitorName $FocusMonitor
+    Start-Sleep -Milliseconds 400
 
     if ($HideStrategy -eq "disconnect" -and $HideMonitors.Count -gt 0) {
         Disable-MonitorsWindows -MonitorNames $HideMonitors
@@ -1878,6 +1999,12 @@ function Start-ConsoleMode {
 
     Set-PrimaryMonitor -MonitorName $FocusMonitor
     Start-Sleep -Milliseconds 500
+
+    if ($MonitorModes -and $MonitorModes.ContainsKey($FocusMonitor)) {
+        Apply-FocusMonitorDisplayMode -FocusMonitor $FocusMonitor -MonitorModes $MonitorModes
+    }
+
+    Clear-ConsoleDeviceCache
     Update-FocusMonitorRect -MonitorName $FocusMonitor -AllowMmtFallback | Out-Null
 
     if ($AudioDeviceId -and (Test-SoundVolumeViewAvailable)) {
@@ -1945,20 +2072,32 @@ function Update-ConsoleMonitorLoop {
     if (-not $Script:ConsoleState.HasAppeared) {
         $bpHandles = Get-BigPictureWindowHandles
         if ($bpHandles.Count -gt 0) {
-            Update-FocusMonitorRect -MonitorName $Script:ConsoleState.FocusMonitor | Out-Null
-            $bpArea = [NativeHelpers]::GetWindowArea($bpHandles[0])
-            if ($bpArea -lt 250000 -and $Script:ConsoleState.MoveCount -lt 3) {
-                $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor
-                $Script:ConsoleState.MoveCount++
-                if ($moved) { $Script:ConsoleState.SteamMoved = $true }
+            Update-FocusMonitorRect -MonitorName $Script:ConsoleState.FocusMonitor -AllowMmtFallback | Out-Null
+            $focusRect = Get-MonitorRect -MonitorName $Script:ConsoleState.FocusMonitor
+            $bpHandle = $bpHandles[0]
+            $bpArea = [NativeHelpers]::GetWindowArea($bpHandle)
+            $onFocus = $false
+            if ($focusRect) {
+                $onFocus = Test-WindowOnMonitorRect -Handle $bpHandle -MonitorRect $focusRect
             }
 
-            foreach ($h in $bpHandles) {
-                if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
-                    $Script:ConsoleState.CachedBigPictureHandle = $h
-                    $Script:ConsoleState.HasAppeared = $true
-                    Register-BigPictureExitWatch -Handle $h | Out-Null
-                    break
+            if (-not $onFocus -and $Script:ConsoleState.MoveCount -lt 8) {
+                $moved = Move-BigPictureToMonitor -MonitorName $Script:ConsoleState.FocusMonitor -WindowHandles $bpHandles
+                $Script:ConsoleState.MoveCount++
+                if ($moved) { $Script:ConsoleState.SteamMoved = $true }
+                if ($focusRect) {
+                    $onFocus = Test-WindowOnMonitorRect -Handle $bpHandle -MonitorRect $focusRect
+                }
+            }
+
+            if ($bpArea -gt 200000 -and $onFocus) {
+                foreach ($h in $bpHandles) {
+                    if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
+                        $Script:ConsoleState.CachedBigPictureHandle = $h
+                        $Script:ConsoleState.HasAppeared = $true
+                        Register-BigPictureExitWatch -Handle $h | Out-Null
+                        break
+                    }
                 }
             }
         }
