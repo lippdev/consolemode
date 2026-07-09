@@ -1005,17 +1005,28 @@ function Test-BackupMonitorSpecActive {
 }
 
 function Get-BackupInactiveMonitorNames {
-<<<<<<< HEAD
-    param([Parameter(Mandatory)][hashtable]$BackupSpecs)
+    param([hashtable]$BackupSpecs)
 
-    $names = @()
-    foreach ($name in $BackupSpecs.Keys) {
-        $spec = $BackupSpecs[$name]
-        $width = 0
-        if ($spec.Width) { [void][int]::TryParse([string]$spec.Width, [ref]$width) }
-        if ($width -le 0) { $names += $name }
+    $names = [System.Collections.ArrayList]@()
+    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
+        if (-not (Test-BackupMonitorSpecActive -Spec $BackupSpecs[$name])) {
+            [void]$names.Add([string]$name)
+        }
     }
-    return $names
+    return @($names)
+}
+
+function Restore-SessionHideStrategyBeforeBackup {
+    param($Context)
+
+    if (-not $Context.HideMonitors -or $Context.HideMonitors.Count -eq 0) { return }
+
+    if ($Context.HideStrategy -eq "turnOff") {
+        foreach ($name in ($Context.HideMonitors | Select-Object -Unique)) {
+            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+        }
+        Start-Sleep -Milliseconds 300
+    }
 }
 
 function Wait-ConsoleMonitorsActive {
@@ -1122,30 +1133,6 @@ function Disable-MonitorWithRetry {
         if (Wait-ConsoleMonitorInactive -MonitorName $MonitorName) { return $true }
     }
     return $false
-=======
-    param([hashtable]$BackupSpecs)
-
-    $names = [System.Collections.ArrayList]@()
-    foreach ($name in ($BackupSpecs.Keys | Sort-Object)) {
-        if (-not (Test-BackupMonitorSpecActive -Spec $BackupSpecs[$name])) {
-            [void]$names.Add([string]$name)
-        }
-    }
-    return @($names)
-}
-
-function Restore-SessionHideStrategyBeforeBackup {
-    param($Context)
-
-    if (-not $Context.HideMonitors -or $Context.HideMonitors.Count -eq 0) { return }
-
-    if ($Context.HideStrategy -eq "turnOff") {
-        foreach ($name in ($Context.HideMonitors | Select-Object -Unique)) {
-            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
-        }
-        Start-Sleep -Milliseconds 300
-    }
->>>>>>> 2d7f501d4529c8f0a8ac16791143c4af0b48545f
 }
 
 function Restore-MonitorBackup {
@@ -1163,21 +1150,8 @@ function Restore-MonitorBackup {
     $ctx = Get-MonitorRestoreContext
     $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
 
-<<<<<<< HEAD
-    # Etapa 1: religar os monitores que foram ocultados
-    $monitorsToEnable = @()
-    if ($ctx.HideMonitors.Count -gt 0 -and ($ctx.HideStrategy -eq "disconnect" -or $ctx.HideStrategy -eq "turnOff")) {
-        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-    }
-
-    if ($monitorsToEnable.Count -gt 0) {
-        if ($ctx.HideStrategy -eq "turnOff") {
-            foreach ($name in $monitorsToEnable) {
-                Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
-            }
-        }
-
-=======
+    # Etapa 1: religar os monitores do backup (TurnOn primeiro se a estratégia
+    # foi turnOff) e confirmar que os que estavam ativos no backup voltaram
     Restore-SessionHideStrategyBeforeBackup -Context $ctx
 
     $allDeviceNames = @(
@@ -1186,26 +1160,28 @@ function Restore-MonitorBackup {
             Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
             Select-Object -Unique
     )
+    $monitorsToVerify = @(
+        $backupSpecs.Keys |
+            Where-Object { Test-BackupMonitorSpecActive -Spec $backupSpecs[$_] }
+    )
 
     if ($allDeviceNames.Count -gt 0) {
->>>>>>> 2d7f501d4529c8f0a8ac16791143c4af0b48545f
         $enableArgs = @("/enable")
         foreach ($deviceName in $allDeviceNames) {
             $enableArgs += "`"$deviceName`""
         }
         Invoke-Mmt -Arguments $enableArgs | Out-Null
-<<<<<<< HEAD
 
-        if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable)) {
+        if ($monitorsToVerify.Count -gt 0 -and -not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToVerify)) {
             # Retry individual: o /enable em lote pode falhar parcialmente
-            foreach ($name in $monitorsToEnable) {
+            foreach ($name in $monitorsToVerify) {
                 Invoke-Mmt -Arguments @("/enable", "`"$name`"") | Out-Null
             }
-            if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable -TimeoutMs 3000)) {
+            if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToVerify -TimeoutMs 3000)) {
                 # Último recurso: modo estendido nativo ativa todos os conectados
                 [void][CcdHelper]::ExtendAll()
-                if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable)) {
-                    $result.Issues += "Nem todos os monitores foram reativados: $($monitorsToEnable -join ', ')"
+                if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToVerify)) {
+                    $result.Issues += "Nem todos os monitores foram reativados: $($monitorsToVerify -join ', ')"
                 }
             }
         }
@@ -1246,24 +1222,10 @@ function Restore-MonitorBackup {
         }
     }
 
+    Clear-ConsoleDeviceCache
+
     if ($result.Issues.Count -gt 0) { $result.Success = $false }
     return $result
-=======
-        Start-Sleep -Milliseconds 500
-    }
-
-    Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
-    Start-Sleep -Milliseconds 500
-
-    foreach ($name in (Get-BackupInactiveMonitorNames -BackupSpecs $backupSpecs)) {
-        $spec = $backupSpecs[$name]
-        if ($spec -and $spec.Name) {
-            Invoke-Mmt -Arguments @("/disable", "`"$($spec.Name)`"") | Out-Null
-        }
-    }
-
-    Clear-ConsoleDeviceCache
->>>>>>> 2d7f501d4529c8f0a8ac16791143c4af0b48545f
 }
 
 function Set-MonitorCacheActive {
@@ -1578,6 +1540,22 @@ function Test-WindowOnMonitorRect {
     )
 }
 
+function Test-MonitorCurrentMode {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [int]$Width,
+        [int]$Height,
+        [int]$Frequency
+    )
+
+    $current = [NativeHelpers]::GetCurrentDisplayMode($MonitorName)
+    if (-not $current) { return $false }
+    if ($Width -gt 0 -and [int]$current.Width -ne $Width) { return $false }
+    if ($Height -gt 0 -and [int]$current.Height -ne $Height) { return $false }
+    if ($Frequency -gt 0 -and [int]$current.Frequency -ne $Frequency) { return $false }
+    return $true
+}
+
 function Apply-FocusMonitorDisplayMode {
     param(
         [Parameter(Mandatory)][string]$FocusMonitor,
@@ -1587,6 +1565,10 @@ function Apply-FocusMonitorDisplayMode {
     if (-not $MonitorModes -or -not $MonitorModes.ContainsKey($FocusMonitor)) { return }
 
     $mode = $MonitorModes[$FocusMonitor]
+    $width = [int]$mode.Width
+    $height = [int]$mode.Height
+    $frequency = [int]$mode.Frequency
+
     $monitors = Get-ConsoleMonitors -ForceRefresh
     $focusInfo = $monitors | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
     $colors = if ($focusInfo) { $focusInfo.Colors } else { $null }
@@ -1598,15 +1580,30 @@ function Apply-FocusMonitorDisplayMode {
         $posY = [int]$position.Y
     }
 
-    Set-PrimaryAndMonitorMode `
-        -MonitorName $FocusMonitor `
-        -Width ([int]$mode.Width) `
-        -Height ([int]$mode.Height) `
-        -Frequency ([string]$mode.Frequency) `
-        -Colors $colors `
-        -PositionX $posX `
-        -PositionY $posY
-    Start-Sleep -Milliseconds 400
+    # O modo pode não pegar na primeira tentativa logo após ligar o monitor;
+    # verificar o resultado real e repetir antes de desistir
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        Set-PrimaryAndMonitorMode `
+            -MonitorName $FocusMonitor `
+            -Width $width `
+            -Height $height `
+            -Frequency ([string]$frequency) `
+            -Colors $colors `
+            -PositionX $posX `
+            -PositionY $posY
+        Start-Sleep -Milliseconds 400
+
+        if (Test-MonitorCurrentMode -MonitorName $FocusMonitor -Width $width -Height $height -Frequency $frequency) {
+            break
+        }
+        Start-Sleep -Milliseconds 400
+    }
+
+    if (-not (Test-MonitorCurrentMode -MonitorName $FocusMonitor -Width $width -Height $height -Frequency $frequency)) {
+        $label = Get-MonitorModeLabel -Mode $mode
+        Write-Warning "Não foi possível aplicar $label em $FocusMonitor (o modo pode não ser suportado)."
+    }
+
     Set-PrimaryMonitor -MonitorName $FocusMonitor
     Start-Sleep -Milliseconds 300
 }
@@ -2291,6 +2288,9 @@ function Start-ConsoleMode {
         Enable-Monitors -MonitorNames @($FocusMonitor) -WindowsEnable
         Start-Sleep -Milliseconds 500
         $focusMode = Get-ConsoleMonitors -ForceRefresh | Where-Object { $_.Name -eq $FocusMonitor } | Select-Object -First 1
+        # Com o monitor ativo dá para enumerar os modos reais; persistir no cache
+        # para o seletor de Resolução/Hz mostrá-los mesmo com ele desconectado
+        Get-MonitorDisplayModes -MonitorName $FocusMonitor -Monitor $focusMode -ForceRefresh | Out-Null
     }
 
     Set-PrimaryMonitor -MonitorName $FocusMonitor
@@ -2437,17 +2437,13 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.RestoreInProgress = $true
     try {
         Close-BlackCurtains
-<<<<<<< HEAD
+        Start-Sleep -Milliseconds 800
         $restoreResult = Restore-MonitorBackup
         if ($restoreResult -and -not $restoreResult.Success) {
             foreach ($issue in $restoreResult.Issues) {
                 Write-Warning "Restauração do setup: $issue"
             }
         }
-=======
-        Start-Sleep -Milliseconds 800
-        Restore-MonitorBackup
->>>>>>> 2d7f501d4529c8f0a8ac16791143c4af0b48545f
         Restore-ConsoleAudioOutput
         Restore-RtssFpsSettings
         Clear-ConsoleDeviceCache
