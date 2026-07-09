@@ -313,6 +313,147 @@ public class NativeHelpers {
         if (!EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm)) return null;
         return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel, " (atual)");
     }
+
+    public const int DM_POSITION = 0x20;
+    public const int DM_PELSWIDTH = 0x80000;
+    public const int DM_PELSHEIGHT = 0x100000;
+    public const int CDS_UPDATEREGISTRY = 0x1;
+    public const int CDS_SET_PRIMARY = 0x10;
+    public const int CDS_NORESET = 0x10000000;
+
+    [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+    public static extern int ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, int dwflags, IntPtr lParam);
+
+    [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+    public static extern int ChangeDisplaySettingsEx(string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd, int dwflags, IntPtr lParam);
+
+    // Desconecta um monitor do desktop (equivalente a "Desconectar este monitor").
+    public static int DetachDisplay(string device) {
+        DEVMODE dm = new DEVMODE();
+        dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+        dm.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT;
+        dm.dmPelsWidth = 0;
+        dm.dmPelsHeight = 0;
+        int r = ChangeDisplaySettingsEx(device, ref dm, IntPtr.Zero, CDS_UPDATEREGISTRY | CDS_NORESET, IntPtr.Zero);
+        if (r != 0) return r;
+        return ChangeDisplaySettingsEx(null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
+    }
+}
+
+// API CCD (SetDisplayConfig) — mesma usada pelas Configurações do Windows.
+// Necessária porque ChangeDisplaySettingsEx falha (DISP_CHANGE_FAILED) em
+// builds recentes do Windows 11 ao trocar o monitor primário.
+public class CcdHelper {
+    [StructLayout(LayoutKind.Sequential)] public struct LUID { public uint LowPart; public int HighPart; }
+    [StructLayout(LayoutKind.Sequential)] public struct RATIONAL { public uint Numerator; public uint Denominator; }
+    [StructLayout(LayoutKind.Sequential)] public struct REGION2D { public uint cx; public uint cy; }
+    [StructLayout(LayoutKind.Sequential)] public struct POINTL { public int x; public int y; }
+
+    [StructLayout(LayoutKind.Sequential)] public struct PATH_SOURCE_INFO {
+        public LUID adapterId; public uint id; public uint modeInfoIdx; public uint statusFlags;
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct PATH_TARGET_INFO {
+        public LUID adapterId; public uint id; public uint modeInfoIdx;
+        public uint outputTechnology; public uint rotation; public uint scaling;
+        public RATIONAL refreshRate; public uint scanLineOrdering;
+        [MarshalAs(UnmanagedType.Bool)] public bool targetAvailable;
+        public uint statusFlags;
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct PATH_INFO {
+        public PATH_SOURCE_INFO sourceInfo; public PATH_TARGET_INFO targetInfo; public uint flags;
+    }
+
+    [StructLayout(LayoutKind.Sequential)] public struct VIDEO_SIGNAL_INFO {
+        public ulong pixelRate; public RATIONAL hSyncFreq; public RATIONAL vSyncFreq;
+        public REGION2D activeSize; public REGION2D totalSize; public uint videoStandard; public uint scanLineOrdering;
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct TARGET_MODE { public VIDEO_SIGNAL_INFO targetVideoSignalInfo; }
+    [StructLayout(LayoutKind.Sequential)] public struct SOURCE_MODE {
+        public uint width; public uint height; public uint pixelFormat; public POINTL position;
+    }
+    [StructLayout(LayoutKind.Explicit)] public struct MODE_UNION {
+        [FieldOffset(0)] public TARGET_MODE targetMode;
+        [FieldOffset(0)] public SOURCE_MODE sourceMode;
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct MODE_INFO {
+        public uint infoType; public uint id; public LUID adapterId; public MODE_UNION mode;
+    }
+
+    [StructLayout(LayoutKind.Sequential)] public struct DEVICE_INFO_HEADER {
+        public uint type; public uint size; public LUID adapterId; public uint id;
+    }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)] public struct SOURCE_DEVICE_NAME {
+        public DEVICE_INFO_HEADER header;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string viewGdiDeviceName;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern int GetDisplayConfigBufferSizes(uint flags, out uint numPaths, out uint numModes);
+    [DllImport("user32.dll")]
+    public static extern int QueryDisplayConfig(uint flags, ref uint numPaths, [Out] PATH_INFO[] paths, ref uint numModes, [Out] MODE_INFO[] modes, IntPtr topologyId);
+    [DllImport("user32.dll")]
+    public static extern int SetDisplayConfig(uint numPaths, PATH_INFO[] paths, uint numModes, MODE_INFO[] modes, uint flags);
+    [DllImport("user32.dll")]
+    public static extern int DisplayConfigGetDeviceInfo(ref SOURCE_DEVICE_NAME deviceName);
+
+    const uint QDC_ONLY_ACTIVE_PATHS = 2;
+    const uint MODE_INFO_TYPE_SOURCE = 1;
+    const uint SDC_TOPOLOGY_EXTEND = 0x4;
+    const uint SDC_USE_SUPPLIED_DISPLAY_CONFIG = 0x20;
+    const uint SDC_APPLY = 0x80;
+    const uint SDC_SAVE_TO_DATABASE = 0x200;
+    const uint SDC_ALLOW_CHANGES = 0x400;
+
+    // Ativa todos os monitores conectados em modo estendido (equivalente ao
+    // Win+P "Estender"). Fallback quando o /enable do MultiMonitorTool falha.
+    public static int ExtendAll() {
+        return SetDisplayConfig(0, null, 0, null, SDC_APPLY | SDC_TOPOLOGY_EXTEND);
+    }
+
+    static string GetSourceGdiName(LUID adapterId, uint sourceId) {
+        SOURCE_DEVICE_NAME req = new SOURCE_DEVICE_NAME();
+        req.header.type = 1; // DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME
+        req.header.size = (uint)Marshal.SizeOf(typeof(SOURCE_DEVICE_NAME));
+        req.header.adapterId = adapterId;
+        req.header.id = sourceId;
+        if (DisplayConfigGetDeviceInfo(ref req) != 0) return null;
+        return req.viewGdiDeviceName;
+    }
+
+    // Torna gdiDeviceName (\\.\DISPLAYn) o primário deslocando as posições de
+    // origem para que ele fique em (0,0). Retorna 0 (ERROR_SUCCESS) em sucesso.
+    public static int SetPrimary(string gdiDeviceName) {
+        uint numPaths, numModes;
+        int err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out numPaths, out numModes);
+        if (err != 0) return err;
+        PATH_INFO[] paths = new PATH_INFO[numPaths];
+        MODE_INFO[] modes = new MODE_INFO[numModes];
+        err = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, IntPtr.Zero);
+        if (err != 0) return err;
+
+        int dx = 0, dy = 0; bool found = false;
+        for (int i = 0; i < numModes; i++) {
+            if (modes[i].infoType != MODE_INFO_TYPE_SOURCE) continue;
+            string name = GetSourceGdiName(modes[i].adapterId, modes[i].id);
+            if (string.Equals(name, gdiDeviceName, StringComparison.OrdinalIgnoreCase)) {
+                dx = modes[i].mode.sourceMode.position.x;
+                dy = modes[i].mode.sourceMode.position.y;
+                found = true;
+                break;
+            }
+        }
+        if (!found) return -100;
+        if (dx == 0 && dy == 0) return 0;
+
+        for (int i = 0; i < numModes; i++) {
+            if (modes[i].infoType != MODE_INFO_TYPE_SOURCE) continue;
+            modes[i].mode.sourceMode.position.x -= dx;
+            modes[i].mode.sourceMode.position.y -= dy;
+        }
+
+        return SetDisplayConfig(numPaths, paths, numModes, modes,
+            SDC_APPLY | SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_SAVE_TO_DATABASE | SDC_ALLOW_CHANGES);
+    }
 }
 "@
 if (-not ([System.Management.Automation.PSTypeName]'NativeHelpers').Type) {
@@ -808,52 +949,211 @@ function Set-PrimaryMonitorFromBackupSpec {
     Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
 }
 
-function Disable-FocusMonitorAfterRestore {
+function Get-BackupInactiveMonitorNames {
+    param([Parameter(Mandatory)][hashtable]$BackupSpecs)
+
+    $names = @()
+    foreach ($name in $BackupSpecs.Keys) {
+        $spec = $BackupSpecs[$name]
+        $width = 0
+        if ($spec.Width) { [void][int]::TryParse([string]$spec.Width, [ref]$width) }
+        if ($width -le 0) { $names += $name }
+    }
+    return $names
+}
+
+function Wait-ConsoleMonitorsActive {
+    param(
+        [Parameter(Mandatory)][string[]]$MonitorNames,
+        [int]$TimeoutMs = 6000,
+        [int]$IntervalMs = 400
+    )
+
+    $deadline = (Get-Date).AddMilliseconds($TimeoutMs)
+    do {
+        $monitors = Get-ConsoleMonitors -ForceRefresh
+        $pending = @($MonitorNames | Where-Object {
+            $name = $_
+            -not ($monitors | Where-Object { $_.Name -eq $name -and $_.IsActive })
+        })
+        if ($pending.Count -eq 0) { return $true }
+        Start-Sleep -Milliseconds $IntervalMs
+    } while ((Get-Date) -lt $deadline)
+    return $false
+}
+
+function Wait-ConsolePrimaryMonitor {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [int]$TimeoutMs = 4000,
+        [int]$IntervalMs = 400
+    )
+
+    $deadline = (Get-Date).AddMilliseconds($TimeoutMs)
+    do {
+        if ((Get-ConsolePrimaryMonitorName) -eq $MonitorName) { return $true }
+        Start-Sleep -Milliseconds $IntervalMs
+    } while ((Get-Date) -lt $deadline)
+    return $false
+}
+
+function Wait-ConsoleMonitorInactive {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [int]$TimeoutMs = 4000,
+        [int]$IntervalMs = 400
+    )
+
+    $deadline = (Get-Date).AddMilliseconds($TimeoutMs)
+    do {
+        $monitor = Get-ConsoleMonitors -ForceRefresh |
+            Where-Object { $_.Name -eq $MonitorName } | Select-Object -First 1
+        if (-not $monitor -or -not $monitor.IsActive) { return $true }
+        Start-Sleep -Milliseconds $IntervalMs
+    } while ((Get-Date) -lt $deadline)
+    return $false
+}
+
+function Set-PrimaryMonitorNative {
     param([Parameter(Mandatory)][string]$MonitorName)
 
-    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
-    Start-Sleep -Milliseconds 120
-    Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
+    $code = [CcdHelper]::SetPrimary($MonitorName)
+    return ($code -eq 0)
+}
+
+function Restore-PrimaryMonitorWithRetry {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [hashtable]$Spec,
+        [int]$MaxAttempts = 3
+    )
+
+    if ((Get-ConsolePrimaryMonitorName) -eq $MonitorName) { return $true }
+
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        switch ($attempt) {
+            1 {
+                # API nativa: mais confiável, reposiciona todos os monitores
+                Set-PrimaryMonitorNative -MonitorName $MonitorName | Out-Null
+            }
+            2 {
+                if ($Spec) { Set-PrimaryMonitorFromBackupSpec -MonitorName $MonitorName -Spec $Spec }
+                else { Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null }
+            }
+            default {
+                Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
+            }
+        }
+
+        if (Wait-ConsolePrimaryMonitor -MonitorName $MonitorName) { return $true }
+    }
+    return $false
+}
+
+function Disable-MonitorWithRetry {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [int]$MaxAttempts = 3
+    )
+
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        if ($attempt -eq 1) {
+            Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
+        }
+        else {
+            [void][NativeHelpers]::DetachDisplay($MonitorName)
+        }
+        if (Wait-ConsoleMonitorInactive -MonitorName $MonitorName) { return $true }
+    }
+    return $false
 }
 
 function Restore-MonitorBackup {
-    if (-not (Test-Path -LiteralPath $Script:BackupMonitorConfig)) { return }
+    $result = [PSCustomObject]@{
+        Success = $true
+        Issues  = @()
+    }
+
+    if (-not (Test-Path -LiteralPath $Script:BackupMonitorConfig)) {
+        $result.Success = $false
+        $result.Issues += "Backup de monitores não encontrado: $Script:BackupMonitorConfig"
+        return $result
+    }
 
     $ctx = Get-MonitorRestoreContext
     $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
+
+    # Etapa 1: religar os monitores que foram ocultados
     $monitorsToEnable = @()
-
-    if ($ctx.HideStrategy -eq "disconnect" -and $ctx.HideMonitors.Count -gt 0) {
+    if ($ctx.HideMonitors.Count -gt 0 -and ($ctx.HideStrategy -eq "disconnect" -or $ctx.HideStrategy -eq "turnOff")) {
         $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
     }
-    elseif ($ctx.HideStrategy -eq "turnOff" -and $ctx.HideMonitors.Count -gt 0) {
-        foreach ($name in $ctx.HideMonitors) {
-            Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+
+    if ($monitorsToEnable.Count -gt 0) {
+        if ($ctx.HideStrategy -eq "turnOff") {
+            foreach ($name in $monitorsToEnable) {
+                Invoke-Mmt -Arguments @("/TurnOn", "`"$name`"") | Out-Null
+            }
         }
-        $monitorsToEnable = @($ctx.HideMonitors | Select-Object -Unique)
-    }
 
-    if ($monitorsToEnable.Count -gt 0 -and $ctx.HideStrategy -eq "disconnect") {
         $enableArgs = @("/enable")
         foreach ($name in $monitorsToEnable) {
             $enableArgs += "`"$name`""
         }
         Invoke-Mmt -Arguments $enableArgs | Out-Null
-    }
 
-    Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
-
-    if ($ctx.OriginalPrimary) {
-        $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
-        Set-PrimaryMonitorFromBackupSpec -MonitorName $ctx.OriginalPrimary -Spec $primarySpec
-    }
-
-    if ($ctx.FocusWasInactive -and $ctx.FocusMonitor) {
-        Invoke-Mmt -Arguments @("/disable", "`"$($ctx.FocusMonitor)`"") | Out-Null
-        if ($ctx.OriginalPrimary) {
-            Invoke-Mmt -Arguments @("/SetPrimary", "`"$($ctx.OriginalPrimary)`"") | Out-Null
+        if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable)) {
+            # Retry individual: o /enable em lote pode falhar parcialmente
+            foreach ($name in $monitorsToEnable) {
+                Invoke-Mmt -Arguments @("/enable", "`"$name`"") | Out-Null
+            }
+            if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable -TimeoutMs 3000)) {
+                # Último recurso: modo estendido nativo ativa todos os conectados
+                [void][CcdHelper]::ExtendAll()
+                if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToEnable)) {
+                    $result.Issues += "Nem todos os monitores foram reativados: $($monitorsToEnable -join ', ')"
+                }
+            }
         }
     }
+
+    # Etapa 2: devolver o monitor primário original ANTES de desconectar o
+    # monitor do console — o Windows não desconecta o monitor primário atual
+    if ($ctx.OriginalPrimary) {
+        $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
+        if (-not (Restore-PrimaryMonitorWithRetry -MonitorName $ctx.OriginalPrimary -Spec $primarySpec)) {
+            $result.Issues += "Não foi possível restaurar o primário para $($ctx.OriginalPrimary)"
+        }
+    }
+
+    # Etapa 3: restaurar posições/resoluções do layout original
+    Invoke-Mmt -Arguments @("/LoadConfig", "`"$Script:BackupMonitorConfig`"") | Out-Null
+    Start-Sleep -Milliseconds 800
+
+    # Etapa 4: o LoadConfig pode ter mexido no primário; reafirmar
+    if ($ctx.OriginalPrimary) {
+        $primarySpec = $backupSpecs[$ctx.OriginalPrimary]
+        if (-not (Restore-PrimaryMonitorWithRetry -MonitorName $ctx.OriginalPrimary -Spec $primarySpec)) {
+            $result.Issues += "Primário não confirmado em $($ctx.OriginalPrimary) após LoadConfig"
+        }
+    }
+
+    # Etapa 5: desconectar os monitores que estavam inativos no backup
+    # (o monitor do console), agora que o primário já não é mais ele
+    $monitorsToDisable = @(Get-BackupInactiveMonitorNames -BackupSpecs $backupSpecs)
+    if ($ctx.FocusWasInactive -and $ctx.FocusMonitor -and $monitorsToDisable -notcontains $ctx.FocusMonitor) {
+        $monitorsToDisable += $ctx.FocusMonitor
+    }
+
+    foreach ($name in $monitorsToDisable) {
+        if ($name -eq $ctx.OriginalPrimary) { continue }
+        if (-not (Disable-MonitorWithRetry -MonitorName $name)) {
+            $result.Issues += "Não foi possível desconectar $name"
+        }
+    }
+
+    if ($result.Issues.Count -gt 0) { $result.Success = $false }
+    return $result
 }
 
 function Set-MonitorCacheActive {
@@ -874,7 +1174,14 @@ function Set-MonitorCacheActive {
 
 function Set-PrimaryMonitor {
     param([Parameter(Mandatory)][string]$MonitorName)
+
     Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
+    if (Wait-ConsolePrimaryMonitor -MonitorName $MonitorName -TimeoutMs 2000) { return }
+
+    # O /SetPrimary do MultiMonitorTool falha em builds recentes do Windows 11;
+    # a API CCD é o caminho confiável
+    Set-PrimaryMonitorNative -MonitorName $MonitorName | Out-Null
+    Wait-ConsolePrimaryMonitor -MonitorName $MonitorName -TimeoutMs 3000 | Out-Null
 }
 
 function Test-ValidMonitorModeInfo {
@@ -1785,7 +2092,12 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.RestoreInProgress = $true
     try {
         Close-BlackCurtains
-        Restore-MonitorBackup
+        $restoreResult = Restore-MonitorBackup
+        if ($restoreResult -and -not $restoreResult.Success) {
+            foreach ($issue in $restoreResult.Issues) {
+                Write-Warning "Restauração do setup: $issue"
+            }
+        }
         Restore-ConsoleAudioOutput
         Restore-RtssFpsSettings
         Clear-ConsoleDeviceCache

@@ -22,6 +22,17 @@ readme.txt
 *.csv
 _test_*.ps1
 
+# Versao antiga arquivada
+OLD_ConsoleMode/
+
+# Scripts de experimento/debug (nao fazem parte do produto)
+build/Fix-Display3.ps1
+build/Test-BackupRestore.ps1
+build/Test-RestoreMethods.ps1
+build/Test-RestoreSim.ps1
+build/Test-RestoreSteps.ps1
+build/Test-SetPrimary.ps1
+
 # IDE / OS
 .vs/
 .idea/
