@@ -85,10 +85,16 @@ function Hide-ConsoleFormForActiveMode {
 function Show-ConsoleActiveView {
     param(
         [System.Windows.Forms.Form]$Form,
-        $WizardContext
+        $WizardContext,
+        [string]$FullscreenMode = "bigPicture"
     )
 
     Set-WizardEnabled @WizardContext -Enabled $false
+    if ($FullscreenMode -eq "xboxMode") {
+        Show-FormOnPrimary -Form $Form
+        return
+    }
+
     Hide-ConsoleFormForActiveMode -Form $Form
 }
 
@@ -226,11 +232,17 @@ function Show-StatusMessage {
 function Get-MonitorFriendlyLabel {
     param($Monitor)
 
-    $shortName = ($Monitor.Name -replace '\\\\\.\\', '').Trim()
-    if ($Monitor.MonitorName) {
-        return "$($Monitor.MonitorName) ($shortName)"
+    $winLabel = if ($Monitor.WindowsDisplayNumber -gt 0) {
+        "Monitor $($Monitor.WindowsDisplayNumber)"
     }
-    return $shortName
+    else {
+        ($Monitor.Name -replace '\\\\\.\\', '').Trim()
+    }
+
+    if ($Monitor.MonitorName) {
+        return "$($Monitor.MonitorName) ($winLabel)"
+    }
+    return $winLabel
 }
 
 function Get-MonitorSecondaryLabel {
@@ -259,15 +271,14 @@ function Initialize-MonitorModeCombo {
         Frequency  = 0
     })
 
-    if (-not $Monitor.IsActive) {
+    $Combo.Enabled = $true
+    $modes = @(Get-MonitorDisplayModes -MonitorName $Monitor.Name -Monitor $Monitor)
+    $matched = $false
+
+    if (-not $Monitor.IsActive -and $modes.Count -eq 0) {
         $Combo.SelectedIndex = 0
-        $Combo.Enabled = $false
         return
     }
-
-    $Combo.Enabled = $true
-    $modes = @(Get-MonitorDisplayModes -MonitorName $Monitor.Name)
-    $matched = $false
 
     foreach ($mode in $modes) {
         [void]$Combo.Items.Add([PSCustomObject]@{
@@ -548,11 +559,17 @@ function Build-MonitorLayoutDiagram {
         }
 
         $lbl = New-Object System.Windows.Forms.Label
-        $lbl.Text = (Get-MonitorFriendlyLabel -Monitor $m)
+        $diagramLabel = if ($m.WindowsDisplayNumber -gt 0) {
+            "$($m.WindowsDisplayNumber)"
+        }
+        else {
+            ($m.Name -replace '\\\\\.\\DISPLAY', '').Trim()
+        }
+        $lbl.Text = $diagramLabel
         $lbl.Dock = [System.Windows.Forms.DockStyle]::Fill
         $lbl.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
         $lbl.ForeColor = $box.ForeColor
-        $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 7.5)
+        $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
         $box.Controls.Add($lbl)
         $Panel.Controls.Add($box)
     }
@@ -724,7 +741,7 @@ function Set-ActiveConsoleMessaging {
     if ($FullscreenMode -eq "xboxMode") {
         $ActiveDesc.Text = @(
             "Modo Xbox (Alpha): sem restauração automática."
-            "Ao terminar, use Restaurar agora, o menu da bandeja ou Mostrar janela."
+            "O app permanece aberto — use Restaurar agora quando terminar."
         ) -join [Environment]::NewLine
         Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
             -Message "Modo Xbox (Alpha) ativo. Restaure manualmente ao sair." `
@@ -741,8 +758,8 @@ function Set-ActiveConsoleMessaging {
 function Test-ConsoleWatchNeeded {
   param([string]$FullscreenMode)
 
-  if ($FullscreenMode -eq "bigPicture") { return $true }
-  return (Test-ConsoleAudioWatchNeeded)
+  if ($FullscreenMode -eq "xboxMode") { return $false }
+  return $true
 }
 
 function Get-WizardSelections {
@@ -1071,23 +1088,38 @@ function Show-ConsoleModeGui {
             $e.Cancel = $true
 
             if ($e.CloseReason -eq [System.Windows.Forms.CloseReason]::UserClosing -and $sender.Visible) {
-                $answer = [System.Windows.Forms.MessageBox]::Show(
-                    "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter oculto na bandeja.",
-                    "Console Mode",
-                    [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
-                    [System.Windows.Forms.MessageBoxIcon]::Question
-                )
-                if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
-                    return
+                if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
+                    $answer = [System.Windows.Forms.MessageBox]::Show(
+                        "O modo Xbox está ativo. Restaurar o setup e sair?",
+                        "Console Mode",
+                        [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
+                        [System.Windows.Forms.MessageBoxIcon]::Question
+                    )
+                    if ($answer -ne [System.Windows.Forms.DialogResult]::Yes) {
+                        return
+                    }
                 }
-                if ($answer -eq [System.Windows.Forms.DialogResult]::No) {
-                    Hide-ConsoleFormForActiveMode -Form $sender
-                    return
+                else {
+                    $answer = [System.Windows.Forms.MessageBox]::Show(
+                        "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter oculto na bandeja.",
+                        "Console Mode",
+                        [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
+                        [System.Windows.Forms.MessageBoxIcon]::Question
+                    )
+                    if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
+                        return
+                    }
+                    if ($answer -eq [System.Windows.Forms.DialogResult]::No) {
+                        Hide-ConsoleFormForActiveMode -Form $sender
+                        return
+                    }
                 }
                 Stop-MonitorWorker
                 Stop-ConsoleMode
                 $script:ConsoleUiLocked = $false
                 $script:AllowFormClosePrompt = $true
+                $e.Cancel = $false
+                return
             }
             return
         }
@@ -1206,7 +1238,7 @@ function Show-ConsoleModeGui {
         $fpsCustomNumeric.Visible = $isCustom
     })
 
-    $hint1 = New-Label -Text "Escolha resolução/Hz por monitor (opcional). Desconectados (cinza) serão reativados ao iniciar." `
+    $hint1 = New-Label -Text "Desconectados: use modos do cache ou estimados — aplicados ao conectar. Serão reativados ao iniciar." `
         -X 235 -Y 258 -W 420 -H 30
     $hint1.ForeColor = $script:Theme.Muted
     $hint1.Font = New-Object System.Drawing.Font("Segoe UI", 8)
@@ -1286,7 +1318,7 @@ function Show-ConsoleModeGui {
     $modeXbox.Checked = ($config.fullscreenMode -eq "xboxMode")
     $modeGroup.Controls.Add($modeXbox)
 
-    $xboxDesc = New-Label -Text "Experimental: envia Win+F11. Sem detecção de fechamento — restaure manualmente pela bandeja ou pelo botão Restaurar agora." `
+    $xboxDesc = New-Label -Text "Experimental: envia Win+F11. O app permanece aberto; restaure manualmente com Restaurar agora." `
         -X 35 -Y 100 -W 600 -H 36
     $xboxDesc.ForeColor = $script:Theme.Warning
     $xboxDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
@@ -1492,7 +1524,7 @@ function Show-ConsoleModeGui {
                 ) | Out-Null
             }
 
-            Show-ConsoleActiveView -Form $form -WizardContext $wizardContext
+            Show-ConsoleActiveView -Form $form -WizardContext $wizardContext -FullscreenMode $data.FullscreenMode
             Set-ActiveConsoleMessaging -ActiveDesc $activeDesc -Form $form -StatusLabel $statusLabel `
                 -FullscreenMode $data.FullscreenMode
             if (Test-ConsoleWatchNeeded -FullscreenMode $data.FullscreenMode) {
