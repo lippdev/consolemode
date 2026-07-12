@@ -16,12 +16,34 @@ $script:Theme = @{
     Bg      = [System.Drawing.Color]::FromArgb(28, 28, 30)
     Surface = [System.Drawing.Color]::FromArgb(37, 37, 40)
     Input   = [System.Drawing.Color]::FromArgb(50, 50, 54)
+    InputHover = [System.Drawing.Color]::FromArgb(62, 62, 68)
     Border  = [System.Drawing.Color]::FromArgb(62, 62, 66)
-    Text    = [System.Drawing.Color]::FromArgb(230, 230, 230)
-    Muted   = [System.Drawing.Color]::FromArgb(150, 150, 155)
+    Text    = [System.Drawing.Color]::FromArgb(235, 235, 238)
+    Muted   = [System.Drawing.Color]::FromArgb(165, 165, 172)
     Accent  = [System.Drawing.Color]::FromArgb(62, 207, 160)
+    AccentHover = [System.Drawing.Color]::FromArgb(88, 220, 176)
     Success = [System.Drawing.Color]::FromArgb(78, 201, 176)
-    Warning = [System.Drawing.Color]::FromArgb(220, 180, 90)
+    Warning = [System.Drawing.Color]::FromArgb(224, 186, 102)
+}
+
+# Família tipográfica: Segoe UI Variable (Win11) com fallback para Segoe UI
+$script:UiFontFamily = "Segoe UI"
+try {
+    $installed = New-Object System.Drawing.Text.InstalledFontCollection
+    if ($installed.Families | Where-Object { $_.Name -eq "Segoe UI Variable Text" }) {
+        $script:UiFontFamily = "Segoe UI Variable Text"
+    }
+    $installed.Dispose()
+}
+catch { }
+
+function New-UiFont {
+    param(
+        [Parameter(Mandatory)][double]$Size,
+        [switch]$Bold
+    )
+    $style = if ($Bold) { [System.Drawing.FontStyle]::Bold } else { [System.Drawing.FontStyle]::Regular }
+    return New-Object System.Drawing.Font($script:UiFontFamily, [single]$Size, $style)
 }
 
 function Get-ConsoleAppIcon {
@@ -196,16 +218,21 @@ function New-StyledButton {
     $btn.Size = New-Object System.Drawing.Size($W, $H)
     $btn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
     $btn.UseVisualStyleBackColor = $false
+    $btn.Cursor = [System.Windows.Forms.Cursors]::Hand
     if ($Primary) {
         $btn.BackColor = $script:Theme.Accent
         $btn.ForeColor = [System.Drawing.Color]::FromArgb(28, 28, 30)
         $btn.FlatAppearance.BorderSize = 0
-        $btn.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+        $btn.FlatAppearance.MouseOverBackColor = $script:Theme.AccentHover
+        $btn.FlatAppearance.MouseDownBackColor = $script:Theme.Accent
+        $btn.Font = New-UiFont 10 -Bold
     }
     else {
         $btn.BackColor = $script:Theme.Input
         $btn.ForeColor = $script:Theme.Text
         $btn.FlatAppearance.BorderColor = $script:Theme.Border
+        $btn.FlatAppearance.MouseOverBackColor = $script:Theme.InputHover
+        $btn.FlatAppearance.MouseDownBackColor = $script:Theme.Input
     }
     return $btn
 }
@@ -549,7 +576,7 @@ function Build-MonitorLayoutDiagram {
         $lbl.Dock = [System.Windows.Forms.DockStyle]::Fill
         $lbl.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
         $lbl.ForeColor = $box.ForeColor
-        $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+        $lbl.Font = New-UiFont 9 -Bold
         $box.Controls.Add($lbl)
         $Panel.Controls.Add($box)
     }
@@ -577,20 +604,20 @@ function Build-MonitorPanel {
     $colName = 110
     $colMode = 340
 
-    $hdrFoco = New-Label -Text "Foco" -X $colFoco -Y 4 -W 50 -H 18 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
+    $hdrFoco = New-Label -Text "Foco" -X $colFoco -Y 4 -W 40 -H 18 `
+        -Font (New-UiFont 8.5 -Bold)
     $Panel.Controls.Add($hdrFoco)
 
-    $hdrHide = New-Label -Text "Esconder" -X $colHide -Y 4 -W 70 -H 18 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
+    $hdrHide = New-Label -Text "Esconder" -X $colHide -Y 4 -W 54 -H 18 `
+        -Font (New-UiFont 8.5 -Bold)
     $Panel.Controls.Add($hdrHide)
 
     $hdrName = New-Label -Text "Monitor" -X $colName -Y 4 -W 220 -H 18 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
+        -Font (New-UiFont 8.5 -Bold)
     $Panel.Controls.Add($hdrName)
 
     $hdrMode = New-Label -Text "Resolução / Hz" -X $colMode -Y 4 -W 280 -H 18 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold))
+        -Font (New-UiFont 8.5 -Bold)
     $Panel.Controls.Add($hdrMode)
 
     $y = 26
@@ -622,7 +649,7 @@ function Build-MonitorPanel {
         $Panel.Controls.Add($check)
 
         $nameLabel = New-Label -Text $friendly -X $colName -Y $y -W 220 -H 16 `
-            -Font (New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold))
+            -Font (New-UiFont 9 -Bold)
         if (-not $monitor.IsActive) {
             $nameLabel.ForeColor = $script:Theme.Muted
         }
@@ -630,7 +657,7 @@ function Build-MonitorPanel {
 
         $subLabel = New-Label -Text $secondary -X ($colName + 2) -Y ($y + 16) -W 220 -H 14
         $subLabel.ForeColor = $script:Theme.Muted
-        $subLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8)
+        $subLabel.Font = New-UiFont 8
         $Panel.Controls.Add($subLabel)
 
         $modeCombo = New-Object System.Windows.Forms.ComboBox
@@ -1029,11 +1056,11 @@ function Show-WizardStep {
 
     for ($i = 0; $i -lt $ProgressLabels.Count; $i++) {
         if ($i -eq $Step) {
-            $ProgressLabels[$i].Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+            $ProgressLabels[$i].Font = New-UiFont 9 -Bold
             $ProgressLabels[$i].ForeColor = $script:Theme.Accent
         }
         else {
-            $ProgressLabels[$i].Font = New-Object System.Drawing.Font("Segoe UI", 9)
+            $ProgressLabels[$i].Font = New-UiFont 9
             $ProgressLabels[$i].ForeColor = $script:Theme.Muted
         }
     }
@@ -1066,7 +1093,7 @@ function Show-ConsoleModeGui {
     $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
     $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedDialog
     $form.MaximizeBox = $false
-    $form.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
+    $form.Font = New-UiFont 9.5
     $form.BackColor = $script:Theme.Bg
     $form.ForeColor = $script:Theme.Text
     $form.Icon = Get-ConsoleAppIcon
@@ -1127,7 +1154,7 @@ function Show-ConsoleModeGui {
     })
 
     $titleLbl = New-Label -Text "Console Mode" -X 20 -Y 14 -W 300 -H 28 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold))
+        -Font (New-UiFont 14 -Bold)
     $titleLbl.ForeColor = $script:Theme.Accent
     $form.Controls.Add($titleLbl)
 
@@ -1213,7 +1240,7 @@ function Show-ConsoleModeGui {
     $fpsGroup.Controls.Add($fpsCustomNumeric)
 
     $fpsLimitStatus = New-Label -Text "" -X 15 -Y 58 -W 620 -H 36
-    $fpsLimitStatus.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $fpsLimitStatus.Font = New-UiFont 8.5
     $fpsGroup.Controls.Add($fpsLimitStatus)
     Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
 
@@ -1230,7 +1257,7 @@ function Show-ConsoleModeGui {
     $hint1 = New-Label -Text "Desconectados: use modos do cache ou estimados — aplicados ao conectar. Serão reativados ao iniciar." `
         -X 235 -Y 258 -W 420 -H 30
     $hint1.ForeColor = $script:Theme.Muted
-    $hint1.Font = New-Object System.Drawing.Font("Segoe UI", 8)
+    $hint1.Font = New-UiFont 8
     $step1.Controls.Add($hint1)
 
     foreach ($control in $monitorPanel.Controls) {
@@ -1273,7 +1300,7 @@ function Show-ConsoleModeGui {
     $hideDesc = New-Label -Text "Desconectar: desativa no Windows (rápido). Cortinas: overlay preto. DDC/CI: apaga o painel via hardware." `
         -X 15 -Y 65 -W 610 -H 40
     $hideDesc.ForeColor = $script:Theme.Muted
-    $hideDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $hideDesc.Font = New-UiFont 8.5
     $hideGroup.Controls.Add($hideDesc)
     $tt = New-Object System.Windows.Forms.ToolTip
     $tt.SetToolTip($hideStrategyCombo, "Desconectar é o mais confiável para a maioria dos setups com 3 monitores.")
@@ -1289,12 +1316,13 @@ function Show-ConsoleModeGui {
     $modeBigPicture.Location = New-Object System.Drawing.Point(15, 30)
     $modeBigPicture.Size = New-Object System.Drawing.Size(610, 24)
     $modeBigPicture.Checked = ($config.fullscreenMode -ne "xboxMode" -and -not ($config.fullscreenMode -eq "playnite" -and (Test-PlayniteAvailable)))
+    $modeBigPicture.Font = New-UiFont 9.5 -Bold
     $modeGroup.Controls.Add($modeBigPicture)
 
     $bpDesc = New-Label -Text "Abre a Steam em modo Big Picture no monitor de foco. Restauração automática ao sair." `
         -X 35 -Y 52 -W 600 -H 18
     $bpDesc.ForeColor = $script:Theme.Muted
-    $bpDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $bpDesc.Font = New-UiFont 8.5
     $modeGroup.Controls.Add($bpDesc)
 
     $playniteAvailable = Test-PlayniteAvailable
@@ -1304,6 +1332,7 @@ function Show-ConsoleModeGui {
     $modePlaynite.Location = New-Object System.Drawing.Point(15, 78)
     $modePlaynite.Size = New-Object System.Drawing.Size(610, 24)
     $modePlaynite.Enabled = $playniteAvailable
+    $modePlaynite.Font = New-UiFont 9.5 -Bold
     $modePlaynite.Checked = ($config.fullscreenMode -eq "playnite" -and $playniteAvailable)
     $modeGroup.Controls.Add($modePlaynite)
 
@@ -1314,11 +1343,12 @@ function Show-ConsoleModeGui {
     }
     $playniteDesc = New-Label -Text $playniteDescText -X 35 -Y 100 -W 600 -H 18
     $playniteDesc.ForeColor = if ($playniteAvailable) { $script:Theme.Muted } else { $script:Theme.Warning }
-    $playniteDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $playniteDesc.Font = New-UiFont 8.5
     $modeGroup.Controls.Add($playniteDesc)
 
     $modeXbox = New-Object System.Windows.Forms.RadioButton
     $modeXbox.Text = "Modo Xbox (Win+F11) — Alpha"
+    $modeXbox.Font = New-UiFont 9.5 -Bold
     $modeXbox.Location = New-Object System.Drawing.Point(15, 126)
     $modeXbox.Size = New-Object System.Drawing.Size(610, 24)
     $modeXbox.Checked = ($config.fullscreenMode -eq "xboxMode")
@@ -1327,7 +1357,7 @@ function Show-ConsoleModeGui {
     $xboxDesc = New-Label -Text "Experimental: envia Win+F11. O app permanece aberto; restaure manualmente com Restaurar agora." `
         -X 35 -Y 148 -W 600 -H 36
     $xboxDesc.ForeColor = $script:Theme.Warning
-    $xboxDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $xboxDesc.Font = New-UiFont 8.5
     $modeGroup.Controls.Add($xboxDesc)
 
     $chkHdr = New-Object System.Windows.Forms.CheckBox
@@ -1344,10 +1374,10 @@ function Show-ConsoleModeGui {
     $chkVrr.Checked = ($config.vrrEnable -eq $true)
     $step2.Controls.Add($chkVrr)
 
-    $vrrDisclaimer = New-Label -Text "VRR: aplica só o ajuste do Windows. Recomendamos ligar o VRR pelo driver da GPU (NVIDIA/AMD)." `
-        -X 330 -Y 386 -W 340 -H 14
+    $vrrDisclaimer = New-Label -Text "VRR: esta opção aplica apenas o ajuste do Windows — recomendamos ligar o VRR pelo painel do driver da GPU (NVIDIA/AMD)." `
+        -X 10 -Y 386 -W 650 -H 14
     $vrrDisclaimer.ForeColor = $script:Theme.Warning
-    $vrrDisclaimer.Font = New-Object System.Drawing.Font("Segoe UI", 8)
+    $vrrDisclaimer.Font = New-UiFont 8.25
     $step2.Controls.Add($vrrDisclaimer)
 
     $ttExtras = New-Object System.Windows.Forms.ToolTip
@@ -1392,7 +1422,7 @@ function Show-ConsoleModeGui {
     $audioHint = New-Label -Text "Use ""$($script:AudioOnConnectLabel)"" quando a TV ainda não está ligada. Ao ligá-la, o Windows mostra o áudio HDMI como nova saída e o app troca para ela automaticamente." `
         -X 5 -Y 125 -W 650 -H 40
     $audioHint.ForeColor = $script:Theme.Muted
-    $audioHint.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $audioHint.Font = New-UiFont 8.5
     $step3.Controls.Add($audioHint)
 
     if (-not (Test-SoundVolumeViewAvailable)) {
@@ -1408,11 +1438,11 @@ function Show-ConsoleModeGui {
     $form.Controls.Add($step4)
 
     $reviewTitle = New-Label -Text "Revise antes de iniciar" -X 5 -Y 10 -W 400 -H 24 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold))
+        -Font (New-UiFont 11 -Bold)
     $step4.Controls.Add($reviewTitle)
 
     $reviewLabel = New-Label -Text "" -X 5 -Y 45 -W 650 -H 140
-    $reviewLabel.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+    $reviewLabel.Font = New-UiFont 10
     $step4.Controls.Add($reviewLabel)
 
     $wizardData = @{
@@ -1435,7 +1465,7 @@ function Show-ConsoleModeGui {
     $form.Controls.Add($panelActive)
 
     $activeTitle = New-Label -Text "Modo console ativo" -X 5 -Y 20 -W 400 -H 28 `
-        -Font (New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold))
+        -Font (New-UiFont 12 -Bold)
     $panelActive.Controls.Add($activeTitle)
 
     $activeDesc = New-Label -Text "" -X 5 -Y 55 -W 650 -H 70
