@@ -1516,13 +1516,38 @@ function Stop-MonitorWorker {
 
 function Invoke-ConsoleMonitorExitUi {
     Stop-MonitorWorker
-    Stop-ConsoleMode
-    $script:ConsoleUiLocked = $false
-    Set-WizardEnabled -Enabled $true
-    Show-FormOnPrimary -Form $script:Ui.Window
-    Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
-        -Message "Modo console encerrado. Setup restaurado." `
-        -Color $script:Theme.Success -Force
+
+    # A janela precisa voltar SEMPRE, mesmo que a restauração falhe no meio
+    $restoreError = $null
+    try {
+        Stop-ConsoleMode
+    }
+    catch {
+        $restoreError = $_.Exception.Message
+        Write-ConsoleLog "ExitUi: erro na restauração: $restoreError"
+    }
+    finally {
+        $script:ConsoleUiLocked = $false
+        try {
+            Set-WizardEnabled -Enabled $true
+            Show-FormOnPrimary -Form $script:Ui.Window
+        }
+        catch {
+            Write-ConsoleLog "ExitUi: erro ao reexibir janela: $($_.Exception.Message)"
+        }
+    }
+
+    if ($restoreError) {
+        Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+            -Message "Erro ao restaurar: $restoreError — use Restaurar agora ou build\Restore-SetupNow.ps1." `
+            -Color $script:Theme.Warning -Force
+        $script:Ui.BtnRestore.IsEnabled = $true
+    }
+    else {
+        Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+            -Message "Modo console encerrado. Setup restaurado." `
+            -Color $script:Theme.Success -Force
+    }
 }
 
 function Start-MonitorTimer {
@@ -1552,7 +1577,21 @@ function Start-MonitorTimer {
 
             $script:ConsoleMonitorTimer.Interval = [TimeSpan]::FromMilliseconds([Math]::Max(1000, (Get-ConsoleMonitorPollDelayMs)))
         }
-        catch { }
+        catch {
+            # Nunca deixar o app "sumir": registrar, parar o loop e devolver a UI
+            Write-ConsoleLog "Loop: erro não tratado: $($_.Exception.Message)"
+            try {
+                if ($script:ConsoleMonitorTimer) { $script:ConsoleMonitorTimer.Stop() }
+                $script:ConsoleUiLocked = $false
+                Set-WizardEnabled -Enabled $true
+                Show-FormOnPrimary -Form $script:Ui.Window
+                $script:Ui.BtnRestore.IsEnabled = $true
+                Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+                    -Message "Erro no acompanhamento: $($_.Exception.Message) — use Restaurar agora." `
+                    -Color $script:Theme.Warning -Force
+            }
+            catch { }
+        }
         finally {
             $script:MonitorLoopBusy = $false
         }

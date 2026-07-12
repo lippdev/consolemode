@@ -617,6 +617,25 @@ $Script:ConsoleState = @{
     VrrApplied = $false
 }
 
+function Write-ConsoleLog {
+    param([Parameter(Mandatory)][string]$Message)
+
+    try {
+        $dir = if ($Script:BackupMonitorConfig) { Split-Path -Parent $Script:BackupMonitorConfig } else { $env:TEMP }
+        $logPath = Join-Path $dir "consolemode.log"
+        $line = "{0:yyyy-MM-dd HH:mm:ss.fff}  {1}" -f (Get-Date), $Message
+        Add-Content -LiteralPath $logPath -Value $line -Encoding UTF8
+
+        # Mantém o log pequeno (~500 KB)
+        $item = Get-Item -LiteralPath $logPath -ErrorAction SilentlyContinue
+        if ($item -and $item.Length -gt 500KB) {
+            $tail = Get-Content -LiteralPath $logPath -Tail 1000 -Encoding UTF8
+            Set-Content -LiteralPath $logPath -Value $tail -Encoding UTF8
+        }
+    }
+    catch { }
+}
+
 $Script:MonitorListCache = $null
 $Script:AudioDevicesCache = $null
 $Script:CachedDefaultAudioId = $null
@@ -1236,6 +1255,7 @@ function Restore-MonitorBackup {
 
     $ctx = Get-MonitorRestoreContext
     $backupSpecs = Get-BackupMonitorSpecs -Path $Script:BackupMonitorConfig
+    Write-ConsoleLog "Restore: iniciando (primário=$($ctx.OriginalPrimary), foco=$($ctx.FocusMonitor), focoInativo=$($ctx.FocusWasInactive), esconder=$($ctx.HideMonitors -join '+'))"
 
     # Etapa 1: religar os monitores do backup (TurnOn primeiro se a estratégia
     # foi turnOff) e confirmar que os que estavam ativos no backup voltaram
@@ -1266,6 +1286,7 @@ function Restore-MonitorBackup {
             }
             if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToVerify -TimeoutMs 3000)) {
                 # Último recurso: modo estendido nativo ativa todos os conectados
+                Write-ConsoleLog "Restore: /enable não confirmou todos ($($monitorsToVerify -join '+')); usando ExtendAll"
                 [void][CcdHelper]::ExtendAll()
                 if (-not (Wait-ConsoleMonitorsActive -MonitorNames $monitorsToVerify)) {
                     $result.Issues += "Nem todos os monitores foram reativados: $($monitorsToVerify -join ', ')"
@@ -1312,6 +1333,12 @@ function Restore-MonitorBackup {
     Clear-ConsoleDeviceCache
 
     if ($result.Issues.Count -gt 0) { $result.Success = $false }
+    if ($result.Success) {
+        Write-ConsoleLog "Restore: concluído com sucesso"
+    }
+    else {
+        Write-ConsoleLog "Restore: concluído com problemas: $($result.Issues -join ' | ')"
+    }
     return $result
 }
 
@@ -2656,6 +2683,7 @@ function Update-ConsoleMonitorLoop {
     }
 
     if (Test-BigPictureExitSignaled) {
+        Write-ConsoleLog "Loop: saída do modo tela cheia detectada"
         return "exit"
     }
 
@@ -2714,6 +2742,7 @@ function Stop-ConsoleMode {
     }
 
     $Script:ConsoleState.RestoreInProgress = $true
+    Write-ConsoleLog "Stop-ConsoleMode: iniciando restauração"
     try {
         Close-BlackCurtains
         Restore-ConsoleHdr
@@ -2728,6 +2757,11 @@ function Stop-ConsoleMode {
         Restore-ConsoleAudioOutput
         Restore-RtssFpsSettings
         Clear-ConsoleDeviceCache
+        Write-ConsoleLog "Stop-ConsoleMode: restauração concluída"
+    }
+    catch {
+        Write-ConsoleLog "Stop-ConsoleMode: ERRO: $($_.Exception.Message)"
+        throw
     }
     finally {
         $Script:ConsoleState.RestoreInProgress = $false
