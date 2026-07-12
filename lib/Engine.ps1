@@ -424,6 +424,80 @@ public class CcdHelper {
         return SetDisplayConfig(0, null, 0, null, SDC_APPLY | SDC_TOPOLOGY_EXTEND);
     }
 
+    [StructLayout(LayoutKind.Sequential)] public struct GET_ADVANCED_COLOR_INFO {
+        public DEVICE_INFO_HEADER header;
+        public uint value; // bit0: suportado, bit1: habilitado
+        public uint colorEncoding;
+        public uint bitsPerColorChannel;
+    }
+    [StructLayout(LayoutKind.Sequential)] public struct SET_ADVANCED_COLOR_STATE {
+        public DEVICE_INFO_HEADER header;
+        public uint enableAdvancedColor; // bit0
+    }
+
+    [DllImport("user32.dll")]
+    public static extern int DisplayConfigGetDeviceInfo(ref GET_ADVANCED_COLOR_INFO info);
+    [DllImport("user32.dll")]
+    public static extern int DisplayConfigSetDeviceInfo(ref SET_ADVANCED_COLOR_STATE state);
+
+    const uint DEVICE_INFO_GET_ADVANCED_COLOR_INFO = 9;
+    const uint DEVICE_INFO_SET_ADVANCED_COLOR_STATE = 10;
+
+    // Localiza o alvo (adapterId + targetId) do caminho ativo cujo nome GDI
+    // de origem corresponde a \\.\DISPLAYn
+    static bool FindTargetForGdiName(string gdiDeviceName, out LUID adapterId, out uint targetId) {
+        adapterId = new LUID();
+        targetId = 0;
+        uint numPaths, numModes;
+        if (GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out numPaths, out numModes) != 0) return false;
+        PATH_INFO[] paths = new PATH_INFO[numPaths];
+        MODE_INFO[] modes = new MODE_INFO[numModes];
+        if (QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, IntPtr.Zero) != 0) return false;
+
+        for (int i = 0; i < numPaths; i++) {
+            string name = GetSourceGdiName(paths[i].sourceInfo.adapterId, paths[i].sourceInfo.id);
+            if (string.Equals(name, gdiDeviceName, StringComparison.OrdinalIgnoreCase)) {
+                adapterId = paths[i].targetInfo.adapterId;
+                targetId = paths[i].targetInfo.id;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -1: monitor não encontrado/erro; 0: HDR não suportado;
+    //  1: suportado e desligado; 2: suportado e ligado
+    public static int GetHdrStatus(string gdiDeviceName) {
+        LUID adapterId; uint targetId;
+        if (!FindTargetForGdiName(gdiDeviceName, out adapterId, out targetId)) return -1;
+
+        GET_ADVANCED_COLOR_INFO info = new GET_ADVANCED_COLOR_INFO();
+        info.header.type = DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
+        info.header.size = (uint)Marshal.SizeOf(typeof(GET_ADVANCED_COLOR_INFO));
+        info.header.adapterId = adapterId;
+        info.header.id = targetId;
+        if (DisplayConfigGetDeviceInfo(ref info) != 0) return -1;
+
+        bool supported = (info.value & 0x1) != 0;
+        bool enabled = (info.value & 0x2) != 0;
+        if (!supported) return 0;
+        return enabled ? 2 : 1;
+    }
+
+    // Liga/desliga HDR (advanced color) no monitor. Retorna 0 em sucesso.
+    public static int SetHdrState(string gdiDeviceName, bool enable) {
+        LUID adapterId; uint targetId;
+        if (!FindTargetForGdiName(gdiDeviceName, out adapterId, out targetId)) return -1;
+
+        SET_ADVANCED_COLOR_STATE state = new SET_ADVANCED_COLOR_STATE();
+        state.header.type = DEVICE_INFO_SET_ADVANCED_COLOR_STATE;
+        state.header.size = (uint)Marshal.SizeOf(typeof(SET_ADVANCED_COLOR_STATE));
+        state.header.adapterId = adapterId;
+        state.header.id = targetId;
+        state.enableAdvancedColor = enable ? 1u : 0u;
+        return DisplayConfigSetDeviceInfo(ref state);
+    }
+
     static string GetSourceGdiName(LUID adapterId, uint sourceId) {
         SOURCE_DEVICE_NAME req = new SOURCE_DEVICE_NAME();
         req.header.type = 1; // DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME
@@ -538,6 +612,9 @@ $Script:ConsoleState = @{
     FpsLimit = 0
     RtssBackup = $null
     RtssLimitApplied = $false
+    HdrApplied = $false
+    HdrMonitor = $null
+    VrrApplied = $false
 }
 
 $Script:MonitorListCache = $null
@@ -838,6 +915,8 @@ function Get-ConsoleConfig {
             audioAutoSwitch = $false
             fpsLimit        = 0
             monitorModes    = @{}
+            hdrEnable       = $false
+            vrrEnable       = $false
         }
     }
 
@@ -853,6 +932,8 @@ function Get-ConsoleConfig {
             audioAutoSwitch = [bool]($raw.audioAutoSwitch -eq $true)
             fpsLimit        = if ($null -ne $raw.fpsLimit) { [int]$raw.fpsLimit } else { 0 }
             monitorModes    = ConvertFrom-ConfigMonitorModes -Raw $raw.monitorModes
+            hdrEnable       = [bool]($raw.hdrEnable -eq $true)
+            vrrEnable       = [bool]($raw.vrrEnable -eq $true)
         }
     }
     catch {
@@ -866,6 +947,8 @@ function Get-ConsoleConfig {
             audioAutoSwitch = $false
             fpsLimit        = 0
             monitorModes    = @{}
+            hdrEnable       = $false
+            vrrEnable       = $false
         }
     }
 }
@@ -880,7 +963,9 @@ function Set-ConsoleConfig {
         [string]$AudioDeviceName,
         [bool]$AudioAutoSwitch = $false,
         [int]$FpsLimit = 0,
-        [hashtable]$MonitorModes = @{}
+        [hashtable]$MonitorModes = @{},
+        [bool]$HdrEnable = $false,
+        [bool]$VrrEnable = $false
     )
 
     $config = [ordered]@{
@@ -893,6 +978,8 @@ function Set-ConsoleConfig {
         audioAutoSwitch = $AudioAutoSwitch
         fpsLimit        = $FpsLimit
         monitorModes    = ConvertTo-ConfigMonitorModes -MonitorModes $MonitorModes
+        hdrEnable       = $HdrEnable
+        vrrEnable       = $VrrEnable
     }
 
     $config | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $Script:ConfigPath -Encoding UTF8
@@ -2138,6 +2225,183 @@ function Start-XboxMode {
     [NativeHelpers]::SendWinF11()
 }
 
+function Get-PlayniteFullscreenPath {
+    $candidates = @()
+    if ($env:LOCALAPPDATA) {
+        $candidates += (Join-Path $env:LOCALAPPDATA "Playnite\Playnite.FullscreenApp.exe")
+    }
+    $candidates += "C:\Program Files\Playnite\Playnite.FullscreenApp.exe"
+    $candidates += "C:\Program Files (x86)\Playnite\Playnite.FullscreenApp.exe"
+
+    foreach ($path in $candidates) {
+        if ($path -and (Test-Path -LiteralPath $path)) { return $path }
+    }
+
+    try {
+        $reg = Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Playnite_is1" -ErrorAction Stop
+        if ($reg.InstallLocation) {
+            $exe = Join-Path $reg.InstallLocation "Playnite.FullscreenApp.exe"
+            if (Test-Path -LiteralPath $exe) { return $exe }
+        }
+    }
+    catch { }
+
+    return $null
+}
+
+function Test-PlayniteAvailable {
+    return [bool](Get-PlayniteFullscreenPath)
+}
+
+function Start-PlayniteMode {
+    $exe = Get-PlayniteFullscreenPath
+    if ($exe) {
+        Start-Process -FilePath $exe
+        return
+    }
+    # Fallback: protocolo do Playnite (abre a instância registrada)
+    Start-Process "playnite://playnite/start"
+}
+
+function Get-PlayniteWindowHandles {
+    $handles = [System.Collections.ArrayList]@()
+    $procs = Get-Process -Name "Playnite.FullscreenApp" -ErrorAction SilentlyContinue |
+        Where-Object { $_.MainWindowHandle -ne 0 }
+    foreach ($p in $procs) {
+        [void]$handles.Add($p.MainWindowHandle)
+    }
+    return @($handles)
+}
+
+function Test-PlayniteActive {
+    if ($Script:ConsoleState.CachedBigPictureHandle -ne [IntPtr]::Zero) {
+        if ([NativeHelpers]::IsWindowStillVisible($Script:ConsoleState.CachedBigPictureHandle)) {
+            $area = [NativeHelpers]::GetWindowArea($Script:ConsoleState.CachedBigPictureHandle)
+            if ($area -gt 200000) { return $true }
+        }
+        $Script:ConsoleState.CachedBigPictureHandle = [IntPtr]::Zero
+    }
+
+    foreach ($h in (Get-PlayniteWindowHandles)) {
+        if ([NativeHelpers]::GetWindowArea($h) -gt 200000) {
+            $Script:ConsoleState.CachedBigPictureHandle = $h
+            return $true
+        }
+    }
+    return $false
+}
+
+# Janela do modo tela cheia atual (Big Picture ou Playnite); o loop de
+# acompanhamento usa isto para mover a janela ao foco e vigiar a saída
+function Get-FullscreenWindowHandles {
+    param([string]$Mode)
+
+    if ($Mode -eq "playnite") { return @(Get-PlayniteWindowHandles) }
+    return @(Get-BigPictureWindowHandles)
+}
+
+# ---------- HDR ----------
+
+function Get-ConsoleHdrStatus {
+    param([Parameter(Mandatory)][string]$MonitorName)
+    # -1: não encontrado; 0: sem suporte; 1: desligado; 2: ligado
+    return [CcdHelper]::GetHdrStatus($MonitorName)
+}
+
+function Enable-ConsoleHdr {
+    param([Parameter(Mandatory)][string]$MonitorName)
+
+    $status = Get-ConsoleHdrStatus -MonitorName $MonitorName
+    if ($status -lt 1) {
+        Write-Warning "HDR não disponível em $MonitorName (monitor sem suporte ou inativo)."
+        return $false
+    }
+    if ($status -eq 2) { return $true }  # já estava ligado; nada a reverter
+
+    $code = [CcdHelper]::SetHdrState($MonitorName, $true)
+    if ($code -ne 0) {
+        Write-Warning "Falha ao ativar HDR em $MonitorName (código $code)."
+        return $false
+    }
+
+    $Script:ConsoleState.HdrApplied = $true
+    $Script:ConsoleState.HdrMonitor = $MonitorName
+    return $true
+}
+
+function Restore-ConsoleHdr {
+    # Reverte apenas se fomos nós que ligamos; precisa rodar ANTES de
+    # desconectar o monitor de foco (o alvo precisa estar ativo)
+    if (-not $Script:ConsoleState.HdrApplied) { return }
+    if ($Script:ConsoleState.HdrMonitor) {
+        [void][CcdHelper]::SetHdrState($Script:ConsoleState.HdrMonitor, $false)
+    }
+    $Script:ConsoleState.HdrApplied = $false
+    $Script:ConsoleState.HdrMonitor = $null
+}
+
+# ---------- VRR (taxa de atualização variável) ----------
+
+$Script:VrrRegistryKey = "HKCU:\Software\Microsoft\DirectX\UserGpuPreferences"
+
+function Get-WindowsVrrSetting {
+    try {
+        return [string](Get-ItemProperty -Path $Script:VrrRegistryKey -ErrorAction Stop).DirectXUserGlobalSettings
+    }
+    catch {
+        return ""
+    }
+}
+
+function Test-WindowsVrrEnabled {
+    return ((Get-WindowsVrrSetting) -match 'VRROptimizeEnable=1')
+}
+
+function Set-WindowsVrrEnabled {
+    param([Parameter(Mandatory)][bool]$Enabled)
+
+    if (-not (Test-Path -LiteralPath $Script:VrrRegistryKey)) {
+        New-Item -Path $Script:VrrRegistryKey -Force | Out-Null
+    }
+
+    $current = Get-WindowsVrrSetting
+    $flag = if ($Enabled) { "1" } else { "0" }
+    if ($current -match 'VRROptimizeEnable=\d') {
+        $new = $current -replace 'VRROptimizeEnable=\d', "VRROptimizeEnable=$flag"
+    }
+    elseif ([string]::IsNullOrWhiteSpace($current)) {
+        $new = "VRROptimizeEnable=$flag;"
+    }
+    else {
+        $sep = if ($current.TrimEnd().EndsWith(";")) { "" } else { ";" }
+        $new = "$current$sep" + "VRROptimizeEnable=$flag;"
+    }
+
+    Set-ItemProperty -Path $Script:VrrRegistryKey -Name "DirectXUserGlobalSettings" -Value $new
+}
+
+function Enable-ConsoleVrr {
+    # Toggle global do Windows ("Taxa de atualização variável" em Configurações
+    # de elementos gráficos); vale para apps iniciados depois da mudança
+    if (Test-WindowsVrrEnabled) { return $true }  # já ligado; nada a reverter
+
+    try {
+        Set-WindowsVrrEnabled -Enabled $true
+        $Script:ConsoleState.VrrApplied = $true
+        return $true
+    }
+    catch {
+        Write-Warning "Falha ao ativar VRR: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+function Restore-ConsoleVrr {
+    if (-not $Script:ConsoleState.VrrApplied) { return }
+    try { Set-WindowsVrrEnabled -Enabled $false } catch { }
+    $Script:ConsoleState.VrrApplied = $false
+}
+
 function Test-XboxModeActive {
     if ($Script:ConsoleState.CachedXboxHandle -ne [IntPtr]::Zero) {
         if ([NativeHelpers]::IsWindowStillVisible($Script:ConsoleState.CachedXboxHandle)) {
@@ -2205,6 +2469,7 @@ function Test-FullscreenModeActive {
     switch ($Mode) {
         "bigPicture" { return Test-BigPictureActive }
         "xboxMode"   { return Test-XboxModeActive }
+        "playnite"   { return Test-PlayniteActive }
         default      { return $false }
     }
 }
@@ -2215,14 +2480,16 @@ function Start-ConsoleMode {
         [string[]]$HideMonitors = @(),
         [ValidateSet("disconnect", "blackCurtain", "turnOff")]
         [string]$HideStrategy = "disconnect",
-        [ValidateSet("bigPicture", "xboxMode")]
+        [ValidateSet("bigPicture", "xboxMode", "playnite")]
         [string]$FullscreenMode = "bigPicture",
         [string]$AudioDeviceId = "",
         [switch]$AudioAutoSwitch,
         [string]$AudioDeviceHint = "",
         $FocusMonitorInfo = $null,
         [int]$FpsLimit = 0,
-        [hashtable]$MonitorModes = @{}
+        [hashtable]$MonitorModes = @{},
+        [bool]$HdrEnable = $false,
+        [bool]$VrrEnable = $false
     )
 
     if ($Script:ConsoleState.IsActive) {
@@ -2315,6 +2582,13 @@ function Start-ConsoleMode {
         Apply-FocusMonitorDisplayMode -FocusMonitor $FocusMonitor -MonitorModes $MonitorModes
     }
 
+    if ($HdrEnable) {
+        Enable-ConsoleHdr -MonitorName $FocusMonitor | Out-Null
+    }
+    if ($VrrEnable) {
+        Enable-ConsoleVrr | Out-Null
+    }
+
     Clear-ConsoleDeviceCache
     Update-FocusMonitorRect -MonitorName $FocusMonitor -AllowMmtFallback | Out-Null
 
@@ -2351,6 +2625,11 @@ function Start-ConsoleMode {
             Start-BigPictureMode
         }
         "xboxMode"   { Start-XboxMode }
+        "playnite"   {
+            Start-Sleep -Milliseconds 400
+            Update-FocusMonitorRect -MonitorName $FocusMonitor -AllowMmtFallback | Out-Null
+            Start-PlayniteMode
+        }
     }
     $Script:ConsoleState.ModeLaunched = $true
     $Script:ConsoleState.LaunchTime = Get-Date
@@ -2381,7 +2660,7 @@ function Update-ConsoleMonitorLoop {
     }
 
     if (-not $Script:ConsoleState.HasAppeared) {
-        $bpHandles = Get-BigPictureWindowHandles
+        $bpHandles = Get-FullscreenWindowHandles -Mode $mode
         if ($bpHandles.Count -gt 0) {
             Update-FocusMonitorRect -MonitorName $Script:ConsoleState.FocusMonitor -AllowMmtFallback | Out-Null
             $focusRect = Get-MonitorRect -MonitorName $Script:ConsoleState.FocusMonitor
@@ -2437,6 +2716,8 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.RestoreInProgress = $true
     try {
         Close-BlackCurtains
+        Restore-ConsoleHdr
+        Restore-ConsoleVrr
         Start-Sleep -Milliseconds 800
         $restoreResult = Restore-MonitorBackup
         if ($restoreResult -and -not $restoreResult.Success) {
@@ -2477,6 +2758,9 @@ function Stop-ConsoleMode {
     $Script:ConsoleState.FpsLimit = 0
     $Script:ConsoleState.RtssBackup = $null
     $Script:ConsoleState.RtssLimitApplied = $false
+    $Script:ConsoleState.HdrApplied = $false
+    $Script:ConsoleState.HdrMonitor = $null
+    $Script:ConsoleState.VrrApplied = $false
     Stop-BigPictureExitWatch
     $Script:ConsoleState.CurtainForms = [System.Collections.ArrayList]@()
 }

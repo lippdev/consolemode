@@ -435,26 +435,6 @@ function Update-FpsLimitStatusLabel {
     }
 }
 
-function Suggest-FpsLimitForFocus {
-    param(
-        [System.Windows.Forms.ComboBox]$Combo,
-        [System.Windows.Forms.NumericUpDown]$CustomNumeric,
-        [string]$FocusMonitorName,
-        [int]$CurrentSavedLimit
-    )
-
-    if ($CurrentSavedLimit -gt 0) { return }
-
-    $monitor = $script:LoadedMonitors | Where-Object { $_.Name -eq $FocusMonitorName } | Select-Object -First 1
-    if (-not $monitor -or -not $monitor.Frequency) { return }
-
-    $hz = 0
-    if (-not [int]::TryParse([string]$monitor.Frequency, [ref]$hz)) { return }
-    if ($hz -le 0) { return }
-
-    Select-FpsLimitInCombo -Combo $Combo -CustomNumeric $CustomNumeric -SavedLimit $hz
-}
-
 function Get-GuiSelections {
     param([System.Windows.Forms.Panel]$MonitorPanel)
 
@@ -727,6 +707,7 @@ function Get-HideStrategyLabel {
 function Get-FullscreenModeLabel {
     param([string]$Mode)
     if ($Mode -eq "xboxMode") { return "Modo Xbox (Win+F11) — Alpha" }
+    if ($Mode -eq "playnite") { return "Playnite (modo tela cheia)" }
     return "Steam Big Picture (recomendado)"
 }
 
@@ -748,9 +729,10 @@ function Set-ActiveConsoleMessaging {
             -Color $script:Theme.Warning -Force
     }
     else {
-        $ActiveDesc.Text = "O app fica oculto na bandeja. Ao sair do Big Picture, monitores, áudio e FPS são restaurados automaticamente."
+        $appName = if ($FullscreenMode -eq "playnite") { "Playnite" } else { "Big Picture" }
+        $ActiveDesc.Text = "O app fica oculto na bandeja. Ao sair do $appName, monitores, áudio e FPS são restaurados automaticamente."
         Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
-            -Message "Modo console ativo. Ao sair do Big Picture, tudo será restaurado." `
+            -Message "Modo console ativo. Ao sair do $appName, tudo será restaurado." `
             -Color $script:Theme.Accent -Force
     }
 }
@@ -767,14 +749,19 @@ function Get-WizardSelections {
         $MonitorPanel,
         $HideStrategyCombo,
         $ModeBigPicture,
+        $ModePlaynite = $null,
         $AudioCombo,
         $FpsLimitCombo = $null,
-        $FpsCustomNumeric = $null
+        $FpsCustomNumeric = $null,
+        $HdrCheck = $null,
+        $VrrCheck = $null
     )
 
     $selection = Get-GuiSelections -MonitorPanel $MonitorPanel
     $hideStrategy = Get-HideStrategyFromCombo -Combo $HideStrategyCombo
-    $fullscreenMode = if ($ModeBigPicture.Checked) { "bigPicture" } else { "xboxMode" }
+    $fullscreenMode = if ($ModeBigPicture.Checked) { "bigPicture" }
+        elseif ($ModePlaynite -and $ModePlaynite.Checked) { "playnite" }
+        else { "xboxMode" }
     $audioItem = $AudioCombo.SelectedItem
     $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
     $audioName = if ($audioItem) { [string]$audioItem.Text } else { "" }
@@ -824,6 +811,8 @@ function Get-WizardSelections {
         FocusMonitorInfo = $focusInfo
         FpsLimit       = $fpsLimit
         MonitorModes   = $selection.MonitorModes
+        HdrEnable      = [bool]($HdrCheck -and $HdrCheck.Checked)
+        VrrEnable      = [bool]($VrrCheck -and $VrrCheck.Checked)
     }
 }
 
@@ -851,7 +840,9 @@ function Save-FromWizard {
         -AudioDeviceName $data.AudioDeviceName `
         -AudioAutoSwitch $data.AudioAutoSwitch `
         -FpsLimit $data.FpsLimit `
-        -MonitorModes $data.MonitorModes
+        -MonitorModes $data.MonitorModes `
+        -HdrEnable $data.HdrEnable `
+        -VrrEnable $data.VrrEnable
 
     Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuração salva." -Color $script:Theme.Success
     return $true
@@ -890,6 +881,7 @@ function Update-ReviewPanel {
         "Modo: $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
         "Áudio: $audioText"
         "Limite de FPS: $fpsText"
+        "HDR: $(if ($data.HdrEnable) { 'ativar no foco' } else { 'não mudar' }) · VRR: $(if ($data.VrrEnable) { 'ativar' } else { 'não mudar' })"
     ) -join [Environment]::NewLine
 }
 
@@ -1225,12 +1217,9 @@ function Show-ConsoleModeGui {
     $fpsGroup.Controls.Add($fpsLimitStatus)
     Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
 
+    # Padrão: desabilitado ("(Não limitar)"); só seleciona algo se o usuário salvou antes
     $savedFpsLimit = if ($null -ne $config.fpsLimit) { [int]$config.fpsLimit } else { 0 }
     Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit $savedFpsLimit
-    if ($savedFpsLimit -le 0) {
-        Suggest-FpsLimitForFocus -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric `
-            -FocusMonitorName $initialFocus -CurrentSavedLimit $savedFpsLimit
-    }
 
     $fpsLimitCombo.Add_SelectedIndexChanged({
         $item = $fpsLimitCombo.SelectedItem
@@ -1250,9 +1239,6 @@ function Show-ConsoleModeGui {
                 $sel = Get-GuiSelections -MonitorPanel $monitorPanel
                 if ($sel.FocusMonitor) {
                     Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
-                    $currentFps = Get-FpsLimitFromControls -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric
-                    Suggest-FpsLimitForFocus -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric `
-                        -FocusMonitorName $sel.FocusMonitor -CurrentSavedLimit $currentFps
                 }
             })
         }
@@ -1295,14 +1281,14 @@ function Show-ConsoleModeGui {
     $modeGroup = New-Object System.Windows.Forms.GroupBox
     $modeGroup.Text = "Modo de tela cheia"
     $modeGroup.Location = New-Object System.Drawing.Point(5, 145)
-    $modeGroup.Size = New-Object System.Drawing.Size(650, 155)
+    $modeGroup.Size = New-Object System.Drawing.Size(650, 215)
     $step2.Controls.Add($modeGroup)
 
     $modeBigPicture = New-Object System.Windows.Forms.RadioButton
     $modeBigPicture.Text = "Steam Big Picture (recomendado)"
     $modeBigPicture.Location = New-Object System.Drawing.Point(15, 30)
     $modeBigPicture.Size = New-Object System.Drawing.Size(610, 24)
-    $modeBigPicture.Checked = ($config.fullscreenMode -ne "xboxMode")
+    $modeBigPicture.Checked = ($config.fullscreenMode -ne "xboxMode" -and -not ($config.fullscreenMode -eq "playnite" -and (Test-PlayniteAvailable)))
     $modeGroup.Controls.Add($modeBigPicture)
 
     $bpDesc = New-Label -Text "Abre a Steam em modo Big Picture no monitor de foco. Restauração automática ao sair." `
@@ -1311,18 +1297,56 @@ function Show-ConsoleModeGui {
     $bpDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
     $modeGroup.Controls.Add($bpDesc)
 
+    $playniteAvailable = Test-PlayniteAvailable
+
+    $modePlaynite = New-Object System.Windows.Forms.RadioButton
+    $modePlaynite.Text = "Playnite (modo tela cheia)"
+    $modePlaynite.Location = New-Object System.Drawing.Point(15, 78)
+    $modePlaynite.Size = New-Object System.Drawing.Size(610, 24)
+    $modePlaynite.Enabled = $playniteAvailable
+    $modePlaynite.Checked = ($config.fullscreenMode -eq "playnite" -and $playniteAvailable)
+    $modeGroup.Controls.Add($modePlaynite)
+
+    $playniteDescText = if ($playniteAvailable) {
+        "Abre o Playnite em tela cheia no monitor de foco. Restauração automática ao sair."
+    } else {
+        "Playnite não encontrado. Instale-o (playnite.link) para habilitar esta opção."
+    }
+    $playniteDesc = New-Label -Text $playniteDescText -X 35 -Y 100 -W 600 -H 18
+    $playniteDesc.ForeColor = if ($playniteAvailable) { $script:Theme.Muted } else { $script:Theme.Warning }
+    $playniteDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
+    $modeGroup.Controls.Add($playniteDesc)
+
     $modeXbox = New-Object System.Windows.Forms.RadioButton
     $modeXbox.Text = "Modo Xbox (Win+F11) — Alpha"
-    $modeXbox.Location = New-Object System.Drawing.Point(15, 78)
+    $modeXbox.Location = New-Object System.Drawing.Point(15, 126)
     $modeXbox.Size = New-Object System.Drawing.Size(610, 24)
     $modeXbox.Checked = ($config.fullscreenMode -eq "xboxMode")
     $modeGroup.Controls.Add($modeXbox)
 
     $xboxDesc = New-Label -Text "Experimental: envia Win+F11. O app permanece aberto; restaure manualmente com Restaurar agora." `
-        -X 35 -Y 100 -W 600 -H 36
+        -X 35 -Y 148 -W 600 -H 36
     $xboxDesc.ForeColor = $script:Theme.Warning
     $xboxDesc.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
     $modeGroup.Controls.Add($xboxDesc)
+
+    $chkHdr = New-Object System.Windows.Forms.CheckBox
+    $chkHdr.Text = "Ativar HDR no monitor de foco"
+    $chkHdr.Location = New-Object System.Drawing.Point(10, 368)
+    $chkHdr.Size = New-Object System.Drawing.Size(310, 24)
+    $chkHdr.Checked = ($config.hdrEnable -eq $true)
+    $step2.Controls.Add($chkHdr)
+
+    $chkVrr = New-Object System.Windows.Forms.CheckBox
+    $chkVrr.Text = "Ativar VRR (taxa de atualização variável)"
+    $chkVrr.Location = New-Object System.Drawing.Point(330, 368)
+    $chkVrr.Size = New-Object System.Drawing.Size(320, 24)
+    $chkVrr.Checked = ($config.vrrEnable -eq $true)
+    $step2.Controls.Add($chkVrr)
+
+    $ttExtras = New-Object System.Windows.Forms.ToolTip
+    $ttExtras.SetToolTip($chkHdr, "Liga o HDR do Windows no monitor de foco ao iniciar e reverte ao restaurar. Requer monitor com suporte a HDR.")
+    $ttExtras.SetToolTip($chkVrr, "Liga a configuração global do Windows 'Taxa de atualização variável' ao iniciar e reverte ao restaurar. Requer monitor/GPU com suporte (G-Sync/FreeSync).")
 
     $step3 = New-Object System.Windows.Forms.Panel
     $step3.Location = New-Object System.Drawing.Point(15, $contentTop)
@@ -1389,9 +1413,12 @@ function Show-ConsoleModeGui {
         MonitorPanel       = $monitorPanel
         HideStrategyCombo  = $hideStrategyCombo
         ModeBigPicture     = $modeBigPicture
+        ModePlaynite       = $modePlaynite
         AudioCombo         = $audioCombo
         FpsLimitCombo      = $fpsLimitCombo
         FpsCustomNumeric   = $fpsCustomNumeric
+        HdrCheck           = $chkHdr
+        VrrCheck           = $chkVrr
     }
     Update-ReviewPanel -ReviewLabel $reviewLabel -WizardData $wizardData
 
@@ -1513,7 +1540,9 @@ function Show-ConsoleModeGui {
                 -AudioDeviceHint $data.AudioDeviceHint `
                 -FocusMonitorInfo $data.FocusMonitorInfo `
                 -FpsLimit $data.FpsLimit `
-                -MonitorModes $data.MonitorModes
+                -MonitorModes $data.MonitorModes `
+                -HdrEnable $data.HdrEnable `
+                -VrrEnable $data.VrrEnable
 
             if ($data.FpsLimit -gt 0 -and -not $Script:ConsoleState.RtssLimitApplied) {
                 [System.Windows.Forms.MessageBox]::Show(
