@@ -1332,21 +1332,27 @@ function Show-ConsoleModeGui {
 
     $chkHdr = New-Object System.Windows.Forms.CheckBox
     $chkHdr.Text = "Ativar HDR no monitor de foco"
-    $chkHdr.Location = New-Object System.Drawing.Point(10, 368)
-    $chkHdr.Size = New-Object System.Drawing.Size(310, 24)
+    $chkHdr.Location = New-Object System.Drawing.Point(10, 364)
+    $chkHdr.Size = New-Object System.Drawing.Size(310, 22)
     $chkHdr.Checked = ($config.hdrEnable -eq $true)
     $step2.Controls.Add($chkHdr)
 
     $chkVrr = New-Object System.Windows.Forms.CheckBox
     $chkVrr.Text = "Ativar VRR (taxa de atualização variável)"
-    $chkVrr.Location = New-Object System.Drawing.Point(330, 368)
-    $chkVrr.Size = New-Object System.Drawing.Size(320, 24)
+    $chkVrr.Location = New-Object System.Drawing.Point(330, 364)
+    $chkVrr.Size = New-Object System.Drawing.Size(320, 22)
     $chkVrr.Checked = ($config.vrrEnable -eq $true)
     $step2.Controls.Add($chkVrr)
 
+    $vrrDisclaimer = New-Label -Text "VRR: aplica só o ajuste do Windows. Recomendamos ligar o VRR pelo driver da GPU (NVIDIA/AMD)." `
+        -X 330 -Y 386 -W 340 -H 14
+    $vrrDisclaimer.ForeColor = $script:Theme.Warning
+    $vrrDisclaimer.Font = New-Object System.Drawing.Font("Segoe UI", 8)
+    $step2.Controls.Add($vrrDisclaimer)
+
     $ttExtras = New-Object System.Windows.Forms.ToolTip
     $ttExtras.SetToolTip($chkHdr, "Liga o HDR do Windows no monitor de foco ao iniciar e reverte ao restaurar. Requer monitor com suporte a HDR.")
-    $ttExtras.SetToolTip($chkVrr, "Liga a configuração global do Windows 'Taxa de atualização variável' ao iniciar e reverte ao restaurar. Requer monitor/GPU com suporte (G-Sync/FreeSync).")
+    $ttExtras.SetToolTip($chkVrr, "Liga a configuração global do Windows 'Taxa de atualização variável' ao iniciar e reverte ao restaurar. Recomendação: prefira ativar o VRR no painel do driver (NVIDIA Control Panel / AMD Software) — esta opção cobre apenas o ajuste do Windows.")
 
     $step3 = New-Object System.Windows.Forms.Panel
     $step3.Location = New-Object System.Drawing.Point(15, $contentTop)
