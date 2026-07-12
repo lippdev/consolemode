@@ -189,7 +189,7 @@ function Build-ConsoleModeExe {
         description = "Console Mode - Big Picture / Modo Xbox"
         company    = "Console Mode"
         product    = "Console Mode"
-        version    = "1.1.0.0"
+        version    = "1.2.0.0"
         noConsole  = $true
         embedFiles = $embedFiles
         sta        = $true
