@@ -341,17 +341,6 @@ public class NativeHelpers {
     [DllImport("user32.dll", CharSet = CharSet.Ansi)]
     public static extern int ChangeDisplaySettingsEx(string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd, int dwflags, IntPtr lParam);
 
-    // Desconecta um monitor do desktop (equivalente a "Desconectar este monitor").
-    public static int DetachDisplay(string device) {
-        DEVMODE dm = new DEVMODE();
-        dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
-        dm.dmFields = DM_POSITION | DM_PELSWIDTH | DM_PELSHEIGHT;
-        dm.dmPelsWidth = 0;
-        dm.dmPelsHeight = 0;
-        int r = ChangeDisplaySettingsEx(device, ref dm, IntPtr.Zero, CDS_UPDATEREGISTRY | CDS_NORESET, IntPtr.Zero);
-        if (r != 0) return r;
-        return ChangeDisplaySettingsEx(null, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero);
-    }
 }
 
 // API CCD (SetDisplayConfig) — mesma usada pelas Configurações do Windows.
@@ -422,6 +411,32 @@ public class CcdHelper {
     // Win+P "Estender"). Fallback quando o /enable do MultiMonitorTool falha.
     public static int ExtendAll() {
         return SetDisplayConfig(0, null, 0, null, SDC_APPLY | SDC_TOPOLOGY_EXTEND);
+    }
+
+    // Desconecta o monitor desativando o caminho ativo dele na topologia
+    // (equivalente a "Desconectar este monitor" nas Configurações).
+    // Fallback quando o /disable do MultiMonitorTool falha.
+    public static int DetachDisplay(string gdiDeviceName) {
+        uint numPaths, numModes;
+        int err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out numPaths, out numModes);
+        if (err != 0) return err;
+        PATH_INFO[] paths = new PATH_INFO[numPaths];
+        MODE_INFO[] modes = new MODE_INFO[numModes];
+        err = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, IntPtr.Zero);
+        if (err != 0) return err;
+
+        bool found = false;
+        for (int i = 0; i < numPaths; i++) {
+            string name = GetSourceGdiName(paths[i].sourceInfo.adapterId, paths[i].sourceInfo.id);
+            if (string.Equals(name, gdiDeviceName, StringComparison.OrdinalIgnoreCase)) {
+                paths[i].flags = 0; // remove DISPLAYCONFIG_PATH_ACTIVE
+                found = true;
+            }
+        }
+        if (!found) return -100;
+
+        return SetDisplayConfig(numPaths, paths, numModes, modes,
+            SDC_APPLY | SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_SAVE_TO_DATABASE | SDC_ALLOW_CHANGES);
     }
 
     [StructLayout(LayoutKind.Sequential)] public struct GET_ADVANCED_COLOR_INFO {
@@ -1194,6 +1209,30 @@ function Set-PrimaryMonitorNative {
     return ($code -eq 0)
 }
 
+function Set-PrimaryMonitorFromBackupSpec {
+    param(
+        [Parameter(Mandatory)][string]$MonitorName,
+        [hashtable]$Spec
+    )
+
+    if ($Spec -and $Spec.Width -and $Spec.Height) {
+        $width = 0
+        $height = 0
+        [void][int]::TryParse([string]$Spec.Width, [ref]$width)
+        [void][int]::TryParse([string]$Spec.Height, [ref]$height)
+        if ($width -gt 0 -and $height -gt 0) {
+            $freq = $Spec.DisplayFrequency
+            if (-not $freq) { $freq = $Spec.Frequency }
+            Set-PrimaryAndMonitorMode -MonitorName $MonitorName `
+                -Width $width -Height $height `
+                -Frequency $freq -Colors $Spec.BitsPerPixel
+            return
+        }
+    }
+
+    Invoke-Mmt -Arguments @("/SetPrimary", "`"$MonitorName`"") | Out-Null
+}
+
 function Restore-PrimaryMonitorWithRetry {
     param(
         [Parameter(Mandatory)][string]$MonitorName,
@@ -1234,7 +1273,10 @@ function Disable-MonitorWithRetry {
             Invoke-Mmt -Arguments @("/disable", "`"$MonitorName`"") | Out-Null
         }
         else {
-            [void][NativeHelpers]::DetachDisplay($MonitorName)
+            # API CCD: o /disable do MMT e o ChangeDisplaySettingsEx falham
+            # em builds recentes do Windows 11
+            $code = [CcdHelper]::DetachDisplay($MonitorName)
+            Write-ConsoleLog "Disable: fallback CCD DetachDisplay($MonitorName) => $code"
         }
         if (Wait-ConsoleMonitorInactive -MonitorName $MonitorName) { return $true }
     }
