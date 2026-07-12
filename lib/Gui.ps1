@@ -1,5 +1,11 @@
 ﻿#Requires -Version 5.1
-# Console Mode - Interface gráfica (wizard)
+# Console Mode - Interface gráfica (wizard) em WPF
+
+Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName PresentationCore
+Add-Type -AssemblyName WindowsBase
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 $script:TrayIcon = $null
 $script:LoadedMonitors = @()
@@ -12,38 +18,37 @@ $script:LastStatusMessage = ""
 $script:ConsoleMonitorTimer = $null
 $script:AudioOnConnectId = "__on_connect__"
 $script:AudioOnConnectLabel = "Usar áudio ao conectar (TV/monitor)"
+$script:MonitorRows = @()
+$script:Ui = @{}
+
 $script:Theme = @{
-    Bg      = [System.Drawing.Color]::FromArgb(28, 28, 30)
-    Surface = [System.Drawing.Color]::FromArgb(37, 37, 40)
-    Input   = [System.Drawing.Color]::FromArgb(50, 50, 54)
-    InputHover = [System.Drawing.Color]::FromArgb(62, 62, 68)
-    Border  = [System.Drawing.Color]::FromArgb(62, 62, 66)
-    Text    = [System.Drawing.Color]::FromArgb(235, 235, 238)
-    Muted   = [System.Drawing.Color]::FromArgb(165, 165, 172)
-    Accent  = [System.Drawing.Color]::FromArgb(62, 207, 160)
-    AccentHover = [System.Drawing.Color]::FromArgb(88, 220, 176)
-    Success = [System.Drawing.Color]::FromArgb(78, 201, 176)
-    Warning = [System.Drawing.Color]::FromArgb(224, 186, 102)
+    Bg          = "#141417"
+    Surface     = "#1D1D21"
+    Card        = "#232329"
+    Input       = "#2C2C33"
+    InputHover  = "#37373F"
+    Border      = "#3A3A42"
+    Text        = "#EDEDF0"
+    Muted       = "#9B9BA6"
+    Accent      = "#3ECFA0"
+    AccentDark  = "#173B31"
+    AccentHover = "#58DCB0"
+    Warning     = "#E0BA66"
+    Success     = "#4EC9B0"
 }
 
-# Família tipográfica: Segoe UI Variable (Win11) com fallback para Segoe UI
-$script:UiFontFamily = "Segoe UI"
-try {
-    $installed = New-Object System.Drawing.Text.InstalledFontCollection
-    if ($installed.Families | Where-Object { $_.Name -eq "Segoe UI Variable Text" }) {
-        $script:UiFontFamily = "Segoe UI Variable Text"
-    }
-    $installed.Dispose()
-}
-catch { }
+$script:FpsPresetValues = @(30, 48, 50, 59, 60, 72, 75, 90, 120, 144)
+$script:FpsCustomComboValue = -1
 
-function New-UiFont {
-    param(
-        [Parameter(Mandatory)][double]$Size,
-        [switch]$Bold
-    )
-    $style = if ($Bold) { [System.Drawing.FontStyle]::Bold } else { [System.Drawing.FontStyle]::Regular }
-    return New-Object System.Drawing.Font($script:UiFontFamily, [single]$Size, $style)
+# ---------------------------------------------------------------------------
+# Helpers visuais
+# ---------------------------------------------------------------------------
+
+function New-UiBrush {
+    param([Parameter(Mandatory)][string]$Hex)
+    $brush = New-Object System.Windows.Media.SolidColorBrush ([System.Windows.Media.ColorConverter]::ConvertFromString($Hex))
+    $brush.Freeze()
+    return $brush
 }
 
 function Get-ConsoleAppIcon {
@@ -59,202 +64,87 @@ function Get-ConsoleAppIcon {
     }
     catch { }
 
-    $iconPath = Get-ConsoleIconPath
-    if ($iconPath) {
-        try {
-            $script:AppIcon = New-Object System.Drawing.Icon($iconPath)
-            return $script:AppIcon
+    try {
+        $psExe = (Get-Process -Id $PID).Path
+        if ($psExe) {
+            $script:AppIcon = [System.Drawing.Icon]::ExtractAssociatedIcon($psExe)
         }
-        catch { }
     }
+    catch { }
 
-    $script:AppIcon = [System.Drawing.SystemIcons]::Application
     return $script:AppIcon
 }
 
-function Move-FormToPrimaryScreen {
-    param([System.Windows.Forms.Form]$Form)
-
-    $targetScreen = $null
-    $monitors = Get-ConsoleMonitors
-    $primaryName = ($monitors | Where-Object { $_.IsPrimary } | Select-Object -First 1).Name
-
-    if ($primaryName) {
-        $targetScreen = Get-ScreenByDeviceName -DeviceName $primaryName
+function Get-ConsoleAppImageSource {
+    $icon = Get-ConsoleAppIcon
+    if (-not $icon) { return $null }
+    try {
+        return [System.Windows.Interop.Imaging]::CreateBitmapSourceFromHIcon(
+            $icon.Handle,
+            [System.Windows.Int32Rect]::Empty,
+            [System.Windows.Media.Imaging.BitmapSizeOptions]::FromEmptyOptions()
+        )
     }
-    if (-not $targetScreen) {
-        $targetScreen = [System.Windows.Forms.Screen]::PrimaryScreen
-    }
-    if (-not $targetScreen) { return }
-
-    $wa = $targetScreen.WorkingArea
-    $x = $wa.X + [Math]::Max(0, ($wa.Width - $Form.Width) / 2)
-    $y = $wa.Y + [Math]::Max(0, ($wa.Height - $Form.Height) / 2)
-
-    $Form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
-    $Form.Location = New-Object System.Drawing.Point([int]$x, [int]$y)
+    catch { return $null }
 }
 
-function Hide-ConsoleFormForActiveMode {
-    param([System.Windows.Forms.Form]$Form)
+function Move-WindowToPrimaryScreen {
+    param($Window)
 
-    $Form.ShowInTaskbar = $false
-    $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-    $Form.Location = New-Object System.Drawing.Point(-32000, -32000)
-    $Form.Hide()
-}
-
-function Show-ConsoleActiveView {
-    param(
-        [System.Windows.Forms.Form]$Form,
-        $WizardContext,
-        [string]$FullscreenMode = "bigPicture"
-    )
-
-    Set-WizardEnabled @WizardContext -Enabled $false
-    if ($FullscreenMode -eq "xboxMode") {
-        Show-FormOnPrimary -Form $Form
-        return
-    }
-
-    Hide-ConsoleFormForActiveMode -Form $Form
+    # SystemParameters.WorkArea = área de trabalho do monitor primário em DIPs
+    $wa = [System.Windows.SystemParameters]::WorkArea
+    $Window.Left = $wa.Left + [Math]::Max(0, ($wa.Width - $Window.Width) / 2)
+    $Window.Top = $wa.Top + [Math]::Max(0, ($wa.Height - $Window.Height) / 2)
 }
 
 function Show-FormOnPrimary {
-    param([System.Windows.Forms.Form]$Form)
+    param($Form)
 
     $Form.ShowInTaskbar = $true
-    $Form.WindowState = [System.Windows.Forms.FormWindowState]::Normal
-    Move-FormToPrimaryScreen -Form $Form
+    $Form.WindowState = [System.Windows.WindowState]::Normal
+    Move-WindowToPrimaryScreen -Window $Form
     $Form.Show()
-    $Form.Activate()
+    [void]$Form.Activate()
 }
 
-function New-Label {
-    param(
-        [string]$Text,
-        [int]$X,
-        [int]$Y,
-        [int]$W = 200,
-        [int]$H = 20,
-        [System.Drawing.Font]$Font = $null
-    )
-    $lbl = New-Object System.Windows.Forms.Label
-    $lbl.Text = $Text
-    $lbl.Location = New-Object System.Drawing.Point($X, $Y)
-    $lbl.Size = New-Object System.Drawing.Size($W, $H)
-    $lbl.BackColor = $script:Theme.Bg
-    $lbl.ForeColor = $script:Theme.Text
-    if ($Font) { $lbl.Font = $Font }
-    return $lbl
-}
-
-function Set-DarkThemeOnControl {
-    param(
-        [System.Windows.Forms.Control]$Control,
-        [switch]$IsSurface
-    )
-
-    $bg = if ($IsSurface) { $script:Theme.Surface } else { $script:Theme.Bg }
-
-    if ($Control -is [System.Windows.Forms.Form]) {
-        $Control.BackColor = $script:Theme.Bg
-        $Control.ForeColor = $script:Theme.Text
-    }
-    elseif ($Control -is [System.Windows.Forms.Panel]) {
-        $Control.BackColor = $bg
-        $Control.ForeColor = $script:Theme.Text
-    }
-    elseif ($Control -is [System.Windows.Forms.GroupBox]) {
-        $Control.BackColor = $script:Theme.Bg
-        $Control.ForeColor = $script:Theme.Accent
-    }
-    elseif ($Control -is [System.Windows.Forms.Label]) {
-        $Control.BackColor = $bg
-        if ($Control.ForeColor -eq [System.Drawing.Color]::Empty -or
-            $Control.ForeColor -eq [System.Drawing.SystemColors]::ControlText) {
-            $Control.ForeColor = $script:Theme.Text
-        }
-    }
-    elseif ($Control -is [System.Windows.Forms.Button]) {
-        if ($Control.BackColor -eq [System.Drawing.Color]::Empty -or
-            $Control.BackColor -eq [System.Drawing.SystemColors]::Control) {
-            $Control.BackColor = $script:Theme.Input
-            $Control.ForeColor = $script:Theme.Text
-            $Control.FlatAppearance.BorderColor = $script:Theme.Border
-        }
-        $Control.UseVisualStyleBackColor = $false
-    }
-    elseif ($Control -is [System.Windows.Forms.ComboBox]) {
-        $Control.BackColor = $script:Theme.Input
-        $Control.ForeColor = $script:Theme.Text
-        $Control.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    }
-    elseif ($Control -is [System.Windows.Forms.RadioButton] -or
-            $Control -is [System.Windows.Forms.CheckBox]) {
-        $Control.BackColor = $bg
-        $Control.ForeColor = $script:Theme.Text
-        $Control.UseVisualStyleBackColor = $false
-    }
-
-    foreach ($child in $Control.Controls) {
-        $childSurface = $IsSurface -or ($Control -is [System.Windows.Forms.GroupBox])
-        Set-DarkThemeOnControl -Control $child -IsSurface:($childSurface -or ($child -is [System.Windows.Forms.Panel]))
-    }
-}
-
-function New-StyledButton {
-    param(
-        [string]$Text,
-        [int]$X,
-        [int]$Y,
-        [int]$W,
-        [int]$H,
-        [switch]$Primary
-    )
-    $btn = New-Object System.Windows.Forms.Button
-    $btn.Text = $Text
-    $btn.Location = New-Object System.Drawing.Point($X, $Y)
-    $btn.Size = New-Object System.Drawing.Size($W, $H)
-    $btn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-    $btn.UseVisualStyleBackColor = $false
-    $btn.Cursor = [System.Windows.Forms.Cursors]::Hand
-    if ($Primary) {
-        $btn.BackColor = $script:Theme.Accent
-        $btn.ForeColor = [System.Drawing.Color]::FromArgb(28, 28, 30)
-        $btn.FlatAppearance.BorderSize = 0
-        $btn.FlatAppearance.MouseOverBackColor = $script:Theme.AccentHover
-        $btn.FlatAppearance.MouseDownBackColor = $script:Theme.Accent
-        $btn.Font = New-UiFont 10 -Bold
-    }
-    else {
-        $btn.BackColor = $script:Theme.Input
-        $btn.ForeColor = $script:Theme.Text
-        $btn.FlatAppearance.BorderColor = $script:Theme.Border
-        $btn.FlatAppearance.MouseOverBackColor = $script:Theme.InputHover
-        $btn.FlatAppearance.MouseDownBackColor = $script:Theme.Input
-    }
-    return $btn
+function Hide-ConsoleFormForActiveMode {
+    param($Form)
+    $Form.ShowInTaskbar = $false
+    $Form.Hide()
 }
 
 function Show-StatusMessage {
     param(
-        [System.Windows.Forms.Form]$Form,
-        [System.Windows.Forms.Label]$StatusLabel,
+        $Form,
+        $StatusLabel,
         [string]$Message,
-        [System.Drawing.Color]$Color,
+        [string]$Color = $null,
         [switch]$Force
     )
 
     if (-not $Force -and $script:LastStatusMessage -eq $Message) { return }
     $script:LastStatusMessage = $Message
     $StatusLabel.Text = $Message
-    $StatusLabel.ForeColor = $Color
-
-    if ($Form.WindowState -ne [System.Windows.Forms.FormWindowState]::Minimized -and $Form.Visible) {
-        $StatusLabel.Refresh()
-    }
+    if ($Color) { $StatusLabel.Foreground = New-UiBrush $Color }
 }
+
+function Show-UiMessageBox {
+    param(
+        [string]$Message,
+        [string]$Title = "Console Mode",
+        [string]$Buttons = "OK",
+        [string]$Icon = "None"
+    )
+    return [System.Windows.MessageBox]::Show(
+        $Message, $Title,
+        [System.Windows.MessageBoxButton]$Buttons,
+        [System.Windows.MessageBoxImage]$Icon
+    )
+}
+
+# ---------------------------------------------------------------------------
+# Rótulos e conversões (sem UI)
+# ---------------------------------------------------------------------------
 
 function Get-MonitorFriendlyLabel {
     param($Monitor)
@@ -275,16 +165,761 @@ function Get-MonitorFriendlyLabel {
 function Get-MonitorSecondaryLabel {
     param($Monitor)
     $parts = @()
-    if ($Monitor.Resolution) { $parts += $Monitor.Resolution }
+    if ($Monitor.Resolution) { $parts += ($Monitor.Resolution -replace '\s+X\s+', ' x ') }
     if ($Monitor.Frequency) { $parts += "$($Monitor.Frequency) Hz" }
-    if ($Monitor.IsPrimary -and $Monitor.IsActive) { $parts += "Primário" }
     if (-not $Monitor.IsActive) { $parts += "Desconectado" }
-    return ($parts -join " · ")
+    return ($parts -join "  •  ")
+}
+
+function Get-HideStrategyLabel {
+    param([string]$Strategy)
+
+    switch ($Strategy) {
+        "blackCurtain" { return "Cortinas pretas" }
+        "turnOff" { return "Desligar fisicamente (DDC/CI)" }
+        default { return "Desconectar monitores" }
+    }
+}
+
+function Get-FullscreenModeLabel {
+    param([string]$Mode)
+    if ($Mode -eq "xboxMode") { return "Modo Xbox (Win+F11) — Alpha" }
+    if ($Mode -eq "playnite") { return "Playnite (modo tela cheia)" }
+    return "Steam Big Picture (recomendado)"
+}
+
+function Test-ConsoleWatchNeeded {
+    param([string]$FullscreenMode)
+
+    if ($FullscreenMode -eq "xboxMode") { return $false }
+    return $true
+}
+
+# ---------------------------------------------------------------------------
+# XAML
+# ---------------------------------------------------------------------------
+
+$script:MainXaml = @'
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Console Mode" Width="880" Height="820"
+        WindowStartupLocation="Manual" ResizeMode="CanMinimize"
+        Background="#141417" TextOptions.TextFormattingMode="Display"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13.5">
+  <Window.Resources>
+    <SolidColorBrush x:Key="BgBrush" Color="#141417"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#1D1D21"/>
+    <SolidColorBrush x:Key="CardBrush" Color="#232329"/>
+    <SolidColorBrush x:Key="InputBrush" Color="#2C2C33"/>
+    <SolidColorBrush x:Key="InputHoverBrush" Color="#37373F"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#3A3A42"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#EDEDF0"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="#9B9BA6"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#3ECFA0"/>
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="#173B31"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#58DCB0"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#E0BA66"/>
+    <SolidColorBrush x:Key="DarkTextBrush" Color="#10241D"/>
+
+    <Style x:Key="IconText" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+    </Style>
+
+    <Style x:Key="Card" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+
+    <Style x:Key="Btn" TargetType="Button">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Background" Value="{StaticResource InputBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Height" Value="40"/>
+      <Setter Property="Padding" Value="16,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Margin="{TemplateBinding Padding}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource InputHoverBrush}"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="BtnPrimary" TargetType="Button" BasedOn="{StaticResource Btn}">
+      <Setter Property="Foreground" Value="{StaticResource DarkTextBrush}"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{StaticResource AccentBrush}" CornerRadius="10">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Margin="{TemplateBinding Padding}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="TabBtn" TargetType="Button">
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid Background="Transparent">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="3"/>
+              </Grid.RowDefinitions>
+              <ContentPresenter Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10"/>
+              <Border Grid.Row="1" x:Name="underline" Background="{StaticResource AccentBrush}"
+                      CornerRadius="2" Visibility="Hidden" Margin="18,0"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="Tag" Value="active">
+                <Setter TargetName="underline" Property="Visibility" Value="Visible"/>
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+              </Trigger>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ComboBoxItem">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Padding" Value="10,7"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBoxItem">
+            <Border x:Name="bd" Background="Transparent" CornerRadius="6" Margin="4,1">
+              <ContentPresenter Margin="{TemplateBinding Padding}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource InputHoverBrush}"/>
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentDarkBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Height" Value="38"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBox">
+            <Grid>
+              <ToggleButton x:Name="toggle" Focusable="False" ClickMode="Press"
+                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                <ToggleButton.Template>
+                  <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="bd" Background="{StaticResource InputBrush}"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="9">
+                      <TextBlock Text="&#xE70D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                 FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                 Margin="0,0,12,0" Foreground="{StaticResource MutedBrush}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="bd" Property="Background" Value="{StaticResource InputHoverBrush}"/>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </ToggleButton.Template>
+              </ToggleButton>
+              <ContentPresenter Margin="14,0,32,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+              <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
+                     StaysOpen="False" PopupAnimation="Fade">
+                <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" CornerRadius="9" MaxHeight="260" Margin="0,4,0,0"
+                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                  <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsPresenter Margin="0,4"/>
+                  </ScrollViewer>
+                </Border>
+              </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="CheckBox">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <StackPanel Orientation="Horizontal" Background="Transparent">
+              <Border x:Name="box" Width="21" Height="21" CornerRadius="6"
+                      Background="{StaticResource InputBrush}"
+                      BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
+                      VerticalAlignment="Center">
+                <TextBlock x:Name="check" Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                           FontSize="12" FontWeight="Bold" Foreground="{StaticResource DarkTextBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
+              </Border>
+              <ContentPresenter Margin="9,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+            </StackPanel>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="box" Property="Background" Value="{StaticResource AccentBrush}"/>
+                <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                <Setter TargetName="check" Property="Visibility" Value="Visible"/>
+              </Trigger>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="RadioButton">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <StackPanel Orientation="Horizontal" Background="Transparent">
+              <Border x:Name="outer" Width="21" Height="21" CornerRadius="11"
+                      Background="{StaticResource InputBrush}"
+                      BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
+                      VerticalAlignment="Center">
+                <Ellipse x:Name="dot" Width="9" Height="9" Fill="{StaticResource AccentBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
+              </Border>
+              <ContentPresenter Margin="9,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+            </StackPanel>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="outer" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                <Setter TargetName="dot" Property="Visibility" Value="Visible"/>
+              </Trigger>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="outer" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="TextBox">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+      <Setter Property="Background" Value="{StaticResource InputBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+      <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Padding" Value="10,7"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TextBox">
+            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="1" CornerRadius="9">
+              <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ScrollBar">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Width" Value="8"/>
+    </Style>
+  </Window.Resources>
+
+  <Grid Margin="26,18,26,18">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Cabeçalho -->
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,4,0,10">
+      <Border Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentDarkBrush}">
+        <TextBlock Style="{StaticResource IconText}" Text="&#xE7F4;" FontSize="22"
+                   Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center"/>
+      </Border>
+      <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+        <TextBlock Text="Console Mode" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+        <TextBlock Text="Transforme seu PC em console de jogos em poucos passos."
+                   Foreground="{StaticResource MutedBrush}" Margin="1,2,0,0"/>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- Tabs -->
+    <Grid Grid.Row="1" Margin="0,0,0,14">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Button x:Name="Tab0" Grid.Column="0" Style="{StaticResource TabBtn}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Text="&#xE7F4;" FontSize="15" Margin="0,0,8,0"/>
+          <TextBlock Text="1. Monitores" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="Tab1" Grid.Column="1" Style="{StaticResource TabBtn}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Text="&#xE7FC;" FontSize="15" Margin="0,0,8,0"/>
+          <TextBlock Text="2. Modo" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="Tab2" Grid.Column="2" Style="{StaticResource TabBtn}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Text="&#xE767;" FontSize="15" Margin="0,0,8,0"/>
+          <TextBlock Text="3. Áudio" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="Tab3" Grid.Column="3" Style="{StaticResource TabBtn}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Text="&#xE768;" FontSize="15" Margin="0,0,8,0"/>
+          <TextBlock Text="Iniciar" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- Conteúdo -->
+    <Grid Grid.Row="2">
+
+      <!-- Passo 1: Monitores -->
+      <ScrollViewer x:Name="Step0" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+          <Border Style="{StaticResource Card}" Padding="16">
+            <StackPanel>
+              <Canvas x:Name="DiagramCanvas" Height="64" Margin="2,0,2,12"/>
+              <Grid Margin="4,0,4,8">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="52"/>
+                  <ColumnDefinition Width="80"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="240"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Foco" Foreground="{StaticResource MutedBrush}" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1" Text="Esconder" Foreground="{StaticResource MutedBrush}" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="2" Text="Monitor" Foreground="{StaticResource MutedBrush}" FontWeight="SemiBold" Margin="8,0,0,0"/>
+                <TextBlock Grid.Column="3" Text="Resolução / Hz" Foreground="{StaticResource MutedBrush}" FontWeight="SemiBold"/>
+              </Grid>
+              <StackPanel x:Name="MonitorList"/>
+              <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BtnHideOthers" Style="{StaticResource Btn}" Height="38">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xED1A;" Margin="0,0,8,0"/>
+                    <TextBlock Text="Esconder todos exceto o foco"/>
+                  </StackPanel>
+                </Button>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
+                  <TextBlock Style="{StaticResource IconText}" Text="&#xE946;" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                  <TextBlock Text="Desconectados: use modos do cache ou estimados — aplicados ao conectar. Serão reativados ao iniciar."
+                             Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" FontSize="12" MaxWidth="420"/>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Card}" Padding="16" Margin="0,12,0,0">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Style="{StaticResource IconText}" Text="&#xEC4A;" Foreground="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+                <TextBlock Text="Limite de FPS (anti-tearing)" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <ComboBox x:Name="FpsCombo" Width="260" DisplayMemberPath="Text"/>
+                <TextBox x:Name="FpsCustomBox" Width="90" Margin="10,0,0,0" Visibility="Collapsed"
+                         VerticalContentAlignment="Center" Text="60"/>
+              </StackPanel>
+              <TextBlock x:Name="FpsStatusText" Foreground="{StaticResource MutedBrush}" FontSize="12"
+                         TextWrapping="Wrap" Margin="2,10,0,0"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Passo 2: Modo -->
+      <ScrollViewer x:Name="Step1" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+        <StackPanel>
+          <Border Style="{StaticResource Card}" Padding="16">
+            <StackPanel>
+              <TextBlock Text="Como esconder os outros monitores?" Foreground="{StaticResource AccentBrush}"
+                         FontWeight="SemiBold" Margin="0,0,0,10"/>
+              <ComboBox x:Name="HideStrategyCombo" DisplayMemberPath="Text"/>
+              <TextBlock Text="Desconectar: desativa no Windows (rápido). Cortinas: overlay preto. DDC/CI: apaga o painel via hardware."
+                         Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="2,10,0,0"/>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Card}" Padding="16" Margin="0,12,0,0">
+            <StackPanel>
+              <TextBlock Text="Modo de tela cheia" Foreground="{StaticResource AccentBrush}"
+                         FontWeight="SemiBold" Margin="0,0,0,12"/>
+              <RadioButton x:Name="ModeBigPicture" GroupName="fsmode">
+                <TextBlock Text="Steam Big Picture (recomendado)" FontWeight="SemiBold"/>
+              </RadioButton>
+              <TextBlock Text="Abre a Steam em modo Big Picture no monitor de foco. Restauração automática ao sair."
+                         Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="30,4,0,14"/>
+              <RadioButton x:Name="ModePlaynite" GroupName="fsmode">
+                <TextBlock Text="Playnite (modo tela cheia)" FontWeight="SemiBold"/>
+              </RadioButton>
+              <TextBlock x:Name="PlayniteDesc" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="30,4,0,14"/>
+              <RadioButton x:Name="ModeXbox" GroupName="fsmode">
+                <TextBlock Text="Modo Xbox (Win+F11) — Alpha" FontWeight="SemiBold"/>
+              </RadioButton>
+              <TextBlock Text="Experimental: envia Win+F11. O app permanece aberto; restaure manualmente com Restaurar agora."
+                         Foreground="{StaticResource WarningBrush}" FontSize="12" Margin="30,4,0,2"/>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Card}" Padding="16" Margin="0,12,0,0">
+            <StackPanel>
+              <TextBlock Text="Recursos de vídeo" Foreground="{StaticResource AccentBrush}"
+                         FontWeight="SemiBold" Margin="0,0,0,12"/>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="ChkHdr" Grid.Column="0" Content="Ativar HDR no monitor de foco"/>
+                <CheckBox x:Name="ChkVrr" Grid.Column="1" Content="Ativar VRR (taxa de atualização variável)"/>
+              </Grid>
+              <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                <TextBlock Style="{StaticResource IconText}" Text="&#xE7BA;" Foreground="{StaticResource WarningBrush}"
+                           FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                <TextBlock Text="VRR: esta opção aplica apenas o ajuste do Windows — recomendamos ligar o VRR pelo painel do driver da GPU (NVIDIA/AMD)."
+                           Foreground="{StaticResource WarningBrush}" FontSize="12" TextWrapping="Wrap" MaxWidth="620"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Passo 3: Áudio -->
+      <StackPanel x:Name="Step2" Visibility="Collapsed">
+        <Border Style="{StaticResource Card}" Padding="16">
+          <StackPanel>
+            <TextBlock Text="Saída de áudio" Foreground="{StaticResource AccentBrush}"
+                       FontWeight="SemiBold" Margin="0,0,0,10"/>
+            <ComboBox x:Name="AudioCombo" DisplayMemberPath="Text"/>
+            <TextBlock x:Name="AudioHintText" Foreground="{StaticResource MutedBrush}" FontSize="12"
+                       TextWrapping="Wrap" Margin="2,10,0,0"
+                       Text="A saída escolhida é aplicada ao iniciar e restaurada ao sair. 'Usar áudio ao conectar' troca automaticamente quando a TV conectar."/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Passo 4: Revisão / Iniciar -->
+      <StackPanel x:Name="Step3" Visibility="Collapsed">
+        <Border Style="{StaticResource Card}" Padding="20">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+              <TextBlock Style="{StaticResource IconText}" Text="&#xE930;" Foreground="{StaticResource AccentBrush}"
+                         FontSize="18" Margin="0,0,10,0"/>
+              <TextBlock Text="Revisão" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+            </StackPanel>
+            <TextBlock x:Name="ReviewText" Foreground="{StaticResource TextBrush}" FontSize="14"
+                       LineHeight="26" TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Modo ativo -->
+      <StackPanel x:Name="PanelActive" Visibility="Collapsed">
+        <Border Style="{StaticResource Card}" Padding="24">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+              <TextBlock Style="{StaticResource IconText}" Text="&#xE768;" Foreground="{StaticResource AccentBrush}"
+                         FontSize="20" Margin="0,0,10,0"/>
+              <TextBlock Text="Modo console ativo" FontSize="19" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+            </StackPanel>
+            <TextBlock x:Name="ActiveDescText" Foreground="{StaticResource MutedBrush}" FontSize="13.5"
+                       TextWrapping="Wrap" LineHeight="22"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Grid>
+
+    <!-- Status -->
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="4,14,0,12">
+      <TextBlock x:Name="StatusIcon" Style="{StaticResource IconText}" Text="&#xE73E;" FontSize="14"
+                 Foreground="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+      <TextBlock x:Name="StatusText" Text="Pronto." Foreground="{StaticResource MutedBrush}"/>
+    </StackPanel>
+
+    <!-- Botões -->
+    <Grid Grid.Row="4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Button x:Name="BtnBack" Grid.Column="0" Style="{StaticResource Btn}" Width="120" AutomationProperties.Name="Voltar">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE76B;" FontSize="12" Margin="0,0,8,0"/>
+          <TextBlock Text="Voltar"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="BtnSave" Grid.Column="1" Style="{StaticResource BtnPrimary}" Width="130" Margin="12,0,0,0">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE74E;" FontSize="13" Margin="0,0,8,0"
+                     Foreground="{StaticResource DarkTextBrush}"/>
+          <TextBlock Text="Salvar"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="BtnRefresh" Grid.Column="2" Style="{StaticResource Btn}" Width="140" Margin="12,0,0,0">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE72C;" FontSize="13" Margin="0,0,8,0"/>
+          <TextBlock Text="Atualizar"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="BtnRestore" Grid.Column="3" Style="{StaticResource Btn}" Width="170" Margin="12,0,0,0" IsEnabled="False">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE7A7;" FontSize="13" Margin="0,0,8,0"/>
+          <TextBlock Text="Restaurar agora"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="BtnNext" Grid.Column="5" Style="{StaticResource BtnPrimary}" Width="150" AutomationProperties.Name="Proximo">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Próximo"/>
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE76C;" FontSize="12" Margin="8,0,0,0"
+                     Foreground="{StaticResource DarkTextBrush}"/>
+        </StackPanel>
+      </Button>
+      <Button x:Name="BtnStart" Grid.Column="5" Style="{StaticResource BtnPrimary}" Width="230" Visibility="Collapsed" AutomationProperties.Name="IniciarModoConsole">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Style="{StaticResource IconText}" Text="&#xE768;" FontSize="13" Margin="0,0,8,0"
+                     Foreground="{StaticResource DarkTextBrush}"/>
+          <TextBlock Text="Iniciar modo console" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+  </Grid>
+</Window>
+'@
+
+# ---------------------------------------------------------------------------
+# Construção das linhas de monitores
+# ---------------------------------------------------------------------------
+
+function New-MonitorRow {
+    param(
+        $Monitor,
+        [string]$SavedFocus,
+        [string[]]$SavedHide,
+        $SavedMode
+    )
+
+    $card = New-Object System.Windows.Controls.Border
+    $card.Background = New-UiBrush $script:Theme.Card
+    $card.CornerRadius = New-Object System.Windows.CornerRadius 10
+    $card.Padding = New-Object System.Windows.Thickness 12, 10, 12, 10
+    $card.Margin = New-Object System.Windows.Thickness 0, 0, 0, 8
+
+    $grid = New-Object System.Windows.Controls.Grid
+    foreach ($w in @(52, 80, 0, 240)) {
+        $col = New-Object System.Windows.Controls.ColumnDefinition
+        if ($w -gt 0) { $col.Width = New-Object System.Windows.GridLength $w }
+        [void]$grid.ColumnDefinitions.Add($col)
+    }
+
+    $radio = New-Object System.Windows.Controls.RadioButton
+    $radio.GroupName = "focusMonitor"
+    $radio.Tag = $Monitor.Name
+    $radio.VerticalAlignment = "Center"
+    $radio.IsChecked = ($Monitor.Name -eq $SavedFocus)
+    [System.Windows.Controls.Grid]::SetColumn($radio, 0)
+    [void]$grid.Children.Add($radio)
+
+    $check = New-Object System.Windows.Controls.CheckBox
+    $check.Tag = $Monitor.Name
+    $check.VerticalAlignment = "Center"
+    $check.IsChecked = ($SavedHide -contains $Monitor.Name)
+    $check.IsEnabled = [bool]$Monitor.IsActive
+    [System.Windows.Controls.Grid]::SetColumn($check, 1)
+    [void]$grid.Children.Add($check)
+
+    $namePanel = New-Object System.Windows.Controls.StackPanel
+    $namePanel.Orientation = "Horizontal"
+    $namePanel.Margin = New-Object System.Windows.Thickness 8, 0, 8, 0
+
+    $icon = New-Object System.Windows.Controls.TextBlock
+    $icon.FontFamily = New-Object System.Windows.Media.FontFamily "Segoe Fluent Icons, Segoe MDL2 Assets"
+    $icon.FontSize = 20
+    $icon.VerticalAlignment = "Center"
+    $icon.Margin = New-Object System.Windows.Thickness 0, 0, 12, 0
+    if ($Monitor.IsActive) {
+        $icon.Text = [char]0xE7F4
+        $icon.Foreground = New-UiBrush $script:Theme.Text
+    }
+    else {
+        $icon.Text = [char]0xEA14
+        $icon.Foreground = New-UiBrush $script:Theme.Muted
+    }
+    [void]$namePanel.Children.Add($icon)
+
+    $textPanel = New-Object System.Windows.Controls.StackPanel
+    $textPanel.VerticalAlignment = "Center"
+
+    $titleRow = New-Object System.Windows.Controls.StackPanel
+    $titleRow.Orientation = "Horizontal"
+
+    $nameText = New-Object System.Windows.Controls.TextBlock
+    $nameText.Text = Get-MonitorFriendlyLabel -Monitor $Monitor
+    $nameText.FontWeight = "SemiBold"
+    $nameText.Foreground = New-UiBrush ($(if ($Monitor.IsActive) { $script:Theme.Text } else { $script:Theme.Muted }))
+    [void]$titleRow.Children.Add($nameText)
+
+    if ($Monitor.IsPrimary -and $Monitor.IsActive) {
+        $badge = New-Object System.Windows.Controls.Border
+        $badge.Background = New-UiBrush $script:Theme.AccentDark
+        $badge.CornerRadius = New-Object System.Windows.CornerRadius 6
+        $badge.Padding = New-Object System.Windows.Thickness 8, 2, 8, 2
+        $badge.Margin = New-Object System.Windows.Thickness 10, 0, 0, 0
+        $badge.VerticalAlignment = "Center"
+        $badgeText = New-Object System.Windows.Controls.TextBlock
+        $badgeText.Text = "PRIMÁRIO"
+        $badgeText.FontSize = 10.5
+        $badgeText.FontWeight = "Bold"
+        $badgeText.Foreground = New-UiBrush $script:Theme.Accent
+        $badge.Child = $badgeText
+        [void]$titleRow.Children.Add($badge)
+    }
+    [void]$textPanel.Children.Add($titleRow)
+
+    $subText = New-Object System.Windows.Controls.TextBlock
+    $subText.Text = Get-MonitorSecondaryLabel -Monitor $Monitor
+    $subText.FontSize = 12
+    $subText.Foreground = New-UiBrush $script:Theme.Muted
+    $subText.Margin = New-Object System.Windows.Thickness 0, 2, 0, 0
+    [void]$textPanel.Children.Add($subText)
+
+    [void]$namePanel.Children.Add($textPanel)
+    [System.Windows.Controls.Grid]::SetColumn($namePanel, 2)
+    [void]$grid.Children.Add($namePanel)
+
+    $combo = New-Object System.Windows.Controls.ComboBox
+    $combo.Tag = $Monitor.Name
+    $combo.DisplayMemberPath = "Text"
+    $combo.VerticalAlignment = "Center"
+    Initialize-MonitorModeCombo -Combo $combo -Monitor $Monitor -SavedMode $SavedMode
+    [System.Windows.Controls.Grid]::SetColumn($combo, 3)
+    [void]$grid.Children.Add($combo)
+
+    $card.Child = $grid
+
+    return @{
+        Name  = [string]$Monitor.Name
+        Card  = $card
+        Radio = $radio
+        Check = $check
+        Combo = $combo
+    }
+}
+
+function Build-MonitorPanel {
+    param(
+        [array]$Monitors,
+        [string]$SavedFocus,
+        [string[]]$SavedHide,
+        [hashtable]$SavedMonitorModes = @{}
+    )
+
+    $list = $script:Ui.MonitorList
+    $list.Children.Clear()
+    $script:MonitorRows = @()
+
+    if ($Monitors.Count -eq 0) {
+        $lbl = New-Object System.Windows.Controls.TextBlock
+        $lbl.Text = "Nenhum monitor detectado."
+        $lbl.Foreground = New-UiBrush $script:Theme.Muted
+        [void]$list.Children.Add($lbl)
+        return
+    }
+
+    foreach ($monitor in $Monitors) {
+        $savedMode = if ($SavedMonitorModes -and $SavedMonitorModes.ContainsKey($monitor.Name)) {
+            $SavedMonitorModes[$monitor.Name]
+        } else { $null }
+
+        $row = New-MonitorRow -Monitor $monitor -SavedFocus $SavedFocus -SavedHide $SavedHide -SavedMode $savedMode
+        $script:MonitorRows += $row
+        [void]$list.Children.Add($row.Card)
+
+        $row.Radio.Add_Checked({
+            $sel = Get-GuiSelections
+            if ($sel.FocusMonitor) {
+                Build-MonitorLayoutDiagram -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
+            }
+        })
+    }
 }
 
 function Initialize-MonitorModeCombo {
     param(
-        [System.Windows.Forms.ComboBox]$Combo,
+        $Combo,
         $Monitor,
         $SavedMode = $null
     )
@@ -298,7 +933,7 @@ function Initialize-MonitorModeCombo {
         Frequency  = 0
     })
 
-    $Combo.Enabled = $true
+    $Combo.IsEnabled = $true
     $modes = @(Get-MonitorDisplayModes -MonitorName $Monitor.Name -Monitor $Monitor)
     $matched = $false
 
@@ -355,7 +990,7 @@ function Initialize-MonitorModeCombo {
 }
 
 function Get-MonitorModeFromCombo {
-    param([System.Windows.Forms.ComboBox]$Combo)
+    param($Combo)
 
     $item = $Combo.SelectedItem
     if (-not $item -or $item.UseCurrent) { return $null }
@@ -368,142 +1003,49 @@ function Get-MonitorModeFromCombo {
 }
 
 function Get-MonitorModesFromPanel {
-    param([System.Windows.Forms.Panel]$MonitorPanel)
-
     $modes = @{}
-    foreach ($control in $MonitorPanel.Controls) {
-        if ($control -is [System.Windows.Forms.ComboBox] -and $control.Name -eq "MonitorModeCombo" -and $control.Tag) {
-            $mode = Get-MonitorModeFromCombo -Combo $control
-            if ($mode) {
-                $modes[[string]$control.Tag] = $mode
-            }
+    foreach ($row in $script:MonitorRows) {
+        $mode = Get-MonitorModeFromCombo -Combo $row.Combo
+        if ($mode) {
+            $modes[[string]$row.Name] = $mode
         }
     }
     return $modes
 }
 
-$script:FpsPresetValues = @(30, 48, 50, 59, 60, 72, 75, 90, 120, 144)
-$script:FpsCustomComboValue = -1
-
-function Initialize-FpsLimitCombo {
-    param([System.Windows.Forms.ComboBox]$Combo)
-
-    $Combo.Items.Clear()
-    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "(Não limitar)"; Value = 0 })
-    foreach ($fps in $script:FpsPresetValues) {
-        [void]$Combo.Items.Add([PSCustomObject]@{ Text = "$fps FPS"; Value = $fps })
-    }
-    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Personalizado"; Value = $script:FpsCustomComboValue })
-    $Combo.DisplayMember = "Text"
-}
-
-function Select-FpsLimitInCombo {
-    param(
-        [System.Windows.Forms.ComboBox]$Combo,
-        [System.Windows.Forms.NumericUpDown]$CustomNumeric,
-        [int]$SavedLimit
-    )
-
-    if ($SavedLimit -le 0) {
-        $Combo.SelectedIndex = 0
-        $CustomNumeric.Visible = $false
-        return
-    }
-
-    $selectedIndex = 0
-    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
-        if ([int]$Combo.Items[$i].Value -eq $SavedLimit) {
-            $selectedIndex = $i
-            $CustomNumeric.Visible = $false
-            $Combo.SelectedIndex = $selectedIndex
-            return
-        }
-    }
-
-    $CustomNumeric.Value = [Math]::Max(1, [Math]::Min(360, $SavedLimit))
-    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
-        if ([int]$Combo.Items[$i].Value -eq $script:FpsCustomComboValue) {
-            $Combo.SelectedIndex = $i
-            break
-        }
-    }
-    $CustomNumeric.Visible = $true
-}
-
-function Get-FpsLimitFromControls {
-    param(
-        [System.Windows.Forms.ComboBox]$Combo,
-        [System.Windows.Forms.NumericUpDown]$CustomNumeric
-    )
-
-    $item = $Combo.SelectedItem
-    if (-not $item) { return 0 }
-    $value = [int]$item.Value
-    if ($value -eq $script:FpsCustomComboValue) {
-        return [int]$CustomNumeric.Value
-    }
-    return $value
-}
-
-function Update-FpsLimitStatusLabel {
-    param([System.Windows.Forms.Label]$StatusLabel)
-
-    if (Test-ConsoleRtssReady) {
-        $StatusLabel.Text = "Requer RivaTuner em execução. Limite global durante o modo console (restaurado ao sair)."
-        $StatusLabel.ForeColor = $script:Theme.Muted
-    }
-    elseif (Test-RtssInstalled) {
-        $StatusLabel.Text = "RTSS instalado, mas rtss-cli ausente. Execute build\Get-RtssCli.ps1."
-        $StatusLabel.ForeColor = $script:Theme.Warning
-    }
-    else {
-        $StatusLabel.Text = "Instale RivaTuner Statistics Server (MSI Afterburner) para usar limite de FPS."
-        $StatusLabel.ForeColor = $script:Theme.Warning
-    }
-}
-
 function Get-GuiSelections {
-    param([System.Windows.Forms.Panel]$MonitorPanel)
-
     $focusMonitor = ""
     $hideMonitors = [System.Collections.ArrayList]@()
 
-    foreach ($control in $MonitorPanel.Controls) {
-        if ($control -is [System.Windows.Forms.RadioButton] -and $control.Checked) {
-            $focusMonitor = [string]$control.Tag
-        }
-        if ($control -is [System.Windows.Forms.CheckBox] -and $control.Checked -and $control.Tag) {
-            [void]$hideMonitors.Add([string]$control.Tag)
-        }
+    foreach ($row in $script:MonitorRows) {
+        if ($row.Radio.IsChecked) { $focusMonitor = [string]$row.Name }
+        if ($row.Check.IsChecked) { [void]$hideMonitors.Add([string]$row.Name) }
     }
 
     return @{
         FocusMonitor = $focusMonitor
         HideMonitors = @($hideMonitors)
-        MonitorModes = Get-MonitorModesFromPanel -MonitorPanel $MonitorPanel
+        MonitorModes = Get-MonitorModesFromPanel
     }
 }
 
+# ---------------------------------------------------------------------------
+# Diagrama de layout
+# ---------------------------------------------------------------------------
+
 function Build-MonitorLayoutDiagram {
     param(
-        [System.Windows.Forms.Panel]$Panel,
         [array]$Monitors,
         [string]$FocusName
     )
 
-    $Panel.Controls.Clear()
-    $Panel.BackColor = $script:Theme.Surface
+    $canvas = $script:Ui.DiagramCanvas
+    $canvas.Children.Clear()
 
-    if ($Monitors.Count -eq 0) {
-        $lbl = New-Label -Text "Nenhum monitor para exibir." -X 10 -Y 10 -W 300
-        $Panel.Controls.Add($lbl)
-        return
-    }
+    if ($Monitors.Count -eq 0) { return }
 
     $active = @($Monitors | Where-Object { $_.IsActive -and $_.Width -gt 0 -and $_.Height -gt 0 })
-    if ($active.Count -eq 0) {
-        $active = @($Monitors)
-    }
+    if ($active.Count -eq 0) { $active = @($Monitors) }
 
     $minX = ($active | ForEach-Object {
         if ($_.LeftTop -match '(-?\d+)\s*,\s*(-?\d+)') { [int]$Matches[1] } else { 0 }
@@ -528,9 +1070,9 @@ function Build-MonitorLayoutDiagram {
     if ($maxX -le 0) { $maxX = 1920 }
     if ($maxY -le 0) { $maxY = 1080 }
 
-    $pad = 10
-    $availW = [Math]::Max(100, $Panel.Width - ($pad * 2))
-    $availH = [Math]::Max(40, $Panel.Height - ($pad * 2))
+    $availW = [Math]::Max(120.0, $canvas.ActualWidth)
+    if ($availW -le 120) { $availW = 640.0 }
+    $availH = [Math]::Max(40.0, $canvas.Height)
     $scale = [Math]::Min($availW / $maxX, $availH / $maxY)
 
     foreach ($m in $active) {
@@ -542,148 +1084,157 @@ function Build-MonitorLayoutDiagram {
         $w = if ($m.Width) { [int]$m.Width } else { 1920 }
         $h = if ($m.Height) { [int]$m.Height } else { 1080 }
 
-        $box = New-Object System.Windows.Forms.Panel
-        $box.Location = New-Object System.Drawing.Point(
-            [int]($pad + ($x * $scale)),
-            [int]($pad + ($y * $scale))
-        )
-        $box.Size = New-Object System.Drawing.Size(
-            [Math]::Max(24, [int]($w * $scale)),
-            [Math]::Max(18, [int]($h * $scale))
-        )
         $isFocus = ($m.Name -eq $FocusName)
+
+        $box = New-Object System.Windows.Controls.Border
+        $box.Width = [Math]::Max(28, $w * $scale - 4)
+        $box.Height = [Math]::Max(20, $h * $scale - 4)
+        $box.CornerRadius = New-Object System.Windows.CornerRadius 6
+        $box.BorderThickness = New-Object System.Windows.Thickness 1.5
+
         if ($isFocus) {
-            $box.BackColor = $script:Theme.Accent
-            $box.ForeColor = [System.Drawing.Color]::FromArgb(28, 28, 30)
+            $box.Background = New-UiBrush $script:Theme.AccentDark
+            $box.BorderBrush = New-UiBrush $script:Theme.Accent
+            $fg = New-UiBrush $script:Theme.Accent
         }
         elseif (-not $m.IsActive) {
-            $box.BackColor = [System.Drawing.Color]::FromArgb(55, 55, 58)
-            $box.ForeColor = $script:Theme.Muted
+            $box.Background = New-UiBrush $script:Theme.Card
+            $box.BorderBrush = New-UiBrush $script:Theme.Border
+            $fg = New-UiBrush $script:Theme.Muted
         }
         else {
-            $box.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 74)
-            $box.ForeColor = $script:Theme.Text
+            $box.Background = New-UiBrush $script:Theme.Input
+            $box.BorderBrush = New-UiBrush $script:Theme.Border
+            $fg = New-UiBrush $script:Theme.Text
         }
 
-        $lbl = New-Object System.Windows.Forms.Label
-        $diagramLabel = if ($m.WindowsDisplayNumber -gt 0) {
+        $lbl = New-Object System.Windows.Controls.TextBlock
+        $lbl.Text = if ($m.WindowsDisplayNumber -gt 0) {
             "$($m.WindowsDisplayNumber)"
         }
         else {
             ($m.Name -replace '\\\\\.\\DISPLAY', '').Trim()
         }
-        $lbl.Text = $diagramLabel
-        $lbl.Dock = [System.Windows.Forms.DockStyle]::Fill
-        $lbl.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-        $lbl.ForeColor = $box.ForeColor
-        $lbl.Font = New-UiFont 9 -Bold
-        $box.Controls.Add($lbl)
-        $Panel.Controls.Add($box)
+        $lbl.FontWeight = "Bold"
+        $lbl.Foreground = $fg
+        $lbl.HorizontalAlignment = "Center"
+        $lbl.VerticalAlignment = "Center"
+        $box.Child = $lbl
+
+        [System.Windows.Controls.Canvas]::SetLeft($box, 2 + $x * $scale)
+        [System.Windows.Controls.Canvas]::SetTop($box, 2 + $y * $scale)
+        [void]$canvas.Children.Add($box)
     }
 }
 
-function Build-MonitorPanel {
+# ---------------------------------------------------------------------------
+# FPS / Áudio / Estratégia
+# ---------------------------------------------------------------------------
+
+function Initialize-FpsLimitCombo {
+    param($Combo)
+
+    $Combo.Items.Clear()
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "(Não limitar)"; Value = 0 })
+    foreach ($fps in $script:FpsPresetValues) {
+        [void]$Combo.Items.Add([PSCustomObject]@{ Text = "$fps FPS"; Value = $fps })
+    }
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Personalizado"; Value = $script:FpsCustomComboValue })
+}
+
+function Select-FpsLimitInCombo {
     param(
-        [System.Windows.Forms.Panel]$Panel,
-        [array]$Monitors,
-        [string]$SavedFocus,
-        [string[]]$SavedHide,
-        [hashtable]$SavedMonitorModes = @{}
+        $Combo,
+        $CustomBox,
+        [int]$SavedLimit
     )
 
-    $Panel.Controls.Clear()
-
-    if ($Monitors.Count -eq 0) {
-        $lbl = New-Label -Text "Nenhum monitor detectado." -X 10 -Y 10 -W 500
-        $Panel.Controls.Add($lbl)
+    if ($SavedLimit -le 0) {
+        $Combo.SelectedIndex = 0
+        $CustomBox.Visibility = "Collapsed"
         return
     }
 
-    $colFoco = 10
-    $colHide = 55
-    $colName = 110
-    $colMode = 340
-
-    $hdrFoco = New-Label -Text "Foco" -X $colFoco -Y 4 -W 40 -H 18 `
-        -Font (New-UiFont 8.5 -Bold)
-    $Panel.Controls.Add($hdrFoco)
-
-    $hdrHide = New-Label -Text "Esconder" -X $colHide -Y 4 -W 54 -H 18 `
-        -Font (New-UiFont 8.5 -Bold)
-    $Panel.Controls.Add($hdrHide)
-
-    $hdrName = New-Label -Text "Monitor" -X $colName -Y 4 -W 220 -H 18 `
-        -Font (New-UiFont 8.5 -Bold)
-    $Panel.Controls.Add($hdrName)
-
-    $hdrMode = New-Label -Text "Resolução / Hz" -X $colMode -Y 4 -W 280 -H 18 `
-        -Font (New-UiFont 8.5 -Bold)
-    $Panel.Controls.Add($hdrMode)
-
-    $y = 26
-    $firstMonitor = $true
-    foreach ($monitor in $Monitors) {
-        $friendly = Get-MonitorFriendlyLabel -Monitor $monitor
-        $secondary = Get-MonitorSecondaryLabel -Monitor $monitor
-
-        $radio = New-Object System.Windows.Forms.RadioButton
-        $radio.Text = ""
-        $radio.Tag = $monitor.Name
-        $radio.Location = New-Object System.Drawing.Point(($colFoco + 12), $y)
-        $radio.Size = New-Object System.Drawing.Size(20, 20)
-        if ($SavedFocus) {
-            $radio.Checked = ($monitor.Name -eq $SavedFocus)
+    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
+        if ([int]$Combo.Items[$i].Value -eq $SavedLimit) {
+            $Combo.SelectedIndex = $i
+            $CustomBox.Visibility = "Collapsed"
+            return
         }
-        elseif ($firstMonitor) {
-            $radio.Checked = $true
-        }
-        $Panel.Controls.Add($radio)
-
-        $check = New-Object System.Windows.Forms.CheckBox
-        $check.Text = ""
-        $check.Tag = $monitor.Name
-        $check.Location = New-Object System.Drawing.Point(($colHide + 22), $y)
-        $check.Size = New-Object System.Drawing.Size(20, 20)
-        $check.Checked = $SavedHide -contains $monitor.Name
-        $check.Enabled = $monitor.IsActive
-        $Panel.Controls.Add($check)
-
-        $nameLabel = New-Label -Text $friendly -X $colName -Y $y -W 220 -H 16 `
-            -Font (New-UiFont 9 -Bold)
-        if (-not $monitor.IsActive) {
-            $nameLabel.ForeColor = $script:Theme.Muted
-        }
-        $Panel.Controls.Add($nameLabel)
-
-        $subLabel = New-Label -Text $secondary -X ($colName + 2) -Y ($y + 16) -W 220 -H 14
-        $subLabel.ForeColor = $script:Theme.Muted
-        $subLabel.Font = New-UiFont 8
-        $Panel.Controls.Add($subLabel)
-
-        $modeCombo = New-Object System.Windows.Forms.ComboBox
-        $modeCombo.Name = "MonitorModeCombo"
-        $modeCombo.Tag = $monitor.Name
-        $modeCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-        $modeCombo.Location = New-Object System.Drawing.Point($colMode, ($y + 2))
-        $modeCombo.Size = New-Object System.Drawing.Size(290, 28)
-        $modeCombo.DisplayMember = "Text"
-        $savedMode = if ($SavedMonitorModes -and $SavedMonitorModes.ContainsKey($monitor.Name)) {
-            $SavedMonitorModes[$monitor.Name]
-        } else { $null }
-        Initialize-MonitorModeCombo -Combo $modeCombo -Monitor $monitor -SavedMode $savedMode
-        $Panel.Controls.Add($modeCombo)
-
-        $y += 44
-        $firstMonitor = $false
     }
+
+    $CustomBox.Text = [string][Math]::Max(1, [Math]::Min(360, $SavedLimit))
+    for ($i = 0; $i -lt $Combo.Items.Count; $i++) {
+        if ([int]$Combo.Items[$i].Value -eq $script:FpsCustomComboValue) {
+            $Combo.SelectedIndex = $i
+            break
+        }
+    }
+    $CustomBox.Visibility = "Visible"
+}
+
+function Get-FpsLimitFromControls {
+    param($Combo, $CustomBox)
+
+    $item = $Combo.SelectedItem
+    if (-not $item) { return 0 }
+    $value = [int]$item.Value
+    if ($value -eq $script:FpsCustomComboValue) {
+        $custom = 0
+        if ([int]::TryParse([string]$CustomBox.Text, [ref]$custom)) {
+            return [Math]::Max(0, [Math]::Min(360, $custom))
+        }
+        return 0
+    }
+    return $value
+}
+
+function Update-FpsLimitStatusLabel {
+    param($StatusLabel)
+
+    if (Test-ConsoleRtssReady) {
+        $StatusLabel.Text = "Requer RivaTuner em execução. Limite global durante o modo console (restaurado ao sair)."
+        $StatusLabel.Foreground = New-UiBrush $script:Theme.Muted
+    }
+    elseif (Test-RtssInstalled) {
+        $StatusLabel.Text = "RTSS instalado, mas rtss-cli ausente. Execute build\Get-RtssCli.ps1."
+        $StatusLabel.Foreground = New-UiBrush $script:Theme.Warning
+    }
+    else {
+        $StatusLabel.Text = "Instale RivaTuner Statistics Server (MSI Afterburner) para usar limite de FPS."
+        $StatusLabel.Foreground = New-UiBrush $script:Theme.Warning
+    }
+}
+
+function Initialize-HideStrategyCombo {
+    param($Combo, [string]$SavedStrategy)
+
+    $Combo.Items.Clear()
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Desconectar monitores (recomendado)"; Value = "disconnect" })
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Cortinas pretas (overlay)"; Value = "blackCurtain" })
+    [void]$Combo.Items.Add([PSCustomObject]@{ Text = "Desligar fisicamente (DDC/CI)"; Value = "turnOff" })
+
+    $Combo.SelectedIndex = switch ($SavedStrategy) {
+        "blackCurtain" { 1 }
+        "turnOff" { 2 }
+        default { 0 }
+    }
+}
+
+function Get-HideStrategyFromCombo {
+    param($Combo)
+
+    $item = $Combo.SelectedItem
+    if ($item) { return [string]$item.Value }
+    return "disconnect"
 }
 
 function Populate-AudioCombo {
     param(
-        [System.Windows.Forms.ComboBox]$Combo,
+        $Combo,
         [string]$SavedAudioId,
-        [string]$SavedAudioName = "",
-        [bool]$SavedAudioAutoSwitch = $false
+        [string]$SavedAudioName,
+        [bool]$SavedAudioAutoSwitch
     )
 
     $Combo.Items.Clear()
@@ -711,85 +1262,19 @@ function Populate-AudioCombo {
     $Combo.SelectedIndex = $selectedIndex
 }
 
-function Get-HideStrategyFromCombo {
-    param([System.Windows.Forms.ComboBox]$Combo)
-
-    switch ($Combo.SelectedIndex) {
-        1 { return "blackCurtain" }
-        2 { return "turnOff" }
-        default { return "disconnect" }
-    }
-}
-
-function Get-HideStrategyLabel {
-    param([string]$Strategy)
-
-    switch ($Strategy) {
-        "blackCurtain" { return "Cortinas pretas" }
-        "turnOff" { return "Desligar fisicamente (DDC/CI)" }
-        default { return "Desconectar monitores" }
-    }
-}
-
-function Get-FullscreenModeLabel {
-    param([string]$Mode)
-    if ($Mode -eq "xboxMode") { return "Modo Xbox (Win+F11) — Alpha" }
-    if ($Mode -eq "playnite") { return "Playnite (modo tela cheia)" }
-    return "Steam Big Picture (recomendado)"
-}
-
-function Set-ActiveConsoleMessaging {
-    param(
-        [System.Windows.Forms.Label]$ActiveDesc,
-        [System.Windows.Forms.Form]$Form,
-        [System.Windows.Forms.Label]$StatusLabel,
-        [string]$FullscreenMode
-    )
-
-    if ($FullscreenMode -eq "xboxMode") {
-        $ActiveDesc.Text = @(
-            "Modo Xbox (Alpha): sem restauração automática."
-            "O app permanece aberto — use Restaurar agora quando terminar."
-        ) -join [Environment]::NewLine
-        Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
-            -Message "Modo Xbox (Alpha) ativo. Restaure manualmente ao sair." `
-            -Color $script:Theme.Warning -Force
-    }
-    else {
-        $appName = if ($FullscreenMode -eq "playnite") { "Playnite" } else { "Big Picture" }
-        $ActiveDesc.Text = "O app fica oculto na bandeja. Ao sair do $appName, monitores, áudio e FPS são restaurados automaticamente."
-        Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
-            -Message "Modo console ativo. Ao sair do $appName, tudo será restaurado." `
-            -Color $script:Theme.Accent -Force
-    }
-}
-
-function Test-ConsoleWatchNeeded {
-  param([string]$FullscreenMode)
-
-  if ($FullscreenMode -eq "xboxMode") { return $false }
-  return $true
-}
+# ---------------------------------------------------------------------------
+# Seleções do wizard / salvar / revisão
+# ---------------------------------------------------------------------------
 
 function Get-WizardSelections {
-    param(
-        $MonitorPanel,
-        $HideStrategyCombo,
-        $ModeBigPicture,
-        $ModePlaynite = $null,
-        $AudioCombo,
-        $FpsLimitCombo = $null,
-        $FpsCustomNumeric = $null,
-        $HdrCheck = $null,
-        $VrrCheck = $null
-    )
-
-    $selection = Get-GuiSelections -MonitorPanel $MonitorPanel
-    $hideStrategy = Get-HideStrategyFromCombo -Combo $HideStrategyCombo
-    $fullscreenMode = if ($ModeBigPicture.Checked) { "bigPicture" }
-        elseif ($ModePlaynite -and $ModePlaynite.Checked) { "playnite" }
+    $ui = $script:Ui
+    $selection = Get-GuiSelections
+    $hideStrategy = Get-HideStrategyFromCombo -Combo $ui.HideStrategyCombo
+    $fullscreenMode = if ($ui.ModeBigPicture.IsChecked) { "bigPicture" }
+        elseif ($ui.ModePlaynite.IsChecked) { "playnite" }
         else { "xboxMode" }
-    $audioItem = $AudioCombo.SelectedItem
+
+    $audioItem = $ui.AudioCombo.SelectedItem
     $audioId = if ($audioItem) { [string]$audioItem.Id } else { "" }
     $audioName = if ($audioItem) { [string]$audioItem.Text } else { "" }
     $audioAutoSwitch = ($audioId -eq $script:AudioOnConnectId -or $audioId -eq "__auto__")
@@ -819,10 +1304,7 @@ function Get-WizardSelections {
         $audioHint = $focusInfo.MonitorName
     }
 
-    $fpsLimit = 0
-    if ($FpsLimitCombo -and $FpsCustomNumeric) {
-        $fpsLimit = Get-FpsLimitFromControls -Combo $FpsLimitCombo -CustomNumeric $FpsCustomNumeric
-    }
+    $fpsLimit = Get-FpsLimitFromControls -Combo $ui.FpsCombo -CustomBox $ui.FpsCustomBox
 
     return @{
         FocusMonitor   = $selection.FocusMonitor
@@ -838,23 +1320,16 @@ function Get-WizardSelections {
         FocusMonitorInfo = $focusInfo
         FpsLimit       = $fpsLimit
         MonitorModes   = $selection.MonitorModes
-        HdrEnable      = [bool]($HdrCheck -and $HdrCheck.Checked)
-        VrrEnable      = [bool]($VrrCheck -and $VrrCheck.Checked)
+        HdrEnable      = [bool]$ui.ChkHdr.IsChecked
+        VrrEnable      = [bool]$ui.ChkVrr.IsChecked
     }
 }
 
 function Save-FromWizard {
-    param($Form, $WizardData, $StatusLabel)
-
-    $data = Get-WizardSelections @WizardData
+    $data = Get-WizardSelections
 
     if ([string]::IsNullOrWhiteSpace($data.FocusMonitor)) {
-        [System.Windows.Forms.MessageBox]::Show(
-            "Selecione o monitor de foco (TV/console).",
-            "Console Mode",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Warning
-        ) | Out-Null
+        [void](Show-UiMessageBox -Message "Selecione o monitor de foco (TV/console)." -Icon "Warning")
         return $false
     }
 
@@ -871,17 +1346,13 @@ function Save-FromWizard {
         -HdrEnable $data.HdrEnable `
         -VrrEnable $data.VrrEnable
 
-    Show-StatusMessage -Form $Form -StatusLabel $StatusLabel -Message "Configuração salva." -Color $script:Theme.Success
+    Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+        -Message "Configuração salva." -Color $script:Theme.Success
     return $true
 }
 
 function Update-ReviewPanel {
-    param(
-        [System.Windows.Forms.Label]$ReviewLabel,
-        $WizardData
-    )
-
-    $data = Get-WizardSelections @WizardData
+    $data = Get-WizardSelections
     $hideText = if ($data.HideLabels.Count -gt 0) { $data.HideLabels -join ", " } else { "(nenhum)" }
     $audioText = if ($data.AudioAutoSwitch) {
         $script:AudioOnConnectLabel
@@ -900,41 +1371,105 @@ function Update-ReviewPanel {
         $focusModeText = Get-MonitorModeLabel -Mode $data.MonitorModes[$data.FocusMonitor]
     }
 
-    $ReviewLabel.Text = @(
-        "Monitor de foco: $($data.FocusLabel)"
-        "Modo do foco: $focusModeText"
-        "Esconder: $hideText"
-        "Estratégia: $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
-        "Modo: $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
-        "Áudio: $audioText"
-        "Limite de FPS: $fpsText"
-        "HDR: $(if ($data.HdrEnable) { 'ativar no foco' } else { 'não mudar' }) · VRR: $(if ($data.VrrEnable) { 'ativar' } else { 'não mudar' })"
+    $script:Ui.ReviewText.Text = @(
+        "Monitor de foco:  $($data.FocusLabel)"
+        "Modo do foco:  $focusModeText"
+        "Esconder:  $hideText"
+        "Estratégia:  $(Get-HideStrategyLabel -Strategy $data.HideStrategy)"
+        "Modo:  $(Get-FullscreenModeLabel -Mode $data.FullscreenMode)"
+        "Áudio:  $audioText"
+        "Limite de FPS:  $fpsText"
+        "HDR:  $(if ($data.HdrEnable) { 'ativar no foco' } else { 'não mudar' })     VRR:  $(if ($data.VrrEnable) { 'ativar' } else { 'não mudar' })"
     ) -join [Environment]::NewLine
 }
 
-function Set-WizardEnabled {
-    param(
-        $Form,
-        [bool]$Enabled,
-        $WizardPanels,
-        $NavButtons,
-        $ActivePanel,
-        $RestoreButton
-    )
+# ---------------------------------------------------------------------------
+# Navegação / estados
+# ---------------------------------------------------------------------------
 
-    foreach ($panel in $WizardPanels) {
-        if ($panel) { $panel.Visible = $Enabled }
+function Show-WizardStep {
+    param([int]$Step)
+
+    $ui = $script:Ui
+    $script:WizardStep = $Step
+
+    $panels = @($ui.Step0, $ui.Step1, $ui.Step2, $ui.Step3)
+    for ($i = 0; $i -lt $panels.Count; $i++) {
+        $panels[$i].Visibility = if ($i -eq $Step) { "Visible" } else { "Collapsed" }
     }
-    foreach ($btn in $NavButtons) {
-        if ($btn) { $btn.Enabled = $Enabled }
+
+    $tabs = @($ui.Tab0, $ui.Tab1, $ui.Tab2, $ui.Tab3)
+    for ($i = 0; $i -lt $tabs.Count; $i++) {
+        $tabs[$i].Tag = if ($i -eq $Step) { "active" } else { $null }
     }
-    if ($ActivePanel) { $ActivePanel.Visible = -not $Enabled }
-    if ($RestoreButton) { $RestoreButton.Enabled = -not $Enabled }
+
+    if ($Step -eq 3) { Update-ReviewPanel }
+
+    $ui.BtnBack.IsEnabled = ($Step -gt 0)
+    $ui.BtnNext.Visibility = if ($Step -lt 3) { "Visible" } else { "Collapsed" }
+    $ui.BtnStart.Visibility = if ($Step -eq 3) { "Visible" } else { "Collapsed" }
 }
+
+function Set-WizardEnabled {
+    param([bool]$Enabled)
+
+    $ui = $script:Ui
+    if ($Enabled) {
+        Show-WizardStep -Step $script:WizardStep
+    }
+    else {
+        foreach ($p in @($ui.Step0, $ui.Step1, $ui.Step2, $ui.Step3)) {
+            $p.Visibility = "Collapsed"
+        }
+    }
+    foreach ($btn in @($ui.BtnBack, $ui.BtnNext, $ui.BtnStart, $ui.BtnSave, $ui.BtnRefresh)) {
+        $btn.IsEnabled = $Enabled
+    }
+    if ($Enabled) { $ui.BtnBack.IsEnabled = ($script:WizardStep -gt 0) }
+    $ui.PanelActive.Visibility = if ($Enabled) { "Collapsed" } else { "Visible" }
+    $ui.BtnRestore.IsEnabled = -not $Enabled
+}
+
+function Show-ConsoleActiveView {
+    param([string]$FullscreenMode = "bigPicture")
+
+    Set-WizardEnabled -Enabled $false
+    if ($FullscreenMode -eq "xboxMode") {
+        Show-FormOnPrimary -Form $script:Ui.Window
+        return
+    }
+    Hide-ConsoleFormForActiveMode -Form $script:Ui.Window
+}
+
+function Set-ActiveConsoleMessaging {
+    param([string]$FullscreenMode)
+
+    $ui = $script:Ui
+    if ($FullscreenMode -eq "xboxMode") {
+        $ui.ActiveDescText.Text = @(
+            "Modo Xbox (Alpha): sem restauração automática."
+            "O app permanece aberto — use Restaurar agora quando terminar."
+        ) -join [Environment]::NewLine
+        Show-StatusMessage -Form $ui.Window -StatusLabel $ui.StatusText `
+            -Message "Modo Xbox (Alpha) ativo. Restaure manualmente ao sair." `
+            -Color $script:Theme.Warning -Force
+    }
+    else {
+        $appName = if ($FullscreenMode -eq "playnite") { "Playnite" } else { "Big Picture" }
+        $ui.ActiveDescText.Text = "O app fica oculto na bandeja. Ao sair do $appName, monitores, áudio e FPS são restaurados automaticamente."
+        Show-StatusMessage -Form $ui.Window -StatusLabel $ui.StatusText `
+            -Message "Modo console ativo. Ao sair do $appName, tudo será restaurado." `
+            -Color $script:Theme.Accent -Force
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Bandeja e loop de acompanhamento
+# ---------------------------------------------------------------------------
 
 function Initialize-TrayIcon {
     param(
-        [System.Windows.Forms.Form]$Form,
+        $Form,
         [scriptblock]$OnRestore
     )
 
@@ -953,7 +1488,7 @@ function Initialize-TrayIcon {
 
     $showItem = New-Object System.Windows.Forms.ToolStripMenuItem
     $showItem.Text = "Mostrar janela"
-    $showItem.Add_Click({ Show-FormOnPrimary -Form $Form })
+    $showItem.Add_Click({ Show-FormOnPrimary -Form $script:Ui.Window })
     [void]$menu.Items.Add($showItem)
 
     $exitItem = New-Object System.Windows.Forms.ToolStripMenuItem
@@ -964,50 +1499,37 @@ function Initialize-TrayIcon {
         $script:TrayIcon.Visible = $false
         $script:TrayIcon.Dispose()
         $script:AllowFormClosePrompt = $true
-        $Form.Close()
+        $script:Ui.Window.Close()
     })
     [void]$menu.Items.Add($exitItem)
 
     $script:TrayIcon.ContextMenuStrip = $menu
-    $script:TrayIcon.Add_DoubleClick({ Show-FormOnPrimary -Form $Form })
+    $script:TrayIcon.Add_DoubleClick({ Show-FormOnPrimary -Form $script:Ui.Window })
 }
 
 function Stop-MonitorWorker {
     if ($script:ConsoleMonitorTimer) {
         $script:ConsoleMonitorTimer.Stop()
-        $script:ConsoleMonitorTimer.Dispose()
         $script:ConsoleMonitorTimer = $null
     }
 }
 
 function Invoke-ConsoleMonitorExitUi {
-    param(
-        [System.Windows.Forms.Form]$Form,
-        [System.Windows.Forms.Label]$StatusLabel,
-        $WizardContext
-    )
-
     Stop-MonitorWorker
     Stop-ConsoleMode
     $script:ConsoleUiLocked = $false
-    Set-WizardEnabled @WizardContext -Enabled $true
-    Show-FormOnPrimary -Form $Form
-    Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
+    Set-WizardEnabled -Enabled $true
+    Show-FormOnPrimary -Form $script:Ui.Window
+    Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
         -Message "Modo console encerrado. Setup restaurado." `
         -Color $script:Theme.Success -Force
 }
 
 function Start-MonitorTimer {
-    param(
-        [System.Windows.Forms.Form]$Form,
-        [System.Windows.Forms.Label]$StatusLabel,
-        $WizardContext
-    )
-
     Stop-MonitorWorker
 
-    $script:ConsoleMonitorTimer = New-Object System.Windows.Forms.Timer
-    $script:ConsoleMonitorTimer.Interval = 1500
+    $script:ConsoleMonitorTimer = New-Object System.Windows.Threading.DispatcherTimer
+    $script:ConsoleMonitorTimer.Interval = [TimeSpan]::FromMilliseconds(1500)
     $script:ConsoleMonitorTimer.Add_Tick({
         if ($script:MonitorLoopBusy) { return }
         if (-not $Script:ConsoleState.IsActive) { return }
@@ -1017,18 +1539,18 @@ function Start-MonitorTimer {
             $result = Update-ConsoleMonitorLoop
             if ($result -eq "exit") {
                 $script:ConsoleMonitorTimer.Stop()
-                Invoke-ConsoleMonitorExitUi -Form $Form -StatusLabel $StatusLabel -WizardContext $WizardContext
+                Invoke-ConsoleMonitorExitUi
                 return
             }
 
             if ($result -eq "running" -and $Script:ConsoleState.LastAudioSwitchName) {
                 $audioName = $Script:ConsoleState.LastAudioSwitchName
                 $Script:ConsoleState.LastAudioSwitchName = $null
-                Show-StatusMessage -Form $Form -StatusLabel $StatusLabel `
+                Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
                     -Message "Áudio alterado para: $audioName." -Color $script:Theme.Accent -Force
             }
 
-            $script:ConsoleMonitorTimer.Interval = [Math]::Max(1000, (Get-ConsoleMonitorPollDelayMs))
+            $script:ConsoleMonitorTimer.Interval = [TimeSpan]::FromMilliseconds([Math]::Max(1000, (Get-ConsoleMonitorPollDelayMs)))
         }
         catch { }
         finally {
@@ -1038,47 +1560,14 @@ function Start-MonitorTimer {
     $script:ConsoleMonitorTimer.Start()
 }
 
-function Show-WizardStep {
-    param(
-        [int]$Step,
-        $StepPanels,
-        $ProgressLabels,
-        $BtnBack,
-        $BtnNext,
-        $BtnStart,
-        $ReviewPanel
-    )
-
-    $script:WizardStep = $Step
-    for ($i = 0; $i -lt $StepPanels.Count; $i++) {
-        $StepPanels[$i].Visible = ($i -eq $Step)
-    }
-
-    for ($i = 0; $i -lt $ProgressLabels.Count; $i++) {
-        if ($i -eq $Step) {
-            $ProgressLabels[$i].Font = New-UiFont 9 -Bold
-            $ProgressLabels[$i].ForeColor = $script:Theme.Accent
-        }
-        else {
-            $ProgressLabels[$i].Font = New-UiFont 9
-            $ProgressLabels[$i].ForeColor = $script:Theme.Muted
-        }
-    }
-
-    $BtnBack.Enabled = ($Step -gt 0)
-    $BtnNext.Visible = ($Step -lt 3)
-    $BtnStart.Visible = ($Step -eq 3)
-    $ReviewPanel.Visible = ($Step -eq 3)
-}
+# ---------------------------------------------------------------------------
+# Janela principal
+# ---------------------------------------------------------------------------
 
 function Show-ConsoleModeGui {
     if (-not (Test-MultiMonitorToolAvailable)) {
-        [System.Windows.Forms.MessageBox]::Show(
-            "MultiMonitorTool.exe não encontrado.`n`nEm desenvolvimento: coloque na pasta do projeto.`nNo executável: será extraído em ConsoleMode_Data\tools na primeira execução.",
-            "Console Mode - Erro",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Error
-        ) | Out-Null
+        [void](Show-UiMessageBox -Message "MultiMonitorTool.exe não encontrado.`n`nEm desenvolvimento: coloque na pasta do projeto.`nNo executável: será extraído em ConsoleMode_Data\tools na primeira execução." `
+            -Title "Console Mode - Erro" -Icon "Error")
         return
     }
 
@@ -1086,49 +1575,223 @@ function Show-ConsoleModeGui {
     $monitors = Get-ConsoleMonitors
     $script:LoadedMonitors = $monitors
 
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Console Mode"
-    $form.Size = New-Object System.Drawing.Size(720, 640)
-    $form.MinimumSize = New-Object System.Drawing.Size(720, 640)
-    $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
-    $form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedDialog
-    $form.MaximizeBox = $false
-    $form.Font = New-UiFont 9.5
-    $form.BackColor = $script:Theme.Bg
-    $form.ForeColor = $script:Theme.Text
-    $form.Icon = Get-ConsoleAppIcon
-    Move-FormToPrimaryScreen -Form $form
-    $form.Add_Shown({ Move-FormToPrimaryScreen -Form $form })
+    $reader = New-Object System.Xml.XmlNodeReader ([xml]$script:MainXaml)
+    $window = [System.Windows.Markup.XamlReader]::Load($reader)
 
-    $form.Add_FormClosing({
+    $ui = @{ Window = $window }
+    foreach ($name in @(
+        'Tab0','Tab1','Tab2','Tab3',
+        'Step0','Step1','Step2','Step3','PanelActive',
+        'DiagramCanvas','MonitorList','BtnHideOthers',
+        'FpsCombo','FpsCustomBox','FpsStatusText',
+        'HideStrategyCombo','ModeBigPicture','ModePlaynite','ModeXbox','PlayniteDesc',
+        'ChkHdr','ChkVrr','AudioCombo','AudioHintText',
+        'ReviewText','ActiveDescText','StatusIcon','StatusText',
+        'BtnBack','BtnSave','BtnRefresh','BtnRestore','BtnNext','BtnStart'
+    )) {
+        $ui[$name] = $window.FindName($name)
+    }
+    $script:Ui = $ui
+
+    $iconSource = Get-ConsoleAppImageSource
+    if ($iconSource) { $window.Icon = $iconSource }
+
+    Move-WindowToPrimaryScreen -Window $window
+
+    # --- Passo 1: monitores + FPS ---
+    Build-MonitorPanel -Monitors $monitors `
+        -SavedFocus $config.focusMonitor -SavedHide $config.hideMonitors `
+        -SavedMonitorModes $config.monitorModes
+    $initialFocus = if ($config.focusMonitor) { $config.focusMonitor } else { ($monitors | Select-Object -First 1).Name }
+
+    $window.Add_ContentRendered({
+        $sel = Get-GuiSelections
+        $focus = if ($sel.FocusMonitor) { $sel.FocusMonitor } else { $script:LoadedMonitors | Select-Object -First 1 -ExpandProperty Name }
+        Build-MonitorLayoutDiagram -Monitors $script:LoadedMonitors -FocusName $focus
+    })
+
+    Initialize-FpsLimitCombo -Combo $ui.FpsCombo
+    Select-FpsLimitInCombo -Combo $ui.FpsCombo -CustomBox $ui.FpsCustomBox -SavedLimit ([int]$config.fpsLimit)
+    Update-FpsLimitStatusLabel -StatusLabel $ui.FpsStatusText
+
+    $ui.FpsCombo.Add_SelectionChanged({
+        $item = $script:Ui.FpsCombo.SelectedItem
+        $isCustom = ($item -and [int]$item.Value -eq $script:FpsCustomComboValue)
+        $script:Ui.FpsCustomBox.Visibility = if ($isCustom) { "Visible" } else { "Collapsed" }
+    })
+
+    $ui.BtnHideOthers.Add_Click({
+        $sel = Get-GuiSelections
+        foreach ($row in $script:MonitorRows) {
+            $row.Check.IsChecked = ($row.Name -ne $sel.FocusMonitor) -and $row.Check.IsEnabled
+        }
+        Build-MonitorLayoutDiagram -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
+    })
+
+    # --- Passo 2: estratégia + modo + extras ---
+    Initialize-HideStrategyCombo -Combo $ui.HideStrategyCombo -SavedStrategy $config.hideStrategy
+
+    $playniteAvailable = Test-PlayniteAvailable
+    $ui.ModePlaynite.IsEnabled = $playniteAvailable
+    $ui.PlayniteDesc.Text = if ($playniteAvailable) {
+        "Abre o Playnite em tela cheia no monitor de foco. Restauração automática ao sair."
+    } else {
+        "Playnite não encontrado. Instale-o (playnite.link) para habilitar esta opção."
+    }
+    if (-not $playniteAvailable) {
+        $ui.PlayniteDesc.Foreground = New-UiBrush $script:Theme.Warning
+    }
+
+    $ui.ModeXbox.IsChecked = ($config.fullscreenMode -eq "xboxMode")
+    $ui.ModePlaynite.IsChecked = ($config.fullscreenMode -eq "playnite" -and $playniteAvailable)
+    $ui.ModeBigPicture.IsChecked = -not ($ui.ModeXbox.IsChecked -or $ui.ModePlaynite.IsChecked)
+
+    $ui.ChkHdr.IsChecked = ($config.hdrEnable -eq $true)
+    $ui.ChkVrr.IsChecked = ($config.vrrEnable -eq $true)
+
+    # --- Passo 3: áudio ---
+    Populate-AudioCombo -Combo $ui.AudioCombo `
+        -SavedAudioId $config.audioDeviceId `
+        -SavedAudioName $config.audioDeviceName `
+        -SavedAudioAutoSwitch $config.audioAutoSwitch
+
+    # --- Navegação ---
+    $ui.BtnBack.Add_Click({
+        if ($script:WizardStep -gt 0) { Show-WizardStep -Step ($script:WizardStep - 1) }
+    })
+
+    $ui.BtnNext.Add_Click({
+        if ($script:WizardStep -eq 0) {
+            $sel = Get-GuiSelections
+            if ([string]::IsNullOrWhiteSpace($sel.FocusMonitor)) {
+                [void](Show-UiMessageBox -Message "Selecione o monitor de foco." -Icon "Warning")
+                return
+            }
+        }
+        if ($script:WizardStep -lt 3) { Show-WizardStep -Step ($script:WizardStep + 1) }
+    })
+
+    $tabAction = {
+        param($sender, $e)
+        if ($script:ConsoleUiLocked) { return }
+        $target = [int]($sender.Name -replace 'Tab', '')
+        if ($target -gt 0) {
+            $sel = Get-GuiSelections
+            if ([string]::IsNullOrWhiteSpace($sel.FocusMonitor)) {
+                [void](Show-UiMessageBox -Message "Selecione o monitor de foco." -Icon "Warning")
+                return
+            }
+        }
+        Show-WizardStep -Step $target
+    }
+    foreach ($tab in @($ui.Tab0, $ui.Tab1, $ui.Tab2, $ui.Tab3)) {
+        $tab.Add_Click($tabAction)
+    }
+
+    $ui.BtnSave.Add_Click({ Save-FromWizard | Out-Null })
+
+    $ui.BtnRefresh.Add_Click({
+        Clear-ConsoleDeviceCache
+        $refreshed = Get-ConsoleMonitors -ForceRefresh
+        $script:LoadedMonitors = $refreshed
+        $cfg = Get-ConsoleConfig
+        $currentModes = Get-MonitorModesFromPanel
+        $savedModes = if ($currentModes.Count -gt 0) { $currentModes } else { $cfg.monitorModes }
+        Build-MonitorPanel -Monitors $refreshed `
+            -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors `
+            -SavedMonitorModes $savedModes
+        Select-FpsLimitInCombo -Combo $script:Ui.FpsCombo -CustomBox $script:Ui.FpsCustomBox -SavedLimit ([int]$cfg.fpsLimit)
+        Populate-AudioCombo -Combo $script:Ui.AudioCombo `
+            -SavedAudioId $cfg.audioDeviceId `
+            -SavedAudioName $cfg.audioDeviceName `
+            -SavedAudioAutoSwitch $cfg.audioAutoSwitch
+        $sel = Get-GuiSelections
+        $focus = if ($sel.FocusMonitor) { $sel.FocusMonitor } else { ($refreshed | Select-Object -First 1).Name }
+        Build-MonitorLayoutDiagram -Monitors $refreshed -FocusName $focus
+        Update-FpsLimitStatusLabel -StatusLabel $script:Ui.FpsStatusText
+        Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+            -Message "Listas atualizadas." -Color $script:Theme.Success
+    })
+
+    $restoreAction = {
+        Stop-MonitorWorker
+        Request-ConsoleModeExit
+        Stop-ConsoleMode
+        $script:ConsoleUiLocked = $false
+        Set-WizardEnabled -Enabled $true
+        Show-FormOnPrimary -Form $script:Ui.Window
+        Show-StatusMessage -Form $script:Ui.Window -StatusLabel $script:Ui.StatusText `
+            -Message "Setup restaurado." -Color $script:Theme.Success -Force
+    }
+
+    $startConsoleAction = {
+        if (-not (Save-FromWizard)) { return }
+
+        $data = Get-WizardSelections
+        try {
+            $script:ConsoleUiLocked = $true
+            Initialize-TrayIcon -Form $script:Ui.Window -OnRestore $restoreAction
+
+            Start-ConsoleMode `
+                -FocusMonitor $data.FocusMonitor `
+                -HideMonitors $data.HideMonitors `
+                -HideStrategy $data.HideStrategy `
+                -FullscreenMode $data.FullscreenMode `
+                -AudioDeviceId $data.AudioDeviceId `
+                -AudioAutoSwitch:$data.AudioAutoSwitch `
+                -AudioDeviceHint $data.AudioDeviceHint `
+                -FocusMonitorInfo $data.FocusMonitorInfo `
+                -FpsLimit $data.FpsLimit `
+                -MonitorModes $data.MonitorModes `
+                -HdrEnable $data.HdrEnable `
+                -VrrEnable $data.VrrEnable
+
+            if ($data.FpsLimit -gt 0 -and -not $Script:ConsoleState.RtssLimitApplied) {
+                [void](Show-UiMessageBox -Message "O limite de FPS não foi aplicado (RTSS ausente ou indisponível).`nO modo console continuará normalmente." -Icon "Warning")
+            }
+
+            Show-ConsoleActiveView -FullscreenMode $data.FullscreenMode
+            Set-ActiveConsoleMessaging -FullscreenMode $data.FullscreenMode
+            if (Test-ConsoleWatchNeeded -FullscreenMode $data.FullscreenMode) {
+                Start-MonitorTimer
+            }
+            $script:Ui.BtnRestore.IsEnabled = $true
+        }
+        catch {
+            [void](Show-UiMessageBox -Message "Erro ao iniciar modo console:`n$_" -Icon "Error")
+            Stop-ConsoleMode
+            $script:ConsoleUiLocked = $false
+            Set-WizardEnabled -Enabled $true
+            Show-FormOnPrimary -Form $script:Ui.Window
+        }
+    }
+
+    $ui.BtnStart.Add_Click($startConsoleAction)
+    $ui.BtnRestore.Add_Click($restoreAction)
+    Initialize-TrayIcon -Form $window -OnRestore $restoreAction
+
+    # --- Fechamento ---
+    $window.Add_Closing({
         param($sender, $e)
 
         if (($Script:ConsoleState.IsActive -or $script:ConsoleUiLocked) -and -not $script:AllowFormClosePrompt) {
             $e.Cancel = $true
 
-            if ($e.CloseReason -eq [System.Windows.Forms.CloseReason]::UserClosing -and $sender.Visible) {
+            if ($sender.IsVisible) {
                 if ($Script:ConsoleState.FullscreenMode -eq "xboxMode") {
-                    $answer = [System.Windows.Forms.MessageBox]::Show(
-                        "O modo Xbox está ativo. Restaurar o setup e sair?",
-                        "Console Mode",
-                        [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
-                        [System.Windows.Forms.MessageBoxIcon]::Question
-                    )
-                    if ($answer -ne [System.Windows.Forms.DialogResult]::Yes) {
+                    $answer = Show-UiMessageBox -Message "O modo Xbox está ativo. Restaurar o setup e sair?" `
+                        -Buttons "YesNoCancel" -Icon "Question"
+                    if ($answer -ne [System.Windows.MessageBoxResult]::Yes) {
                         return
                     }
                 }
                 else {
-                    $answer = [System.Windows.Forms.MessageBox]::Show(
-                        "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter oculto na bandeja.",
-                        "Console Mode",
-                        [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
-                        [System.Windows.Forms.MessageBoxIcon]::Question
-                    )
-                    if ($answer -eq [System.Windows.Forms.DialogResult]::Cancel) {
+                    $answer = Show-UiMessageBox -Message "O modo console está ativo. Restaurar o setup e sair?`n`nNão = manter oculto na bandeja." `
+                        -Buttons "YesNoCancel" -Icon "Question"
+                    if ($answer -eq [System.Windows.MessageBoxResult]::Cancel) {
                         return
                     }
-                    if ($answer -eq [System.Windows.Forms.DialogResult]::No) {
+                    if ($answer -eq [System.Windows.MessageBoxResult]::No) {
                         Hide-ConsoleFormForActiveMode -Form $sender
                         return
                     }
@@ -1153,469 +1816,9 @@ function Show-ConsoleModeGui {
         }
     })
 
-    $titleLbl = New-Label -Text "Console Mode" -X 20 -Y 14 -W 300 -H 28 `
-        -Font (New-UiFont 14 -Bold)
-    $titleLbl.ForeColor = $script:Theme.Accent
-    $form.Controls.Add($titleLbl)
-
-    $subtitleLbl = New-Label -Text "Transforme seu PC em console de jogos em poucos passos." -X 20 -Y 44 -W 660 -H 20
-    $subtitleLbl.ForeColor = $script:Theme.Muted
-    $form.Controls.Add($subtitleLbl)
-
-    $progressY = 72
-    $stepTitles = @("1. Monitores", "2. Modo", "3. Áudio", "Iniciar")
-    $progressLabels = @()
-    $px = 20
-    foreach ($title in $stepTitles) {
-        $pl = New-Label -Text $title -X $px -Y $progressY -W 150 -H 20
-        $form.Controls.Add($pl)
-        $progressLabels += $pl
-        $px += 155
-    }
-
-    $linePanel = New-Object System.Windows.Forms.Panel
-    $linePanel.Location = New-Object System.Drawing.Point(20, ($progressY + 22))
-    $linePanel.Size = New-Object System.Drawing.Size(660, 2)
-    $linePanel.BackColor = $script:Theme.Border
-    $form.Controls.Add($linePanel)
-
-    $contentTop = $progressY + 36
-    $contentH = 400
-
-    $step1 = New-Object System.Windows.Forms.Panel
-    $step1.Location = New-Object System.Drawing.Point(15, $contentTop)
-    $step1.Size = New-Object System.Drawing.Size(680, $contentH)
-    $form.Controls.Add($step1)
-
-    $diagramPanel = New-Object System.Windows.Forms.Panel
-    $diagramPanel.Location = New-Object System.Drawing.Point(5, 5)
-    $diagramPanel.Size = New-Object System.Drawing.Size(650, 70)
-    $step1.Controls.Add($diagramPanel)
-
-    $monitorPanel = New-Object System.Windows.Forms.Panel
-    $monitorPanel.Name = "monitorPanel"
-    $monitorPanel.Location = New-Object System.Drawing.Point(5, 80)
-    $monitorPanel.Size = New-Object System.Drawing.Size(650, 165)
-    $monitorPanel.AutoScroll = $true
-    $step1.Controls.Add($monitorPanel)
-
-    Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors `
-        -SavedFocus $config.focusMonitor -SavedHide $config.hideMonitors `
-        -SavedMonitorModes $config.monitorModes
-    $initialFocus = if ($config.focusMonitor) { $config.focusMonitor } else { ($monitors | Select-Object -First 1).Name }
-    Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $initialFocus
-
-    $btnHideOthers = New-StyledButton -Text "Esconder todos exceto o foco" -X 5 -Y 252 -W 220 -H 30
-    $btnHideOthers.Add_Click({
-        $sel = Get-GuiSelections -MonitorPanel $monitorPanel
-        foreach ($control in $monitorPanel.Controls) {
-            if ($control -is [System.Windows.Forms.CheckBox] -and $control.Tag) {
-                $control.Checked = ($control.Tag -ne $sel.FocusMonitor) -and $control.Enabled
-            }
-        }
-        Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
-    })
-    $step1.Controls.Add($btnHideOthers)
-
-    $fpsGroup = New-Object System.Windows.Forms.GroupBox
-    $fpsGroup.Text = "Limite de FPS (anti-tearing)"
-    $fpsGroup.Location = New-Object System.Drawing.Point(5, 288)
-    $fpsGroup.Size = New-Object System.Drawing.Size(650, 100)
-    $step1.Controls.Add($fpsGroup)
-
-    $fpsLimitCombo = New-Object System.Windows.Forms.ComboBox
-    $fpsLimitCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-    $fpsLimitCombo.Location = New-Object System.Drawing.Point(15, 28)
-    $fpsLimitCombo.Size = New-Object System.Drawing.Size(220, 28)
-    $fpsGroup.Controls.Add($fpsLimitCombo)
-    Initialize-FpsLimitCombo -Combo $fpsLimitCombo
-
-    $fpsCustomNumeric = New-Object System.Windows.Forms.NumericUpDown
-    $fpsCustomNumeric.Location = New-Object System.Drawing.Point(245, 28)
-    $fpsCustomNumeric.Size = New-Object System.Drawing.Size(80, 28)
-    $fpsCustomNumeric.Minimum = 1
-    $fpsCustomNumeric.Maximum = 360
-    $fpsCustomNumeric.Value = 60
-    $fpsCustomNumeric.Visible = $false
-    $fpsGroup.Controls.Add($fpsCustomNumeric)
-
-    $fpsLimitStatus = New-Label -Text "" -X 15 -Y 58 -W 620 -H 36
-    $fpsLimitStatus.Font = New-UiFont 8.5
-    $fpsGroup.Controls.Add($fpsLimitStatus)
-    Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
-
-    # Padrão: desabilitado ("(Não limitar)"); só seleciona algo se o usuário salvou antes
-    $savedFpsLimit = if ($null -ne $config.fpsLimit) { [int]$config.fpsLimit } else { 0 }
-    Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit $savedFpsLimit
-
-    $fpsLimitCombo.Add_SelectedIndexChanged({
-        $item = $fpsLimitCombo.SelectedItem
-        $isCustom = ($item -and [int]$item.Value -eq $script:FpsCustomComboValue)
-        $fpsCustomNumeric.Visible = $isCustom
-    })
-
-    $hint1 = New-Label -Text "Desconectados: use modos do cache ou estimados — aplicados ao conectar. Serão reativados ao iniciar." `
-        -X 235 -Y 258 -W 420 -H 30
-    $hint1.ForeColor = $script:Theme.Muted
-    $hint1.Font = New-UiFont 8
-    $step1.Controls.Add($hint1)
-
-    foreach ($control in $monitorPanel.Controls) {
-        if ($control -is [System.Windows.Forms.RadioButton]) {
-            $control.Add_CheckedChanged({
-                $sel = Get-GuiSelections -MonitorPanel $monitorPanel
-                if ($sel.FocusMonitor) {
-                    Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $script:LoadedMonitors -FocusName $sel.FocusMonitor
-                }
-            })
-        }
-    }
-
-    $step2 = New-Object System.Windows.Forms.Panel
-    $step2.Location = New-Object System.Drawing.Point(15, $contentTop)
-    $step2.Size = New-Object System.Drawing.Size(680, $contentH)
-    $step2.Visible = $false
-    $form.Controls.Add($step2)
-
-    $hideGroup = New-Object System.Windows.Forms.GroupBox
-    $hideGroup.Text = "Como esconder os outros monitores?"
-    $hideGroup.Location = New-Object System.Drawing.Point(5, 10)
-    $hideGroup.Size = New-Object System.Drawing.Size(650, 120)
-    $step2.Controls.Add($hideGroup)
-
-    $hideStrategyCombo = New-Object System.Windows.Forms.ComboBox
-    $hideStrategyCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-    $hideStrategyCombo.Location = New-Object System.Drawing.Point(15, 30)
-    $hideStrategyCombo.Size = New-Object System.Drawing.Size(610, 28)
-    [void]$hideStrategyCombo.Items.Add("Desconectar monitores (recomendado)")
-    [void]$hideStrategyCombo.Items.Add("Cortinas pretas")
-    [void]$hideStrategyCombo.Items.Add("Desligar fisicamente (DDC/CI)")
-    $hideStrategyCombo.SelectedIndex = switch ($config.hideStrategy) {
-        "blackCurtain" { 1 }
-        "turnOff" { 2 }
-        default { 0 }
-    }
-    $hideGroup.Controls.Add($hideStrategyCombo)
-
-    $hideDesc = New-Label -Text "Desconectar: desativa no Windows (rápido). Cortinas: overlay preto. DDC/CI: apaga o painel via hardware." `
-        -X 15 -Y 65 -W 610 -H 40
-    $hideDesc.ForeColor = $script:Theme.Muted
-    $hideDesc.Font = New-UiFont 8.5
-    $hideGroup.Controls.Add($hideDesc)
-    $tt = New-Object System.Windows.Forms.ToolTip
-    $tt.SetToolTip($hideStrategyCombo, "Desconectar é o mais confiável para a maioria dos setups com 3 monitores.")
-
-    $modeGroup = New-Object System.Windows.Forms.GroupBox
-    $modeGroup.Text = "Modo de tela cheia"
-    $modeGroup.Location = New-Object System.Drawing.Point(5, 145)
-    $modeGroup.Size = New-Object System.Drawing.Size(650, 215)
-    $step2.Controls.Add($modeGroup)
-
-    $modeBigPicture = New-Object System.Windows.Forms.RadioButton
-    $modeBigPicture.Text = "Steam Big Picture (recomendado)"
-    $modeBigPicture.Location = New-Object System.Drawing.Point(15, 30)
-    $modeBigPicture.Size = New-Object System.Drawing.Size(610, 24)
-    $modeBigPicture.Checked = ($config.fullscreenMode -ne "xboxMode" -and -not ($config.fullscreenMode -eq "playnite" -and (Test-PlayniteAvailable)))
-    $modeBigPicture.Font = New-UiFont 9.5 -Bold
-    $modeGroup.Controls.Add($modeBigPicture)
-
-    $bpDesc = New-Label -Text "Abre a Steam em modo Big Picture no monitor de foco. Restauração automática ao sair." `
-        -X 35 -Y 52 -W 600 -H 18
-    $bpDesc.ForeColor = $script:Theme.Muted
-    $bpDesc.Font = New-UiFont 8.5
-    $modeGroup.Controls.Add($bpDesc)
-
-    $playniteAvailable = Test-PlayniteAvailable
-
-    $modePlaynite = New-Object System.Windows.Forms.RadioButton
-    $modePlaynite.Text = "Playnite (modo tela cheia)"
-    $modePlaynite.Location = New-Object System.Drawing.Point(15, 78)
-    $modePlaynite.Size = New-Object System.Drawing.Size(610, 24)
-    $modePlaynite.Enabled = $playniteAvailable
-    $modePlaynite.Font = New-UiFont 9.5 -Bold
-    $modePlaynite.Checked = ($config.fullscreenMode -eq "playnite" -and $playniteAvailable)
-    $modeGroup.Controls.Add($modePlaynite)
-
-    $playniteDescText = if ($playniteAvailable) {
-        "Abre o Playnite em tela cheia no monitor de foco. Restauração automática ao sair."
-    } else {
-        "Playnite não encontrado. Instale-o (playnite.link) para habilitar esta opção."
-    }
-    $playniteDesc = New-Label -Text $playniteDescText -X 35 -Y 100 -W 600 -H 18
-    $playniteDesc.ForeColor = if ($playniteAvailable) { $script:Theme.Muted } else { $script:Theme.Warning }
-    $playniteDesc.Font = New-UiFont 8.5
-    $modeGroup.Controls.Add($playniteDesc)
-
-    $modeXbox = New-Object System.Windows.Forms.RadioButton
-    $modeXbox.Text = "Modo Xbox (Win+F11) — Alpha"
-    $modeXbox.Font = New-UiFont 9.5 -Bold
-    $modeXbox.Location = New-Object System.Drawing.Point(15, 126)
-    $modeXbox.Size = New-Object System.Drawing.Size(610, 24)
-    $modeXbox.Checked = ($config.fullscreenMode -eq "xboxMode")
-    $modeGroup.Controls.Add($modeXbox)
-
-    $xboxDesc = New-Label -Text "Experimental: envia Win+F11. O app permanece aberto; restaure manualmente com Restaurar agora." `
-        -X 35 -Y 148 -W 600 -H 36
-    $xboxDesc.ForeColor = $script:Theme.Warning
-    $xboxDesc.Font = New-UiFont 8.5
-    $modeGroup.Controls.Add($xboxDesc)
-
-    $chkHdr = New-Object System.Windows.Forms.CheckBox
-    $chkHdr.Text = "Ativar HDR no monitor de foco"
-    $chkHdr.Location = New-Object System.Drawing.Point(10, 364)
-    $chkHdr.Size = New-Object System.Drawing.Size(310, 22)
-    $chkHdr.Checked = ($config.hdrEnable -eq $true)
-    $step2.Controls.Add($chkHdr)
-
-    $chkVrr = New-Object System.Windows.Forms.CheckBox
-    $chkVrr.Text = "Ativar VRR (taxa de atualização variável)"
-    $chkVrr.Location = New-Object System.Drawing.Point(330, 364)
-    $chkVrr.Size = New-Object System.Drawing.Size(320, 22)
-    $chkVrr.Checked = ($config.vrrEnable -eq $true)
-    $step2.Controls.Add($chkVrr)
-
-    $vrrDisclaimer = New-Label -Text "VRR: esta opção aplica apenas o ajuste do Windows — recomendamos ligar o VRR pelo painel do driver da GPU (NVIDIA/AMD)." `
-        -X 10 -Y 386 -W 650 -H 14
-    $vrrDisclaimer.ForeColor = $script:Theme.Warning
-    $vrrDisclaimer.Font = New-UiFont 8.25
-    $step2.Controls.Add($vrrDisclaimer)
-
-    $ttExtras = New-Object System.Windows.Forms.ToolTip
-    $ttExtras.SetToolTip($chkHdr, "Liga o HDR do Windows no monitor de foco ao iniciar e reverte ao restaurar. Requer monitor com suporte a HDR.")
-    $ttExtras.SetToolTip($chkVrr, "Liga a configuração global do Windows 'Taxa de atualização variável' ao iniciar e reverte ao restaurar. Recomendação: prefira ativar o VRR no painel do driver (NVIDIA Control Panel / AMD Software) — esta opção cobre apenas o ajuste do Windows.")
-
-    $step3 = New-Object System.Windows.Forms.Panel
-    $step3.Location = New-Object System.Drawing.Point(15, $contentTop)
-    $step3.Size = New-Object System.Drawing.Size(680, $contentH)
-    $step3.Visible = $false
-    $form.Controls.Add($step3)
-
-    $audioGroup = New-Object System.Windows.Forms.GroupBox
-    $audioGroup.Text = "Saída de áudio"
-    $audioGroup.Location = New-Object System.Drawing.Point(5, 10)
-    $audioGroup.Size = New-Object System.Drawing.Size(650, 115)
-    $step3.Controls.Add($audioGroup)
-
-    $audioCombo = New-Object System.Windows.Forms.ComboBox
-    $audioCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-    $audioCombo.Location = New-Object System.Drawing.Point(15, 35)
-    $audioCombo.Size = New-Object System.Drawing.Size(610, 28)
-    $audioCombo.DisplayMember = "Text"
-    $audioGroup.Controls.Add($audioCombo)
-    Populate-AudioCombo -Combo $audioCombo `
-        -SavedAudioId $config.audioDeviceId `
-        -SavedAudioName $config.audioDeviceName `
-        -SavedAudioAutoSwitch $config.audioAutoSwitch
-
-    if (-not $config.audioDeviceId -and -not $config.audioAutoSwitch) {
-        $focusForAudio = $monitors | Where-Object { $_.Name -eq $config.focusMonitor } | Select-Object -First 1
-        if ($focusForAudio -and -not $focusForAudio.IsActive) {
-            for ($i = 0; $i -lt $audioCombo.Items.Count; $i++) {
-                if ($audioCombo.Items[$i].Id -eq $script:AudioOnConnectId) {
-                    $audioCombo.SelectedIndex = $i
-                    break
-                }
-            }
-        }
-    }
-
-    $audioHint = New-Label -Text "Use ""$($script:AudioOnConnectLabel)"" quando a TV ainda não está ligada. Ao ligá-la, o Windows mostra o áudio HDMI como nova saída e o app troca para ela automaticamente." `
-        -X 5 -Y 125 -W 650 -H 40
-    $audioHint.ForeColor = $script:Theme.Muted
-    $audioHint.Font = New-UiFont 8.5
-    $step3.Controls.Add($audioHint)
-
-    if (-not (Test-SoundVolumeViewAvailable)) {
-        $audioWarn = New-Label -Text "SoundVolumeView não encontrado — troca de áudio desabilitada." -X 5 -Y 165 -W 650 -H 20
-        $audioWarn.ForeColor = $script:Theme.Warning
-        $step3.Controls.Add($audioWarn)
-    }
-
-    $step4 = New-Object System.Windows.Forms.Panel
-    $step4.Location = New-Object System.Drawing.Point(15, $contentTop)
-    $step4.Size = New-Object System.Drawing.Size(680, $contentH)
-    $step4.Visible = $false
-    $form.Controls.Add($step4)
-
-    $reviewTitle = New-Label -Text "Revise antes de iniciar" -X 5 -Y 10 -W 400 -H 24 `
-        -Font (New-UiFont 11 -Bold)
-    $step4.Controls.Add($reviewTitle)
-
-    $reviewLabel = New-Label -Text "" -X 5 -Y 45 -W 650 -H 140
-    $reviewLabel.Font = New-UiFont 10
-    $step4.Controls.Add($reviewLabel)
-
-    $wizardData = @{
-        MonitorPanel       = $monitorPanel
-        HideStrategyCombo  = $hideStrategyCombo
-        ModeBigPicture     = $modeBigPicture
-        ModePlaynite       = $modePlaynite
-        AudioCombo         = $audioCombo
-        FpsLimitCombo      = $fpsLimitCombo
-        FpsCustomNumeric   = $fpsCustomNumeric
-        HdrCheck           = $chkHdr
-        VrrCheck           = $chkVrr
-    }
-    Update-ReviewPanel -ReviewLabel $reviewLabel -WizardData $wizardData
-
-    $panelActive = New-Object System.Windows.Forms.Panel
-    $panelActive.Location = New-Object System.Drawing.Point(15, $contentTop)
-    $panelActive.Size = New-Object System.Drawing.Size(680, $contentH)
-    $panelActive.Visible = $false
-    $form.Controls.Add($panelActive)
-
-    $activeTitle = New-Label -Text "Modo console ativo" -X 5 -Y 20 -W 400 -H 28 `
-        -Font (New-UiFont 12 -Bold)
-    $panelActive.Controls.Add($activeTitle)
-
-    $activeDesc = New-Label -Text "" -X 5 -Y 55 -W 650 -H 70
-    $activeDesc.ForeColor = $script:Theme.Muted
-    $panelActive.Controls.Add($activeDesc)
-
-    $statusLabel = New-Label -Text "Pronto." -X 20 -Y 520 -W 660 -H 36
-    $statusLabel.ForeColor = $script:Theme.Muted
-    $form.Controls.Add($statusLabel)
-
-    $btnBack = New-StyledButton -Text "< Voltar" -X 20 -Y 565 -W 100 -H 34
-    $btnNext = New-StyledButton -Text "Próximo >" -X 490 -Y 565 -W 100 -H 34
-    $btnStart = New-StyledButton -Text "Iniciar modo console" -X 430 -Y 555 -W 250 -H 44 -Primary
-    $btnStart.Visible = $false
-
-    $btnSave = New-StyledButton -Text "Salvar" -X 130 -Y 565 -W 90 -H 34
-    $btnRefresh = New-StyledButton -Text "Atualizar" -X 230 -Y 565 -W 90 -H 34
-    $btnRestore = New-StyledButton -Text "Restaurar agora" -X 330 -Y 565 -W 130 -H 34
-    $btnRestore.Enabled = $false
-
-    $form.Controls.AddRange(@($btnBack, $btnNext, $btnStart, $btnSave, $btnRefresh, $btnRestore))
-
-    $stepPanels = @($step1, $step2, $step3, $step4)
-    $wizardContext = @{
-        Form          = $form
-        WizardPanels  = $stepPanels
-        NavButtons    = @($btnBack, $btnNext, $btnStart, $btnSave, $btnRefresh)
-        ActivePanel   = $panelActive
-        RestoreButton = $btnRestore
-    }
-
-    $btnBack.Add_Click({
-        if ($script:WizardStep -gt 0) {
-            Show-WizardStep -Step ($script:WizardStep - 1) -StepPanels $stepPanels `
-                -ProgressLabels $progressLabels -BtnBack $btnBack -BtnNext $btnNext `
-                -BtnStart $btnStart -ReviewPanel $step4
-        }
-    })
-
-    $btnNext.Add_Click({
-        if ($script:WizardStep -eq 0) {
-            $sel = Get-GuiSelections -MonitorPanel $monitorPanel
-            if ([string]::IsNullOrWhiteSpace($sel.FocusMonitor)) {
-                [System.Windows.Forms.MessageBox]::Show("Selecione o monitor de foco.", "Console Mode") | Out-Null
-                return
-            }
-        }
-        if ($script:WizardStep -lt 3) {
-            $next = $script:WizardStep + 1
-            if ($next -eq 3) { Update-ReviewPanel -ReviewLabel $reviewLabel -WizardData $wizardData }
-            Show-WizardStep -Step $next -StepPanels $stepPanels -ProgressLabels $progressLabels `
-                -BtnBack $btnBack -BtnNext $btnNext -BtnStart $btnStart -ReviewPanel $step4
-        }
-    })
-
-    $btnSave.Add_Click({
-        Save-FromWizard -Form $form -WizardData $wizardData -StatusLabel $statusLabel | Out-Null
-    })
-
-    $btnRefresh.Add_Click({
-        Clear-ConsoleDeviceCache
-        $monitors = Get-ConsoleMonitors -ForceRefresh
-        $script:LoadedMonitors = $monitors
-        $cfg = Get-ConsoleConfig
-        $currentModes = Get-MonitorModesFromPanel -MonitorPanel $monitorPanel
-        $savedModes = if ($currentModes.Count -gt 0) { $currentModes } else { $cfg.monitorModes }
-        Build-MonitorPanel -Panel $monitorPanel -Monitors $monitors `
-            -SavedFocus $cfg.focusMonitor -SavedHide $cfg.hideMonitors `
-            -SavedMonitorModes $savedModes
-        Select-FpsLimitInCombo -Combo $fpsLimitCombo -CustomNumeric $fpsCustomNumeric -SavedLimit ([int]$cfg.fpsLimit)
-        Populate-AudioCombo -Combo $audioCombo `
-            -SavedAudioId $cfg.audioDeviceId `
-            -SavedAudioName $cfg.audioDeviceName `
-            -SavedAudioAutoSwitch $cfg.audioAutoSwitch
-        $sel = Get-GuiSelections -MonitorPanel $monitorPanel
-        $focus = if ($sel.FocusMonitor) { $sel.FocusMonitor } else { ($monitors | Select-Object -First 1).Name }
-        Build-MonitorLayoutDiagram -Panel $diagramPanel -Monitors $monitors -FocusName $focus
-        Update-FpsLimitStatusLabel -StatusLabel $fpsLimitStatus
-        Show-StatusMessage -Form $form -StatusLabel $statusLabel -Message "Listas atualizadas." -Color $script:Theme.Success
-    })
-
-    $restoreAction = {
-        Stop-MonitorWorker
-        Request-ConsoleModeExit
-        Stop-ConsoleMode
-        $script:ConsoleUiLocked = $false
-        Set-WizardEnabled @wizardContext -Enabled $true
-        Show-FormOnPrimary -Form $form
-        Show-StatusMessage -Form $form -StatusLabel $statusLabel `
-            -Message "Setup restaurado." -Color $script:Theme.Success -Force
-    }
-
-    $startConsoleAction = {
-        if (-not (Save-FromWizard -Form $form -WizardData $wizardData -StatusLabel $statusLabel)) { return }
-
-        $data = Get-WizardSelections @wizardData
-        try {
-            $script:ConsoleUiLocked = $true
-            Initialize-TrayIcon -Form $form -OnRestore $restoreAction
-
-            Start-ConsoleMode `
-                -FocusMonitor $data.FocusMonitor `
-                -HideMonitors $data.HideMonitors `
-                -HideStrategy $data.HideStrategy `
-                -FullscreenMode $data.FullscreenMode `
-                -AudioDeviceId $data.AudioDeviceId `
-                -AudioAutoSwitch:$data.AudioAutoSwitch `
-                -AudioDeviceHint $data.AudioDeviceHint `
-                -FocusMonitorInfo $data.FocusMonitorInfo `
-                -FpsLimit $data.FpsLimit `
-                -MonitorModes $data.MonitorModes `
-                -HdrEnable $data.HdrEnable `
-                -VrrEnable $data.VrrEnable
-
-            if ($data.FpsLimit -gt 0 -and -not $Script:ConsoleState.RtssLimitApplied) {
-                [System.Windows.Forms.MessageBox]::Show(
-                    "O limite de FPS nao foi aplicado (RTSS ausente ou indisponivel).`nO modo console continuara normalmente.",
-                    "Console Mode",
-                    [System.Windows.Forms.MessageBoxButtons]::OK,
-                    [System.Windows.Forms.MessageBoxIcon]::Warning
-                ) | Out-Null
-            }
-
-            Show-ConsoleActiveView -Form $form -WizardContext $wizardContext -FullscreenMode $data.FullscreenMode
-            Set-ActiveConsoleMessaging -ActiveDesc $activeDesc -Form $form -StatusLabel $statusLabel `
-                -FullscreenMode $data.FullscreenMode
-            if (Test-ConsoleWatchNeeded -FullscreenMode $data.FullscreenMode) {
-                Start-MonitorTimer -Form $form -StatusLabel $statusLabel -WizardContext $wizardContext
-            }
-            $btnRestore.Enabled = $true
-        }
-        catch {
-            [System.Windows.Forms.MessageBox]::Show("Erro ao iniciar modo console:`n$_", "Console Mode") | Out-Null
-            Stop-ConsoleMode
-            $script:ConsoleUiLocked = $false
-            Set-WizardEnabled @wizardContext -Enabled $true
-            Show-FormOnPrimary -Form $form
-        }
-    }
-
-    $btnStart.Add_Click($startConsoleAction)
-
-    $btnRestore.Add_Click($restoreAction)
-    Initialize-TrayIcon -Form $form -OnRestore $restoreAction
-
-    Show-WizardStep -Step 0 -StepPanels $stepPanels -ProgressLabels $progressLabels `
-        -BtnBack $btnBack -BtnNext $btnNext -BtnStart $btnStart -ReviewPanel $step4
-
-    Set-DarkThemeOnControl -Control $form
-
-    [void]$form.Show()
-    [System.Windows.Forms.Application]::Run($form)
+    Show-WizardStep -Step 0
+
+    $app = New-Object System.Windows.Application
+    $app.ShutdownMode = [System.Windows.ShutdownMode]::OnMainWindowClose
+    [void]$app.Run($window)
 }
