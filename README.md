@@ -1,224 +1,155 @@
 # Console Mode
 
-Turn your Windows PC into a **game console** with one click: hide extra monitors, focus on your TV, switch audio, and launch **Steam Big Picture** (recommended) or **Xbox Game Bar fullscreen** (Win+F11, experimental).
+Turn your Windows PC into a **game console** with one click: focus on your TV, hide extra monitors, switch audio, and launch your preferred fullscreen game UI.
 
 [English](#console-mode) · [Português (BR)](#português-br)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Status](https://img.shields.io/badge/status-alpha-orange)
-![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE)
+![Version](https://img.shields.io/badge/version-1.2-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
-
-> **Alpha software** — Console Mode is a personal side project under active development. Expect rough edges, setup-specific behavior, and breaking changes between releases. Feedback and issues are welcome.
 
 ## Features
 
-- 4-step setup wizard (monitors → mode → audio → launch)
-- Hide monitors via **disconnect**, **black overlays**, or **DDC/CI**
-- Audio option to **use output when connected** (e.g. TV HDMI when it powers on)
-- **Steam Big Picture (recommended)** — automatic restore when you exit (Windows window event hook)
-- **Xbox mode (Alpha)** — sends Win+F11; **manual restore only** (tray or *Restore now*)
-- **Optional FPS limit (RTSS)** — global frame cap via RivaTuner during console mode (anti-tearing)
-- **Per-monitor resolution & refresh rate** — optional display mode per screen in step 1 (restored from backup on exit)
-- Portable executable (`ConsoleMode.exe`) or PowerShell dev mode
-- System tray icon to restore or reopen the app
+- Guided setup wizard (monitors → mode → audio → launch)
+- Hide spare displays by **disconnect**, **black overlays**, or **DDC/CI**
+- Optional **resolution & refresh rate** per monitor for console mode
+- Launch **Steam Big Picture**, **Playnite fullscreen**, or **Xbox** (Win+F11)
+- Optional **HDR** on the focus monitor and **VRR** (Windows setting)
+- Optional global **FPS limit** via RivaTuner (RTSS)
+- Audio routing, including “use output when connected” (e.g. TV HDMI)
+- System tray icon to restore your desktop layout or reopen the app
+- Portable executable — no installer required
 
 ## Requirements
 
 - Windows 10 or 11
-- [Steam](https://store.steampowered.com/) (Big Picture mode — recommended path)
-- Xbox Game Bar on Windows 11 (optional, experimental; Win+F11 shortcut)
-- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) (optional; FPS limit feature — install via MSI Afterburner)
-- PowerShell 5.1+ **for development/build only** — the `.exe` does not require PowerShell
+- One of the launch modes you plan to use:
+  - [Steam](https://store.steampowered.com/) (Big Picture — recommended)
+  - [Playnite](https://playnite.link/) (fullscreen app)
+  - Xbox / Game Bar on Windows 11 (experimental; Win+F11)
+- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) — optional, only if you want the FPS limit (usually via MSI Afterburner)
 
-## Quick start (executable)
+## How to use
 
-1. Build or download `dist/ConsoleMode.exe` (see [Build](#build))
-2. Run it — on first launch it creates `ConsoleMode_Data/` next to the executable
+1. Download `ConsoleMode.exe` from the [latest release](https://github.com/lippdev/consolemode/releases)
+2. Run it — on first launch it creates a `ConsoleMode_Data/` folder next to the executable
 3. Follow the wizard and click **Start console mode**
-4. Prefer **Steam Big Picture** unless you specifically want to try Xbox mode
+4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 
-> **Antivirus note:** executables built with [PS2EXE](https://github.com/MScholtes/PS2EXE) may trigger false positives. Source code is available here for review.
+> **Antivirus note:** some scanners may flag the packaged executable. The source code is available in this repository for review.
 
-## Development
+## Modes and restore
 
-```powershell
-# 1. Clone the repository
-git clone https://github.com/lippdev/consolemode.git
-cd consolemode
+| Mode | On exit |
+|------|---------|
+| **Steam Big Picture** | Automatic restore (app stays in the tray) |
+| **Playnite fullscreen** | Automatic restore (app stays in the tray) |
+| **Xbox mode** | Manual — use *Restore now*, the tray menu, or reopen the window |
 
-# 2. Download NirSoft tools (automated)
-powershell -ExecutionPolicy Bypass -File .\build\Get-NirSoftTools.ps1
+You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-# 2b. Download rtss-cli for FPS limit (optional)
-powershell -ExecutionPolicy Bypass -File .\build\Get-RtssCli.ps1
+## Optional extras
 
-# 3. Run
-.\IniciarConsoleMode.bat
-# or
-powershell -ExecutionPolicy Bypass -File .\ConsoleMode.ps1
-```
+### HDR
 
-In dev mode, config and backups are stored in `ConsoleMode_Data/`.
+Enable HDR on the focus monitor while console mode is active. It is turned back off (or restored) when you exit.
 
-## Build
+### VRR
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\build\Build-ConsoleMode.ps1
-```
+Console Mode can toggle the Windows VRR optimize setting. For best results, also enable VRR / G-SYNC / FreeSync in your **GPU control panel** (NVIDIA or AMD).
 
-Output: `dist/ConsoleMode.exe` (NirSoft tools, `rtss-cli`, and icon embedded when available).
+### FPS limit (RTSS)
 
-## FPS limit (RTSS)
+Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requires RTSS installed and running. The previous limit is restored when you exit.
 
-Optional anti-tearing helper in **step 1 (Monitors)** of the wizard:
+## Limitations
 
-1. Install **RivaTuner Statistics Server** (ships with [MSI Afterburner](https://www.msi.com/Landing/afterburner/graphics-cards))
-2. Keep RTSS running (Console Mode can try to start it)
-3. Choose a global FPS cap (e.g. 60 for a 60 Hz TV)
-
-The limit applies to **all GPU apps** while console mode is active and is **restored automatically** when you exit or click *Restore now*. This is not per-monitor (RTSS limitation) and does not replace VSync.
-
-## Display mode (resolution & Hz)
-
-In **step 1 (Monitors)**, each connected display has a **Resolution / Hz** dropdown:
-
-1. Default **(Keep current)** leaves that monitor unchanged
-2. Pick a mode from the list (live modes, **cached** from last connection, or **estimated** from max resolution when disconnected)
-3. On **Start console mode**, selected modes are applied before hiding other monitors
-4. On exit or **Restore now**, the previous layout is restored from the MMT backup saved at start
-
-Typical use: set your TV to **3840×2160 @ 60 Hz** while keeping a high-refresh desktop monitor unchanged until you exit.
-
-Validate without compiling:
-
-```powershell
-.\build\Build-ConsoleMode.ps1 -TestDev
-.\build\Build-ConsoleMode.ps1 -TestExe
-```
-
-## Project structure
-
-```
-consolemode/
-├── ConsoleMode.ps1          # Entry point
-├── IniciarConsoleMode.bat   # Dev launcher
-├── assets/icon.ico          # App icon
-├── lib/
-│   ├── Encoding.ps1         # UTF-8
-│   ├── Paths.ps1            # Portable paths (dev / exe)
-│   ├── Rtss.ps1             # RTSS / FPS limit
-│   ├── Engine.ps1           # Monitors, audio, restore
-│   └── Gui.ps1              # WinForms wizard
-└── build/
-    ├── Build-ConsoleMode.ps1
-    ├── Get-NirSoftTools.ps1
-    └── Get-RtssCli.ps1
-```
-
-## Restoring your setup
-
-| Mode | Restore on exit |
-|------|-----------------|
-| **Steam Big Picture** | Automatic (app stays in the tray) |
-| **Xbox mode (Alpha)** | Manual — *Restore now*, tray menu, or reopen the window |
-
-Other options:
-
-- **ESC** — dismiss black overlays (overlay hide strategy)
-- **Tray** — *Restore setup* or *Show window* at any time
-
-## Known limitations (Alpha)
-
-- Multi-monitor layouts vary widely; restore may need a retry on some setups
-- Xbox mode does not detect when fullscreen closes — you must restore manually
-- Monitor/audio switching relies on [NirSoft](https://www.nirsoft.net/) tools bundled at build time
-- FPS limit requires user-installed RTSS; cap is global, not per display
-- PS2EXE builds may be flagged by antivirus software
+- Multi-monitor layouts vary; on some setups restore may need a second try from the tray
+- Xbox mode does not detect when fullscreen ends — restore manually
+- Monitor and audio switching rely on bundled [NirSoft](https://www.nirsoft.net/) tools
+- The FPS limit is global (RTSS limitation), not per display
+- Packaged builds may be flagged by antivirus software
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE).
 
-Third-party dependencies: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
 ## Português (BR)
 
-Transforme seu PC Windows em um **console de jogos** com um clique: esconda monitores extras, foque na TV, ajuste o áudio e abra o **Steam Big Picture** (recomendado) ou o **Modo Xbox** (Win+F11, experimental).
+Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV, esconda monitores extras, ajuste o áudio e abra a interface de jogos em tela cheia que você preferir.
 
-> **Software em Alpha** — projeto pessoal em desenvolvimento ativo. Pode haver arestas, comportamento dependente do seu setup e mudanças entre versões. Issues e feedback são bem-vindos.
+![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
+![Version](https://img.shields.io/badge/versão-1.2-brightgreen)
+![License](https://img.shields.io/badge/licença-MIT-green)
 
 ### Funcionalidades
 
-- Assistente em 4 passos (monitores → modo → áudio → iniciar)
+- Assistente guiado (monitores → modo → áudio → iniciar)
 - Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
-- Áudio com opção **usar ao conectar** (HDMI da TV quando ligar)
-- **Steam Big Picture (recomendado)** — restauração automática ao sair
-- **Modo Xbox (Alpha)** — envia Win+F11; **restauração manual** (bandeja ou *Restaurar agora*)
-- **Limite de FPS opcional (RTSS)** — cap global via RivaTuner durante o modo console (anti-tearing)
-- **Resolução e Hz por monitor** — modo de exibição opcional no passo 1 (restaurado do backup ao sair)
-- Executável portátil (`ConsoleMode.exe`) ou modo desenvolvimento via PowerShell
-- Ícone na bandeja para restaurar ou reabrir o app
+- **Resolução e Hz** opcionais por monitor no modo console
+- Abrir **Steam Big Picture**, **Playnite em tela cheia** ou **Modo Xbox** (Win+F11)
+- **HDR** opcional no monitor de foco e **VRR** (ajuste do Windows)
+- **Limite de FPS** opcional via RivaTuner (RTSS)
+- Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
+- Ícone na bandeja para restaurar o layout ou reabrir o app
+- Executável portátil — sem instalador
 
 ### Requisitos
 
 - Windows 10 ou 11
-- [Steam](https://store.steampowered.com/) (modo Big Picture — caminho recomendado)
-- Modo Xbox no Windows 11 (opcional, experimental; atalho Win+F11)
-- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) (opcional; limite de FPS — via MSI Afterburner)
-- PowerShell 5.1+ **apenas para desenvolvimento/build** — o `.exe` não exige PowerShell instalado
+- Um dos modos que você for usar:
+  - [Steam](https://store.steampowered.com/) (Big Picture — recomendado)
+  - [Playnite](https://playnite.link/) (app em tela cheia)
+  - Xbox / Game Bar no Windows 11 (experimental; Win+F11)
+- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) — opcional, só se quiser o limite de FPS (em geral via MSI Afterburner)
 
-### Uso rápido (executável)
+### Como usar
 
-1. Gere ou baixe `dist/ConsoleMode.exe` (veja [Build](#build))
-2. Execute o arquivo — na primeira vez cria `ConsoleMode_Data/` ao lado dele
+1. Baixe `ConsoleMode.exe` na [última release](https://github.com/lippdev/consolemode/releases)
+2. Execute — na primeira vez cria a pasta `ConsoleMode_Data/` ao lado do executável
 3. Siga o assistente e clique em **Iniciar modo console**
-4. Prefira **Steam Big Picture**, a menos que queira testar o Modo Xbox
+4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
 
-> **Antivírus:** executáveis gerados com [PS2EXE](https://github.com/MScholtes/PS2EXE) podem gerar falso positivo. O código-fonte está aqui para auditoria.
+> **Antivírus:** alguns scanners podem sinalizar o executável empacotado. O código-fonte está neste repositório para auditoria.
 
-### Desenvolvimento
-
-```powershell
-git clone https://github.com/lippdev/consolemode.git
-cd consolemode
-powershell -ExecutionPolicy Bypass -File .\build\Get-NirSoftTools.ps1
-powershell -ExecutionPolicy Bypass -File .\build\Get-RtssCli.ps1
-.\IniciarConsoleMode.bat
-```
-
-Config e backups ficam em `ConsoleMode_Data/`.
-
-### Resolução e Hz
-
-No **passo 1 (Monitores)**, cada tela conectada tem um menu **Resolução / Hz**:
-
-1. **(Manter atual)** — não altera aquele monitor
-2. Escolha um modo da lista (ao vivo, **cache** da última conexão ou **estimado** pela resolução máxima quando desconectado)
-3. Ao **Iniciar modo console**, os modos selecionados são aplicados antes de esconder os outros monitores
-4. Ao sair ou em **Restaurar agora**, o layout anterior volta pelo backup MMT salvo no início
-
-Exemplo: TV em **3840×2160 @ 60 Hz** enquanto o monitor desktop continua em alta taxa até você sair.
-
-### Restaurar o setup
+### Modos e restauração
 
 | Modo | Ao sair |
 |------|---------|
-| **Steam Big Picture** | Automático (app na bandeja) |
-| **Modo Xbox (Alpha)** | Manual — *Restaurar agora*, bandeja ou reabrir a janela |
+| **Steam Big Picture** | Restauração automática (app na bandeja) |
+| **Playnite tela cheia** | Restauração automática (app na bandeja) |
+| **Modo Xbox** | Manual — *Restaurar agora*, menu da bandeja ou reabrir a janela |
 
-Também: **ESC** nas cortinas pretas; menu da bandeja a qualquer momento.
+Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
-### Limitações conhecidas (Alpha)
+### Extras opcionais
 
-- Layouts de monitores variam; em alguns setups a restauração pode precisar de nova tentativa
-- Modo Xbox não detecta o fechamento do fullscreen — restaure manualmente
-- Monitores/áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no build
-- Limite de FPS exige RTSS instalado pelo usuário; o cap é global, não por monitor
-- Builds PS2EXE podem ser sinalizados por antivírus
+#### HDR
+
+Ativa HDR no monitor de foco enquanto o modo console estiver ligado. Ao sair, o estado anterior é restaurado.
+
+#### VRR
+
+O Console Mode pode alterar a opção de VRR do Windows. Para melhor resultado, ligue também VRR / G-SYNC / FreeSync no **painel do driver da GPU** (NVIDIA ou AMD).
+
+#### Limite de FPS (RTSS)
+
+Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exige RTSS instalado e em execução. O limite anterior volta ao sair.
+
+### Limitações
+
+- Layouts multi-monitor variam; em alguns setups a restauração pode precisar de uma nova tentativa pela bandeja
+- O Modo Xbox não detecta o fim do fullscreen — restaure manualmente
+- Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
+- O limite de FPS é global (limitação do RTSS), não por tela
+- Builds empacotados podem ser sinalizados por antivírus
 
 ### Licença
 
-Projeto sob licença [MIT](LICENSE). Dependências externas: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Licença [MIT](LICENSE).
+
+Avisos de terceiros: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

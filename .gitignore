@@ -27,12 +27,10 @@ _test_*.ps1
 OLD_ConsoleMode/
 
 # Scripts de experimento/debug (nao fazem parte do produto)
-build/Fix-Display3.ps1
-build/Test-BackupRestore.ps1
-build/Test-RestoreMethods.ps1
-build/Test-RestoreSim.ps1
-build/Test-RestoreSteps.ps1
-build/Test-SetPrimary.ps1
+build/Test-*.ps1
+build/Fix-*.ps1
+build/Run-Diagnostics.ps1
+build/Restore-SetupNow.ps1
 
 # IDE / OS
 .vs/
