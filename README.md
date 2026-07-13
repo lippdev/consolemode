@@ -5,7 +5,7 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 [English](#console-mode) · [Português (BR)](#português-br)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Version](https://img.shields.io/badge/version-1.2-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Features
