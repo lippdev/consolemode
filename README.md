@@ -70,6 +70,20 @@ Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requi
 - The FPS limit is global (RTSS limitation), not per display
 - Packaged builds may be flagged by antivirus software
 
+## Troubleshooting
+
+### Desktop layout did not restore
+
+Open the tray menu and choose **Restore setup**. If the layout still looks wrong, choose **Restore setup** again after Windows finishes applying the monitor change. You can also reopen the window from the tray and restore manually.
+
+### Audio stayed on the previous output
+
+Check that the target output is connected and available in Windows before starting console mode. For HDMI/TV outputs, reconnecting the cable and starting the mode again may be necessary.
+
+### HDR or VRR did not change
+
+Confirm that the focus monitor supports the feature and that HDR is enabled in Windows. For VRR, also enable G-SYNC or FreeSync in the GPU control panel when applicable.
+
 ## License
 
 Licensed under the [MIT License](LICENSE).
