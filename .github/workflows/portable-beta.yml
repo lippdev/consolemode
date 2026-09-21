@@ -1,0 +1,54 @@
+name: Portable beta
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*-beta*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish single-file exe
+        shell: pwsh
+        run: .\build\Publish-ConsoleMode.ps1 -Runtime x64
+
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsoleMode-portable
+          path: dist/ConsoleMode.exe
+          if-no-files-found: error
+
+      - name: Draft hidden beta release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.3.0-beta.1
+          name: Console Mode v1.3.0-beta (WinUI 3)
+          draft: true
+          prerelease: true
+          fail_on_unmatched_files: true
+          files: dist/ConsoleMode.exe
+          body: |
+            Beta **escondida** (draft) da reescrita em C# / WinUI 3.
+
+            - Um único `ConsoleMode.exe` portátil — sem instalador e sem pasta de DLLs
+            - Na primeira execução cria `ConsoleMode_Data/` ao lado do exe (config, backup e ferramentas NirSoft extraídas)
+            - Assistente e paleta iguais à versão 1.2
+
+            Ainda não substitui a release pública 1.2 (PowerShell). Testar no Windows 10/11.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

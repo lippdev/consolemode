@@ -22,7 +22,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 - Optional global **FPS limit** via RivaTuner (RTSS)
 - Audio routing, including “use output when connected” (e.g. TV HDMI)
 - System tray icon to restore your desktop layout or reopen the app
-- Portable executable — no installer required
+- Portable **single-file** executable — copy one `.exe`, no installer
+- Native **C# / WinUI 3** app (Windows App SDK), unpackaged and self-contained
 
 ## Requirements
 
@@ -35,12 +36,25 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## How to use
 
-1. Download `ConsoleMode.exe` from the [latest release](https://github.com/lippdev/consolemode/releases)
-2. Run it — on first launch it creates a `ConsoleMode_Data/` folder next to the executable
+1. Build `ConsoleMode.exe` on Windows (`.\build\Publish-ConsoleMode.ps1`) or grab the WinUI beta when it is published
+2. Run the single `ConsoleMode.exe` — on first launch it creates `ConsoleMode_Data/` next to it (config, backups, and extracted helper tools)
 3. Follow the wizard and click **Start console mode**
 4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 
-> **Antivirus note:** some scanners may flag the packaged executable. The source code is available in this repository for review.
+> **Antivirus note:** some scanners may flag bundled helper tools. The source code is available in this repository for review.
+
+## Build from source (Windows)
+
+Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Windows application development** workload, or the .NET 8 SDK plus the Windows App SDK.
+
+```powershell
+# Download MultiMonitorTool / SoundVolumeView / rtss-cli, then publish
+.\build\Publish-ConsoleMode.ps1
+```
+
+Output: `dist\ConsoleMode.exe` (one portable file). Open `ConsoleMode.sln` to debug.
+
+The previous PowerShell + WPF implementation is archived under `legacy/` and is not used by the WinUI app.
 
 ## Modes and restore
 
@@ -72,7 +86,7 @@ Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requi
 - Xbox mode does not detect when fullscreen ends — restore manually
 - Monitor and audio switching rely on bundled [NirSoft](https://www.nirsoft.net/) tools
 - The FPS limit is global (RTSS limitation), not per display
-- Packaged builds may be flagged by antivirus software
+- The WinUI 3 build currently requires Windows to compile (`net8.0-windows`)
 
 ## Troubleshooting
 
@@ -116,7 +130,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 - **Limite de FPS** opcional via RivaTuner (RTSS)
 - Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
 - Ícone na bandeja para restaurar o layout ou reabrir o app
-- Executável portátil — sem instalador
+- Executável portátil em **um único `.exe`** — sem instalador
+- App nativo **C# / WinUI 3** (Windows App SDK), sem MSIX e self-contained
 
 ### Requisitos
 
@@ -129,12 +144,24 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ### Como usar
 
-1. Baixe `ConsoleMode.exe` na [última release](https://github.com/lippdev/consolemode/releases)
-2. Execute — na primeira vez cria a pasta `ConsoleMode_Data/` ao lado do executável
+1. Compile `ConsoleMode.exe` no Windows (`.\build\Publish-ConsoleMode.ps1`) ou use o beta WinUI quando for publicado
+2. Execute o `ConsoleMode.exe` — na primeira vez cria `ConsoleMode_Data/` ao lado (config, backup e ferramentas extraídas)
 3. Siga o assistente e clique em **Iniciar modo console**
 4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
 
-> **Antivírus:** alguns scanners podem sinalizar o executável empacotado. O código-fonte está neste repositório para auditoria.
+> **Antivírus:** alguns scanners podem sinalizar as ferramentas auxiliares. O código-fonte está neste repositório para auditoria.
+
+### Compilar no Windows
+
+Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
+
+```powershell
+.\build\Publish-ConsoleMode.ps1
+```
+
+Saída: `dist\ConsoleMode.exe` (um arquivo só). Abra `ConsoleMode.sln` para depurar.
+
+A implementação antiga em PowerShell + WPF ficou em `legacy/` e não é usada pelo app WinUI.
 
 ### Modos e restauração
 
@@ -166,7 +193,7 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 - O Modo Xbox não detecta o fim do fullscreen — restaure manualmente
 - Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
-- Builds empacotados podem ser sinalizados por antivírus
+- O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
 
 ### Licença
 
