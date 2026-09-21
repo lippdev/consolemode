@@ -154,8 +154,8 @@ public sealed class MonitorService
         }
 
         var allDeviceNames = backupSpecs.Values
-            .Select(s => s.GetValueOrDefault("Name"))
-            .Where(n => !string.IsNullOrWhiteSpace(n))
+            .Select(s => s.GetValueOrDefault("Name") ?? "")
+            .Where(n => n.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         var monitorsToVerify = backupSpecs
