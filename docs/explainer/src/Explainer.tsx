@@ -179,7 +179,92 @@ export const Explainer: React.FC = () => {
       </div>
 
       <Cursor x={cursorX} y={cursorY} opacity={cursorOp} pressed={clicked} />
+
+      {CAPTIONS.map((caption) => (
+        <Caption key={caption.text} frame={frame} {...caption} />
+      ))}
     </AbsoluteFill>
+  );
+};
+
+const CAPTIONS: { text: string; start: number; end: number }[] = [
+  {
+    text: "Two desk monitors on. The HDMI TV is off.",
+    start: 18,
+    end: 95,
+  },
+  {
+    text: "Start Console Mode — Steam or Xbox.",
+    start: 105,
+    end: 198,
+  },
+  {
+    text: "Desk displays turn off. The TV becomes the console.",
+    start: 215,
+    end: 330,
+  },
+  {
+    text: "Close Big Picture when you are done.",
+    start: 340,
+    end: 438,
+  },
+  {
+    text: "The desktop restores automatically.",
+    start: 465,
+    end: 600,
+  },
+];
+
+const Caption: React.FC<{
+  frame: number;
+  text: string;
+  start: number;
+  end: number;
+}> = ({ frame, text, start, end }) => {
+  const opacity = interpolate(
+    frame,
+    [start, start + 10, end - 10, end],
+    [0, 1, 1, 0],
+    linear,
+  );
+
+  if (opacity <= 0.01) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: 120,
+        opacity,
+        background:
+          "linear-gradient(180deg, rgba(20,20,23,0) 0%, rgba(20,20,23,0.9) 72%)",
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        paddingBottom: 28,
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        style={{
+          color: theme.text,
+          fontSize: 26,
+          fontWeight: 600,
+          fontFamily: "Segoe UI, system-ui, sans-serif",
+          textAlign: "center",
+          letterSpacing: 0.2,
+          textShadow: "0 2px 12px rgba(0,0,0,0.8)",
+          padding: "0 48px",
+        }}
+      >
+        {text}
+      </div>
+    </div>
   );
 };
 

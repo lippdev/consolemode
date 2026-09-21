@@ -313,22 +313,6 @@ export const Room: React.FC<RoomProps> = ({
       <div
         style={{
           position: "absolute",
-          left: 620,
-          top: 628,
-          opacity: hdmiDraw,
-          color: theme.muted,
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: 2,
-          zIndex: 2,
-        }}
-      >
-        HDMI
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
           left: 48,
           bottom: 176,
           width: 520,

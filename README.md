@@ -10,6 +10,8 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
 
+Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mode focuses the TV, turns the desk displays off, launches Steam Big Picture (or Xbox), and restores your desktop automatically when you quit Big Picture.
+
 ## Features
 
 - Guided setup wizard (monitors → mode → audio → launch)
