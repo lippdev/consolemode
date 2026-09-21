@@ -8,7 +8,7 @@ export const RemotionRoot: FC = () => {
     <Composition
       id="ConsoleModeExplainer"
       component={Explainer}
-      durationInFrames={540}
+      durationInFrames={630}
       fps={30}
       width={1280}
       height={720}

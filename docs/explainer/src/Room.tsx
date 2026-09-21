@@ -10,6 +10,8 @@ export type RoomProps = {
   steamOn: number;
   ambientDesk: number;
   tvFlash: number;
+  exitGlow: number;
+  autoBadge: number;
 };
 
 const font = "Segoe UI, system-ui, sans-serif";
@@ -85,7 +87,7 @@ const DesktopScreen: React.FC<{ variant: "left" | "right" }> = ({ variant }) => 
   );
 };
 
-const SteamUi: React.FC = () => {
+const SteamUi: React.FC<{ exitGlow: number }> = ({ exitGlow }) => {
   return (
     <div
       style={{
@@ -100,13 +102,39 @@ const SteamUi: React.FC = () => {
     >
       <div
         style={{
-          color: "#c7d5e0",
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: 3,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        STEAM
+        <div
+          style={{
+            color: "#c7d5e0",
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: 3,
+          }}
+        >
+          STEAM
+        </div>
+        <div
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: 5,
+            background: exitGlow > 0.2 ? "#c75050" : "rgba(255,255,255,0.14)",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 16,
+            fontWeight: 700,
+            lineHeight: 1,
+            scale: 1 + exitGlow * 0.2,
+          }}
+        >
+          ×
+        </div>
       </div>
       <div style={{ flex: 1, display: "flex", gap: 8, marginTop: 10 }}>
         <div
@@ -222,6 +250,8 @@ export const Room: React.FC<RoomProps> = ({
   steamOn,
   ambientDesk,
   tvFlash,
+  exitGlow,
+  autoBadge,
 }) => {
   const cableLength = 1100;
 
@@ -420,7 +450,7 @@ export const Room: React.FC<RoomProps> = ({
       >
         <div style={{ position: "relative" }}>
           <Bezel width={360} height={210} on={tvOn} led={tvOn > 0.2 ? theme.accent : "#7a1f1f"}>
-            <SteamUi />
+            <SteamUi exitGlow={exitGlow} />
             <div
               style={{
                 position: "absolute",
@@ -471,6 +501,28 @@ export const Room: React.FC<RoomProps> = ({
           }}
         />
       </div>
+      {autoBadge > 0.05 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: 200,
+            top: 200,
+            opacity: autoBadge,
+            zIndex: 6,
+            background: theme.accentDark,
+            border: `1px solid ${theme.accent}`,
+            color: theme.accent,
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: 1,
+            padding: "4px 12px",
+            borderRadius: 999,
+            whiteSpace: "nowrap",
+          }}
+        >
+          auto
+        </div>
+      ) : null}
     </div>
   );
 };

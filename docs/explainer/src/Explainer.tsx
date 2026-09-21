@@ -20,6 +20,32 @@ const linear = {
   extrapolateRight: "clamp" as const,
 };
 
+const Cursor: React.FC<{
+  x: number;
+  y: number;
+  opacity: number;
+  pressed: number;
+}> = ({ x, y, opacity, pressed }) => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        opacity,
+        width: 0,
+        height: 0,
+        borderLeft: "16px solid white",
+        borderTop: "10px solid transparent",
+        borderBottom: "16px solid transparent",
+        filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.55))",
+        scale: 1 - pressed * 0.12,
+        zIndex: 8,
+      }}
+    />
+  );
+};
+
 export const Explainer: React.FC = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -28,14 +54,16 @@ export const Explainer: React.FC = () => {
   const title = interpolate(frame, [55, 80, 200, 225], [0, 1, 1, 0], linear);
   const hud = interpolate(frame, [100, 125, 195, 220], [0, 1, 1, 0], linear);
   const clicked = interpolate(frame, [168, 176, 188], [0, 1, 0], linear);
-  const foco = interpolate(frame, [175, 200, 500, 525], [0, 1, 1, 0], ease);
-  const deskOn = interpolate(frame, [205, 245, 440, 490], [1, 0, 0, 1], ease);
-  const tvOn = interpolate(frame, [220, 270, 430, 480], [0, 1, 1, 0], ease);
-  const steamOn = interpolate(frame, [258, 298, 425, 460], [0, 1, 1, 0], ease);
+  const foco = interpolate(frame, [175, 200, 445, 480], [0, 1, 1, 0], ease);
+  const deskOn = interpolate(frame, [205, 245, 470, 520], [1, 0, 0, 1], ease);
+  const tvOn = interpolate(frame, [220, 270, 455, 505], [0, 1, 1, 0], ease);
+  const steamOn = interpolate(frame, [258, 298, 405, 438], [0, 1, 1, 0], ease);
   const tvFlash = interpolate(frame, [222, 234, 258], [0, 0.65, 0], linear);
-  const ambientDesk = interpolate(frame, [205, 260, 440, 500], [1, 0.25, 0.25, 1], ease);
-  const hdmiGlow = interpolate(frame, [200, 250, 420, 470], [0.15, 1, 1, 0.15], linear);
-  const camScale = interpolate(frame, [200, 280, 430, 500], [1, 1.14, 1.14, 1], ease);
+  const ambientDesk = interpolate(frame, [205, 260, 470, 535], [1, 0.25, 0.25, 1], ease);
+  const hdmiGlow = interpolate(frame, [200, 250, 455, 510], [0.15, 1, 1, 0.15], linear);
+  const camScale = interpolate(frame, [200, 280, 470, 545], [1, 1.14, 1.14, 1], ease);
+  const exitGlow = interpolate(frame, [340, 365, 395, 415], [0, 1, 1, 0], linear);
+  const autoBadge = interpolate(frame, [475, 500, 575, 605], [0, 1, 1, 0], linear);
   const fade = interpolate(
     frame,
     [0, 18, durationInFrames - 22, durationInFrames],
@@ -46,6 +74,11 @@ export const Explainer: React.FC = () => {
   const cursorX = interpolate(frame, [105, 165], [280, 1188], ease);
   const cursorY = interpolate(frame, [105, 165], [300, 86], ease);
   const cursorOp = interpolate(frame, [95, 115, 188, 210], [0, 1, 1, 0], linear);
+
+  const exitX = interpolate(frame, [335, 375], [1020, 1192], ease);
+  const exitY = interpolate(frame, [335, 375], [400, 298], ease);
+  const exitOp = interpolate(frame, [328, 348, 398, 418], [0, 1, 1, 0], linear);
+  const exitClick = interpolate(frame, [378, 388, 400], [0, 1, 0], linear);
 
   return (
     <AbsoluteFill style={{ backgroundColor: theme.bg }}>
@@ -67,7 +100,10 @@ export const Explainer: React.FC = () => {
           steamOn={steamOn}
           ambientDesk={ambientDesk}
           tvFlash={tvFlash}
+          exitGlow={exitGlow}
+          autoBadge={autoBadge}
         />
+        <Cursor x={exitX} y={exitY} opacity={exitOp} pressed={exitClick} />
       </div>
 
       <div
@@ -142,26 +178,15 @@ export const Explainer: React.FC = () => {
         </div>
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          left: cursorX,
-          top: cursorY,
-          opacity: cursorOp,
-          width: 0,
-          height: 0,
-          borderLeft: "16px solid white",
-          borderTop: "10px solid transparent",
-          borderBottom: "16px solid transparent",
-          filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.55))",
-          scale: 1 - clicked * 0.12,
-        }}
-      />
+      <Cursor x={cursorX} y={cursorY} opacity={cursorOp} pressed={clicked} />
     </AbsoluteFill>
   );
 };
 
-const Pill: React.FC<{ label: string; active?: boolean }> = ({ label, active }) => {
+const Pill: React.FC<{ label: string; active?: boolean }> = ({
+  label,
+  active,
+}) => {
   return (
     <div
       style={{

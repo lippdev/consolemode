@@ -8,7 +8,7 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 ![Version](https://img.shields.io/badge/version-1.2-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<img src="assets/console-mode.gif" alt="Desk monitors turn off; a previously off HDMI TV becomes the console." width="800">
+<img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
 
 ## Features
 
@@ -102,7 +102,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/badge/versão-1.2-brightgreen)
 ![License](https://img.shields.io/badge/licença-MIT-green)
 
-<img src="assets/console-mode.gif" alt="Os monitores da mesa desligam; a TV no HDMI, que estava apagada, vira o console." width="800">
+<img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
 
 ### Funcionalidades
 
