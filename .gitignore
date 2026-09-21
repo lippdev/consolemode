@@ -37,3 +37,8 @@ build/Restore-SetupNow.ps1
 .idea/
 Thumbs.db
 Desktop.ini
+
+# Remotion explainer
+docs/explainer/node_modules/
+docs/explainer/out/
+docs/explainer/.remotion/

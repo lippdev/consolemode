@@ -1,0 +1,30 @@
+{
+  "name": "console-mode-explainer",
+  "version": "1.0.0",
+  "description": "Explainer animation for the Console Mode README",
+  "repository": {},
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.526",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.526"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.526",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "studio": "remotion studio",
+    "gif": "remotion render src/index.ts ConsoleModeExplainer ../../assets/console-mode.gif --codec=gif --every-nth-frame=2 --scale=0.75",
+    "mp4": "remotion render src/index.ts ConsoleModeExplainer out/explainer.mp4",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc"
+  }
+}

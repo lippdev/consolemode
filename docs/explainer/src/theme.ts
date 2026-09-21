@@ -1,0 +1,15 @@
+export const theme = {
+  bg: "#141417",
+  wall: "#121218",
+  floor: "#0b0b0e",
+  surface: "#1D1D21",
+  card: "#232329",
+  text: "#EDEDF0",
+  muted: "#9B9BA6",
+  accent: "#3ECFA0",
+  accentDark: "#173B31",
+  desk: "#3a342e",
+  bezel: "#18181c",
+  steam: "#1b2838",
+  steamHi: "#66c0f4",
+} as const;
