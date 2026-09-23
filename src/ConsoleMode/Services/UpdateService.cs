@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace ConsoleMode.Services;
 
-public sealed record UpdateInfo(string Version, string Name, string Notes, string PageUrl, string? AssetUrl, string? AssetName, bool IsPrerelease);
+public sealed record UpdateInfo(string Version, string Name, string Notes, string PageUrl, string? AssetUrl, string? AssetName, string? AssetDigest, bool IsPrerelease);
 
 /// <summary>
 /// Checks GitHub Releases for a newer version and applies it: the installed build runs the
@@ -62,7 +62,7 @@ public static partial class UpdateService
             if (version is null || version.CompareTo(current) <= 0) continue;
             if (bestVersion is not null && version.CompareTo(bestVersion) <= 0) continue;
 
-            var (assetUrl, assetName) = PickAsset(release);
+            var (assetUrl, assetName, assetDigest) = PickAsset(release);
             best = new UpdateInfo(
                 version.ToString(),
                 string.IsNullOrWhiteSpace(name) ? tag : name,
@@ -70,6 +70,7 @@ public static partial class UpdateService
                 release.GetProperty("html_url").GetString() ?? $"https://github.com/{Repository}/releases",
                 assetUrl,
                 assetName,
+                assetDigest,
                 prerelease);
             bestVersion = version;
         }
@@ -77,9 +78,9 @@ public static partial class UpdateService
         return best;
     }
 
-    private static (string? Url, string? Name) PickAsset(JsonElement release)
+    private static (string? Url, string? Name, string? Digest) PickAsset(JsonElement release)
     {
-        if (!release.TryGetProperty("assets", out var assets)) return (null, null);
+        if (!release.TryGetProperty("assets", out var assets)) return (null, null, null);
         var prefix = AppPaths.IsInstalled ? SetupAssetPrefix : PortableAssetPrefix;
         foreach (var asset in assets.EnumerateArray())
         {
@@ -87,10 +88,13 @@ public static partial class UpdateService
             if (name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) &&
                 name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
             {
-                return (asset.GetProperty("browser_download_url").GetString(), name);
+                var digest = asset.TryGetProperty("digest", out var d) ? d.GetString() : null;
+                // Without GitHub's SHA-256 digest, show the release page but never auto-run the asset.
+                if (!UpdateIntegrity.IsValidSha256Digest(digest)) return (null, null, null);
+                return (asset.GetProperty("browser_download_url").GetString(), name, digest);
             }
         }
-        return (null, null);
+        return (null, null, null);
     }
 
     /// <summary>
@@ -99,14 +103,19 @@ public static partial class UpdateService
     /// </summary>
     public static async Task ApplyAsync(UpdateInfo update, IProgress<double>? progress, CancellationToken ct = default)
     {
-        if (update.AssetUrl is null || update.AssetName is null)
-            throw new InvalidOperationException("Esta release não tem um arquivo para este tipo de instalação.");
+        if (update.AssetUrl is null || update.AssetName is null || update.AssetDigest is null)
+            throw new InvalidOperationException("Esta release não tem um arquivo verificável para este tipo de instalação.");
 
         var dir = Path.Combine(Path.GetTempPath(), "ConsoleModeUpdate");
         Directory.CreateDirectory(dir);
         var file = Path.Combine(dir, update.AssetName);
         await DownloadAsync(update.AssetUrl, file, progress, ct);
-        AppLog.Write($"Atualização {update.Version}: baixada em {file}");
+        if (!await UpdateIntegrity.VerifyFileAsync(file, update.AssetDigest, ct))
+        {
+            try { File.Delete(file); } catch { /* do not keep an untrusted update */ }
+            throw new InvalidDataException("O SHA-256 do arquivo baixado não corresponde ao digest publicado pelo GitHub.");
+        }
+        AppLog.Write($"Atualização {update.Version}: baixada e verificada em {file}");
 
         if (AppPaths.IsInstalled)
         {
