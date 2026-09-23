@@ -5,7 +5,7 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 [English](#console-mode) · [Português (BR)](#português-br)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Version](https://img.shields.io/badge/version-1.2-brightgreen)
+![Version](https://img.shields.io/badge/version-1.4.0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
@@ -23,7 +23,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 - Optional global **FPS limit** via RivaTuner (RTSS)
 - Audio routing, including “use output when connected” (e.g. TV HDMI)
 - System tray icon to restore your desktop layout or reopen the app
-- Portable **single-file** executable — copy one `.exe`, no installer
+- **Installer** (per-user, no admin) or a **portable single-file** `.exe` — both announce new versions from GitHub Releases
+- Interface in **Brazilian Portuguese** or **English**, switchable in Settings without restarting
 - Native **C# / WinUI 3** app (Windows App SDK), unpackaged and self-contained
 
 ## Requirements
@@ -121,7 +122,7 @@ Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV, esconda monitores extras, ajuste o áudio e abra a interface de jogos em tela cheia que você preferir.
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Version](https://img.shields.io/badge/versão-1.2-brightgreen)
+![Version](https://img.shields.io/badge/versão-1.4.0-brightgreen)
 ![License](https://img.shields.io/badge/licença-MIT-green)
 
 <img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
@@ -137,7 +138,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 - **Limite de FPS** opcional via RivaTuner (RTSS)
 - Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
 - Ícone na bandeja para restaurar o layout ou reabrir o app
-- Executável portátil em **um único `.exe`** — sem instalador
+- **Instalador** (por usuário, sem admin) ou **executável portátil em um único `.exe`** — os dois avisam das versões novas pelo GitHub
+- Interface em **português do Brasil** ou **inglês**, trocável em Ajustes sem reiniciar
 - App nativo **C# / WinUI 3** (Windows App SDK), sem MSIX e self-contained
 
 ### Requisitos

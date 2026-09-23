@@ -64,6 +64,10 @@ jobs:
           ) -join "`n"
           Set-Content -LiteralPath "release-notes.md" -Value $releaseNotes -Encoding utf8
 
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test tests/ConsoleMode.Tests/ConsoleMode.Tests.csproj -c Release --nologo
+
       - name: Install Inno Setup (if missing)
         shell: pwsh
         run: |
@@ -95,10 +99,5 @@ jobs:
           files: |
             dist/ConsoleMode-Setup-x64.exe
             dist/ConsoleMode-Portable-x64.exe
-          body: |
-            **Instalador (recomendado):** `ConsoleMode-Setup-x64.exe` — instala por usuário, sem admin, com atalho de 1 clique e opção de iniciar com o Windows.
-            **Portátil:** `ConsoleMode-Portable-x64.exe` — um único .exe; guarda a config em `ConsoleMode_Data` ao lado dele.
-
-            O app avisa sozinho quando sai uma versão nova.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
