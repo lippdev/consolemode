@@ -42,6 +42,28 @@ jobs:
           "version=$v" >> $env:GITHUB_OUTPUT
           "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
+      - name: Prepare release notes (pt-BR)
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $changelog = Get-Content -LiteralPath "CHANGELOG.md" -Raw -Encoding utf8
+          $pattern = "(?ms)^## \[$([regex]::Escape($env:VERSION))\]\r?\n(?<notes>.*?)(?=^## \[|\z)"
+          $match = [regex]::Match($changelog, $pattern)
+          if (-not $match.Success) { throw "CHANGELOG.md precisa conter a seção ## [$($env:VERSION)] em português do Brasil." }
+          $notes = $match.Groups["notes"].Value.Trim()
+          if ([string]::IsNullOrWhiteSpace($notes)) { throw "A seção de changelog para $($env:VERSION) está vazia." }
+          $releaseNotes = @(
+            $notes
+            ""
+            "## Arquivos para baixar"
+            ""
+            "- **Instalador:** `ConsoleMode-Setup-x64.exe` — instala o aplicativo e oferece atalhos e inicialização com o Windows."
+            "- **Versão portátil:** `ConsoleMode-Portable-x64.exe` — um único executável; mantém os dados na pasta `ConsoleMode_Data` ao lado do arquivo."
+          ) -join "`n"
+          Set-Content -LiteralPath "release-notes.md" -Value $releaseNotes -Encoding utf8
+
       - name: Install Inno Setup (if missing)
         shell: pwsh
         run: |
@@ -67,7 +89,9 @@ jobs:
           name: Console Mode ${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.prerelease }}
           fail_on_unmatched_files: true
-          generate_release_notes: true
+          generate_release_notes: false
+          append_body: false
+          body_path: release-notes.md
           files: |
             dist/ConsoleMode-Setup-x64.exe
             dist/ConsoleMode-Portable-x64.exe
