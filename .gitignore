@@ -1,11 +1,5 @@
-# Runtime / dados do usuario
+# Runtime / dados do usuario (config, backup das telas, log)
 ConsoleMode_Data/
-config.json
-backup_monitores.cfg
-backup_monitores_meta.json
-backup_audio.txt
-backup_rtss_fps.json
-monitor_modes_cache.json
 
 # Build
 dist/
@@ -23,9 +17,6 @@ readme.txt
 # Temporarios
 *.csv
 _test_*.ps1
-
-# Versao antiga (PowerShell) em legacy\: ps2exe baixado pelo build dela
-legacy/ps2exe.ps1
 
 # Scripts de experimento/debug (nao fazem parte do produto)
 build/Test-*.ps1

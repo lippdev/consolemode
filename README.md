@@ -61,7 +61,7 @@ Output: `dist\ConsoleMode-Portable-x64.exe` and `dist\ConsoleMode-Setup-x64.exe`
 
 To release, push a tag like `v1.3.0` (or `v1.3.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
 
-The previous PowerShell + WPF implementation is archived under `legacy/` and is not used by the WinUI app.
+The previous PowerShell + WPF implementation (1.2 and earlier) lives on the [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) branch and is not used by the WinUI app.
 
 ## Modes and restore
 
@@ -175,7 +175,7 @@ Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (
 
 Para lançar uma versão, faça push de uma tag como `v1.3.0` (ou `v1.3.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
 
-A implementação antiga em PowerShell + WPF ficou em `legacy/` e não é usada pelo app WinUI.
+A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) e não é usada pelo app WinUI.
 
 ### Modos e restauração
 
