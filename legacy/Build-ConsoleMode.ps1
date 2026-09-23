@@ -8,9 +8,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$root = Split-Path -Parent $PSScriptRoot
+# Lives in legacy\ next to ConsoleMode.ps1 and lib\; the icon and the tool download scripts come from the repo.
+$root = $PSScriptRoot
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $distDir = Join-Path $root "dist"
-$assetsDir = Join-Path $root "assets"
+$assetsDir = Join-Path $repoRoot "assets"
 $entryPs1 = Join-Path $root "ConsoleMode.ps1"
 $mmt = Join-Path $root "MultiMonitorTool.exe"
 $svv = Join-Path $root "SoundVolumeView.exe"
@@ -55,7 +57,7 @@ function Ensure-Ps2Exe {
     $localPs2Exe = Join-Path $PSScriptRoot "ps2exe.ps1"
     if (-not (Test-Path -LiteralPath $localPs2Exe)) {
         if ($SkipInstall) {
-            throw "Invoke-ps2exe nao encontrado. Rode sem -SkipInstall ou coloque ps2exe.ps1 em build\"
+            throw "Invoke-ps2exe nao encontrado. Rode sem -SkipInstall ou coloque ps2exe.ps1 em legacy\"
         }
         Write-Host "Baixando ps2exe.ps1..."
         try {
@@ -97,7 +99,7 @@ function Ensure-RtssCli {
     }
 
     Write-Host "rtss-cli ausente. Baixando..."
-    & (Join-Path $PSScriptRoot "Get-RtssCli.ps1")
+    & (Join-Path $repoRoot "build\Get-RtssCli.ps1") -TargetDir (Join-Path $root "ConsoleMode_Data\tools")
 
     $script:BuildRtssCliPath = Resolve-BuildToolPath -FileName "rtss-cli.exe"
     if (-not $script:BuildRtssCliPath) {
@@ -116,7 +118,7 @@ function Ensure-NirSoftTools {
     }
 
     Write-Host "Ferramentas NirSoft ausentes. Baixando..."
-    & (Join-Path $PSScriptRoot "Get-NirSoftTools.ps1") -TargetDir $root
+    & (Join-Path $repoRoot "build\Get-NirSoftTools.ps1") -TargetDir $root
 
     $script:BuildMmtPath = Resolve-BuildToolPath -FileName "MultiMonitorTool.exe"
     $script:BuildSvvPath = Resolve-BuildToolPath -FileName "SoundVolumeView.exe"
