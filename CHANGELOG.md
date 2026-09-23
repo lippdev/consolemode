@@ -1,6 +1,6 @@
 # Histórico de alterações
 
-As notas são mantidas em português do Brasil. Antes de publicar uma versão, adicione abaixo uma seção `## [VERSÃO]` com o changelog daquela versão. O workflow publica somente a seção correspondente à tag.
+Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [1.4.0]
 ### Novidades

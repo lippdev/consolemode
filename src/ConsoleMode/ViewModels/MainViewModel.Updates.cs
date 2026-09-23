@@ -185,20 +185,9 @@ public partial class MainViewModel
     }
 
     /// <summary>
-    /// First real line of the release notes (skipping "## Novidades"-style headings). Notes are
-    /// written in pt-BR only (CHANGELOG.md), so other languages get the generic message instead.
+    /// First item of the release notes in the interface language. Releases without notes in
+    /// that language (pt-BR-only ones before 1.5.0) get the generic message instead.
     /// </summary>
-    private static string? FirstNoteLine(string notes)
-    {
-        if (!string.Equals(LocalizationService.Language, LocalizationService.PortugueseBrazil, StringComparison.Ordinal))
-            return null;
-        foreach (var raw in notes.Split('\n'))
-        {
-            var trimmed = raw.Trim();
-            if (trimmed.Length == 0 || trimmed.StartsWith('#')) continue;
-            var line = trimmed.TrimStart('-', '*', ' ').Replace("**", "").Trim();
-            if (line.Length > 0) return line.Length > 140 ? line[..140] + "…" : line;
-        }
-        return null;
-    }
+    private static string? FirstNoteLine(string notes) =>
+        ReleaseNotes.FirstLine(notes, LocalizationService.Language);
 }

@@ -42,6 +42,11 @@ UninstallDisplayName={#AppName}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+; Always ask for the installer language, preselecting the Windows display language.
+; Silent in-app updates skip the dialog and reuse the language of the previous install.
+ShowLanguageDialog=yes
+LanguageDetectionMethod=uilanguage
+UsePreviousLanguage=yes
 ; Updates run silently from inside the app; close it through Restart Manager if it is still up.
 CloseApplications=yes
 RestartApplications=no
