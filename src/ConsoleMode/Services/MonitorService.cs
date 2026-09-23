@@ -7,13 +7,14 @@ namespace ConsoleMode.Services;
 
 public sealed class MonitorService
 {
+    private readonly object _gate = new();
     private List<MonitorInfo>? _cache;
     private readonly Dictionary<string, List<DisplayModeOption>> _modesCache = new(StringComparer.OrdinalIgnoreCase);
 
     public void ClearCache()
     {
-        _cache = null;
-        _modesCache.Clear();
+        lock (_gate) _cache = null;
+        lock (_modesCache) _modesCache.Clear();
     }
 
     public int InvokeMmt(params string[] args)
@@ -24,6 +25,20 @@ public sealed class MonitorService
 
     public IReadOnlyList<MonitorInfo> GetMonitors(bool forceRefresh = false)
     {
+        // Called from the UI load task and the console loop at the same time.
+        lock (_gate) return ReadMonitors(forceRefresh);
+    }
+
+    /// <summary>Finds a monitor by <see cref="MonitorInfo.StableId"/> or GDI name.</summary>
+    public MonitorInfo? Find(string idOrName, bool forceRefresh = false) =>
+        GetMonitors(forceRefresh).FirstOrDefault(m => m.Matches(idOrName));
+
+    /// <summary>Current GDI name (\\.\DISPLAYn) for a stable id; falls back to the input.</summary>
+    public string ResolveName(string idOrName) =>
+        Find(idOrName)?.Name ?? Find(idOrName, true)?.Name ?? idOrName;
+
+    private IReadOnlyList<MonitorInfo> ReadMonitors(bool forceRefresh)
+    {
         if (!forceRefresh && _cache is not null) return _cache;
         if (!AppPaths.HasMmt)
         {
@@ -31,7 +46,7 @@ public sealed class MonitorService
             return _cache;
         }
 
-        var csvPath = Path.Combine(Path.GetTempPath(), "consolemode_monitors.csv");
+        var csvPath = Path.Combine(Path.GetTempPath(), $"consolemode_monitors_{Guid.NewGuid():N}.csv");
         try
         {
             InvokeMmt("/HideInactiveMonitors", "0", "/scomma", csvPath);
@@ -75,6 +90,8 @@ public sealed class MonitorService
                     IsDisconnected = string.Equals(row.Get("Disconnected"), "Yes", StringComparison.OrdinalIgnoreCase) || !isActive,
                     MonitorName = row.Get("Monitor Name"),
                     ShortId = row.Get("Short Monitor ID"),
+                    MonitorId = row.Get("Monitor ID"),
+                    SerialNumber = row.Get("Monitor Serial Number"),
                     LeftTop = row.Get("Left-Top")
                 });
             }
@@ -288,6 +305,11 @@ public sealed class MonitorService
 
     public List<DisplayModeOption> GetDisplayModes(string monitorName, MonitorInfo? monitor, bool forceRefresh = false)
     {
+        lock (_modesCache) return ReadDisplayModes(monitorName, monitor, forceRefresh);
+    }
+
+    private List<DisplayModeOption> ReadDisplayModes(string monitorName, MonitorInfo? monitor, bool forceRefresh)
+    {
         if (!forceRefresh && _modesCache.TryGetValue(monitorName, out var cached)) return cached;
 
         var live = new List<DisplayModeOption>();
@@ -464,12 +486,15 @@ public sealed class MonitorService
 
     private void MarkActive(IReadOnlyList<string> names)
     {
-        if (_cache is null) return;
-        foreach (var m in _cache)
+        lock (_gate)
         {
-            if (!names.Contains(m.Name, StringComparer.OrdinalIgnoreCase)) continue;
-            m.IsActive = true;
-            m.IsDisconnected = false;
+            if (_cache is null) return;
+            foreach (var m in _cache)
+            {
+                if (!names.Contains(m.Name, StringComparer.OrdinalIgnoreCase)) continue;
+                m.IsActive = true;
+                m.IsDisconnected = false;
+            }
         }
     }
 

@@ -4,6 +4,8 @@ namespace ConsoleMode.Models;
 
 public sealed class AppConfig
 {
+    /// <summary>2 = monitor fields hold <see cref="MonitorInfo.StableId"/>; 0/1 = GDI names (\\.\DISPLAYn).</summary>
+    public int Version { get; set; }
     public string FocusMonitor { get; set; } = "";
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
@@ -44,18 +46,66 @@ public sealed class MonitorInfo
     public bool IsDisconnected { get; set; }
     public string MonitorName { get; set; } = "";
     public string ShortId { get; set; } = "";
+    public string MonitorId { get; set; } = "";
+    public string SerialNumber { get; set; } = "";
     public string LeftTop { get; set; } = "";
+
+    /// <summary>
+    /// Survives Windows renumbering \\.\DISPLAYn when a screen is disabled and re-enabled.
+    /// </summary>
+    public string StableId =>
+        !string.IsNullOrWhiteSpace(MonitorId) ? MonitorId
+        : !string.IsNullOrWhiteSpace(ShortId) ? $"{ShortId}#{SerialNumber}"
+        : Name;
+
+    public bool Matches(string idOrName) =>
+        !string.IsNullOrWhiteSpace(idOrName) &&
+        (string.Equals(StableId, idOrName, StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(Name, idOrName, StringComparison.OrdinalIgnoreCase));
+
+    public string FriendlyName
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(MonitorName)) return MonitorName;
+            if (ShortId.Length >= 3)
+            {
+                var vendor = PnpVendors.GetValueOrDefault(ShortId[..3]) ?? ShortId[..3];
+                return $"{vendor} ({ShortId})";
+            }
+            return Name.Replace(@"\\.\", "");
+        }
+    }
+
+    public string ResolutionText
+    {
+        get
+        {
+            var w = Width > 0 ? Width : MaxWidth;
+            var h = Height > 0 ? Height : MaxHeight;
+            if (w <= 0 || h <= 0) return "";
+            var hz = int.TryParse(Frequency, out var f) && f > 0 ? $" @ {f} Hz" : "";
+            return $"{w} × {h}{hz}";
+        }
+    }
 
     public string DisplayTitle
     {
         get
         {
-            var label = string.IsNullOrWhiteSpace(MonitorName) ? Name : MonitorName;
-            var n = WindowsDisplayNumber > 0 ? WindowsDisplayNumber.ToString() : "?";
-            var status = IsActive ? "" : "  ·  desconectado";
-            return $"{n}. {label}{status}";
+            // WindowsDisplayNumber is CSV order, not the number Windows shows in "Identify".
+            var status = IsActive ? "" : "  ·  desligada";
+            return $"{FriendlyName}{status}";
         }
     }
+
+    private static readonly Dictionary<string, string> PnpVendors = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["ACR"] = "Acer", ["AOC"] = "AOC", ["AUS"] = "ASUS", ["BNQ"] = "BenQ", ["DEL"] = "Dell",
+        ["GSM"] = "LG", ["HWP"] = "HP", ["LEN"] = "Lenovo", ["MSI"] = "MSI", ["PHL"] = "Philips",
+        ["SAM"] = "Samsung", ["SNY"] = "Sony", ["TCL"] = "TCL", ["VSC"] = "ViewSonic", ["GBT"] = "Gigabyte",
+        ["HSD"] = "HannStar", ["IVM"] = "iiyama", ["XMI"] = "Xiaomi", ["HIS"] = "Hisense", ["PHI"] = "Philips"
+    };
 }
 
 public sealed class AudioDevice

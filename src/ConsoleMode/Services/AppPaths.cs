@@ -11,7 +11,10 @@ public static class AppLog
     {
         try
         {
-            var dir = AppPaths.DataDir;
+            // DataDir is empty until AppPaths.Initialize; early crashes still need a log.
+            var dir = !string.IsNullOrEmpty(AppPaths.DataDir)
+                ? AppPaths.DataDir
+                : Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? AppContext.BaseDirectory, "ConsoleMode_Data");
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, "consolemode.log");
             var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}  {message}";

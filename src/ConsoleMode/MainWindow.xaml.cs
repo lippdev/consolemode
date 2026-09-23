@@ -15,12 +15,11 @@ public sealed partial class MainWindow : Window
     {
         ViewModel = viewModel;
         InitializeComponent();
-        RootGrid.DataContext = viewModel;
 
         var hwnd = WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
         var appWindow = AppWindow.GetFromWindowId(windowId);
-        appWindow.Resize(new Windows.Graphics.SizeInt32(880, 820));
+        appWindow.Resize(new Windows.Graphics.SizeInt32(900, 700));
         if (File.Exists(AppPaths.IconPath))
             appWindow.SetIcon(AppPaths.IconPath);
 

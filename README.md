@@ -14,7 +14,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## Features
 
-- Guided setup wizard (monitors → mode → audio → launch)
+- **One-click home screen**: pick the screen you play on, hit **Enter console mode**
+- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight to console mode from the tray
 - Hide spare displays by **disconnect**, **black overlays**, or **DDC/CI**
 - Optional **resolution & refresh rate** per monitor for console mode
 - Launch **Steam Big Picture**, **Playnite fullscreen**, or **Xbox** (Win+F11)
@@ -38,8 +39,9 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 1. Build `ConsoleMode.exe` on Windows (`.\build\Publish-ConsoleMode.ps1`) or grab the WinUI beta when it is published
 2. Run the single `ConsoleMode.exe` — on first launch it creates `ConsoleMode_Data/` next to it (config, backups, and extracted helper tools)
-3. Follow the wizard and click **Start console mode**
-4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
+3. On first launch, choose the screen you play on (the others are turned off) and click **Done**
+4. From then on it is one click: **Enter console mode** on the home screen, or the **Modo Console** desktop shortcut created in Settings
+5. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 
 > **Antivirus note:** some scanners may flag bundled helper tools. The source code is available in this repository for review.
 
@@ -122,7 +124,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ### Funcionalidades
 
-- Assistente guiado (monitores → modo → áudio → iniciar)
+- **Tela inicial de 1 clique**: escolha a tela onde você joga e clique em **Entrar no modo console**
+- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, pela bandeja
 - Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
 - **Resolução e Hz** opcionais por monitor no modo console
 - Abrir **Steam Big Picture**, **Playnite em tela cheia** ou **Modo Xbox** (Win+F11)
@@ -146,8 +149,9 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 1. Compile `ConsoleMode.exe` no Windows (`.\build\Publish-ConsoleMode.ps1`) ou use o beta WinUI quando for publicado
 2. Execute o `ConsoleMode.exe` — na primeira vez cria `ConsoleMode_Data/` ao lado (config, backup e ferramentas extraídas)
-3. Siga o assistente e clique em **Iniciar modo console**
-4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
+3. Na primeira vez, escolha a tela onde você joga (as outras são desligadas) e clique em **Concluir**
+4. Depois é 1 clique: **Entrar no modo console** na tela inicial, ou o atalho **Modo Console** criado em Ajustes
+5. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
 
 > **Antivírus:** alguns scanners podem sinalizar as ferramentas auxiliares. O código-fonte está neste repositório para auditoria.
 

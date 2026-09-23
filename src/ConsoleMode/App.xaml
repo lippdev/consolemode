@@ -3,7 +3,6 @@
     x:Class="ConsoleMode.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ConsoleMode"
     RequestedTheme="Dark">
     <Application.Resources>
         <ResourceDictionary>
@@ -30,11 +29,6 @@
             <Color x:Key="SystemAccentColorDark1">#173B31</Color>
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#3ECFA0"/>
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#58DCB0"/>
-
-            <local:BoolToVisibilityConverter x:Key="BoolToVis"/>
-            <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
-            <local:TabBackgroundConverter x:Key="TabBg"/>
-            <local:TabForegroundConverter x:Key="TabFg"/>
 
             <Style TargetType="ComboBox">
                 <Setter Property="Background" Value="{StaticResource InputBrush}"/>
@@ -157,26 +151,63 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="TabBtn" TargetType="Button">
-                <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Height" Value="44"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="CornerRadius" Value="10"/>
+            <!-- Screen tile on the home page: background/border come from the row's role. -->
+            <Style x:Key="TileBtn" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="Padding" Value="12,10"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="10" Padding="8,0">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="Hover.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="Hover.Opacity" Value="1"/>
+                                                <Setter Target="Bd.Opacity" Value="0.85"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="Bd.Opacity" Value="0.4"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Bd"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="2"
+                                        CornerRadius="12">
+                                    <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                                <Border x:Name="Hover" Opacity="0" CornerRadius="12" BorderThickness="2"
+                                        BorderBrush="{StaticResource AccentHoverBrush}" IsHitTestVisible="False"/>
+                            </Grid>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>
 
-            <Style x:Key="TabBtnActive" TargetType="Button" BasedOn="{StaticResource TabBtn}">
+            <Style x:Key="SectionTitle" TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
-                <Setter Property="Background" Value="{StaticResource AccentDarkBrush}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style x:Key="Hint" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

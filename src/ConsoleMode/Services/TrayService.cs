@@ -28,6 +28,11 @@ public sealed class TrayService : IDisposable
         var menu = new MenuFlyout();
         var show = new MenuFlyoutItem { Text = "Mostrar janela" };
         show.Click += (_, _) => ShowWindow();
+        var start = new MenuFlyoutItem { Text = "Entrar no modo console" };
+        start.Click += async (_, _) =>
+        {
+            if (!await _vm.TryAutoStartAsync()) ShowWindow();
+        };
         var restore = new MenuFlyoutItem { Text = "Restaurar setup" };
         restore.Click += async (_, _) => await _vm.RestoreNowAsync();
         var exit = new MenuFlyoutItem { Text = "Sair" };
@@ -46,6 +51,7 @@ public sealed class TrayService : IDisposable
             }
         };
         menu.Items.Add(show);
+        menu.Items.Add(start);
         menu.Items.Add(restore);
         menu.Items.Add(new MenuFlyoutSeparator());
         menu.Items.Add(exit);

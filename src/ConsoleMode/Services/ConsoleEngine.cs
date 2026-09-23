@@ -14,9 +14,23 @@ public sealed class ConsoleEngine
 
     public const string AudioOnConnectId = "__on_connect__";
 
+    /// <summary>
+    /// Runs an action on the UI thread and waits for it. The black curtain windows and the
+    /// Big Picture SetWinEventHook both need a thread that pumps messages; Start/Tick don't.
+    /// </summary>
+    public Action<Action>? UiInvoker { get; set; }
+
+    private void OnUi(Action action)
+    {
+        if (UiInvoker is null) action();
+        else UiInvoker(action);
+    }
+
     public void Start(AppConfig config, MonitorInfo? focusInfo)
     {
         if (State.IsActive) throw new InvalidOperationException("O modo console já está ativo.");
+        config = ResolveMonitorNames(config);
+        AppLog.Write($"Start: foco={config.FocusMonitor}, esconder={string.Join('+', config.HideMonitors)}, estratégia={config.HideStrategy}, modo={config.FullscreenMode}");
 
         State.FocusMonitor = config.FocusMonitor;
         State.FocusMonitorRect = null;
@@ -42,7 +56,7 @@ public sealed class ConsoleEngine
         State.FpsLimit = config.FpsLimit;
         State.RtssBackup = null;
         State.RtssLimitApplied = false;
-        NativeWindows.StopBigPictureExitWatch();
+        OnUi(NativeWindows.StopBigPictureExitWatch);
 
         focusInfo ??= Monitors.GetMonitors().FirstOrDefault(m => m.Name == config.FocusMonitor)
                       ?? Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == config.FocusMonitor);
@@ -132,7 +146,7 @@ public sealed class ConsoleEngine
                 CompleteAudioWatch();
         }
 
-        if (config.FpsLimit > 0)
+        if (config.FpsLimit > 0 && Rtss.IsReady)
         {
             var rtss = Rtss.Enable(config.FpsLimit, State);
             if (!rtss.Success && !string.IsNullOrWhiteSpace(rtss.Message))
@@ -207,8 +221,7 @@ public sealed class ConsoleEngine
                         if (NativeWindows.GetWindowArea(h) <= 200000) continue;
                         State.CachedBigPictureHandle = h;
                         State.HasAppeared = true;
-                        NativeWindows.StartBigPictureExitWatch(h);
-                        State.BigPictureWatchActive = NativeWindows.BigPictureWatchActive;
+                        OnUi(() => State.BigPictureWatchActive = NativeWindows.StartBigPictureExitWatch(h));
                         break;
                     }
                 }
@@ -232,7 +245,7 @@ public sealed class ConsoleEngine
         if (State.RestoreInProgress) return;
         if (!State.IsActive)
         {
-            BlackCurtain.Close();
+            OnUi(BlackCurtain.Close);
             Rtss.Restore(State);
             return;
         }
@@ -241,7 +254,7 @@ public sealed class ConsoleEngine
         AppLog.Write("Stop-ConsoleMode: iniciando restauração");
         try
         {
-            BlackCurtain.Close();
+            OnUi(BlackCurtain.Close);
             Video.RestoreHdr(State);
             Video.RestoreVrr(State);
             Thread.Sleep(800);
@@ -293,7 +306,7 @@ public sealed class ConsoleEngine
             State.HdrApplied = false;
             State.HdrMonitor = null;
             State.VrrApplied = false;
-            NativeWindows.StopBigPictureExitWatch();
+            OnUi(NativeWindows.StopBigPictureExitWatch);
         }
     }
 
@@ -301,14 +314,49 @@ public sealed class ConsoleEngine
 
     private void ShowCurtains(IReadOnlyList<string> names)
     {
-        BlackCurtain.Close();
         var rects = new List<ScreenRect>();
         foreach (var name in names)
         {
             var bounds = DisplayScreens.GetBounds(name);
             if (bounds is not null) rects.Add(bounds);
         }
-        if (rects.Count > 0) BlackCurtain.Show(rects, RequestExit);
+        OnUi(() =>
+        {
+            BlackCurtain.Close();
+            if (rects.Count > 0) BlackCurtain.Show(rects, RequestExit);
+        });
+    }
+
+    /// <summary>
+    /// Config stores stable monitor ids; everything below Start works with the current GDI names.
+    /// </summary>
+    private AppConfig ResolveMonitorNames(AppConfig config)
+    {
+        var focus = Monitors.ResolveName(config.FocusMonitor);
+        var hide = config.HideMonitors
+            .Select(Monitors.ResolveName)
+            .Where(n => !string.Equals(n, focus, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var modes = new Dictionary<string, SavedDisplayMode>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, mode) in config.MonitorModes)
+            modes[Monitors.ResolveName(key)] = mode;
+
+        return new AppConfig
+        {
+            Version = config.Version,
+            FocusMonitor = focus,
+            HideMonitors = hide,
+            HideStrategy = config.HideStrategy,
+            FullscreenMode = config.FullscreenMode,
+            AudioDeviceId = config.AudioDeviceId,
+            AudioDeviceName = config.AudioDeviceName,
+            AudioAutoSwitch = config.AudioAutoSwitch,
+            FpsLimit = config.FpsLimit,
+            MonitorModes = modes,
+            HdrEnable = config.HdrEnable,
+            VrrEnable = config.VrrEnable
+        };
     }
 
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)

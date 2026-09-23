@@ -24,7 +24,7 @@ public sealed class AudioService
         if (!AppPaths.HasSvv) return [];
         if (!forceRefresh && _cache is not null) return _cache;
 
-        var csvPath = Path.Combine(Path.GetTempPath(), "consolemode_audio.csv");
+        var csvPath = Path.Combine(Path.GetTempPath(), $"consolemode_audio_{Guid.NewGuid():N}.csv");
         try
         {
             InvokeSvv("/ShowDisabledDevices", "1", "/ShowUnpluggedDevices", "1", "/scomma", csvPath);
