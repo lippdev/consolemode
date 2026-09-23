@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using ConsoleMode.Models;
+using ConsoleMode.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
@@ -19,7 +20,8 @@ public partial class MonitorRowViewModel : ObservableObject
     private int _roleIndex;
     private DisplayModeOption _selectedMode;
 
-    public static IReadOnlyList<string> RoleOptions { get; } = ["Jogar aqui", "Desligar", "Manter ligada"];
+    public static IReadOnlyList<string> RoleOptions =>
+        [LocalizationService.Get("RolePlayHere"), LocalizationService.Get("RoleTurnOff"), LocalizationService.Get("RoleKeepOn")];
 
     public MonitorInfo Monitor { get; }
 
@@ -34,11 +36,15 @@ public partial class MonitorRowViewModel : ObservableObject
         _onSelected = onSelected;
     }
 
-    public string Title => Monitor.DisplayTitle;
+    public string Title => Monitor.IsActive
+        ? Monitor.FriendlyName
+        : $"{Monitor.FriendlyName}  ·  {LocalizationService.Get("MonitorOff")}";
     public string Name => Monitor.FriendlyName;
     public string Details => Monitor.IsActive
         ? Monitor.ResolutionText
-        : string.IsNullOrEmpty(Monitor.ResolutionText) ? "desligada agora" : $"{Monitor.ResolutionText} · desligada agora";
+        : string.IsNullOrEmpty(Monitor.ResolutionText)
+            ? LocalizationService.Get("DisplayOffNow")
+            : $"{Monitor.ResolutionText} · {LocalizationService.Get("DisplayOffNow")}";
 
     public IReadOnlyList<DisplayModeOption> Modes { get; }
 
@@ -103,10 +109,19 @@ public partial class MonitorRowViewModel : ObservableObject
 
     public string RoleLabel => Role switch
     {
-        MonitorRole.Focus => "Jogar aqui",
-        MonitorRole.Hide => "Desliga",
-        _ => "Fica ligada"
+        MonitorRole.Focus => LocalizationService.Get("RolePlayHere"),
+        MonitorRole.Hide => LocalizationService.Get("RoleTurnOff"),
+        _ => LocalizationService.Get("RoleKeepOn")
     };
+
+    public void RefreshLocalizedText()
+    {
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(Details));
+        OnPropertyChanged(nameof(RoleLabel));
+        // "Não alterar" / "(cache)" / "(estimado)" live in the mode labels themselves.
+        foreach (var mode in Modes) mode.RefreshText();
+    }
 
     public string RoleGlyph => Role switch
     {

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ConsoleMode.Services;
 
 namespace ConsoleMode.Models;
 
@@ -6,6 +7,7 @@ public sealed class AppConfig
 {
     /// <summary>2 = monitor fields hold <see cref="MonitorInfo.StableId"/>; 0/1 = GDI names (\\.\DISPLAYn).</summary>
     public int Version { get; set; }
+    public string AppLanguage { get; set; } = "pt-BR";
     public string FocusMonitor { get; set; } = "";
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
@@ -113,7 +115,7 @@ public sealed class MonitorInfo
         get
         {
             // WindowsDisplayNumber is CSV order, not the number Windows shows in "Identify".
-            var status = IsActive ? "" : "  ·  desligada";
+            var status = IsActive ? "" : $"  ·  {LocalizationService.Get("MonitorOff")}";
             return $"{FriendlyName}{status}";
         }
     }
@@ -135,15 +137,49 @@ public sealed class AudioDevice
     public bool IsActive { get; set; }
 }
 
-public sealed class DisplayModeOption
+public sealed class DisplayModeOption : System.ComponentModel.INotifyPropertyChanged
 {
+    private string _text = "";
+
     public int Width { get; set; }
     public int Height { get; set; }
     public int Frequency { get; set; }
     public int BitsPerPel { get; set; }
     public string Key { get; set; } = "";
-    public string Text { get; set; } = "";
     public bool UseCurrent { get; set; }
+
+    /// <summary>
+    /// Catalog key of the whole label (the "don't change" entry) or of the suffix such as
+    /// " (cache)"; lets <see cref="RefreshText"/> follow a language switch.
+    /// </summary>
+    public string? TextKey { get; set; }
+
+    public string Text
+    {
+        get => _text;
+        set
+        {
+            if (_text == value) return;
+            _text = value;
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Text)));
+        }
+    }
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Rebuilds <see cref="Text"/> in the current app language.</summary>
+    public DisplayModeOption RefreshText()
+    {
+        if (UseCurrent)
+        {
+            if (TextKey is not null) Text = LocalizationService.Get(TextKey);
+            return this;
+        }
+        var freq = Frequency > 0 ? $" @ {Frequency} Hz" : "";
+        var suffix = TextKey is null ? "" : LocalizationService.Get(TextKey);
+        Text = $"{Width} x {Height}{freq}{suffix}";
+        return this;
+    }
 
     public override string ToString() => Text;
 }

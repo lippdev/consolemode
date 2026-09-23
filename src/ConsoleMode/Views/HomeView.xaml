@@ -19,9 +19,9 @@
 
             <StackPanel Spacing="12">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Onde você vai jogar?" Style="{StaticResource TitleTextBlockStyle}"/>
+                    <TextBlock Text="{x:Bind ViewModel.Texts.HomeHeading, Mode=OneWay}" Style="{StaticResource TitleTextBlockStyle}"/>
                     <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
-                               Text="Clique numa tela e escolha o que ela faz. As que desligam voltam sozinhas quando você sai do jogo."/>
+                               Text="{x:Bind ViewModel.Texts.HomeDescription, Mode=OneWay}"/>
                 </StackPanel>
                 <InfoBar IsOpen="{x:Bind ViewModel.IsUpdateOpen, Mode=TwoWay}" Severity="Success"
                          Title="{x:Bind ViewModel.UpdateTitle, Mode=OneWay}"
@@ -43,8 +43,8 @@
                     </InfoBar.ActionButton>
                     <InfoBar.Content>
                         <StackPanel Orientation="Horizontal" Spacing="4" Margin="-12,0,0,8">
-                            <HyperlinkButton Content="Novidades" Command="{x:Bind ViewModel.OpenReleasePageCommand}"/>
-                            <HyperlinkButton Content="Ignorar esta versão" Command="{x:Bind ViewModel.SkipUpdateCommand}"/>
+                            <HyperlinkButton Content="{x:Bind ViewModel.Texts.ReleaseNews, Mode=OneWay}" Command="{x:Bind ViewModel.OpenReleasePageCommand}"/>
+                            <HyperlinkButton Content="{x:Bind ViewModel.Texts.IgnoreUpdate, Mode=OneWay}" Command="{x:Bind ViewModel.SkipUpdateCommand}"/>
                         </StackPanel>
                     </InfoBar.Content>
                 </InfoBar>
@@ -114,15 +114,15 @@
                         <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center"
                                     Visibility="{x:Bind ViewModel.ShowEmpty, Mode=OneWay}">
                             <FontIcon Glyph="&#xE7F4;" FontSize="32" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                            <TextBlock Text="Nenhuma tela encontrada" HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <Button HorizontalAlignment="Center" Content="Tentar de novo" Command="{x:Bind ViewModel.RefreshCommand}"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.NoDisplays, Mode=OneWay}" HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <Button HorizontalAlignment="Center" Content="{x:Bind ViewModel.Texts.TryAgain, Mode=OneWay}" Command="{x:Bind ViewModel.RefreshCommand}"/>
                         </StackPanel>
 
                         <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-8,-12,0"
                                 Background="Transparent" BorderThickness="0" Padding="8"
                                 Command="{x:Bind ViewModel.RefreshCommand}"
-                                ToolTipService.ToolTip="Procurar telas de novo"
-                                AutomationProperties.Name="Atualizar telas">
+                                ToolTipService.ToolTip="{x:Bind ViewModel.Texts.RefreshDisplaysTooltip, Mode=OneWay}"
+                                AutomationProperties.Name="{x:Bind ViewModel.Texts.RefreshDisplaysName, Mode=OneWay}">
                             <FontIcon Glyph="&#xE72C;" FontSize="14"/>
                         </Button>
                     </Grid>
@@ -144,18 +144,18 @@
                         </StackPanel>
                         <ctk:Segmented x:Name="RoleSelector" Grid.Column="1" VerticalAlignment="Center"
                                        SelectedIndex="{x:Bind ViewModel.SelectedMonitor.RoleIndex, Mode=TwoWay}"
-                                       AutomationProperties.Name="O que esta tela faz">
-                            <ctk:SegmentedItem Content="Jogar aqui">
+                                       AutomationProperties.Name="{x:Bind ViewModel.Texts.RoleQuestion, Mode=OneWay}">
+                            <ctk:SegmentedItem Content="{x:Bind ViewModel.Texts.RolePlayHere, Mode=OneWay}">
                                 <ctk:SegmentedItem.Icon>
                                     <FontIcon Glyph="&#xE7FC;"/>
                                 </ctk:SegmentedItem.Icon>
                             </ctk:SegmentedItem>
-                            <ctk:SegmentedItem Content="Desligar">
+                            <ctk:SegmentedItem Content="{x:Bind ViewModel.Texts.RoleTurnOff, Mode=OneWay}">
                                 <ctk:SegmentedItem.Icon>
                                     <FontIcon Glyph="&#xE7E8;"/>
                                 </ctk:SegmentedItem.Icon>
                             </ctk:SegmentedItem>
-                            <ctk:SegmentedItem Content="Manter ligada">
+                            <ctk:SegmentedItem Content="{x:Bind ViewModel.Texts.RoleKeepOn, Mode=OneWay}">
                                 <ctk:SegmentedItem.Icon>
                                     <FontIcon Glyph="&#xE7F4;"/>
                                 </ctk:SegmentedItem.Icon>
@@ -193,7 +193,7 @@
                     <Button Height="40" Padding="14,0" Command="{x:Bind ViewModel.OpenSettingsCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE713;" FontSize="14"/>
-                            <TextBlock Text="Ajustes"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.Settings, Mode=OneWay}"/>
                         </StackPanel>
                     </Button>
                     <Button x:Name="PlayButton" Style="{StaticResource AccentButtonStyle}" Height="40" Padding="22,0" MinWidth="160"
@@ -211,34 +211,34 @@
         <!-- ───────────── First-run tour (coach marks on the real controls) ───────────── -->
         <TeachingTip Target="{x:Bind MonitorMap}" PreferredPlacement="Top" IsLightDismissEnabled="False"
                      IsOpen="{x:Bind ViewModel.IsTourMap, Mode=OneWay}"
-                     Title="1 de 3 · Suas telas"
+                     Title="{x:Bind ViewModel.Texts.TourMapTitle, Mode=OneWay}"
                      Subtitle="{x:Bind ViewModel.TourMapText, Mode=OneWay}"
-                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
-                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+                     ActionButtonContent="{x:Bind ViewModel.Texts.Next, Mode=OneWay}" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="{x:Bind ViewModel.Texts.SkipTour, Mode=OneWay}" Closed="{x:Bind ViewModel.OnTourTipClosed}">
             <TeachingTip.IconSource>
                 <FontIconSource Glyph="&#xE7F4;"/>
             </TeachingTip.IconSource>
         </TeachingTip>
         <TeachingTip Target="{x:Bind RoleSelector}" PreferredPlacement="Top" IsLightDismissEnabled="False"
                      IsOpen="{x:Bind ViewModel.IsTourRole, Mode=OneWay}"
-                     Title="2 de 3 · O que cada tela faz"
-                     Subtitle="Com uma tela selecionada, escolha aqui: jogar nela, desligar enquanto você joga ou deixar ligada. As desligadas voltam sozinhas quando você sai."
-                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
-                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+                     Title="{x:Bind ViewModel.Texts.TourRoleTitle, Mode=OneWay}"
+                     Subtitle="{x:Bind ViewModel.Texts.TourRoleDescription, Mode=OneWay}"
+                     ActionButtonContent="{x:Bind ViewModel.Texts.Next, Mode=OneWay}" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="{x:Bind ViewModel.Texts.SkipTour, Mode=OneWay}" Closed="{x:Bind ViewModel.OnTourTipClosed}">
             <TeachingTip.IconSource>
                 <FontIconSource Glyph="&#xE7E8;"/>
             </TeachingTip.IconSource>
         </TeachingTip>
         <TeachingTip Target="{x:Bind PlayButton}" PreferredPlacement="TopLeft" IsLightDismissEnabled="False"
                      IsOpen="{x:Bind ViewModel.IsTourPlay, Mode=OneWay}"
-                     Title="3 de 3 · Um clique para jogar"
-                     Subtitle="As telas trocam e o Big Picture abre na TV. Na primeira vez a TV pergunta se você está vendo a imagem; se ninguém responder em 15 s, tudo volta sozinho. Para sair, é só fechar o Big Picture."
-                     ActionButtonContent="Entendi" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     Title="{x:Bind ViewModel.Texts.TourPlayTitle, Mode=OneWay}"
+                     Subtitle="{x:Bind ViewModel.Texts.TourPlayDescription, Mode=OneWay}"
+                     ActionButtonContent="{x:Bind ViewModel.Texts.GotIt, Mode=OneWay}" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
                      Closed="{x:Bind ViewModel.OnTourTipClosed}">
             <TeachingTip.IconSource>
                 <FontIconSource Glyph="&#xE768;"/>
             </TeachingTip.IconSource>
-            <HyperlinkButton Content="Criar atalho na Área de Trabalho" Margin="-12,4,0,0"
+            <HyperlinkButton Content="{x:Bind ViewModel.Texts.CreateDesktopShortcut, Mode=OneWay}" Margin="-12,4,0,0"
                              Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
         </TeachingTip>
 
@@ -249,20 +249,20 @@
                     Background="{ThemeResource AccentFillColorDefaultBrush}">
                 <FontIcon Glyph="&#xE7FC;" FontSize="38" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
             </Border>
-            <TextBlock Text="Modo console ativo" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+            <TextBlock Text="{x:Bind ViewModel.Texts.ActiveTitle, Mode=OneWay}" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
             <TextBlock Text="{x:Bind ViewModel.ActiveDescText, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             <Button Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Height="40" Padding="22,0" Margin="0,8,0,0"
                     Command="{x:Bind ViewModel.RestoreNowCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xE7A7;" FontSize="14"/>
-                    <TextBlock Text="Restaurar agora" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind ViewModel.Texts.RestoreNow, Mode=OneWay}" FontWeight="SemiBold"/>
                 </StackPanel>
             </Button>
             <ProgressBar IsIndeterminate="True" Width="160" Visibility="{x:Bind ViewModel.IsRestoring, Mode=OneWay}"/>
             <TextBlock Style="{StaticResource CaptionTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap"
                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                       Text="Pode fechar esta janela: o Console Mode continua na bandeja."/>
+                       Text="{x:Bind ViewModel.Texts.RunningInTray, Mode=OneWay}"/>
         </StackPanel>
     </Grid>
 </UserControl>

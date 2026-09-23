@@ -19,7 +19,7 @@ public sealed class MonitorService
 
     public int InvokeMmt(params string[] args)
     {
-        if (!AppPaths.HasMmt) throw new InvalidOperationException($"MultiMonitorTool.exe não encontrado em {AppPaths.MmtPath}");
+        if (!AppPaths.HasMmt) throw new InvalidOperationException(LocalizationService.Get("MmtMissing", AppPaths.MmtPath));
         return ProcessRunner.Run(AppPaths.MmtPath, args);
     }
 
@@ -323,14 +323,14 @@ public sealed class MonitorService
         if (live.Count > 0) PersistModes(monitorName, live);
 
         var persisted = LoadPersistedModes().GetValueOrDefault(monitorName) ?? [];
-        var modes = MergeModes(live, persisted, " (cache)");
+        var modes = MergeModes(live, persisted, "CachedModeSuffix");
         if (modes.Count == 0)
         {
             modes = FallbackModes(monitor);
         }
         else if (live.Count == 0 && monitor is { IsActive: false })
         {
-            modes = MergeModes(modes, FallbackModes(monitor), " (estimado)");
+            modes = MergeModes(modes, FallbackModes(monitor), "EstimatedModeSuffix");
         }
 
         _modesCache[monitorName] = modes;
@@ -587,20 +587,18 @@ public sealed class MonitorService
         y = int.Parse(m.Groups[2].Value);
     }
 
-    private static DisplayModeOption ToOption(int width, int height, int frequency, string suffix = "")
-    {
-        var freqPart = frequency > 0 ? $" @ {frequency} Hz" : "";
-        return new DisplayModeOption
+    /// <param name="suffixKey">Catalog key of a suffix such as " (cache)"; resolved in the current language.</param>
+    private static DisplayModeOption ToOption(int width, int height, int frequency, string? suffixKey = null) =>
+        new DisplayModeOption
         {
             Width = width,
             Height = height,
             Frequency = frequency,
             Key = $"{width}x{height}@{frequency}",
-            Text = $"{width} x {height}{freqPart}{suffix}"
-        };
-    }
+            TextKey = suffixKey
+        }.RefreshText();
 
-    private static List<DisplayModeOption> MergeModes(List<DisplayModeOption> primary, List<DisplayModeOption> secondary, string secondarySuffix)
+    private static List<DisplayModeOption> MergeModes(List<DisplayModeOption> primary, List<DisplayModeOption> secondary, string secondarySuffixKey)
     {
         var merged = new List<DisplayModeOption>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -609,8 +607,9 @@ public sealed class MonitorService
             foreach (var mode in list)
             {
                 if (!seen.Add(mode.Key)) continue;
-                var suffix = list == secondary ? secondarySuffix : "";
-                merged.Add(ToOption(mode.Width, mode.Height, mode.Frequency, suffix));
+                // Primary entries keep their own suffix, e.g. "(cache)" survives a merge with estimates.
+                var suffixKey = list == secondary ? secondarySuffixKey : mode.TextKey;
+                merged.Add(ToOption(mode.Width, mode.Height, mode.Frequency, suffixKey));
             }
         }
         return [.. merged.OrderByDescending(m => m.Width).ThenByDescending(m => m.Height).ThenByDescending(m => m.Frequency)];
@@ -654,7 +653,7 @@ public sealed class MonitorService
                 if (w >= 2560 && rate > 165) continue;
                 var key = $"{w}x{h}@{rate}";
                 if (!seen.Add(key)) continue;
-                modes.Add(ToOption(w, h, rate, " (estimado)"));
+                modes.Add(ToOption(w, h, rate, "EstimatedModeSuffix"));
             }
         }
         return modes;

@@ -104,7 +104,7 @@ public static partial class UpdateService
     public static async Task ApplyAsync(UpdateInfo update, IProgress<double>? progress, CancellationToken ct = default)
     {
         if (update.AssetUrl is null || update.AssetName is null || update.AssetDigest is null)
-            throw new InvalidOperationException("Esta release não tem um arquivo verificável para este tipo de instalação.");
+            throw new InvalidOperationException(LocalizationService.Get("UpdateAssetMissing"));
 
         var dir = Path.Combine(Path.GetTempPath(), "ConsoleModeUpdate");
         Directory.CreateDirectory(dir);
@@ -113,7 +113,7 @@ public static partial class UpdateService
         if (!await UpdateIntegrity.VerifyFileAsync(file, update.AssetDigest, ct))
         {
             try { File.Delete(file); } catch { /* do not keep an untrusted update */ }
-            throw new InvalidDataException("O SHA-256 do arquivo baixado não corresponde ao digest publicado pelo GitHub.");
+            throw new InvalidDataException(LocalizationService.Get("UpdateHashMismatch"));
         }
         AppLog.Write($"Atualização {update.Version}: baixada e verificada em {file}");
 
@@ -131,7 +131,7 @@ public static partial class UpdateService
 
         // Portable: a running exe can't be overwritten, so a tiny script waits for us to exit,
         // swaps the file and starts the new version.
-        var exe = Environment.ProcessPath ?? throw new InvalidOperationException("Caminho do executável desconhecido.");
+        var exe = Environment.ProcessPath ?? throw new InvalidOperationException(LocalizationService.Get("UnknownExecutablePath"));
         var script = Path.Combine(dir, "swap.cmd");
         File.WriteAllText(script,
             "@echo off\r\n" +

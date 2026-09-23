@@ -2,6 +2,14 @@
 
 As notas são mantidas em português do Brasil. Antes de publicar uma versão, adicione abaixo uma seção `## [VERSÃO]` com o changelog daquela versão. O workflow publica somente a seção correspondente à tag.
 
+## [Não lançado]
+### Novidades
+- Interface em inglês (Estados Unidos), além do português do Brasil. O idioma é escolhido em Ajustes e muda na hora, sem reiniciar o aplicativo.
+
+### Correções
+- Os nomes das resoluções ("Não alterar", "(cache)", "(estimado)") e os botões Ativado/Desativado agora acompanham o idioma escolhido.
+- O aviso de nova versão mostra o primeiro item das novidades, e não mais o título "Novidades".
+
 ## [1.3.0]
 ### Novidades
 - Interface nativa para escolher em qual tela jogar e o que fazer com as demais.

@@ -18,10 +18,10 @@
             <Border Width="40" Height="40" CornerRadius="20" Background="{ThemeResource AccentFillColorDefaultBrush}">
                 <FontIcon Glyph="&#xE7F4;" FontSize="18" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
             </Border>
-            <TextBlock Text="Está vendo esta tela?" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
+            <TextBlock Text="{x:Bind Texts.ConfirmTitle, Mode=OneWay}" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
         </StackPanel>
         <TextBlock Grid.Row="1" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                   Text="Esta é a tela de jogo. Confirme com o mouse, o teclado ou o controle. Se ninguém responder, suas telas voltam ao normal sozinhas."/>
+                   Text="{x:Bind Texts.ConfirmDescription, Mode=OneWay}"/>
         <ProgressBar x:Name="CountdownBar" Grid.Row="2" Margin="0,8,0,0" Minimum="0"/>
         <TextBlock x:Name="CountdownText" Grid.Row="3" Style="{StaticResource CaptionTextBlockStyle}"
                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
@@ -32,14 +32,14 @@
                     <!-- Controller hint: B on Xbox, Circle on PlayStation. -->
                     <FontIcon x:Name="BackXboxGlyph" Glyph="&#xF094;" FontSize="16" Visibility="Collapsed"/>
                     <TextBlock x:Name="BackPsGlyph" Text="○" FontSize="16" VerticalAlignment="Center" Visibility="Collapsed"/>
-                    <TextBlock Text="Voltar ao normal" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind Texts.Revert, Mode=OneWay}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
             <Button x:Name="KeepButton" Style="{StaticResource AccentButtonStyle}" Click="OnKeep" Padding="12,6">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon x:Name="KeepXboxGlyph" Glyph="&#xF093;" FontSize="16" Visibility="Collapsed"/>
                     <TextBlock x:Name="KeepPsGlyph" Text="✕" FontSize="16" VerticalAlignment="Center" Visibility="Collapsed"/>
-                    <TextBlock Text="Sim, continuar" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind Texts.Continue, Mode=OneWay}" VerticalAlignment="Center" FontWeight="SemiBold"/>
                 </StackPanel>
             </Button>
         </StackPanel>

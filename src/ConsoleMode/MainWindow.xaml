@@ -22,11 +22,11 @@
                     VerticalAlignment="Center" Width="40" Height="36"
                     Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}"
                     Command="{x:Bind ViewModel.GoHomeCommand}"
-                    ToolTipService.ToolTip="Voltar" AutomationProperties.Name="Voltar"/>
+                    ToolTipService.ToolTip="{x:Bind ViewModel.Texts.Back, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.Texts.Back, Mode=OneWay}"/>
             <Grid x:Name="AppTitleBar" Grid.Column="1" Background="Transparent">
                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="12,0,0,0" VerticalAlignment="Center">
                     <Image x:Name="TitleIcon" Width="16" Height="16"/>
-                    <TextBlock Text="Console Mode" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind ViewModel.Texts.Brand, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Grid>

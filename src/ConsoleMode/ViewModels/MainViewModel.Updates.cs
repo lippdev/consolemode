@@ -11,6 +11,9 @@ namespace ConsoleMode.ViewModels;
 public partial class MainViewModel
 {
     private UpdateInfo? _update;
+    private UpdateStatusKind _updateStatusKind;
+
+    private enum UpdateStatusKind { InstallKind, Searching, Latest, Available, Failed }
 
     [ObservableProperty] private bool _checkUpdates = true;
     [ObservableProperty] private bool _startWithWindows;
@@ -22,16 +25,39 @@ public partial class MainViewModel
     [ObservableProperty] private bool _isCheckingUpdates;
     [ObservableProperty] private string _updateStatusText = "";
 
-    public string InstallKindText => AppPaths.IsInstalled
-        ? $"Versão {UpdateService.CurrentVersion} · instalada"
-        : $"Versão {UpdateService.CurrentVersion} · portátil";
+    public string InstallKindText => LocalizationService.Get(
+        AppPaths.IsInstalled ? "InstallKindInstalled" : "InstallKindPortable", UpdateService.CurrentVersion);
 
-    public string UpdateActionText => _update?.AssetUrl is null ? "Baixar" : "Atualizar agora";
+    public string UpdateActionText => LocalizationService.Get(_update?.AssetUrl is null ? "Download" : "UpdateNow");
 
     private void InitializeAppSettings()
     {
         StartWithWindows = StartupService.IsEnabled;
-        UpdateStatusText = InstallKindText;
+        _updateStatusKind = UpdateStatusKind.InstallKind;
+        RefreshUpdateStatusText();
+    }
+
+    private void RefreshUpdateStatusText()
+    {
+        UpdateStatusText = _updateStatusKind switch
+        {
+            UpdateStatusKind.InstallKind => InstallKindText,
+            UpdateStatusKind.Searching => LocalizationService.Get("SearchingUpdates"),
+            UpdateStatusKind.Latest => LocalizationService.Get("LatestVersionStatus", InstallKindText),
+            UpdateStatusKind.Available => LocalizationService.Get("UpdateAvailableStatus", InstallKindText, _update?.Version ?? ""),
+            UpdateStatusKind.Failed => LocalizationService.Get("UpdateCheckFailedStatus", InstallKindText),
+            _ => InstallKindText
+        };
+    }
+
+    private void RefreshUpdateStrings()
+    {
+        RefreshUpdateStatusText();
+        if (_update is null) return;
+        UpdateTitle = LocalizationService.Get("UpdateAvailableTitle", _update.Version,
+            _update.IsPrerelease ? LocalizationService.Get("BetaSuffix") : "");
+        UpdateMessage = FirstNoteLine(_update.Notes) ?? LocalizationService.Get("NewVersionOnGithub");
+        OnPropertyChanged(nameof(UpdateActionText));
     }
 
     partial void OnStartWithWindowsChanged(bool value)
@@ -44,7 +70,7 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             AppLog.Write($"Iniciar com o Windows: {ex}");
-            SetStatus($"Não foi possível mudar a inicialização com o Windows: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("StartupSettingError", ex.Message), InfoBarSeverity.Error);
         }
     }
 
@@ -64,25 +90,32 @@ public partial class MainViewModel
     {
         if (IsCheckingUpdates) return;
         IsCheckingUpdates = true;
-        if (manual) UpdateStatusText = "Procurando atualizações…";
+        if (manual)
+        {
+            _updateStatusKind = UpdateStatusKind.Searching;
+            RefreshUpdateStatusText();
+        }
         try
         {
             var update = await UpdateService.CheckAsync();
             if (update is null)
             {
-                UpdateStatusText = $"{InstallKindText} · você está na versão mais recente";
-                if (manual) SetStatus("O Console Mode está atualizado.", InfoBarSeverity.Success);
+                _updateStatusKind = UpdateStatusKind.Latest;
+                RefreshUpdateStatusText();
+                if (manual) SetStatus(LocalizationService.Get("AppUpToDate"), InfoBarSeverity.Success);
                 return;
             }
 
             AppLog.Write($"Atualização disponível: {update.Version} ({update.AssetName ?? "sem arquivo"})");
-            UpdateStatusText = $"{InstallKindText} · {update.Version} disponível";
+            _updateStatusKind = UpdateStatusKind.Available;
+            RefreshUpdateStatusText();
             if (!manual && string.Equals(update.Version, _loadedConfig.SkippedUpdateVersion, StringComparison.OrdinalIgnoreCase))
                 return;
 
             _update = update;
-            UpdateTitle = $"Console Mode {update.Version} disponível{(update.IsPrerelease ? " (beta)" : "")}";
-            UpdateMessage = FirstNoteLine(update.Notes) ?? "Tem uma versão nova no GitHub.";
+            UpdateTitle = LocalizationService.Get("UpdateAvailableTitle", update.Version,
+                update.IsPrerelease ? LocalizationService.Get("BetaSuffix") : "");
+            UpdateMessage = FirstNoteLine(update.Notes) ?? LocalizationService.Get("NewVersionOnGithub");
             OnPropertyChanged(nameof(UpdateActionText));
             IsUpdateOpen = true;
             if (manual) ShowPage(settings: false);
@@ -90,8 +123,9 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             AppLog.Write($"Atualizações: {ex.Message}");
-            UpdateStatusText = $"{InstallKindText} · não foi possível verificar agora";
-            if (manual) SetStatus($"Não foi possível procurar atualizações: {ex.Message}", InfoBarSeverity.Warning);
+            _updateStatusKind = UpdateStatusKind.Failed;
+            RefreshUpdateStatusText();
+            if (manual) SetStatus(LocalizationService.Get("UpdateSearchFailure", ex.Message), InfoBarSeverity.Warning);
         }
         finally
         {
@@ -106,7 +140,7 @@ public partial class MainViewModel
         if (IsConsoleActive)
         {
             // The app restarts during an update; never leave the desk screens off.
-            SetStatus("Saia do modo console antes de atualizar.", InfoBarSeverity.Warning);
+            SetStatus(LocalizationService.Get("ExitConsoleBeforeUpdate"), InfoBarSeverity.Warning);
             return;
         }
         if (_update.AssetUrl is null)
@@ -127,7 +161,7 @@ public partial class MainViewModel
         catch (Exception ex)
         {
             AppLog.Write($"Atualização: {ex}");
-            SetStatus($"Não foi possível atualizar: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("UpdateFailure", ex.Message), InfoBarSeverity.Error);
             IsUpdating = false;
         }
     }
@@ -137,7 +171,7 @@ public partial class MainViewModel
     {
         var url = _update?.PageUrl ?? $"https://github.com/{UpdateService.Repository}/releases";
         try { Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true }); }
-        catch (Exception ex) { SetStatus($"Não foi possível abrir o navegador: {ex.Message}", InfoBarSeverity.Error); }
+        catch (Exception ex) { SetStatus(LocalizationService.Get("BrowserOpenFailure", ex.Message), InfoBarSeverity.Error); }
     }
 
     [RelayCommand]
@@ -150,11 +184,19 @@ public partial class MainViewModel
         IsUpdateOpen = false;
     }
 
+    /// <summary>
+    /// First real line of the release notes (skipping "## Novidades"-style headings). Notes are
+    /// written in pt-BR only (CHANGELOG.md), so other languages get the generic message instead.
+    /// </summary>
     private static string? FirstNoteLine(string notes)
     {
+        if (!string.Equals(LocalizationService.Language, LocalizationService.PortugueseBrazil, StringComparison.Ordinal))
+            return null;
         foreach (var raw in notes.Split('\n'))
         {
-            var line = raw.Trim().TrimStart('#', '-', '*', ' ').Trim();
+            var trimmed = raw.Trim();
+            if (trimmed.Length == 0 || trimmed.StartsWith('#')) continue;
+            var line = trimmed.TrimStart('-', '*', ' ').Replace("**", "").Trim();
             if (line.Length > 0) return line.Length > 140 ? line[..140] + "…" : line;
         }
         return null;

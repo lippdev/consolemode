@@ -33,7 +33,7 @@ public static class StartupService
         using var key = Registry.CurrentUser.CreateSubKey(RunKey, writable: true);
         if (enabled)
         {
-            var exe = Environment.ProcessPath ?? throw new InvalidOperationException("Caminho do executável desconhecido.");
+            var exe = Environment.ProcessPath ?? throw new InvalidOperationException(LocalizationService.Get("UnknownExecutablePath"));
             key.SetValue(ValueName, $"\"{exe}\" {TrayArgument}");
         }
         else

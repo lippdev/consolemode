@@ -11,6 +11,10 @@ public sealed class TrayService : IDisposable
     private readonly TaskbarIcon _icon;
     private readonly Window _window;
     private readonly MainViewModel _vm;
+    private readonly MenuFlyoutItem _showItem = new();
+    private readonly MenuFlyoutItem _startItem = new();
+    private readonly MenuFlyoutItem _restoreItem = new();
+    private readonly MenuFlyoutItem _exitItem = new();
 
     public TrayService(Window window, MainViewModel vm)
     {
@@ -26,17 +30,17 @@ public sealed class TrayService : IDisposable
             _icon.IconSource = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
 
         var menu = new MenuFlyout();
-        var show = new MenuFlyoutItem { Text = "Mostrar janela" };
-        show.Click += (_, _) => ShowWindow();
-        var start = new MenuFlyoutItem { Text = "Entrar no modo console" };
-        start.Click += async (_, _) =>
+        _showItem.Text = LocalizationService.Get("ShowWindow");
+        _showItem.Click += (_, _) => ShowWindow();
+        _startItem.Text = LocalizationService.Get("TrayEnterConsole");
+        _startItem.Click += async (_, _) =>
         {
             if (!await _vm.TryAutoStartAsync()) ShowWindow();
         };
-        var restore = new MenuFlyoutItem { Text = "Restaurar setup" };
-        restore.Click += async (_, _) => await _vm.RestoreNowAsync();
-        var exit = new MenuFlyoutItem { Text = "Sair" };
-        exit.Click += (_, _) =>
+        _restoreItem.Text = LocalizationService.Get("RestoreSetup");
+        _restoreItem.Click += async (_, _) => await _vm.RestoreNowAsync();
+        _exitItem.Text = LocalizationService.Get("Exit");
+        _exitItem.Click += (_, _) =>
         {
             if (_vm.IsConsoleActive)
             {
@@ -50,13 +54,14 @@ public sealed class TrayService : IDisposable
                 Application.Current.Exit();
             }
         };
-        menu.Items.Add(show);
-        menu.Items.Add(start);
-        menu.Items.Add(restore);
+        menu.Items.Add(_showItem);
+        menu.Items.Add(_startItem);
+        menu.Items.Add(_restoreItem);
         menu.Items.Add(new MenuFlyoutSeparator());
-        menu.Items.Add(exit);
+        menu.Items.Add(_exitItem);
         _icon.ContextFlyout = menu;
         _icon.LeftClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(ShowWindow);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
         try
         {
             _icon.ForceCreate();
@@ -77,5 +82,17 @@ public sealed class TrayService : IDisposable
         });
     }
 
-    public void Dispose() => _icon.Dispose();
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        _showItem.Text = LocalizationService.Get("ShowWindow");
+        _startItem.Text = LocalizationService.Get("TrayEnterConsole");
+        _restoreItem.Text = LocalizationService.Get("RestoreSetup");
+        _exitItem.Text = LocalizationService.Get("Exit");
+    }
+
+    public void Dispose()
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
+        _icon.Dispose();
+    }
 }
