@@ -35,7 +35,22 @@ foreach ($tool in $sources) {
 
     $zipPath = Join-Path $tempDir $tool.Zip
     Write-Host "Baixando $($tool.Name)..."
-    Invoke-WebRequest -Uri $tool.Url -OutFile $zipPath -UseBasicParsing
+    $ua = @{ "User-Agent" = "Mozilla/5.0 ConsoleMode-build" }
+    $downloaded = $false
+    foreach ($attempt in 1..3) {
+        try {
+            Invoke-WebRequest -Uri $tool.Url -OutFile $zipPath -UseBasicParsing -Headers $ua
+            $downloaded = $true
+            break
+        }
+        catch {
+            if ($attempt -eq 3) { throw }
+            Start-Sleep -Seconds (2 * $attempt)
+        }
+    }
+    if (-not $downloaded) {
+        throw "Falha ao baixar $($tool.Name)"
+    }
 
     $extractDir = Join-Path $tempDir ($tool.Name -replace '\.exe$', '')
     Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir -Force

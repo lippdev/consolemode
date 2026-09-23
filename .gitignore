@@ -9,6 +9,7 @@ monitor_modes_cache.json
 
 # Build
 dist/
+artifacts/
 build/ps2exe.ps1
 
 # Ferramentas NirSoft (baixadas pelo build ou colocadas localmente em dev)
@@ -37,6 +38,14 @@ build/Restore-SetupNow.ps1
 .idea/
 Thumbs.db
 Desktop.ini
+*.user
+*.suo
+
+# .NET / WinUI
+bin/
+obj/
+src/**/bin/
+src/**/obj/
 
 # Remotion explainer
 docs/explainer/node_modules/

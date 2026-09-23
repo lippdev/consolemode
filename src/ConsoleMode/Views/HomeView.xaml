@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="ConsoleMode.Views.HomeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ConsoleMode.ViewModels"
+    xmlns:controls="using:ConsoleMode.Controls"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls">
+
+    <Grid MaxWidth="{StaticResource PageMaxWidth}" Padding="36,4,36,28">
+
+        <!-- ───────────── Idle: choose screens, then play ───────────── -->
+        <Grid RowSpacing="16" Visibility="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Spacing="12">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Onde você vai jogar?" Style="{StaticResource TitleTextBlockStyle}"/>
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                               Text="Clique numa tela e escolha o que ela faz. As que desligam voltam sozinhas quando você sai do jogo."/>
+                </StackPanel>
+                <InfoBar IsOpen="{x:Bind ViewModel.IsUpdateOpen, Mode=TwoWay}" Severity="Success"
+                         Title="{x:Bind ViewModel.UpdateTitle, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}">
+                    <InfoBar.IconSource>
+                        <FontIconSource Glyph="&#xE896;"/>
+                    </InfoBar.IconSource>
+                    <InfoBar.ActionButton>
+                        <Button Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.ApplyUpdateCommand}"
+                                IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{x:Bind ViewModel.UpdateActionText, Mode=OneWay}"/>
+                                <ProgressRing Width="14" Height="14" IsActive="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+                                              Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+                                              Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                            </StackPanel>
+                        </Button>
+                    </InfoBar.ActionButton>
+                    <InfoBar.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="-12,0,0,8">
+                            <HyperlinkButton Content="Novidades" Command="{x:Bind ViewModel.OpenReleasePageCommand}"/>
+                            <HyperlinkButton Content="Ignorar esta versão" Command="{x:Bind ViewModel.SkipUpdateCommand}"/>
+                        </StackPanel>
+                    </InfoBar.Content>
+                </InfoBar>
+                <InfoBar IsOpen="{x:Bind ViewModel.IsStatusOpen, Mode=TwoWay}"
+                         Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.StatusText, Mode=OneWay}"/>
+            </StackPanel>
+
+            <!-- Screen map card -->
+            <Border Grid.Row="1" CornerRadius="8" BorderThickness="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid MinHeight="250" Padding="24,20">
+                        <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
+
+                        <!-- Screens drawn where they sit on the desktop, like Windows display settings. -->
+                        <ItemsControl x:Name="MonitorMap" ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.ShowTiles, Mode=OneWay}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <controls:MonitorLayoutPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MonitorRowViewModel">
+                                    <Grid Width="{x:Bind TileWidth, Mode=OneWay}" Height="{x:Bind TileHeight, Mode=OneWay}">
+                                        <Button Style="{StaticResource MonitorTileButton}"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                Opacity="{x:Bind TileOpacity, Mode=OneWay}"
+                                                Background="{x:Bind TileBackground, Mode=OneWay}"
+                                                BorderBrush="{x:Bind TileBorder, Mode=OneWay}"
+                                                Click="{x:Bind Select}"
+                                                DoubleTapped="{x:Bind MakeFocus}"
+                                                AutomationProperties.Name="{x:Bind Name}"
+                                                ToolTipService.ToolTip="{x:Bind Title}">
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
+                                                <FontIcon Glyph="{x:Bind RoleGlyph, Mode=OneWay}" FontSize="18"
+                                                          Foreground="{x:Bind TileForeground, Mode=OneWay}"/>
+                                                <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" TextAlignment="Center"
+                                                           TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"
+                                                           Foreground="{x:Bind TileForeground, Mode=OneWay}"/>
+                                                <TextBlock Text="{x:Bind RoleLabel, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                           TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                           Foreground="{x:Bind TileSecondaryForeground, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Rectangle RadiusX="6" RadiusY="6" StrokeThickness="1.5" StrokeDashArray="3,2"
+                                                   Stroke="{ThemeResource TextFillColorTertiaryBrush}" IsHitTestVisible="False"
+                                                   Visibility="{x:Bind IsOff}"/>
+                                        <Border CornerRadius="9" BorderThickness="2" Margin="-4" IsHitTestVisible="False"
+                                                BorderBrush="{ThemeResource TextFillColorPrimaryBrush}"
+                                                Visibility="{x:Bind IsSelected, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Visibility="{x:Bind ViewModel.ShowEmpty, Mode=OneWay}">
+                            <FontIcon Glyph="&#xE7F4;" FontSize="32" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                            <TextBlock Text="Nenhuma tela encontrada" HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <Button HorizontalAlignment="Center" Content="Tentar de novo" Command="{x:Bind ViewModel.RefreshCommand}"/>
+                        </StackPanel>
+
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-8,-12,0"
+                                Background="Transparent" BorderThickness="0" Padding="8"
+                                Command="{x:Bind ViewModel.RefreshCommand}"
+                                ToolTipService.ToolTip="Procurar telas de novo"
+                                AutomationProperties.Name="Atualizar telas">
+                            <FontIcon Glyph="&#xE72C;" FontSize="14"/>
+                        </Button>
+                    </Grid>
+
+                    <!-- Selected screen: what it does while you play -->
+                    <Grid Grid.Row="1" Padding="20,14" ColumnSpacing="16"
+                          BorderThickness="0,1,0,0" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          Visibility="{x:Bind ViewModel.HasSelectedMonitor, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind ViewModel.SelectedMonitor.Name, Mode=OneWay}"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{x:Bind ViewModel.SelectedMonitor.Details, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ctk:Segmented x:Name="RoleSelector" Grid.Column="1" VerticalAlignment="Center"
+                                       SelectedIndex="{x:Bind ViewModel.SelectedMonitor.RoleIndex, Mode=TwoWay}"
+                                       AutomationProperties.Name="O que esta tela faz">
+                            <ctk:SegmentedItem Content="Jogar aqui">
+                                <ctk:SegmentedItem.Icon>
+                                    <FontIcon Glyph="&#xE7FC;"/>
+                                </ctk:SegmentedItem.Icon>
+                            </ctk:SegmentedItem>
+                            <ctk:SegmentedItem Content="Desligar">
+                                <ctk:SegmentedItem.Icon>
+                                    <FontIcon Glyph="&#xE7E8;"/>
+                                </ctk:SegmentedItem.Icon>
+                            </ctk:SegmentedItem>
+                            <ctk:SegmentedItem Content="Manter ligada">
+                                <ctk:SegmentedItem.Icon>
+                                    <FontIcon Glyph="&#xE7F4;"/>
+                                </ctk:SegmentedItem.Icon>
+                            </ctk:SegmentedItem>
+                        </ctk:Segmented>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Summary + primary action -->
+            <Grid Grid.Row="2" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind ViewModel.SummaryTitle, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"
+                               TextWrapping="Wrap"/>
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.SummaryItems, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="6"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Style="{StaticResource ChipBorder}">
+                                    <TextBlock Text="{x:Bind}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Height="40" Padding="14,0" Command="{x:Bind ViewModel.OpenSettingsCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE713;" FontSize="14"/>
+                            <TextBlock Text="Ajustes"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="PlayButton" Style="{StaticResource AccentButtonStyle}" Height="40" Padding="22,0" MinWidth="160"
+                            Command="{x:Bind ViewModel.StartCommand}"
+                            IsEnabled="{x:Bind ViewModel.CanStart, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE768;" FontSize="14"/>
+                            <TextBlock Text="{x:Bind ViewModel.StartButtonText, Mode=OneWay}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- ───────────── First-run tour (coach marks on the real controls) ───────────── -->
+        <TeachingTip Target="{x:Bind MonitorMap}" PreferredPlacement="Top" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourMap, Mode=OneWay}"
+                     Title="1 de 3 · Suas telas"
+                     Subtitle="{x:Bind ViewModel.TourMapText, Mode=OneWay}"
+                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE7F4;"/>
+            </TeachingTip.IconSource>
+        </TeachingTip>
+        <TeachingTip Target="{x:Bind RoleSelector}" PreferredPlacement="Top" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourRole, Mode=OneWay}"
+                     Title="2 de 3 · O que cada tela faz"
+                     Subtitle="Com uma tela selecionada, escolha aqui: jogar nela, desligar enquanto você joga ou deixar ligada. As desligadas voltam sozinhas quando você sai."
+                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE7E8;"/>
+            </TeachingTip.IconSource>
+        </TeachingTip>
+        <TeachingTip Target="{x:Bind PlayButton}" PreferredPlacement="TopLeft" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourPlay, Mode=OneWay}"
+                     Title="3 de 3 · Um clique para jogar"
+                     Subtitle="As telas trocam e o Big Picture abre na TV. Na primeira vez a TV pergunta se você está vendo a imagem; se ninguém responder em 15 s, tudo volta sozinho. Para sair, é só fechar o Big Picture."
+                     ActionButtonContent="Entendi" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE768;"/>
+            </TeachingTip.IconSource>
+            <HyperlinkButton Content="Criar atalho na Área de Trabalho" Margin="-12,4,0,0"
+                             Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
+        </TeachingTip>
+
+        <!-- ───────────── Active: one way back ───────────── -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" MaxWidth="460"
+                    Visibility="{x:Bind ViewModel.IsConsoleActive, Mode=OneWay}">
+            <Border Width="88" Height="88" CornerRadius="44" HorizontalAlignment="Center"
+                    Background="{ThemeResource AccentFillColorDefaultBrush}">
+                <FontIcon Glyph="&#xE7FC;" FontSize="38" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+            </Border>
+            <TextBlock Text="Modo console ativo" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+            <TextBlock Text="{x:Bind ViewModel.ActiveDescText, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            <Button Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Height="40" Padding="22,0" Margin="0,8,0,0"
+                    Command="{x:Bind ViewModel.RestoreNowCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE7A7;" FontSize="14"/>
+                    <TextBlock Text="Restaurar agora" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
+            <ProgressBar IsIndeterminate="True" Width="160" Visibility="{x:Bind ViewModel.IsRestoring, Mode=OneWay}"/>
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                       Text="Pode fechar esta janela: o Console Mode continua na bandeja."/>
+        </StackPanel>
+    </Grid>
+</UserControl>

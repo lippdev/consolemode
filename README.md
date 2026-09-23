@@ -14,7 +14,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## Features
 
-- Guided setup wizard (monitors → mode → audio → launch)
+- **One-click home screen**: pick the screen you play on, hit **Enter console mode**
+- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight to console mode from the tray
 - Hide spare displays by **disconnect**, **black overlays**, or **DDC/CI**
 - Optional **resolution & refresh rate** per monitor for console mode
 - Launch **Steam Big Picture**, **Playnite fullscreen**, or **Xbox** (Win+F11)
@@ -22,7 +23,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 - Optional global **FPS limit** via RivaTuner (RTSS)
 - Audio routing, including “use output when connected” (e.g. TV HDMI)
 - System tray icon to restore your desktop layout or reopen the app
-- Portable executable — no installer required
+- Portable **single-file** executable — copy one `.exe`, no installer
+- Native **C# / WinUI 3** app (Windows App SDK), unpackaged and self-contained
 
 ## Requirements
 
@@ -35,12 +37,30 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## How to use
 
-1. Download `ConsoleMode.exe` from the [latest release](https://github.com/lippdev/consolemode/releases)
-2. Run it — on first launch it creates a `ConsoleMode_Data/` folder next to the executable
-3. Follow the wizard and click **Start console mode**
+1. Download from [Releases](https://github.com/lippdev/consolemode/releases):
+   - **`ConsoleMode-Setup-x64.exe`** (recommended) — per-user install, no admin, Start menu entry, optional one-click desktop shortcut and start with Windows; data in `%LOCALAPPDATA%\ConsoleMode`
+   - **`ConsoleMode-Portable-x64.exe`** — a single exe that keeps its data in `ConsoleMode_Data\` next to it
+2. On first launch a short tour shows the screen map: pick the screen you play on (the others turn off)
+3. From then on it is one click: **Jogar agora**, or the **Modo Console** desktop shortcut (Settings → Criar atalho). The first time with a new game screen, the TV asks "Está vendo esta tela?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
 4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
+5. New versions are announced in the app from GitHub Releases (installed: updates silently; portable: swaps the exe)
 
-> **Antivirus note:** some scanners may flag the packaged executable. The source code is available in this repository for review.
+> **Antivirus note:** some scanners may flag bundled helper tools. The source code is available in this repository for review.
+
+## Build from source (Windows)
+
+Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Windows application development** workload, or the .NET 8 SDK plus the Windows App SDK.
+
+```powershell
+# Downloads MultiMonitorTool / SoundVolumeView / rtss-cli, then builds both packages
+.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
+```
+
+Output: `dist\ConsoleMode-Portable-x64.exe` and `dist\ConsoleMode-Setup-x64.exe` (the installer needs [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Open `ConsoleMode.sln` to debug.
+
+To release, push a tag like `v1.3.0` (or `v1.3.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
+
+The previous PowerShell + WPF implementation is archived under `legacy/` and is not used by the WinUI app.
 
 ## Modes and restore
 
@@ -72,7 +92,7 @@ Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requi
 - Xbox mode does not detect when fullscreen ends — restore manually
 - Monitor and audio switching rely on bundled [NirSoft](https://www.nirsoft.net/) tools
 - The FPS limit is global (RTSS limitation), not per display
-- Packaged builds may be flagged by antivirus software
+- The WinUI 3 build currently requires Windows to compile (`net8.0-windows`)
 
 ## Troubleshooting
 
@@ -108,7 +128,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ### Funcionalidades
 
-- Assistente guiado (monitores → modo → áudio → iniciar)
+- **Tela inicial de 1 clique**: escolha a tela onde você joga e clique em **Entrar no modo console**
+- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, pela bandeja
 - Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
 - **Resolução e Hz** opcionais por monitor no modo console
 - Abrir **Steam Big Picture**, **Playnite em tela cheia** ou **Modo Xbox** (Win+F11)
@@ -116,7 +137,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 - **Limite de FPS** opcional via RivaTuner (RTSS)
 - Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
 - Ícone na bandeja para restaurar o layout ou reabrir o app
-- Executável portátil — sem instalador
+- Executável portátil em **um único `.exe`** — sem instalador
+- App nativo **C# / WinUI 3** (Windows App SDK), sem MSIX e self-contained
 
 ### Requisitos
 
@@ -129,12 +151,29 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ### Como usar
 
-1. Baixe `ConsoleMode.exe` na [última release](https://github.com/lippdev/consolemode/releases)
-2. Execute — na primeira vez cria a pasta `ConsoleMode_Data/` ao lado do executável
-3. Siga o assistente e clique em **Iniciar modo console**
+1. Baixe em [Releases](https://github.com/lippdev/consolemode/releases):
+   - **`ConsoleMode-Setup-x64.exe`** (recomendado) — instala por usuário, sem admin, com menu Iniciar e, se quiser, atalho de 1 clique e iniciar com o Windows; dados em `%LOCALAPPDATA%\ConsoleMode`
+   - **`ConsoleMode-Portable-x64.exe`** — um único exe que guarda os dados em `ConsoleMode_Data\` ao lado dele
+2. Na primeira vez, um tour curto mostra o mapa das telas: escolha a tela onde você joga (as outras desligam)
+3. Depois é 1 clique: **Jogar agora**, ou o atalho **Modo Console** na Área de Trabalho (Ajustes → Criar atalho). Na primeira vez com uma tela de jogo nova, a TV pergunta "Está vendo esta tela?" e tudo volta sozinho se ninguém responder (mouse, teclado ou controle de Xbox/PlayStation)
 4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
+5. O app avisa das versões novas pelas releases do GitHub (instalado: atualiza sozinho; portátil: troca o exe)
 
-> **Antivírus:** alguns scanners podem sinalizar o executável empacotado. O código-fonte está neste repositório para auditoria.
+> **Antivírus:** alguns scanners podem sinalizar as ferramentas auxiliares. O código-fonte está neste repositório para auditoria.
+
+### Compilar no Windows
+
+Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
+
+```powershell
+.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
+```
+
+Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (o instalador precisa do [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Abra `ConsoleMode.sln` para depurar.
+
+Para lançar uma versão, faça push de uma tag como `v1.3.0` (ou `v1.3.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
+
+A implementação antiga em PowerShell + WPF ficou em `legacy/` e não é usada pelo app WinUI.
 
 ### Modos e restauração
 
@@ -166,7 +205,7 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 - O Modo Xbox não detecta o fim do fullscreen — restaure manualmente
 - Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
-- Builds empacotados podem ser sinalizados por antivírus
+- O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
 
 ### Licença
 

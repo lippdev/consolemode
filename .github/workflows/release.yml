@@ -1,0 +1,80 @@
+name: Release
+
+# Push a tag like v1.3.0 (stable) or v1.3.0-beta.2 (pre-release) to publish a release.
+# The app's update check (UpdateService) reads these releases and looks for the
+# ConsoleMode-Setup-*.exe / ConsoleMode-Portable-*.exe assets built here.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build without publishing (e.g. 1.3.0-beta.2)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          $v = if ($env:EVENT_NAME -eq "push") { $env:REF_NAME } else { $env:INPUT_VERSION }
+          $v = $v.TrimStart("v")
+          if ($v -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.\-]+)?$') { throw "Versão inválida: $v" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
+      - name: Install Inno Setup (if missing)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build portable + installer
+        shell: pwsh
+        run: .\build\Publish-ConsoleMode.ps1 -Runtime x64 -Target All -Version "${{ steps.version.outputs.version }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsoleMode-${{ steps.version.outputs.version }}
+          path: |
+            dist/ConsoleMode-Setup-x64.exe
+            dist/ConsoleMode-Portable-x64.exe
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Console Mode ${{ steps.version.outputs.version }}
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            dist/ConsoleMode-Setup-x64.exe
+            dist/ConsoleMode-Portable-x64.exe
+          body: |
+            **Instalador (recomendado):** `ConsoleMode-Setup-x64.exe` — instala por usuário, sem admin, com atalho de 1 clique e opção de iniciar com o Windows.
+            **Portátil:** `ConsoleMode-Portable-x64.exe` — um único .exe; guarda a config em `ConsoleMode_Data` ao lado dele.
+
+            O app avisa sozinho quando sai uma versão nova.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

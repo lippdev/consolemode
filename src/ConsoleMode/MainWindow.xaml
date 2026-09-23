@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="ConsoleMode.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:views="using:ConsoleMode.Views"
+    Title="Console Mode">
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title bar: the back button sits outside the drag region so it stays clickable. -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Style="{StaticResource NavigationBackButtonNormalStyle}" Margin="4,0,0,0"
+                    VerticalAlignment="Center" Width="40" Height="36"
+                    Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}"
+                    Command="{x:Bind ViewModel.GoHomeCommand}"
+                    ToolTipService.ToolTip="Voltar" AutomationProperties.Name="Voltar"/>
+            <Grid x:Name="AppTitleBar" Grid.Column="1" Background="Transparent">
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="12,0,0,0" VerticalAlignment="Center">
+                    <Image x:Name="TitleIcon" Width="16" Height="16"/>
+                    <TextBlock Text="Console Mode" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <views:HomeView Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}">
+                <views:HomeView.Transitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
+                    </TransitionCollection>
+                </views:HomeView.Transitions>
+            </views:HomeView>
+            <views:SettingsView Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}">
+                <views:SettingsView.Transitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>
+                    </TransitionCollection>
+                </views:SettingsView.Transitions>
+            </views:SettingsView>
+        </Grid>
+    </Grid>
+</Window>

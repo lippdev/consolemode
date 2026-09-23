@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="ConsoleMode.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="{StaticResource PageMaxWidth}" Padding="36,4,36,36" Spacing="4">
+            <TextBlock Text="Ajustes" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,4"/>
+            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                       Text="Tudo é salvo na hora. As telas se escolhem na tela inicial."/>
+            <InfoBar IsOpen="{x:Bind ViewModel.IsStatusOpen, Mode=TwoWay}" Margin="0,8,0,0"
+                     Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"
+                     Message="{x:Bind ViewModel.StatusText, Mode=OneWay}"/>
+
+            <!-- Game screen -->
+            <TextBlock Text="Tela de jogo" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Resolução e taxa de atualização"
+                              Description="{x:Bind ViewModel.FocusModeDescription, Mode=OneWay}"
+                              IsEnabled="{x:Bind ViewModel.HasFocusRow, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7F4;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.FocusRow.Modes, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.FocusRow.SelectedMode, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Como desligar as outras telas"
+                              Description="Desconectar é o mais rápido. A tela preta não mexe no layout; DDC/CI apaga o painel pelo hardware.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.HideStrategies, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedHideStrategy, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+
+            <!-- On entering -->
+            <TextBlock Text="Ao entrar no modo console" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Abrir" Description="{x:Bind ViewModel.LaunchDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.LaunchOptions, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedLaunch, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Saída de áudio" Description="{x:Bind ViewModel.AudioHintText, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE767;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220" MaxWidth="300"
+                          ItemsSource="{x:Bind ViewModel.AudioOptions, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedAudio, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+
+            <!-- Optional extras -->
+            <TextBlock Text="Extras opcionais" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="HDR na tela de jogo" Description="Liga ao entrar e volta como estava ao sair.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE706;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.HdrEnable, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Taxa de atualização variável (VRR)"
+                              Description="Liga o ajuste do Windows. Ative também no painel da NVIDIA/AMD.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE916;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.VrrEnable, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Limite de FPS" Description="{x:Bind ViewModel.FpsStatusText, Mode=OneWay}"
+                              IsEnabled="{x:Bind ViewModel.IsFpsAvailable, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xEC4A;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Width="72" PlaceholderText="FPS"
+                             Visibility="{x:Bind ViewModel.ShowCustomFps, Mode=OneWay}"
+                             Text="{x:Bind ViewModel.CustomFpsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox MinWidth="160"
+                              ItemsSource="{x:Bind ViewModel.FpsOptions, Mode=OneWay}"
+                              SelectedItem="{x:Bind ViewModel.SelectedFps, Mode=TwoWay}"
+                              DisplayMemberPath="Text"/>
+                </StackPanel>
+            </ctk:SettingsCard>
+
+            <!-- App -->
+            <TextBlock Text="App" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Iniciar com o Windows" Description="Abre direto na bandeja ao ligar o PC, pronto para o atalho de 1 clique.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE770;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Atualizações" Description="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE895;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ProgressRing Width="18" Height="18" IsActive="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"/>
+                    <Button Content="Procurar agora" Command="{x:Bind ViewModel.CheckNowCommand}"/>
+                </StackPanel>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Avisar quando sair versão nova" Description="Consulta as releases no GitHub ao abrir o app.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xEA8F;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.CheckUpdates, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+
+            <!-- Shortcut, help & data -->
+            <TextBlock Text="Atalho, ajuda e dados" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Confirmação na TV"
+                              Description="Na primeira vez com uma tela de jogo nova, a TV pergunta se você está vendo a imagem. Responde com mouse, teclado ou controle (Xbox: A/B · PlayStation: ✕/○). Teste aqui sem mexer nas telas.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="Testar agora" Command="{x:Bind ViewModel.TestConfirmCommand}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Tutorial" Description="Mostra de novo o passo a passo da tela inicial.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE897;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="Ver de novo" Command="{x:Bind ViewModel.StartTourCommand}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Atalho de 1 clique"
+                              Description="Cria &quot;Modo Console&quot; na Área de Trabalho. Ele entra no modo console direto, sem abrir esta janela.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE71B;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="Criar atalho" Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Pasta de dados" Description="Configuração, backup das telas e o log (consolemode.log)."
+                              IsClickEnabled="True" Command="{x:Bind ViewModel.OpenDataFolderCommand}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8B7;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ctk:SettingsCard.ActionIcon>
+                    <FontIcon Glyph="&#xE8A7;"/>
+                </ctk:SettingsCard.ActionIcon>
+            </ctk:SettingsCard>
+
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Margin="1,16,0,0"
+                       Foreground="{ThemeResource TextFillColorTertiaryBrush}">
+                <Run Text="Console Mode"/>
+                <Run Text="{x:Bind ViewModel.AppVersion}"/>
+            </TextBlock>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
