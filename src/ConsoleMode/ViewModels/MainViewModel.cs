@@ -1,11 +1,15 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ConsoleMode.Models;
 using ConsoleMode.Services;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml.Controls;
 
 namespace ConsoleMode.ViewModels;
 
@@ -15,13 +19,15 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<MonitorRowViewModel> Monitors { get; } = [];
     public ObservableCollection<ComboOption> HideStrategies { get; } = [];
+    public ObservableCollection<ComboOption> LaunchOptions { get; } = [];
     public ObservableCollection<ComboOption> FpsOptions { get; } = [];
     public ObservableCollection<ComboOption> AudioOptions { get; } = [];
+    public ObservableCollection<string> SummaryItems { get; } = [];
 
     private static readonly int[] FpsPresets = [30, 48, 50, 59, 60, 72, 75, 90, 120, 144];
     private const int FpsCustomValue = -1;
-    private const double LayoutMaxWidth = 760;
-    private const double LayoutMaxHeight = 200;
+    private const double LayoutMaxWidth = 720;
+    private const double LayoutMaxHeight = 220;
     private const double TileInset = 3;
 
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
@@ -34,40 +40,51 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isHomePage = true;
     [ObservableProperty] private bool _isSettingsPage;
-    [ObservableProperty] private bool _isFirstRun;
+    [ObservableProperty] private bool _isWelcomeOpen;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _hasMonitors;
     [ObservableProperty] private bool _isConsoleActive;
     [ObservableProperty] private bool _isStarting;
-    [ObservableProperty] private string _statusText = "Pronto.";
-    [ObservableProperty] private bool _statusIsWarning;
-    [ObservableProperty] private string _summaryText = "";
+    [ObservableProperty] private bool _isRestoring;
+    [ObservableProperty] private bool _isStatusOpen;
+    [ObservableProperty] private string _statusText = "";
+    [ObservableProperty] private InfoBarSeverity _statusSeverity = InfoBarSeverity.Informational;
+    [ObservableProperty] private string _summaryTitle = "";
     [ObservableProperty] private string _activeDescText = "";
-    [ObservableProperty] private string _playniteDesc = "Abre o Playnite em tela cheia na tela de jogo. Restauração automática ao sair.";
     [ObservableProperty] private bool _isPlayniteAvailable = true;
     [ObservableProperty] private string _fpsStatusText = "";
-    [ObservableProperty] private string _audioHintText = "A saída escolhida é aplicada ao entrar e restaurada ao sair. 'Usar áudio ao conectar' troca sozinho quando a TV conectar.";
+    [ObservableProperty] private string _audioHintText = "Aplicada ao entrar e restaurada ao sair. \"Ao conectar\" troca sozinho quando a TV aparecer.";
     [ObservableProperty] private ComboOption? _selectedHideStrategy;
+    [ObservableProperty] private ComboOption? _selectedLaunch;
     [ObservableProperty] private ComboOption? _selectedFps;
     [ObservableProperty] private ComboOption? _selectedAudio;
     [ObservableProperty] private string _customFpsText = "60";
     [ObservableProperty] private bool _showCustomFps;
     [ObservableProperty] private bool _isFpsAvailable;
-    [ObservableProperty] private bool _modeBigPicture = true;
-    [ObservableProperty] private bool _modePlaynite;
-    [ObservableProperty] private bool _modeXbox;
     [ObservableProperty] private bool _hdrEnable;
     [ObservableProperty] private bool _vrrEnable;
     [ObservableProperty] private MonitorRowViewModel? _selectedMonitor;
+    [ObservableProperty] private MonitorRowViewModel? _focusRow;
+
+    public string AppVersion { get; } =
+        Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "";
 
     public bool HasSelectedMonitor => SelectedMonitor is not null;
-
+    public bool HasFocusRow => FocusRow is not null;
     public bool IsIdle => !IsConsoleActive;
-    public bool CanStart => HasMonitors && !IsLoading && !IsStarting && !IsConsoleActive;
+    public bool CanStart => HasMonitors && FocusRow is not null && !IsLoading && !IsStarting && !IsConsoleActive;
     public bool ShowTiles => HasMonitors && !IsConsoleActive;
     public bool ShowEmpty => !HasMonitors && !IsLoading && !IsConsoleActive;
-    public string StatusGlyph => StatusIsWarning ? "" : "";
-    public string StartButtonText => IsStarting ? "Entrando no modo console…" : "Entrar no modo console";
+    public string StartButtonText => IsStarting ? "Entrando…" : "Jogar agora";
+    public string LaunchDescription => SelectedLaunch?.Value switch
+    {
+        "playnite" => "Abre o Playnite em tela cheia. Ao fechar, suas telas voltam sozinhas.",
+        "xboxMode" => "Experimental: envia Win+F11. A volta é manual, pelo app ou pela bandeja.",
+        _ => "Abre o Steam em Big Picture. Ao fechar, suas telas voltam sozinhas."
+    };
+    public string FocusModeDescription => FocusRow is null
+        ? "Escolha uma tela para jogar na tela inicial."
+        : $"Aplicada em {FocusRow.Name} ao entrar e desfeita ao sair.";
 
     partial void OnHasMonitorsChanged(bool value) => NotifyStartState();
     partial void OnIsLoadingChanged(bool value) => NotifyStartState();
@@ -77,7 +94,12 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(IsIdle));
         NotifyStartState();
     }
-    partial void OnStatusIsWarningChanged(bool value) => OnPropertyChanged(nameof(StatusGlyph));
+    partial void OnFocusRowChanged(MonitorRowViewModel? value)
+    {
+        OnPropertyChanged(nameof(HasFocusRow));
+        OnPropertyChanged(nameof(FocusModeDescription));
+        NotifyStartState();
+    }
 
     private void NotifyStartState()
     {
@@ -92,41 +114,44 @@ public partial class MainViewModel : ObservableObject
         Engine.UiInvoker = RunOnUi;
 
         HideStrategies.Clear();
-        HideStrategies.Add(new ComboOption { Text = "Desconectar no Windows (recomendado)", Value = "disconnect" });
-        HideStrategies.Add(new ComboOption { Text = "Cortinas pretas (overlay)", Value = "blackCurtain" });
-        HideStrategies.Add(new ComboOption { Text = "Apagar painel via DDC/CI", Value = "turnOff" });
-
-        FpsOptions.Clear();
-        FpsOptions.Add(new ComboOption { Text = "Não limitar", Value = "0" });
-        foreach (var fps in FpsPresets)
-            FpsOptions.Add(new ComboOption { Text = $"{fps} FPS", Value = fps.ToString() });
-        FpsOptions.Add(new ComboOption { Text = "Personalizado…", Value = FpsCustomValue.ToString() });
+        HideStrategies.Add(new ComboOption { Text = "Desconectar no Windows", Value = "disconnect" });
+        HideStrategies.Add(new ComboOption { Text = "Cobrir com tela preta", Value = "blackCurtain" });
+        HideStrategies.Add(new ComboOption { Text = "Apagar o painel (DDC/CI)", Value = "turnOff" });
 
         IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
-        if (!IsPlayniteAvailable)
-            PlayniteDesc = "Playnite não encontrado. Instale o Playnite para usar esta opção.";
+        LaunchOptions.Clear();
+        LaunchOptions.Add(new ComboOption { Text = "Steam Big Picture", Value = "bigPicture" });
+        if (IsPlayniteAvailable)
+            LaunchOptions.Add(new ComboOption { Text = "Playnite (tela cheia)", Value = "playnite" });
+        LaunchOptions.Add(new ComboOption { Text = "Modo Xbox (experimental)", Value = "xboxMode" });
+
+        FpsOptions.Clear();
+        FpsOptions.Add(new ComboOption { Text = "Sem limite", Value = "0" });
+        foreach (var fps in FpsPresets)
+            FpsOptions.Add(new ComboOption { Text = $"{fps} FPS", Value = fps.ToString() });
+        FpsOptions.Add(new ComboOption { Text = "Personalizado", Value = FpsCustomValue.ToString() });
 
         IsFpsAvailable = Engine.Rtss.IsReady;
         FpsStatusText = IsFpsAvailable
-            ? "RTSS encontrado. O limite vale para todos os jogos enquanto o modo console estiver ativo e é desfeito ao sair."
-            : "Opcional. Instale o RivaTuner Statistics Server (RTSS) para limitar o FPS. Sem ele o modo console funciona normalmente, só sem limite.";
+            ? "Vale para todos os jogos enquanto o modo console estiver ativo. Usa o RTSS."
+            : "Opcional. Instale o RivaTuner Statistics Server (RTSS) para usar.";
 
-        IsFirstRun = !ConfigService.Exists;
-        if (IsFirstRun) ShowPage(settings: true);
-
+        var firstRun = !ConfigService.Exists;
         await ReloadAsync();
-        if (IsFirstRun && HasMonitors)
-            SetStatus("Bem-vindo! Escolha a tela onde você joga e clique em Concluir.");
+        if (firstRun && HasMonitors)
+        {
+            // Save the detected defaults so the tray/shortcut work right away.
+            TrySave(BuildConfig());
+            IsWelcomeOpen = true;
+        }
     }
 
-    /// <summary>--start: enter console mode with the saved config, window stays hidden.</summary>
+    /// <summary>--start / tray: enter console mode with the saved config.</summary>
     public async Task<bool> TryAutoStartAsync()
     {
-        if (IsFirstRun || !HasMonitors)
+        if (!HasMonitors || FocusRow is null)
         {
-            SetStatus(IsFirstRun
-                ? "Configure o Console Mode uma vez antes de usar o atalho."
-                : "Nenhuma tela encontrada; o atalho não pôde entrar no modo console.", warning: true);
+            SetStatus("Nenhuma tela de jogo configurada; não foi possível entrar no modo console.", InfoBarSeverity.Warning);
             return false;
         }
         await StartAsync();
@@ -151,7 +176,7 @@ public partial class MainViewModel : ObservableObject
             if (list.Count == 0)
             {
                 error = AppPaths.HasMmt
-                    ? "Nenhuma tela encontrada. Clique em Atualizar."
+                    ? "Nenhuma tela encontrada. Tente atualizar."
                     : $"MultiMonitorTool.exe não encontrado em {AppPaths.MmtPath}";
             }
         }
@@ -200,11 +225,9 @@ public partial class MainViewModel : ObservableObject
             ApplyAudio(config, data.Audio);
 
             SelectedHideStrategy = HideStrategies.FirstOrDefault(s => s.Value == config.HideStrategy) ?? HideStrategies[0];
+            SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
-            ModeBigPicture = config.FullscreenMode is "bigPicture" or "" || (config.FullscreenMode == "playnite" && !IsPlayniteAvailable);
-            ModePlaynite = config.FullscreenMode == "playnite" && IsPlayniteAvailable;
-            ModeXbox = config.FullscreenMode == "xboxMode";
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -225,16 +248,21 @@ public partial class MainViewModel : ObservableObject
             _applying = false;
         }
 
-        if (data.MonitorError is not null) SetStatus(data.MonitorError, warning: true);
+        if (data.MonitorError is not null) SetStatus(data.MonitorError, InfoBarSeverity.Warning);
         UpdateSummary();
     }
 
     private void ApplyMonitors(AppConfig config, List<LoadedMonitor> loaded)
     {
+        foreach (var row in Monitors) row.PropertyChanged -= OnRowPropertyChanged;
         SelectedMonitor = null;
         Monitors.Clear();
         HasMonitors = loaded.Count > 0;
-        if (loaded.Count == 0) return;
+        if (loaded.Count == 0)
+        {
+            FocusRow = null;
+            return;
+        }
 
         var ordered = loaded.OrderBy(m => ParseLeft(m.Info.LeftTop)).ThenBy(m => m.Info.WindowsDisplayNumber).ToList();
 
@@ -252,7 +280,7 @@ public partial class MainViewModel : ObservableObject
         {
             var modes = new List<DisplayModeOption>
             {
-                new() { Text = "Atual (não alterar)", Key = "current", UseCurrent = true }
+                new() { Text = "Não alterar", Key = "current", UseCurrent = true }
             };
             modes.AddRange(monitorModes);
 
@@ -268,11 +296,19 @@ public partial class MainViewModel : ObservableObject
             else if (firstRun || config.HideMonitors.Any(monitor.Matches)) role = MonitorRole.Hide;
             else role = MonitorRole.Keep;
 
-            Monitors.Add(new MonitorRowViewModel(monitor, role, selected, modes, OnRoleChanged, OnMonitorSelected));
+            var row = new MonitorRowViewModel(monitor, role, selected, modes, OnRoleChanged, OnMonitorSelected);
+            row.PropertyChanged += OnRowPropertyChanged;
+            Monitors.Add(row);
         }
 
         LayoutTiles();
-        SelectedMonitor = Monitors.FirstOrDefault(m => m.IsFocus) ?? Monitors[0];
+        FocusRow = Monitors.FirstOrDefault(m => m.IsFocus);
+        SelectedMonitor = FocusRow ?? Monitors[0];
+    }
+
+    private void OnRowPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MonitorRowViewModel.SelectedMode)) SaveQuietly();
     }
 
     private readonly record struct DesktopRect(double X, double Y, double W, double H)
@@ -363,7 +399,7 @@ public partial class MainViewModel : ObservableObject
     {
         AudioOptions.Clear();
         AudioOptions.Add(new ComboOption { Text = "Não alterar", Value = "" });
-        AudioOptions.Add(new ComboOption { Text = "Usar áudio ao conectar (TV/monitor)", Value = ConsoleEngine.AudioOnConnectId });
+        AudioOptions.Add(new ComboOption { Text = "A que aparecer ao conectar (TV)", Value = ConsoleEngine.AudioOnConnectId });
 
         if (AppPaths.HasSvv)
         {
@@ -396,20 +432,34 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
+        FocusRow = Monitors.FirstOrDefault(m => m.IsFocus);
         UpdateSummary();
-        if (IsHomePage) SaveQuietly();
+        SaveQuietly();
     }
 
+    // Every setting saves as soon as it changes; there is no Save button.
     partial void OnSelectedFpsChanged(ComboOption? value)
     {
         ShowCustomFps = value?.Value == FpsCustomValue.ToString();
-        UpdateSummary();
+        SettingChanged();
     }
 
-    partial void OnSelectedAudioChanged(ComboOption? value) => UpdateSummary();
-    partial void OnModeBigPictureChanged(bool value) => UpdateSummary();
-    partial void OnModePlayniteChanged(bool value) => UpdateSummary();
-    partial void OnModeXboxChanged(bool value) => UpdateSummary();
+    partial void OnCustomFpsTextChanged(string value) => SettingChanged();
+    partial void OnSelectedAudioChanged(ComboOption? value) => SettingChanged();
+    partial void OnSelectedHideStrategyChanged(ComboOption? value) => SettingChanged();
+    partial void OnHdrEnableChanged(bool value) => SettingChanged();
+    partial void OnVrrEnableChanged(bool value) => SettingChanged();
+    partial void OnSelectedLaunchChanged(ComboOption? value)
+    {
+        OnPropertyChanged(nameof(LaunchDescription));
+        SettingChanged();
+    }
+
+    private void SettingChanged()
+    {
+        UpdateSummary();
+        SaveQuietly();
+    }
 
     [RelayCommand]
     private void OpenSettings()
@@ -419,20 +469,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void CloseSettings()
-    {
-        var config = BuildConfig();
-        if (string.IsNullOrWhiteSpace(config.FocusMonitor) && HasMonitors)
-        {
-            SetStatus("Escolha a tela onde você quer jogar.", warning: true);
-            return;
-        }
-
-        TrySave(config);
-        IsFirstRun = false;
-        ShowPage(settings: false);
-        SetStatus("Tudo pronto. Clique em Entrar no modo console quando quiser jogar.");
-    }
+    private void GoHome() => ShowPage(settings: false);
 
     [RelayCommand]
     private async Task RefreshAsync()
@@ -441,9 +478,8 @@ public partial class MainViewModel : ObservableObject
         if (HasMonitors) TrySave(BuildConfig());
         Engine.Monitors.ClearCache();
         Engine.Audio.ClearCache();
-        SetStatus("Atualizando telas e áudio…");
+        IsStatusOpen = false;
         await ReloadAsync();
-        if (!StatusIsWarning) SetStatus($"{Monitors.Count} telas encontradas.");
     }
 
     [RelayCommand]
@@ -452,13 +488,26 @@ public partial class MainViewModel : ObservableObject
         try
         {
             TrySave(BuildConfig());
-            var path = ShortcutService.CreateDesktopShortcut();
-            SetStatus($"Atalho criado: {Path.GetFileName(path)} na Área de Trabalho. Ele entra no modo console direto.");
+            ShortcutService.CreateDesktopShortcut();
+            SetStatus("Atalho \"Modo Console\" criado na Área de Trabalho.", InfoBarSeverity.Success);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Atalho: {ex}");
-            SetStatus($"Não foi possível criar o atalho: {ex.Message}", warning: true);
+            SetStatus($"Não foi possível criar o atalho: {ex.Message}", InfoBarSeverity.Error);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenDataFolder()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = AppPaths.DataDir, UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"Não foi possível abrir a pasta: {ex.Message}", InfoBarSeverity.Error);
         }
     }
 
@@ -469,28 +518,28 @@ public partial class MainViewModel : ObservableObject
         var config = BuildConfig();
         if (string.IsNullOrWhiteSpace(config.FocusMonitor))
         {
-            SetStatus("Escolha a tela onde você quer jogar.", warning: true);
+            SetStatus("Escolha a tela onde você quer jogar.", InfoBarSeverity.Warning);
             return;
         }
 
         TrySave(config);
         _busy = true;
         IsStarting = true;
-        SetStatus("Entrando no modo console…");
+        IsStatusOpen = false;
+        IsWelcomeOpen = false;
         try
         {
-            var focus = Monitors.FirstOrDefault(m => m.IsFocus)?.Monitor;
+            var focus = FocusRow?.Monitor;
             await Task.Run(() => Engine.Start(config, focus));
             IsConsoleActive = true;
             ShowPage(settings: false);
             ActiveDescText = DescribeActive(config);
-            SetStatus("Modo console ativo. O app fica na bandeja.");
             StartLoop();
         }
         catch (Exception ex)
         {
             AppLog.Write($"Start: {ex}");
-            SetStatus($"Falha ao entrar no modo console: {ex.Message}", warning: true);
+            SetStatus($"Falha ao entrar no modo console: {ex.Message}", InfoBarSeverity.Error);
             if (Engine.State.IsActive)
             {
                 // Half-applied setup: put the desktop back instead of leaving it broken.
@@ -511,20 +560,21 @@ public partial class MainViewModel : ObservableObject
         if (_busy && !Engine.State.IsActive) return;
         StopLoop();
         _busy = true;
-        SetStatus("Restaurando suas telas…");
+        IsRestoring = true;
         try
         {
             await Task.Run(() => Engine.Stop());
             IsConsoleActive = false;
-            SetStatus("Setup restaurado.");
+            SetStatus("Suas telas voltaram ao normal.", InfoBarSeverity.Success);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Restore: {ex}");
-            SetStatus($"Falha ao restaurar: {ex.Message}", warning: true);
+            SetStatus($"Falha ao restaurar: {ex.Message}", InfoBarSeverity.Error);
         }
         finally
         {
+            IsRestoring = false;
             _busy = false;
         }
 
@@ -533,12 +583,7 @@ public partial class MainViewModel : ObservableObject
         await ReloadAsync();
     }
 
-    public bool TryCloseToTray()
-    {
-        if (!IsConsoleActive) return false;
-        SetStatus("O modo console segue ativo na bandeja.");
-        return true;
-    }
+    public bool TryCloseToTray() => IsConsoleActive;
 
     private void StartLoop()
     {
@@ -616,7 +661,7 @@ public partial class MainViewModel : ObservableObject
             HideMonitors = [.. _loadedConfig.HideMonitors],
             MonitorModes = new Dictionary<string, SavedDisplayMode>(_loadedConfig.MonitorModes, StringComparer.OrdinalIgnoreCase),
             HideStrategy = SelectedHideStrategy?.Value ?? "disconnect",
-            FullscreenMode = ModePlaynite ? "playnite" : ModeXbox ? "xboxMode" : "bigPicture",
+            FullscreenMode = SelectedLaunch?.Value ?? "bigPicture",
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
@@ -627,7 +672,7 @@ public partial class MainViewModel : ObservableObject
 
         if (Monitors.Count == 0) return config;
 
-        config.FocusMonitor = Monitors.FirstOrDefault(m => m.IsFocus)?.Monitor.StableId ?? "";
+        config.FocusMonitor = FocusRow?.Monitor.StableId ?? "";
         config.HideMonitors = [.. Monitors.Where(m => m.IsHide).Select(m => m.Monitor.StableId)];
         config.MonitorModes = new Dictionary<string, SavedDisplayMode>(StringComparer.OrdinalIgnoreCase);
         foreach (var row in Monitors)
@@ -659,7 +704,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Write($"Config save: {ex}");
-            SetStatus($"Não foi possível salvar a configuração: {ex.Message}", warning: true);
+            SetStatus($"Não foi possível salvar a configuração: {ex.Message}", InfoBarSeverity.Error);
         }
     }
 
@@ -674,36 +719,38 @@ public partial class MainViewModel : ObservableObject
     private void UpdateSummary()
     {
         if (_applying) return;
-        var focus = Monitors.FirstOrDefault(m => m.IsFocus);
         var hidden = Monitors.Where(m => m.IsHide).Select(m => m.Name).ToList();
-        var app = ModePlaynite ? "Playnite" : ModeXbox ? "Modo Xbox" : "Big Picture";
+        SummaryTitle = FocusRow is null
+            ? "Escolha a tela onde você quer jogar"
+            : hidden.Count > 0
+                ? $"Jogar em {FocusRow.Name} e desligar {string.Join(" e ", hidden)}"
+                : $"Jogar em {FocusRow.Name}";
 
-        var parts = new List<string> { app };
-        var audio = SelectedAudio?.Value switch
+        SummaryItems.Clear();
+        SummaryItems.Add(SelectedLaunch?.Text ?? "Steam Big Picture");
+        switch (SelectedAudio?.Value)
         {
-            null or "" => null,
-            ConsoleEngine.AudioOnConnectId => "áudio ao conectar",
-            _ => $"áudio: {SelectedAudio.Text}"
-        };
-        if (audio is not null) parts.Add(audio);
+            case null or "":
+                break;
+            case ConsoleEngine.AudioOnConnectId:
+                SummaryItems.Add("Áudio ao conectar");
+                break;
+            default:
+                SummaryItems.Add($"Áudio: {SelectedAudio.Text}");
+                break;
+        }
         var fps = ReadFpsLimit();
-        if (IsFpsAvailable && fps > 0) parts.Add($"{fps} FPS");
-
-        var where = focus is null ? "Escolha a tela de jogo" : $"Jogar em {focus.Name}";
-        var off = hidden.Count > 0 ? $" · desliga {string.Join(" e ", hidden)}" : "";
-        SummaryText = $"{where}{off}\n{string.Join(" · ", parts)}";
+        if (IsFpsAvailable && fps > 0) SummaryItems.Add($"{fps} FPS");
+        if (HdrEnable) SummaryItems.Add("HDR");
+        if (VrrEnable) SummaryItems.Add("VRR");
     }
 
-    private static string DescribeActive(AppConfig config)
+    private static string DescribeActive(AppConfig config) => config.FullscreenMode switch
     {
-        var mode = config.FullscreenMode switch
-        {
-            "playnite" => "Feche o Playnite para voltar ao seu setup automaticamente.",
-            "xboxMode" => "No Modo Xbox a volta é manual: use Restaurar agora ou o menu da bandeja.",
-            _ => "Feche o Big Picture para voltar ao seu setup automaticamente."
-        };
-        return $"{mode}\nO app continua na bandeja do sistema.";
-    }
+        "playnite" => "Feche o Playnite e suas telas voltam sozinhas.",
+        "xboxMode" => "No Modo Xbox a volta é manual: use Restaurar agora ou o menu da bandeja.",
+        _ => "Feche o Big Picture e suas telas voltam sozinhas."
+    };
 
     private void ShowPage(bool settings)
     {
@@ -711,10 +758,11 @@ public partial class MainViewModel : ObservableObject
         IsHomePage = !settings;
     }
 
-    private void SetStatus(string text, bool warning = false)
+    private void SetStatus(string text, InfoBarSeverity severity = InfoBarSeverity.Informational)
     {
         StatusText = text;
-        StatusIsWarning = warning;
+        StatusSeverity = severity;
+        IsStatusOpen = true;
     }
 
     private static int ParseLeft(string? leftTop)

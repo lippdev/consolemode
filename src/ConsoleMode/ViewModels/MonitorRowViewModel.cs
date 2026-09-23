@@ -55,9 +55,10 @@ public partial class MonitorRowViewModel : ObservableObject
             OnPropertyChanged(nameof(IsHide));
             OnPropertyChanged(nameof(RoleLabel));
             OnPropertyChanged(nameof(RoleGlyph));
-            OnPropertyChanged(nameof(RoleBrush));
             OnPropertyChanged(nameof(TileBackground));
             OnPropertyChanged(nameof(TileBorder));
+            OnPropertyChanged(nameof(TileForeground));
+            OnPropertyChanged(nameof(TileSecondaryForeground));
             OnPropertyChanged(nameof(TileOpacity));
             _onRoleChanged(this);
         }
@@ -103,7 +104,7 @@ public partial class MonitorRowViewModel : ObservableObject
     public string RoleLabel => Role switch
     {
         MonitorRole.Focus => "Jogar aqui",
-        MonitorRole.Hide => "Desligar",
+        MonitorRole.Hide => "Desliga",
         _ => "Fica ligada"
     };
 
@@ -114,10 +115,13 @@ public partial class MonitorRowViewModel : ObservableObject
         _ => ""
     };
 
-    public Brush TileBackground => Resource(IsFocus ? "AccentDarkBrush" : "CardBrush");
-    public Brush TileBorder => Resource(IsFocus ? "AccentBrush" : "BorderBrush");
-    public Brush RoleBrush => Resource(IsFocus ? "AccentBrush" : "MutedBrush");
-    public double TileOpacity => IsHide ? 0.6 : 1.0;
+    // Fluent theme brushes: the game screen is the accent-filled tile, like the
+    // selected display in Windows settings.
+    public Brush TileBackground => Resource(IsFocus ? "AccentFillColorDefaultBrush" : "ControlFillColorDefaultBrush");
+    public Brush TileBorder => Resource(IsFocus ? "AccentFillColorDefaultBrush" : "ControlStrokeColorDefaultBrush");
+    public Brush TileForeground => Resource(IsFocus ? "TextOnAccentFillColorPrimaryBrush" : "TextFillColorPrimaryBrush");
+    public Brush TileSecondaryForeground => Resource(IsFocus ? "TextOnAccentFillColorSecondaryBrush" : "TextFillColorSecondaryBrush");
+    public double TileOpacity => IsHide ? 0.55 : 1.0;
 
     /// <summary>Tile click on the home screen.</summary>
     public void MakeFocus() => Role = MonitorRole.Focus;

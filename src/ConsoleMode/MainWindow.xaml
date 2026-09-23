@@ -6,64 +6,46 @@
     xmlns:views="using:ConsoleMode.Views"
     Title="Console Mode">
 
-    <Grid x:Name="RootGrid" Background="{StaticResource BgBrush}" Padding="28,18,28,20">
+    <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="48"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,4,0,18">
+        <!-- Title bar: the back button sits outside the drag region so it stays clickable. -->
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal">
-                <Border Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentDarkBrush}">
-                    <TextBlock Style="{StaticResource IconText}" Text="&#xE7FC;" FontSize="22"
-                               Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center"/>
-                </Border>
-                <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="Console Mode" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
-                    <TextBlock Text="Do desktop pra TV com 1 clique — e de volta quando você fechar o jogo."
-                               Foreground="{StaticResource MutedBrush}" Margin="1,2,0,0"/>
+            <Button Style="{StaticResource NavigationBackButtonNormalStyle}" Margin="4,0,0,0"
+                    VerticalAlignment="Center" Width="40" Height="36"
+                    Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}"
+                    Command="{x:Bind ViewModel.GoHomeCommand}"
+                    ToolTipService.ToolTip="Voltar" AutomationProperties.Name="Voltar"/>
+            <Grid x:Name="AppTitleBar" Grid.Column="1" Background="Transparent">
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="12,0,0,0" VerticalAlignment="Center">
+                    <Image x:Name="TitleIcon" Width="16" Height="16"/>
+                    <TextBlock Text="Console Mode" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
                 </StackPanel>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Style="{StaticResource Btn}" Height="38"
-                        Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}"
-                        IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}"
-                        Command="{x:Bind ViewModel.RefreshCommand}"
-                        ToolTipService.ToolTip="Atualizar telas e áudio">
-                    <TextBlock Style="{StaticResource IconText}" Text="&#xE72C;" FontSize="14"/>
-                </Button>
-                <Button Style="{StaticResource Btn}" Height="38"
-                        Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}"
-                        IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}"
-                        Command="{x:Bind ViewModel.OpenSettingsCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource IconText}" Text="&#xE713;" FontSize="14" Margin="0,0,8,0"/>
-                        <TextBlock Text="Ajustes"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="1">
-            <views:HomeView Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}"/>
-            <views:SettingsView Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}"/>
-        </Grid>
-
-        <Grid Grid.Row="2" Margin="4,14,0,0" ColumnSpacing="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Style="{StaticResource IconText}" Text="{x:Bind ViewModel.StatusGlyph, Mode=OneWay}" FontSize="14"
-                       Foreground="{StaticResource AccentBrush}" VerticalAlignment="Top" Margin="0,2,0,0"/>
-            <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.StatusText, Mode=OneWay}"
-                       Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
+            <views:HomeView Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}">
+                <views:HomeView.Transitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
+                    </TransitionCollection>
+                </views:HomeView.Transitions>
+            </views:HomeView>
+            <views:SettingsView Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}">
+                <views:SettingsView.Transitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>
+                    </TransitionCollection>
+                </views:SettingsView.Transitions>
+            </views:SettingsView>
         </Grid>
     </Grid>
 </Window>

@@ -3,6 +3,8 @@ using ConsoleMode.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using WinRT.Interop;
 
 namespace ConsoleMode;
@@ -16,20 +18,29 @@ public sealed partial class MainWindow : Window
         ViewModel = viewModel;
         InitializeComponent();
 
+        SystemBackdrop = new MicaBackdrop();
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(AppTitleBar);
+
         var hwnd = WindowNative.GetWindowHandle(this);
-        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
-        appWindow.Resize(new Windows.Graphics.SizeInt32(900, 700));
+        var appWindow = AppWindow.GetFromWindowId(Win32Interop.GetWindowIdFromWindow(hwnd));
+        var scale = Win32Dpi.GetScale(hwnd);
+        appWindow.Resize(new Windows.Graphics.SizeInt32((int)(960 * scale), (int)(760 * scale)));
+        appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
+        appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+
         if (File.Exists(AppPaths.IconPath))
+        {
             appWindow.SetIcon(AppPaths.IconPath);
+            TitleIcon.Source = new BitmapImage(new Uri(AppPaths.IconPath));
+        }
 
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
-            presenter.IsMaximizable = false;
-            presenter.IsResizable = false;
+            // The screen map is laid out for ~860 DIPs; don't let the window go narrower.
+            presenter.PreferredMinimumWidth = (int)(900 * scale);
+            presenter.PreferredMinimumHeight = (int)(640 * scale);
         }
-
-        TryTintTitleBar(appWindow);
 
         appWindow.Closing += (_, e) =>
         {
@@ -39,17 +50,15 @@ public sealed partial class MainWindow : Window
         };
     }
 
-    private static void TryTintTitleBar(AppWindow appWindow)
+    private static class Win32Dpi
     {
-        if (!AppWindowTitleBar.IsCustomizationSupported()) return;
-        var bar = appWindow.TitleBar;
-        bar.BackgroundColor = ColorHelper.FromArgb(255, 0x14, 0x14, 0x17);
-        bar.ForegroundColor = ColorHelper.FromArgb(255, 0xED, 0xED, 0xF0);
-        bar.InactiveBackgroundColor = ColorHelper.FromArgb(255, 0x14, 0x14, 0x17);
-        bar.InactiveForegroundColor = ColorHelper.FromArgb(255, 0x9B, 0x9B, 0xA6);
-        bar.ButtonBackgroundColor = ColorHelper.FromArgb(255, 0x14, 0x14, 0x17);
-        bar.ButtonForegroundColor = ColorHelper.FromArgb(255, 0xED, 0xED, 0xF0);
-        bar.ButtonHoverBackgroundColor = ColorHelper.FromArgb(255, 0x2C, 0x2C, 0x33);
-        bar.ButtonPressedBackgroundColor = ColorHelper.FromArgb(255, 0x37, 0x37, 0x3F);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern uint GetDpiForWindow(nint hwnd);
+
+        public static double GetScale(nint hwnd)
+        {
+            var dpi = GetDpiForWindow(hwnd);
+            return dpi > 0 ? dpi / 96.0 : 1.0;
+        }
     }
 }
