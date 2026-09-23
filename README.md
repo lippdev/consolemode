@@ -31,7 +31,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 - **Pick a monitor in Playnite / Big Picture settings?** That moves the game UI to the TV, but your desk monitors stay on, audio stays on the desk speakers, and you undo it by hand afterwards.
 - **Use a display-switching add-on?** Those change the primary display. Console Mode also turns off or covers the other screens, routes audio to the TV, optionally sets resolution, HDR, VRR and an FPS cap, and puts everything back when you quit.
-- **Win+P "Second screen only"?** Works for one fixed setup. Console Mode remembers which screen is the TV, launches Steam, Playnite or Xbox, and on a new screen asks "Can you see this screen?" so you never end up without a picture.
+- **Win+P "Second screen only"?** Works for one fixed setup. Console Mode remembers which screen is the TV, launches Steam, Playnite or Xbox, and on a new screen asks "Can you see this screen?" and reverts on its own if nobody answers.
 
 ## Requirements
 
@@ -115,7 +115,7 @@ Check that the target output is connected and available in Windows before starti
 
 Confirm that the focus monitor supports the feature and that HDR is enabled in Windows. For VRR, also enable G-SYNC or FreeSync in the GPU control panel when applicable.
 
-If Console Mode saved you some cable juggling, a ⭐ on the repo helps other couch gamers find it.
+If Console Mode saved you some monitor juggling, a ⭐ on the repo helps other couch gamers find it.
 
 ## License
 
@@ -154,7 +154,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 - **Escolher o monitor nos ajustes do Playnite / Big Picture?** Isso leva a interface para a TV, mas os monitores da mesa continuam ligados, o áudio fica nas caixas da mesa e depois você desfaz tudo na mão.
 - **Usar um add-on de trocar tela?** Eles mudam o monitor principal. O Console Mode também desliga ou cobre as outras telas, manda o áudio para a TV, ajusta resolução, HDR, VRR e limite de FPS se você quiser, e devolve tudo ao sair.
-- **Win+P "Somente segunda tela"?** Funciona para um setup fixo. O Console Mode lembra qual tela é a TV, abre Steam, Playnite ou Xbox e, numa tela nova, pergunta "Está vendo esta tela?" para você nunca ficar sem imagem.
+- **Win+P "Somente segunda tela"?** Funciona para um setup fixo. O Console Mode lembra qual tela é a TV, abre Steam, Playnite ou Xbox e, numa tela nova, pergunta "Está vendo esta tela?" e desfaz tudo sozinho se ninguém responder.
 
 ### Requisitos
 
@@ -223,7 +223,7 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 - O limite de FPS é global (limitação do RTSS), não por tela
 - O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
 
-Se o Console Mode te poupou da dança dos cabos, uma ⭐ no repositório ajuda outras pessoas a encontrá-lo.
+Se o Console Mode te poupou da dança dos monitores, uma ⭐ no repositório ajuda outras pessoas a encontrá-lo.
 
 ### Licença
 
