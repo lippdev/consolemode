@@ -27,6 +27,12 @@ public sealed class AppConfig
     /// </summary>
     public string ConfirmedSetup { get; set; } = "";
 
+    /// <summary>Look for new GitHub releases on startup.</summary>
+    public bool CheckUpdates { get; set; } = true;
+
+    /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
+    public string SkippedUpdateVersion { get; set; } = "";
+
     [JsonIgnore]
     public string SetupKey =>
         $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";

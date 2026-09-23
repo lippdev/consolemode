@@ -372,7 +372,9 @@ public sealed class ConsoleEngine
             HdrEnable = config.HdrEnable,
             VrrEnable = config.VrrEnable,
             TourDone = config.TourDone,
-            ConfirmedSetup = config.ConfirmedSetup
+            ConfirmedSetup = config.ConfirmedSetup,
+            CheckUpdates = config.CheckUpdates,
+            SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
 

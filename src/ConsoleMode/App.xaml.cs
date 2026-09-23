@@ -38,15 +38,17 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var autoStart = Environment.GetCommandLineArgs()
-            .Skip(1)
-            .Any(a => string.Equals(a, ShortcutService.StartArgument, StringComparison.OrdinalIgnoreCase));
+        var cliArgs = Environment.GetCommandLineArgs().Skip(1).ToList();
+        bool HasArg(string name) => cliArgs.Any(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
+        var autoStart = HasArg(ShortcutService.StartArgument);
+        // --tray: launched with Windows; stay in the tray until the user opens the window.
+        var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
 
         _instanceMutex = new Mutex(true, InstanceMutexName, out var isFirstInstance);
         if (!isFirstInstance)
         {
             // Hand the request to the running instance (tray) instead of fighting over the screens.
-            SignalRunningInstance(autoStart ? StartSignalName : ShowSignalName);
+            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : ShowSignalName);
             Exit();
             return;
         }
@@ -64,8 +66,8 @@ public partial class App : Application
             _tray = new TrayService(_window, ViewModel);
             ListenForSignals();
 
-            if (!autoStart) _window.Activate();
-            await ViewModel.InitializeAsync(interactive: !autoStart);
+            if (!autoStart && !trayOnly) _window.Activate();
+            await ViewModel.InitializeAsync(interactive: !autoStart && !trayOnly);
 
             if (autoStart && !await ViewModel.TryAutoStartAsync())
                 _window.Activate();

@@ -12,9 +12,7 @@ public static class AppLog
         try
         {
             // DataDir is empty until AppPaths.Initialize; early crashes still need a log.
-            var dir = !string.IsNullOrEmpty(AppPaths.DataDir)
-                ? AppPaths.DataDir
-                : Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? AppContext.BaseDirectory, "ConsoleMode_Data");
+            var dir = !string.IsNullOrEmpty(AppPaths.DataDir) ? AppPaths.DataDir : AppPaths.ResolveDataDir(AppPaths.ResolveExeDir());
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, "consolemode.log");
             var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}  {message}";
@@ -63,14 +61,31 @@ public static class AppPaths
     public static string MonitorModesCacheFile { get; private set; } = "";
     public static string IconPath { get; private set; } = "";
 
-    public static void Initialize()
+    /// <summary>Dropped next to the exe by the installer; its absence means the portable build.</summary>
+    public const string InstalledMarker = "ConsoleMode.installed";
+
+    /// <summary>Installed via setup: data lives in %LOCALAPPDATA%\ConsoleMode instead of next to the exe.</summary>
+    public static bool IsInstalled { get; private set; }
+
+    public static string ResolveExeDir()
     {
-        // Single-file extract goes to %TEMP%\.net — keep data next to the real exe.
+        // Single-file extract goes to %TEMP%\.net — use the real exe's folder.
         var processPath = Environment.ProcessPath;
-        ExeDir = !string.IsNullOrWhiteSpace(processPath)
+        return !string.IsNullOrWhiteSpace(processPath)
             ? Path.GetDirectoryName(processPath) ?? ""
             : AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        DataDir = Path.Combine(ExeDir, "ConsoleMode_Data");
+    }
+
+    public static string ResolveDataDir(string exeDir) =>
+        File.Exists(Path.Combine(exeDir, InstalledMarker))
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ConsoleMode")
+            : Path.Combine(exeDir, "ConsoleMode_Data");
+
+    public static void Initialize()
+    {
+        ExeDir = ResolveExeDir();
+        IsInstalled = File.Exists(Path.Combine(ExeDir, InstalledMarker));
+        DataDir = ResolveDataDir(ExeDir);
         ToolsDir = Path.Combine(DataDir, "tools");
         Directory.CreateDirectory(DataDir);
         Directory.CreateDirectory(ToolsDir);
@@ -106,6 +121,8 @@ public static class AppPaths
             Path.Combine(ExeDir, "assets", "icon.ico"),
             Path.Combine(ExeDir, "icon.ico"));
 
+        // Files the PowerShell 1.x build left next to the exe (portable only).
+        if (IsInstalled) return;
         MigrateLegacy(ExeDir, "config.json", ConfigPath);
         foreach (var file in new[] { "backup_monitores.cfg", "backup_monitores_meta.json", "backup_audio.txt", "backup_rtss_fps.json" })
         {

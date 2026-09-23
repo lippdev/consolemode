@@ -90,6 +90,31 @@
                 </StackPanel>
             </ctk:SettingsCard>
 
+            <!-- App -->
+            <TextBlock Text="App" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Iniciar com o Windows" Description="Abre direto na bandeja ao ligar o PC, pronto para o atalho de 1 clique.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE770;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Atualizações" Description="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE895;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ProgressRing Width="18" Height="18" IsActive="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"/>
+                    <Button Content="Procurar agora" Command="{x:Bind ViewModel.CheckNowCommand}"/>
+                </StackPanel>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Avisar quando sair versão nova" Description="Consulta as releases no GitHub ao abrir o app.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xEA8F;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.CheckUpdates, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+
             <!-- Shortcut, help & data -->
             <TextBlock Text="Atalho, ajuda e dados" Style="{StaticResource SettingsSectionHeader}"/>
             <ctk:SettingsCard Header="Confirmação na TV"

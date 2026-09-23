@@ -37,11 +37,13 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## How to use
 
-1. Build `ConsoleMode.exe` on Windows (`.\build\Publish-ConsoleMode.ps1`) or grab the WinUI beta when it is published
-2. Run the single `ConsoleMode.exe` — on first launch it creates `ConsoleMode_Data/` next to it (config, backups, and extracted helper tools)
-3. On first launch, choose the screen you play on (the others are turned off) and click **Done**
-4. From then on it is one click: **Enter console mode** on the home screen, or the **Modo Console** desktop shortcut created in Settings
-5. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
+1. Download from [Releases](https://github.com/lippdev/consolemode/releases):
+   - **`ConsoleMode-Setup-x64.exe`** (recommended) — per-user install, no admin, Start menu entry, optional one-click desktop shortcut and start with Windows; data in `%LOCALAPPDATA%\ConsoleMode`
+   - **`ConsoleMode-Portable-x64.exe`** — a single exe that keeps its data in `ConsoleMode_Data\` next to it
+2. On first launch a short tour shows the screen map: pick the screen you play on (the others turn off)
+3. From then on it is one click: **Jogar agora**, or the **Modo Console** desktop shortcut (Settings → Criar atalho). The first time with a new game screen, the TV asks "Está vendo esta tela?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
+4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
+5. New versions are announced in the app from GitHub Releases (installed: updates silently; portable: swaps the exe)
 
 > **Antivirus note:** some scanners may flag bundled helper tools. The source code is available in this repository for review.
 
@@ -50,11 +52,13 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Windows application development** workload, or the .NET 8 SDK plus the Windows App SDK.
 
 ```powershell
-# Download MultiMonitorTool / SoundVolumeView / rtss-cli, then publish
-.\build\Publish-ConsoleMode.ps1
+# Downloads MultiMonitorTool / SoundVolumeView / rtss-cli, then builds both packages
+.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
 ```
 
-Output: `dist\ConsoleMode.exe` (one portable file). Open `ConsoleMode.sln` to debug.
+Output: `dist\ConsoleMode-Portable-x64.exe` and `dist\ConsoleMode-Setup-x64.exe` (the installer needs [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Open `ConsoleMode.sln` to debug.
+
+To release, push a tag like `v1.3.0` (or `v1.3.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
 
 The previous PowerShell + WPF implementation is archived under `legacy/` and is not used by the WinUI app.
 
@@ -147,11 +151,13 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ### Como usar
 
-1. Compile `ConsoleMode.exe` no Windows (`.\build\Publish-ConsoleMode.ps1`) ou use o beta WinUI quando for publicado
-2. Execute o `ConsoleMode.exe` — na primeira vez cria `ConsoleMode_Data/` ao lado (config, backup e ferramentas extraídas)
-3. Na primeira vez, escolha a tela onde você joga (as outras são desligadas) e clique em **Concluir**
-4. Depois é 1 clique: **Entrar no modo console** na tela inicial, ou o atalho **Modo Console** criado em Ajustes
-5. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
+1. Baixe em [Releases](https://github.com/lippdev/consolemode/releases):
+   - **`ConsoleMode-Setup-x64.exe`** (recomendado) — instala por usuário, sem admin, com menu Iniciar e, se quiser, atalho de 1 clique e iniciar com o Windows; dados em `%LOCALAPPDATA%\ConsoleMode`
+   - **`ConsoleMode-Portable-x64.exe`** — um único exe que guarda os dados em `ConsoleMode_Data\` ao lado dele
+2. Na primeira vez, um tour curto mostra o mapa das telas: escolha a tela onde você joga (as outras desligam)
+3. Depois é 1 clique: **Jogar agora**, ou o atalho **Modo Console** na Área de Trabalho (Ajustes → Criar atalho). Na primeira vez com uma tela de jogo nova, a TV pergunta "Está vendo esta tela?" e tudo volta sozinho se ninguém responder (mouse, teclado ou controle de Xbox/PlayStation)
+4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
+5. O app avisa das versões novas pelas releases do GitHub (instalado: atualiza sozinho; portátil: troca o exe)
 
 > **Antivírus:** alguns scanners podem sinalizar as ferramentas auxiliares. O código-fonte está neste repositório para auditoria.
 
@@ -160,10 +166,12 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
 
 ```powershell
-.\build\Publish-ConsoleMode.ps1
+.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
 ```
 
-Saída: `dist\ConsoleMode.exe` (um arquivo só). Abra `ConsoleMode.sln` para depurar.
+Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (o instalador precisa do [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Abra `ConsoleMode.sln` para depurar.
+
+Para lançar uma versão, faça push de uma tag como `v1.3.0` (ou `v1.3.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
 
 A implementação antiga em PowerShell + WPF ficou em `legacy/` e não é usada pelo app WinUI.
 

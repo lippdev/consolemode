@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -65,8 +64,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private MonitorRowViewModel? _selectedMonitor;
     [ObservableProperty] private MonitorRowViewModel? _focusRow;
 
-    public string AppVersion { get; } =
-        Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "";
+    public string AppVersion => UpdateService.CurrentVersion;
 
     public bool HasSelectedMonitor => SelectedMonitor is not null;
     public bool HasFocusRow => FocusRow is not null;
@@ -140,7 +138,9 @@ public partial class MainViewModel : ObservableObject
         await ReloadAsync();
         // Save the detected defaults so the tray/shortcut work right away.
         if (firstRun && HasMonitors) TrySave(BuildConfig());
+        InitializeAppSettings();
         if (interactive && HasMonitors && !_loadedConfig.TourDone) StartTour();
+        _ = CheckForUpdatesOnStartupAsync();
     }
 
     /// <summary>--start / tray: enter console mode with the saved config.</summary>
@@ -225,6 +225,7 @@ public partial class MainViewModel : ObservableObject
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
+            CheckUpdates = config.CheckUpdates;
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -786,7 +787,9 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             TourDone = _loadedConfig.TourDone,
-            ConfirmedSetup = _loadedConfig.ConfirmedSetup
+            ConfirmedSetup = _loadedConfig.ConfirmedSetup,
+            CheckUpdates = CheckUpdates,
+            SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
 
         if (Monitors.Count == 0) return config;

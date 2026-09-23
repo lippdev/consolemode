@@ -1,0 +1,3 @@
+Marker file installed by the Console Mode setup. Its presence makes the app keep its data
+in %LOCALAPPDATA%\ConsoleMode; the portable ConsoleMode.exe (without this file) keeps it
+in ConsoleMode_Data next to the exe.

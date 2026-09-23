@@ -23,6 +23,31 @@
                     <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
                                Text="Clique numa tela e escolha o que ela faz. As que desligam voltam sozinhas quando você sai do jogo."/>
                 </StackPanel>
+                <InfoBar IsOpen="{x:Bind ViewModel.IsUpdateOpen, Mode=TwoWay}" Severity="Success"
+                         Title="{x:Bind ViewModel.UpdateTitle, Mode=OneWay}"
+                         Message="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}">
+                    <InfoBar.IconSource>
+                        <FontIconSource Glyph="&#xE896;"/>
+                    </InfoBar.IconSource>
+                    <InfoBar.ActionButton>
+                        <Button Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.ApplyUpdateCommand}"
+                                IsEnabled="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{x:Bind ViewModel.UpdateActionText, Mode=OneWay}"/>
+                                <ProgressRing Width="14" Height="14" IsActive="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+                                              Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+                                              Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                            </StackPanel>
+                        </Button>
+                    </InfoBar.ActionButton>
+                    <InfoBar.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="-12,0,0,8">
+                            <HyperlinkButton Content="Novidades" Command="{x:Bind ViewModel.OpenReleasePageCommand}"/>
+                            <HyperlinkButton Content="Ignorar esta versão" Command="{x:Bind ViewModel.SkipUpdateCommand}"/>
+                        </StackPanel>
+                    </InfoBar.Content>
+                </InfoBar>
                 <InfoBar IsOpen="{x:Bind ViewModel.IsStatusOpen, Mode=TwoWay}"
                          Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"
                          Message="{x:Bind ViewModel.StatusText, Mode=OneWay}"/>
