@@ -5,7 +5,7 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 [English](#console-mode) · [Português (BR)](#português-br)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Version](https://img.shields.io/badge/version-1.4.0-brightgreen)
+![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
@@ -14,8 +14,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 ## Features
 
-- **One-click home screen**: pick the screen you play on, hit **Enter console mode**
-- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight to console mode from the tray
+- **One-click home screen**: pick the screen you play on, hit **Play now**
+- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight into console mode, with the app waiting in the tray
 - Hide spare displays by **disconnect**, **black overlays**, or **DDC/CI**
 - Optional **resolution & refresh rate** per monitor for console mode
 - Launch **Steam Big Picture**, **Playnite fullscreen**, or **Xbox** (Win+F11)
@@ -42,7 +42,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
    - **`ConsoleMode-Setup-x64.exe`** (recommended) — per-user install, no admin, Start menu entry, optional one-click desktop shortcut and start with Windows; data in `%LOCALAPPDATA%\ConsoleMode`
    - **`ConsoleMode-Portable-x64.exe`** — a single exe that keeps its data in `ConsoleMode_Data\` next to it
 2. On first launch a short tour shows the screen map: pick the screen you play on (the others turn off)
-3. From then on it is one click: **Jogar agora**, or the **Modo Console** desktop shortcut (Settings → Criar atalho). The first time with a new game screen, the TV asks "Está vendo esta tela?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
+3. From then on it is one click: **Play now**, or the **Console Mode** desktop shortcut (Settings → Create shortcut). The first time with a new game screen, the TV asks "Can you see this screen?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
 4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 5. New versions are announced in the app from GitHub Releases (installed: updates silently; portable: swaps the exe)
 
@@ -54,12 +54,12 @@ Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Wi
 
 ```powershell
 # Downloads MultiMonitorTool / SoundVolumeView / rtss-cli, then builds both packages
-.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
+.\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 
 Output: `dist\ConsoleMode-Portable-x64.exe` and `dist\ConsoleMode-Setup-x64.exe` (the installer needs [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Open `ConsoleMode.sln` to debug.
 
-To release, push a tag like `v1.3.0` (or `v1.3.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
+To release, push a tag like `v1.4.0` (or `v1.4.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
 
 The previous PowerShell + WPF implementation (1.2 and earlier) lives on the [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) branch and is not used by the WinUI app.
 
@@ -122,15 +122,15 @@ Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV, esconda monitores extras, ajuste o áudio e abra a interface de jogos em tela cheia que você preferir.
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
-![Version](https://img.shields.io/badge/versão-1.4.0-brightgreen)
+![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![License](https://img.shields.io/badge/licença-MIT-green)
 
 <img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
 
 ### Funcionalidades
 
-- **Tela inicial de 1 clique**: escolha a tela onde você joga e clique em **Entrar no modo console**
-- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, pela bandeja
+- **Tela inicial de 1 clique**: escolha a tela onde você joga e clique em **Jogar agora**
+- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, com o app aguardando na bandeja
 - Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
 - **Resolução e Hz** opcionais por monitor no modo console
 - Abrir **Steam Big Picture**, **Playnite em tela cheia** ou **Modo Xbox** (Win+F11)
@@ -168,12 +168,12 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
 
 ```powershell
-.\build\Publish-ConsoleMode.ps1 -Version 1.3.0
+.\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 
 Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (o instalador precisa do [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Abra `ConsoleMode.sln` para depurar.
 
-Para lançar uma versão, faça push de uma tag como `v1.3.0` (ou `v1.3.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
+Para lançar uma versão, faça push de uma tag como `v1.4.0` (ou `v1.4.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
 
 A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) e não é usada pelo app WinUI.
 
