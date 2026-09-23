@@ -10,7 +10,7 @@ monitor_modes_cache.json
 # Build
 dist/
 artifacts/
-build/ps2exe.ps1
+release-notes.md
 
 # Ferramentas NirSoft (baixadas pelo build ou colocadas localmente em dev)
 MultiMonitorTool.exe
@@ -24,8 +24,8 @@ readme.txt
 *.csv
 _test_*.ps1
 
-# Versao antiga arquivada
-OLD_ConsoleMode/
+# Versao antiga (PowerShell) em legacy\: ps2exe baixado pelo build dela
+legacy/ps2exe.ps1
 
 # Scripts de experimento/debug (nao fazem parte do produto)
 build/Test-*.ps1
