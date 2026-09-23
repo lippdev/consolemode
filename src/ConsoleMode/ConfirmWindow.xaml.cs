@@ -23,6 +23,7 @@ public sealed partial class ConfirmWindow : Window
     private int _secondsLeft;
 
     public Task<bool> Result => _result.Task;
+    public LocalizedStrings Texts => LocalizationService.Texts;
 
     /// <summary>How the prompt was answered, for the log and the test result.</summary>
     public string AnsweredBy { get; private set; } = "tempo esgotado";
@@ -33,6 +34,7 @@ public sealed partial class ConfirmWindow : Window
         _secondsLeft = seconds;
         CountdownBar.Maximum = seconds;
         UpdateCountdown();
+        LocalizationService.LanguageChanged += OnLanguageChanged;
 
         var hwnd = WindowNative.GetWindowHandle(this);
         var appWindow = AppWindow.GetFromWindowId(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd));
@@ -70,6 +72,7 @@ public sealed partial class ConfirmWindow : Window
         Activated += (_, _) => KeepButton.Focus(FocusState.Programmatic);
         Closed += (_, _) =>
         {
+            LocalizationService.LanguageChanged -= OnLanguageChanged;
             _timer.Stop();
             _controller.Dispose();
             _result.TrySetResult(false);
@@ -101,8 +104,11 @@ public sealed partial class ConfirmWindow : Window
     private void UpdateCountdown()
     {
         CountdownBar.Value = _secondsLeft;
-        CountdownText.Text = $"Voltando ao normal em {_secondsLeft} s";
+        CountdownText.Text = LocalizationService.Get("Countdown", _secondsLeft);
     }
+
+    private void OnLanguageChanged(object? sender, EventArgs e) =>
+        DispatcherQueue.TryEnqueue(UpdateCountdown);
 
     private static void CenterOn(AppWindow appWindow, ScreenRect? target)
     {

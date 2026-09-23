@@ -19,6 +19,10 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <Compile Include="../../src/ConsoleMode/Services/UpdateIntegrity.cs" Link="UpdateIntegrity.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/LocalizationService.cs" Link="LocalizationService.cs" />
+    <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
+    <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
+    <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
   </ItemGroup>
 
 </Project>

@@ -21,7 +21,9 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<ComboOption> LaunchOptions { get; } = [];
     public ObservableCollection<ComboOption> FpsOptions { get; } = [];
     public ObservableCollection<ComboOption> AudioOptions { get; } = [];
+    public ObservableCollection<ComboOption> LanguageOptions { get; } = [];
     public ObservableCollection<string> SummaryItems { get; } = [];
+    public LocalizedStrings Texts => LocalizationService.Texts;
 
     private static readonly int[] FpsPresets = [30, 48, 50, 59, 60, 72, 75, 90, 120, 144];
     private const int FpsCustomValue = -1;
@@ -36,6 +38,9 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>Last config read from disk; monitor fields survive a failed monitor listing.</summary>
     private AppConfig _loadedConfig = new();
+    private List<AudioDevice> _availableAudioDevices = [];
+
+    public MainViewModel() => LocalizationService.LanguageChanged += OnLanguageChanged;
 
     [ObservableProperty] private bool _isHomePage = true;
     [ObservableProperty] private bool _isSettingsPage;
@@ -51,11 +56,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _activeDescText = "";
     [ObservableProperty] private bool _isPlayniteAvailable = true;
     [ObservableProperty] private string _fpsStatusText = "";
-    [ObservableProperty] private string _audioHintText = "Aplicada ao entrar e restaurada ao sair. \"Ao conectar\" troca sozinho quando a TV aparecer.";
+    [ObservableProperty] private string _audioHintText = LocalizationService.Get("AudioHint");
     [ObservableProperty] private ComboOption? _selectedHideStrategy;
     [ObservableProperty] private ComboOption? _selectedLaunch;
     [ObservableProperty] private ComboOption? _selectedFps;
     [ObservableProperty] private ComboOption? _selectedAudio;
+    [ObservableProperty] private ComboOption? _selectedLanguage;
     [ObservableProperty] private string _customFpsText = "60";
     [ObservableProperty] private bool _showCustomFps;
     [ObservableProperty] private bool _isFpsAvailable;
@@ -72,16 +78,16 @@ public partial class MainViewModel : ObservableObject
     public bool CanStart => HasMonitors && FocusRow is not null && !IsLoading && !IsStarting && !IsConsoleActive;
     public bool ShowTiles => HasMonitors && !IsConsoleActive;
     public bool ShowEmpty => !HasMonitors && !IsLoading && !IsConsoleActive;
-    public string StartButtonText => IsStarting ? "Entrando…" : "Jogar agora";
+    public string StartButtonText => LocalizationService.Get(IsStarting ? "StartEntering" : "StartNow");
     public string LaunchDescription => SelectedLaunch?.Value switch
     {
-        "playnite" => "Abre o Playnite em tela cheia. Ao fechar, suas telas voltam sozinhas.",
-        "xboxMode" => "Experimental: envia Win+F11. A volta é manual, pelo app ou pela bandeja.",
-        _ => "Abre o Steam em Big Picture. Ao fechar, suas telas voltam sozinhas."
+        "playnite" => LocalizationService.Get("LaunchPlayniteDescription"),
+        "xboxMode" => LocalizationService.Get("LaunchXboxDescription"),
+        _ => LocalizationService.Get("LaunchSteamDescription")
     };
     public string FocusModeDescription => FocusRow is null
-        ? "Escolha uma tela para jogar na tela inicial."
-        : $"Aplicada em {FocusRow.Name} ao entrar e desfeita ao sair.";
+        ? LocalizationService.Get("FocusChoose")
+        : LocalizationService.Get("FocusApplied", FocusRow.Name);
 
     partial void OnHasMonitorsChanged(bool value) => NotifyStartState();
     partial void OnIsLoadingChanged(bool value) => NotifyStartState();
@@ -111,28 +117,9 @@ public partial class MainViewModel : ObservableObject
     {
         Engine.UiInvoker = RunOnUi;
 
-        HideStrategies.Clear();
-        HideStrategies.Add(new ComboOption { Text = "Desconectar no Windows", Value = "disconnect" });
-        HideStrategies.Add(new ComboOption { Text = "Cobrir com tela preta", Value = "blackCurtain" });
-        HideStrategies.Add(new ComboOption { Text = "Apagar o painel (DDC/CI)", Value = "turnOff" });
-
         IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
-        LaunchOptions.Clear();
-        LaunchOptions.Add(new ComboOption { Text = "Steam Big Picture", Value = "bigPicture" });
-        if (IsPlayniteAvailable)
-            LaunchOptions.Add(new ComboOption { Text = "Playnite (tela cheia)", Value = "playnite" });
-        LaunchOptions.Add(new ComboOption { Text = "Modo Xbox (experimental)", Value = "xboxMode" });
-
-        FpsOptions.Clear();
-        FpsOptions.Add(new ComboOption { Text = "Sem limite", Value = "0" });
-        foreach (var fps in FpsPresets)
-            FpsOptions.Add(new ComboOption { Text = $"{fps} FPS", Value = fps.ToString() });
-        FpsOptions.Add(new ComboOption { Text = "Personalizado", Value = FpsCustomValue.ToString() });
-
         IsFpsAvailable = Engine.Rtss.IsReady;
-        FpsStatusText = IsFpsAvailable
-            ? "Vale para todos os jogos enquanto o modo console estiver ativo. Usa o RTSS."
-            : "Opcional. Instale o RivaTuner Statistics Server (RTSS) para usar.";
+        BuildLocalizedOptions();
 
         var firstRun = !ConfigService.Exists;
         await ReloadAsync();
@@ -143,12 +130,96 @@ public partial class MainViewModel : ObservableObject
         _ = CheckForUpdatesOnStartupAsync();
     }
 
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(StartButtonText));
+        OnPropertyChanged(nameof(LaunchDescription));
+        OnPropertyChanged(nameof(FocusModeDescription));
+        OnPropertyChanged(nameof(InstallKindText));
+        OnPropertyChanged(nameof(UpdateActionText));
+        OnPropertyChanged(nameof(TourMapText));
+        if (IsConsoleActive) ActiveDescText = DescribeActive(_loadedConfig);
+        if (IsStatusOpen) IsStatusOpen = false;
+        BuildLocalizedOptions();
+        foreach (var monitor in Monitors) monitor.RefreshLocalizedText();
+        UpdateSummary();
+        RefreshUpdateStrings();
+    }
+
+    private void BuildLocalizedOptions()
+    {
+        var hideValue = SelectedHideStrategy?.Value ?? "disconnect";
+        var launchValue = SelectedLaunch?.Value ?? "bigPicture";
+        var fpsValue = SelectedFps?.Value ?? "0";
+        var audioValue = SelectedAudio?.Value ?? "";
+        var wasApplying = _applying;
+        _applying = true;
+        try
+        {
+            HideStrategies.Clear();
+            HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyDisconnect"), Value = "disconnect" });
+            HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyBlack"), Value = "blackCurtain" });
+            HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyTurnOff"), Value = "turnOff" });
+            SelectedHideStrategy = HideStrategies.FirstOrDefault(x => x.Value == hideValue) ?? HideStrategies[0];
+
+            LaunchOptions.Clear();
+            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchSteam"), Value = "bigPicture" });
+            if (IsPlayniteAvailable)
+                LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchPlaynite"), Value = "playnite" });
+            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
+            SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == launchValue) ?? LaunchOptions[0];
+
+            FpsOptions.Clear();
+            FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsNoLimit"), Value = "0" });
+            foreach (var fps in FpsPresets)
+                FpsOptions.Add(new ComboOption { Text = $"{fps} FPS", Value = fps.ToString() });
+            FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsCustom"), Value = FpsCustomValue.ToString() });
+            SelectedFps = FpsOptions.FirstOrDefault(x => x.Value == fpsValue) ?? FpsOptions[0];
+            ShowCustomFps = SelectedFps.Value == FpsCustomValue.ToString();
+
+            if (LanguageOptions.Count == 0)
+            {
+                LanguageOptions.Add(new ComboOption { Text = LocalizationService.Get("LanguagePortuguese"), Value = LocalizationService.PortugueseBrazil });
+                LanguageOptions.Add(new ComboOption { Text = LocalizationService.Get("LanguageEnglish"), Value = LocalizationService.EnglishUnitedStates });
+            }
+
+            BuildAudioOptions(audioValue);
+            FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
+        }
+        finally
+        {
+            _applying = wasApplying;
+        }
+    }
+
+    private void BuildAudioOptions(string selectedValue)
+    {
+        AudioOptions.Clear();
+        AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioNoChange"), Value = "" });
+        AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioOnConnect"), Value = ConsoleEngine.AudioOnConnectId });
+        if (AppPaths.HasSvv)
+        {
+            foreach (var device in _availableAudioDevices)
+                AudioOptions.Add(new ComboOption
+                {
+                    Text = device.IsActive ? device.Name : $"{device.Name}{LocalizationService.Get("AudioDisabledSuffix")}",
+                    Value = device.FriendlyId
+                });
+            AudioHintText = LocalizationService.Get("AudioHint");
+        }
+        else
+        {
+            AudioHintText = LocalizationService.Get("SvvMissing");
+        }
+        SelectedAudio = AudioOptions.FirstOrDefault(x => x.Value == selectedValue) ?? AudioOptions[0];
+    }
+
     /// <summary>--start / tray: enter console mode with the saved config.</summary>
     public async Task<bool> TryAutoStartAsync()
     {
         if (!HasMonitors || FocusRow is null)
         {
-            SetStatus("Nenhuma tela de jogo configurada; não foi possível entrar no modo console.", InfoBarSeverity.Warning);
+            SetStatus(LocalizationService.Get("NoGameDisplayConfigured"), InfoBarSeverity.Warning);
             return false;
         }
         await StartAsync();
@@ -173,14 +244,14 @@ public partial class MainViewModel : ObservableObject
             if (list.Count == 0)
             {
                 error = AppPaths.HasMmt
-                    ? "Nenhuma tela encontrada. Tente atualizar."
-                    : $"MultiMonitorTool.exe não encontrado em {AppPaths.MmtPath}";
+                    ? LocalizationService.Get("NoDisplayTryRefresh")
+                    : LocalizationService.Get("MmtMissing", AppPaths.MmtPath);
             }
         }
         catch (Exception ex)
         {
             AppLog.Write($"Monitores: {ex}");
-            error = $"Não foi possível listar as telas: {ex.Message}";
+            error = LocalizationService.Get("ListDisplaysError", ex.Message);
         }
 
         List<AudioDevice> audio = [];
@@ -218,6 +289,7 @@ public partial class MainViewModel : ObservableObject
         {
             var config = data.Config;
             _loadedConfig = config;
+            SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Value == config.AppLanguage) ?? LanguageOptions.FirstOrDefault();
             ApplyMonitors(config, data.Monitors);
             ApplyAudio(config, data.Audio);
 
@@ -278,7 +350,7 @@ public partial class MainViewModel : ObservableObject
         {
             var modes = new List<DisplayModeOption>
             {
-                new() { Text = "Não alterar", Key = "current", UseCurrent = true }
+                new DisplayModeOption { Key = "current", UseCurrent = true, TextKey = "DisplayNoChange" }.RefreshText()
             };
             modes.AddRange(monitorModes);
 
@@ -395,26 +467,14 @@ public partial class MainViewModel : ObservableObject
 
     private void ApplyAudio(AppConfig config, List<AudioDevice> devices)
     {
-        AudioOptions.Clear();
-        AudioOptions.Add(new ComboOption { Text = "Não alterar", Value = "" });
-        AudioOptions.Add(new ComboOption { Text = "A que aparecer ao conectar (TV)", Value = ConsoleEngine.AudioOnConnectId });
-
-        if (AppPaths.HasSvv)
-        {
-            foreach (var device in devices)
-                AudioOptions.Add(new ComboOption { Text = device.Name, Value = device.FriendlyId });
-        }
-        else
-        {
-            AudioHintText = "SoundVolumeView.exe não encontrado em ConsoleMode_Data/tools; a troca de áudio fica desativada.";
-        }
+        _availableAudioDevices = devices;
 
         if (config.AudioAutoSwitch)
-            SelectedAudio = AudioOptions.FirstOrDefault(a => a.Value == ConsoleEngine.AudioOnConnectId);
+            BuildAudioOptions(ConsoleEngine.AudioOnConnectId);
         else if (!string.IsNullOrWhiteSpace(config.AudioDeviceId))
-            SelectedAudio = AudioOptions.FirstOrDefault(a => a.Value == config.AudioDeviceId) ?? AudioOptions[0];
+            BuildAudioOptions(config.AudioDeviceId);
         else
-            SelectedAudio = AudioOptions[0];
+            BuildAudioOptions("");
     }
 
     private void OnRoleChanged(MonitorRowViewModel source)
@@ -444,6 +504,12 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnCustomFpsTextChanged(string value) => SettingChanged();
     partial void OnSelectedAudioChanged(ComboOption? value) => SettingChanged();
+    partial void OnSelectedLanguageChanged(ComboOption? value)
+    {
+        if (_applying || value is null) return;
+        LocalizationService.SetLanguage(value.Value);
+        SettingChanged();
+    }
     partial void OnSelectedHideStrategyChanged(ComboOption? value) => SettingChanged();
     partial void OnHdrEnableChanged(bool value) => SettingChanged();
     partial void OnVrrEnableChanged(bool value) => SettingChanged();
@@ -487,12 +553,12 @@ public partial class MainViewModel : ObservableObject
         {
             TrySave(BuildConfig());
             ShortcutService.CreateDesktopShortcut();
-            SetStatus("Atalho \"Modo Console\" criado na Área de Trabalho.", InfoBarSeverity.Success);
+            SetStatus(LocalizationService.Get("ShortcutCreated"), InfoBarSeverity.Success);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Atalho: {ex}");
-            SetStatus($"Não foi possível criar o atalho: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("ShortcutCreateError", ex.Message), InfoBarSeverity.Error);
         }
     }
 
@@ -505,7 +571,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            SetStatus($"Não foi possível abrir a pasta: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("OpenFolderError", ex.Message), InfoBarSeverity.Error);
         }
     }
 
@@ -516,7 +582,7 @@ public partial class MainViewModel : ObservableObject
         var config = BuildConfig();
         if (string.IsNullOrWhiteSpace(config.FocusMonitor))
         {
-            SetStatus("Escolha a tela onde você quer jogar.", InfoBarSeverity.Warning);
+            SetStatus(LocalizationService.Get("ChooseGameScreen"), InfoBarSeverity.Warning);
             return;
         }
 
@@ -549,8 +615,8 @@ public partial class MainViewModel : ObservableObject
         {
             AppLog.Write($"Start: {ex}");
             SetStatus(ex is OperationCanceledException
-                    ? "Suas telas voltaram ao normal porque a tela de jogo não foi confirmada. Confira a tela escolhida e tente de novo."
-                    : $"Falha ao entrar no modo console: {ex.Message}",
+                    ? LocalizationService.Get("UnconfirmedSetup")
+                    : LocalizationService.Get("StartFailure", ex.Message),
                 ex is OperationCanceledException ? InfoBarSeverity.Warning : InfoBarSeverity.Error);
             if (Engine.State.IsActive)
             {
@@ -613,14 +679,21 @@ public partial class MainViewModel : ObservableObject
         var confirmed = await window.Result;
         var family = ControllerInput.DetectFamily() switch
         {
-            ControllerFamily.Xbox => "controle Xbox detectado",
-            ControllerFamily.PlayStation => "controle PlayStation detectado",
-            ControllerFamily.Other => "controle detectado",
-            _ => "nenhum controle detectado"
+            ControllerFamily.Xbox => LocalizationService.Get("ControllerXbox"),
+            ControllerFamily.PlayStation => LocalizationService.Get("ControllerPlaystation"),
+            ControllerFamily.Other => LocalizationService.Get("ControllerOther"),
+            _ => LocalizationService.Get("ControllerNone")
         };
         AppLog.Write($"Teste de confirmação: {(confirmed ? "sim" : "não")} ({window.AnsweredBy}; {family})");
-        SetStatus(
-            $"Teste: {(confirmed ? "confirmado" : "voltaria ao normal")} por {window.AnsweredBy} ({family}).",
+        var answerSource = window.AnsweredBy switch
+        {
+            "controle" => LocalizationService.Get("SourceController"),
+            "teclado" => LocalizationService.Get("SourceKeyboard"),
+            "mouse/teclado" => LocalizationService.Get("SourceMouseKeyboard"),
+            _ => LocalizationService.Get("SourceTimeout")
+        };
+        SetStatus(LocalizationService.Get("ConfirmationResult",
+                LocalizationService.Get(confirmed ? "ConfirmationAccepted" : "ConfirmationWillRevert"), answerSource, family),
             confirmed ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
     }
 
@@ -635,8 +708,8 @@ public partial class MainViewModel : ObservableObject
     public bool IsTourPlay => TourStep == 3;
 
     public string TourMapText => FocusRow is null
-        ? "Aqui estão as suas telas, na posição em que estão na mesa. Clique na tela onde você quer jogar."
-        : $"Aqui estão as suas telas, na posição em que estão na mesa. Escolhemos {FocusRow.Name} para jogar porque ela está desligada agora; clique em outra se preferir.";
+        ? LocalizationService.Get("TourMapGeneric")
+        : LocalizationService.Get("TourMapWithFocus", FocusRow.Name);
 
     [RelayCommand]
     private void StartTour()
@@ -683,12 +756,12 @@ public partial class MainViewModel : ObservableObject
         {
             await Task.Run(() => Engine.Stop());
             IsConsoleActive = false;
-            SetStatus("Suas telas voltaram ao normal.", InfoBarSeverity.Success);
+            SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Restore: {ex}");
-            SetStatus($"Falha ao restaurar: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
         }
         finally
         {
@@ -774,6 +847,7 @@ public partial class MainViewModel : ObservableObject
         var auto = audioId == ConsoleEngine.AudioOnConnectId;
         var config = new AppConfig
         {
+            AppLanguage = SelectedLanguage?.Value ?? LocalizationService.Language,
             // Listing failed: keep the saved screens instead of wiping them.
             FocusMonitor = _loadedConfig.FocusMonitor,
             HideMonitors = [.. _loadedConfig.HideMonitors],
@@ -826,7 +900,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Write($"Config save: {ex}");
-            SetStatus($"Não foi possível salvar a configuração: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(LocalizationService.Get("ConfigSaveFailure", ex.Message), InfoBarSeverity.Error);
         }
     }
 
@@ -843,35 +917,42 @@ public partial class MainViewModel : ObservableObject
         if (_applying) return;
         var hidden = Monitors.Where(m => m.IsHide).Select(m => m.Name).ToList();
         SummaryTitle = FocusRow is null
-            ? "Escolha a tela onde você quer jogar"
+            ? LocalizationService.Get("SummaryChooseScreen")
             : hidden.Count > 0
-                ? $"Jogar em {FocusRow.Name} e desligar {string.Join(" e ", hidden)}"
-                : $"Jogar em {FocusRow.Name}";
+                ? LocalizationService.Get("SummaryFocusAndHide", FocusRow.Name, JoinLocalized(hidden))
+                : LocalizationService.Get("SummaryFocusOnly", FocusRow.Name);
 
         SummaryItems.Clear();
-        SummaryItems.Add(SelectedLaunch?.Text ?? "Steam Big Picture");
+        SummaryItems.Add(SelectedLaunch?.Text ?? LocalizationService.Get("LaunchSteam"));
         switch (SelectedAudio?.Value)
         {
             case null or "":
                 break;
             case ConsoleEngine.AudioOnConnectId:
-                SummaryItems.Add("Áudio ao conectar");
+                SummaryItems.Add(LocalizationService.Get("SummaryAudioOnConnect"));
                 break;
             default:
-                SummaryItems.Add($"Áudio: {SelectedAudio.Text}");
+                SummaryItems.Add(LocalizationService.Get("SummaryAudio", SelectedAudio.Text));
                 break;
         }
         var fps = ReadFpsLimit();
-        if (IsFpsAvailable && fps > 0) SummaryItems.Add($"{fps} FPS");
+        if (IsFpsAvailable && fps > 0) SummaryItems.Add(LocalizationService.Get("SummaryFps", fps));
         if (HdrEnable) SummaryItems.Add("HDR");
         if (VrrEnable) SummaryItems.Add("VRR");
     }
 
+    private static string JoinLocalized(IReadOnlyList<string> values)
+    {
+        if (values.Count < 2) return values.FirstOrDefault() ?? "";
+        return string.Join(LocalizationService.Get("ListSeparator"), values.Take(values.Count - 1)) +
+               LocalizationService.Get("ListConjunction") + values[^1];
+    }
+
     private static string DescribeActive(AppConfig config) => config.FullscreenMode switch
     {
-        "playnite" => "Feche o Playnite e suas telas voltam sozinhas.",
-        "xboxMode" => "No Modo Xbox a volta é manual: use Restaurar agora ou o menu da bandeja.",
-        _ => "Feche o Big Picture e suas telas voltam sozinhas."
+        "playnite" => LocalizationService.Get("ActivePlaynite"),
+        "xboxMode" => LocalizationService.Get("ActiveXbox"),
+        _ => LocalizationService.Get("ActiveSteam")
     };
 
     private void ShowPage(bool settings)

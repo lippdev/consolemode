@@ -25,7 +25,7 @@ public static class ProcessRunner
         if (!process.WaitForExit(timeoutMs))
         {
             try { process.Kill(true); } catch { /* ignore */ }
-            throw new TimeoutException($"{Path.GetFileName(fileName)} expirou: {string.Join(' ', arguments)}");
+            throw new TimeoutException(LocalizationService.Get("ProcessTimeout", Path.GetFileName(fileName), string.Join(' ', arguments)));
         }
         return process.ExitCode;
     }
@@ -53,7 +53,7 @@ public static class ProcessRunner
         if (!process.WaitForExit(timeoutMs))
         {
             try { process.Kill(true); } catch { /* ignore */ }
-            throw new TimeoutException($"{Path.GetFileName(fileName)} expirou: {string.Join(' ', arguments)}");
+            throw new TimeoutException(LocalizationService.Get("ProcessTimeout", Path.GetFileName(fileName), string.Join(' ', arguments)));
         }
 
         stdout = stdout.Trim();
@@ -61,7 +61,7 @@ public static class ProcessRunner
         {
             var msg = !string.IsNullOrWhiteSpace(stderr) ? stderr.Trim() : stdout;
             if (string.IsNullOrWhiteSpace(msg)) msg = $"exit {process.ExitCode}";
-            throw new InvalidOperationException($"{Path.GetFileName(fileName)} falhou ({string.Join(' ', arguments)}): {msg}");
+            throw new InvalidOperationException(LocalizationService.Get("ProcessFailure", Path.GetFileName(fileName), string.Join(' ', arguments), msg));
         }
 
         return stdout;

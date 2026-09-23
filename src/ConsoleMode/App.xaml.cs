@@ -56,6 +56,7 @@ public partial class App : Application
         try
         {
             AppPaths.Initialize();
+            LocalizationService.SetLanguage(ConfigService.Load().AppLanguage);
             ControllerInput.Warmup();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
                          $"mmt={AppPaths.HasMmt}, svv={AppPaths.HasSvv}, rtss-cli={AppPaths.HasRtssCli}");

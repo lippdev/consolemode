@@ -9,12 +9,13 @@ public static class ShortcutService
     /// <summary>Creates "Modo Console.lnk" on the desktop that runs this exe with --start.</summary>
     public static string CreateDesktopShortcut()
     {
-        var exe = Environment.ProcessPath ?? throw new InvalidOperationException("Caminho do executável desconhecido.");
+        var exe = Environment.ProcessPath ?? throw new InvalidOperationException(LocalizationService.Get("UnknownExecutablePath"));
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        var path = Path.Combine(desktop, "Modo Console.lnk");
+        var name = LocalizationService.Get("ShortcutName");
+        var path = Path.Combine(desktop, $"{name}.lnk");
 
         var shellType = Type.GetTypeFromProgID("WScript.Shell")
-                        ?? throw new InvalidOperationException("WScript.Shell indisponível neste Windows.");
+                        ?? throw new InvalidOperationException(LocalizationService.Get("ShortcutUnavailable"));
         dynamic shell = Activator.CreateInstance(shellType)!;
         try
         {
@@ -25,7 +26,7 @@ public static class ShortcutService
                 link.Arguments = StartArgument;
                 link.WorkingDirectory = AppPaths.ExeDir;
                 link.IconLocation = File.Exists(AppPaths.IconPath) ? AppPaths.IconPath : $"{exe},0";
-                link.Description = "Entra no modo console com 1 clique";
+                link.Description = LocalizationService.Get("ShortcutDescription");
                 link.Save();
             }
             finally

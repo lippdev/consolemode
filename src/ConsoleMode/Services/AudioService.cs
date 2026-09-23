@@ -15,7 +15,7 @@ public sealed class AudioService
 
     public int InvokeSvv(params string[] args)
     {
-        if (!AppPaths.HasSvv) throw new InvalidOperationException($"SoundVolumeView.exe não encontrado em {AppPaths.SvvPath}");
+        if (!AppPaths.HasSvv) throw new InvalidOperationException(LocalizationService.Get("SvvMissing"));
         return ProcessRunner.Run(AppPaths.SvvPath, args);
     }
 
@@ -50,7 +50,7 @@ public sealed class AudioService
                 if (string.IsNullOrWhiteSpace(friendlyName)) displayName = driverName;
                 else if (!string.IsNullOrWhiteSpace(driverName) && driverName != friendlyName) displayName = $"{friendlyName} ({driverName})";
                 else displayName = friendlyName;
-                if (!isActive) displayName += " [Desabilitado]";
+
 
                 devices.Add(new AudioDevice
                 {
@@ -116,7 +116,10 @@ public sealed class AudioService
 
     private static int Score(AudioDevice device, string? hint, MonitorInfo? focus)
     {
-        var text = device.Name.Replace(" [Desabilitado]", "", StringComparison.OrdinalIgnoreCase).Trim();
+        var text = device.Name
+            .Replace(LocalizationService.Get("AudioDisabledSuffix"), "", StringComparison.OrdinalIgnoreCase)
+            .Replace(" [Desabilitado]", "", StringComparison.OrdinalIgnoreCase)
+            .Trim();
         var score = 0;
         if (!string.IsNullOrWhiteSpace(hint))
         {

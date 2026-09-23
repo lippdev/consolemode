@@ -285,6 +285,7 @@ public static class NativeWindows
     {
         var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf<DEVMODE>() };
         if (!EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm)) return null;
-        return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel, " (atual)");
+        return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel,
+            ConsoleMode.Services.LocalizationService.Get("CurrentModeSuffix"));
     }
 }

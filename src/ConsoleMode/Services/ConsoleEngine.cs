@@ -33,7 +33,7 @@ public sealed class ConsoleEngine
     /// </param>
     public void Start(AppConfig config, MonitorInfo? focusInfo, Func<ScreenRect?, bool>? confirmScreen = null)
     {
-        if (State.IsActive) throw new InvalidOperationException("O modo console já está ativo.");
+        if (State.IsActive) throw new InvalidOperationException(LocalizationService.Get("AlreadyConsoleActive"));
         config = ResolveMonitorNames(config);
         AppLog.Write($"Start: foco={config.FocusMonitor}, esconder={string.Join('+', config.HideMonitors)}, estratégia={config.HideStrategy}, modo={config.FullscreenMode}");
 
@@ -157,7 +157,7 @@ public sealed class ConsoleEngine
             if (!confirmScreen(State.FocusMonitorRect))
             {
                 AppLog.Write("Start: tela de jogo não confirmada; restaurando");
-                throw new OperationCanceledException("Tela de jogo não confirmada.");
+                throw new OperationCanceledException(LocalizationService.Get("GameScreenNotConfirmed"));
             }
         }
 

@@ -7,16 +7,16 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="{StaticResource PageMaxWidth}" Padding="36,4,36,36" Spacing="4">
-            <TextBlock Text="Ajustes" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,4"/>
+            <TextBlock Text="{x:Bind ViewModel.Texts.SettingsTitle, Mode=OneWay}" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,4"/>
             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
-                       Text="Tudo é salvo na hora. As telas se escolhem na tela inicial."/>
+                       Text="{x:Bind ViewModel.Texts.SettingsIntro, Mode=OneWay}"/>
             <InfoBar IsOpen="{x:Bind ViewModel.IsStatusOpen, Mode=TwoWay}" Margin="0,8,0,0"
                      Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"
                      Message="{x:Bind ViewModel.StatusText, Mode=OneWay}"/>
 
             <!-- Game screen -->
-            <TextBlock Text="Tela de jogo" Style="{StaticResource SettingsSectionHeader}"/>
-            <ctk:SettingsCard Header="Resolução e taxa de atualização"
+            <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}"
                               Description="{x:Bind ViewModel.FocusModeDescription, Mode=OneWay}"
                               IsEnabled="{x:Bind ViewModel.HasFocusRow, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
@@ -27,8 +27,8 @@
                           SelectedItem="{x:Bind ViewModel.FocusRow.SelectedMode, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Como desligar as outras telas"
-                              Description="Desconectar é o mais rápido. A tela preta não mexe no layout; DDC/CI apaga o painel pelo hardware.">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HideOtherScreensCard, Mode=OneWay}"
+                              Description="{x:Bind ViewModel.Texts.HideOtherScreensDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7E8;"/>
                 </ctk:SettingsCard.HeaderIcon>
@@ -39,8 +39,8 @@
             </ctk:SettingsCard>
 
             <!-- On entering -->
-            <TextBlock Text="Ao entrar no modo console" Style="{StaticResource SettingsSectionHeader}"/>
-            <ctk:SettingsCard Header="Abrir" Description="{x:Bind ViewModel.LaunchDescription, Mode=OneWay}">
+            <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.LaunchCard, Mode=OneWay}" Description="{x:Bind ViewModel.LaunchDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7FC;"/>
                 </ctk:SettingsCard.HeaderIcon>
@@ -49,7 +49,7 @@
                           SelectedItem="{x:Bind ViewModel.SelectedLaunch, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Saída de áudio" Description="{x:Bind ViewModel.AudioHintText, Mode=OneWay}">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}" Description="{x:Bind ViewModel.AudioHintText, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE767;"/>
                 </ctk:SettingsCard.HeaderIcon>
@@ -60,27 +60,29 @@
             </ctk:SettingsCard>
 
             <!-- Optional extras -->
-            <TextBlock Text="Extras opcionais" Style="{StaticResource SettingsSectionHeader}"/>
-            <ctk:SettingsCard Header="HDR na tela de jogo" Description="Liga ao entrar e volta como estava ao sair.">
+            <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HdrDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE706;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.HdrEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.HdrEnable, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Taxa de atualização variável (VRR)"
-                              Description="Liga o ajuste do Windows. Ative também no painel da NVIDIA/AMD.">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.VrrCard, Mode=OneWay}"
+                              Description="{x:Bind ViewModel.Texts.VrrDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE916;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.VrrEnable, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.VrrEnable, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Limite de FPS" Description="{x:Bind ViewModel.FpsStatusText, Mode=OneWay}"
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}" Description="{x:Bind ViewModel.FpsStatusText, Mode=OneWay}"
                               IsEnabled="{x:Bind ViewModel.IsFpsAvailable, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEC4A;"/>
                 </ctk:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBox Width="72" PlaceholderText="FPS"
+                    <TextBox Width="72" PlaceholderText="{x:Bind ViewModel.Texts.FpsPlaceholder, Mode=OneWay}"
                              Visibility="{x:Bind ViewModel.ShowCustomFps, Mode=OneWay}"
                              Text="{x:Bind ViewModel.CustomFpsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <ComboBox MinWidth="160"
@@ -91,53 +93,64 @@
             </ctk:SettingsCard>
 
             <!-- App -->
-            <TextBlock Text="App" Style="{StaticResource SettingsSectionHeader}"/>
-            <ctk:SettingsCard Header="Iniciar com o Windows" Description="Abre direto na bandeja ao ligar o PC, pronto para o atalho de 1 clique.">
+            <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.LanguageCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.LanguageDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE774;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.LanguageOptions, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.StartupCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.StartupDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE770;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Atualizações" Description="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.UpdatesCard, Mode=OneWay}" Description="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE895;"/>
                 </ctk:SettingsCard.HeaderIcon>
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <ProgressRing Width="18" Height="18" IsActive="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"
                                   Visibility="{x:Bind ViewModel.IsCheckingUpdates, Mode=OneWay}"/>
-                    <Button Content="Procurar agora" Command="{x:Bind ViewModel.CheckNowCommand}"/>
+                    <Button Content="{x:Bind ViewModel.Texts.CheckNow, Mode=OneWay}" Command="{x:Bind ViewModel.CheckNowCommand}"/>
                 </StackPanel>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Avisar quando sair versão nova" Description="Consulta as releases no GitHub ao abrir o app.">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.NotifyUpdatesCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.NotifyUpdatesDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xEA8F;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.CheckUpdates, Mode=TwoWay}"/>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.CheckUpdates, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
 
             <!-- Shortcut, help & data -->
-            <TextBlock Text="Atalho, ajuda e dados" Style="{StaticResource SettingsSectionHeader}"/>
-            <ctk:SettingsCard Header="Confirmação na TV"
-                              Description="Na primeira vez com uma tela de jogo nova, a TV pergunta se você está vendo a imagem. Responde com mouse, teclado ou controle (Xbox: A/B · PlayStation: ✕/○). Teste aqui sem mexer nas telas.">
+            <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvConfirmationCard, Mode=OneWay}"
+                              Description="{x:Bind ViewModel.Texts.TvConfirmationDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7FC;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <Button Content="Testar agora" Command="{x:Bind ViewModel.TestConfirmCommand}"/>
+                <Button Content="{x:Bind ViewModel.Texts.TestNow, Mode=OneWay}" Command="{x:Bind ViewModel.TestConfirmCommand}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Tutorial" Description="Mostra de novo o passo a passo da tela inicial.">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TutorialCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TutorialDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE897;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <Button Content="Ver de novo" Command="{x:Bind ViewModel.StartTourCommand}"/>
+                <Button Content="{x:Bind ViewModel.Texts.SeeAgain, Mode=OneWay}" Command="{x:Bind ViewModel.StartTourCommand}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Atalho de 1 clique"
-                              Description="Cria &quot;Modo Console&quot; na Área de Trabalho. Ele entra no modo console direto, sem abrir esta janela.">
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.OneClickCard, Mode=OneWay}"
+                              Description="{x:Bind ViewModel.Texts.OneClickDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE71B;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <Button Content="Criar atalho" Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
+                <Button Content="{x:Bind ViewModel.Texts.CreateShortcut, Mode=OneWay}" Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="Pasta de dados" Description="Configuração, backup das telas e o log (consolemode.log)."
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.DataFolderCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.DataFolderDescription, Mode=OneWay}"
                               IsClickEnabled="True" Command="{x:Bind ViewModel.OpenDataFolderCommand}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8B7;"/>
