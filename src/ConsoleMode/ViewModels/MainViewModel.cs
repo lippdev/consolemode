@@ -577,17 +577,50 @@ public partial class MainViewModel : ObservableObject
     /// <summary>Runs on the Start worker thread; shows the prompt on the UI thread and waits.</summary>
     private bool ConfirmOnGameScreen(ScreenRect? gameScreen)
     {
-        Task<bool>? answer = null;
+        ConfirmWindow? window = null;
         RunOnUi(() =>
         {
-            var window = new ConfirmWindow(gameScreen, ConfirmSeconds);
+            window = new ConfirmWindow(gameScreen, ConfirmSeconds);
             window.Activate();
-            answer = window.Result;
         });
-        if (answer is null) return true; // could not show the prompt: don't block the user
+        if (window is null) return true; // could not show the prompt: don't block the user
+        var answer = window.Result;
         var confirmed = answer.Wait(TimeSpan.FromSeconds(ConfirmSeconds + 10)) && answer.Result;
-        AppLog.Write($"Confirmação na tela de jogo: {(confirmed ? "sim" : "não")}");
+        AppLog.Write($"Confirmação na tela de jogo: {(confirmed ? "sim" : "não")} ({window.AnsweredBy})");
         return confirmed;
+    }
+
+    /// <summary>Settings: show the prompt over this window without touching any screen.</summary>
+    [RelayCommand]
+    private async Task TestConfirmAsync()
+    {
+        ScreenRect? here = null;
+        if (App.MainWindowInstance is { } main)
+        {
+            var appWindow = main.AppWindow;
+            here = new ScreenRect
+            {
+                X = appWindow.Position.X,
+                Y = appWindow.Position.Y,
+                Width = appWindow.Size.Width,
+                Height = appWindow.Size.Height
+            };
+        }
+
+        var window = new ConfirmWindow(here, ConfirmSeconds);
+        window.Activate();
+        var confirmed = await window.Result;
+        var family = ControllerInput.DetectFamily() switch
+        {
+            ControllerFamily.Xbox => "controle Xbox detectado",
+            ControllerFamily.PlayStation => "controle PlayStation detectado",
+            ControllerFamily.Other => "controle detectado",
+            _ => "nenhum controle detectado"
+        };
+        AppLog.Write($"Teste de confirmação: {(confirmed ? "sim" : "não")} ({window.AnsweredBy}; {family})");
+        SetStatus(
+            $"Teste: {(confirmed ? "confirmado" : "voltaria ao normal")} por {window.AnsweredBy} ({family}).",
+            confirmed ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
     }
 
     // ───────────── First-run tour ─────────────

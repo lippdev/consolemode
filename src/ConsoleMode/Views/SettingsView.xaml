@@ -92,6 +92,13 @@
 
             <!-- Shortcut, help & data -->
             <TextBlock Text="Atalho, ajuda e dados" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Confirmação na TV"
+                              Description="Na primeira vez com uma tela de jogo nova, a TV pergunta se você está vendo a imagem. Responde com mouse, teclado ou controle (Xbox: A/B · PlayStation: ✕/○). Teste aqui sem mexer nas telas.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="Testar agora" Command="{x:Bind ViewModel.TestConfirmCommand}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="Tutorial" Description="Mostra de novo o passo a passo da tela inicial.">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE897;"/>

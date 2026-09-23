@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Console Mode">
 
-    <Grid Padding="32,28" RowSpacing="12" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+    <Grid x:Name="Root" Padding="32,28" RowSpacing="12" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -21,14 +21,27 @@
             <TextBlock Text="Está vendo esta tela?" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
         </StackPanel>
         <TextBlock Grid.Row="1" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                   Text="Esta é a tela de jogo. Confirme para abrir o jogo. Se ninguém responder, suas telas voltam ao normal sozinhas."/>
+                   Text="Esta é a tela de jogo. Confirme com o mouse, o teclado ou o controle. Se ninguém responder, suas telas voltam ao normal sozinhas."/>
         <ProgressBar x:Name="CountdownBar" Grid.Row="2" Margin="0,8,0,0" Minimum="0"/>
         <TextBlock x:Name="CountdownText" Grid.Row="3" Style="{StaticResource CaptionTextBlockStyle}"
                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-            <Button Content="Voltar ao normal" Click="OnRevert"/>
-            <Button x:Name="KeepButton" Style="{StaticResource AccentButtonStyle}" Content="Sim, continuar" Click="OnKeep"/>
+            <Button Click="OnRevert" Padding="12,6">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <!-- Controller hint: B on Xbox, Circle on PlayStation. -->
+                    <FontIcon x:Name="BackXboxGlyph" Glyph="&#xF094;" FontSize="16" Visibility="Collapsed"/>
+                    <TextBlock x:Name="BackPsGlyph" Text="○" FontSize="16" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <TextBlock Text="Voltar ao normal" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="KeepButton" Style="{StaticResource AccentButtonStyle}" Click="OnKeep" Padding="12,6">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon x:Name="KeepXboxGlyph" Glyph="&#xF093;" FontSize="16" Visibility="Collapsed"/>
+                    <TextBlock x:Name="KeepPsGlyph" Text="✕" FontSize="16" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <TextBlock Text="Sim, continuar" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>
