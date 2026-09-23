@@ -17,6 +17,19 @@ public sealed class AppConfig
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }
+
+    /// <summary>The first-run tour was finished or skipped.</summary>
+    public bool TourDone { get; set; }
+
+    /// <summary>
+    /// Game screen + mode the user confirmed they can see ("id|WxH@Hz"). A different setup
+    /// asks for confirmation on the TV before launching, and rolls back if nobody answers.
+    /// </summary>
+    public string ConfirmedSetup { get; set; } = "";
+
+    [JsonIgnore]
+    public string SetupKey =>
+        $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";
 }
 
 public sealed class SavedDisplayMode

@@ -40,7 +40,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isHomePage = true;
     [ObservableProperty] private bool _isSettingsPage;
-    [ObservableProperty] private bool _isWelcomeOpen;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _hasMonitors;
     [ObservableProperty] private bool _isConsoleActive;
@@ -109,7 +108,8 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(StartButtonText));
     }
 
-    public async Task InitializeAsync()
+    /// <param name="interactive">False for --start: no tour while the window stays hidden.</param>
+    public async Task InitializeAsync(bool interactive = true)
     {
         Engine.UiInvoker = RunOnUi;
 
@@ -138,12 +138,9 @@ public partial class MainViewModel : ObservableObject
 
         var firstRun = !ConfigService.Exists;
         await ReloadAsync();
-        if (firstRun && HasMonitors)
-        {
-            // Save the detected defaults so the tray/shortcut work right away.
-            TrySave(BuildConfig());
-            IsWelcomeOpen = true;
-        }
+        // Save the detected defaults so the tray/shortcut work right away.
+        if (firstRun && HasMonitors) TrySave(BuildConfig());
+        if (interactive && HasMonitors && !_loadedConfig.TourDone) StartTour();
     }
 
     /// <summary>--start / tray: enter console mode with the saved config.</summary>
@@ -526,25 +523,40 @@ public partial class MainViewModel : ObservableObject
         _busy = true;
         IsStarting = true;
         IsStatusOpen = false;
-        IsWelcomeOpen = false;
+        TourStep = 0;
+
+        // Safety net: a game screen/mode never seen working must be confirmed on the TV,
+        // otherwise the desk screens come back by themselves.
+        var setup = config.SetupKey;
+        Func<ScreenRect?, bool>? confirm = config.ConfirmedSetup == setup ? null : ConfirmOnGameScreen;
+        var rolledBack = false;
         try
         {
             var focus = FocusRow?.Monitor;
-            await Task.Run(() => Engine.Start(config, focus));
+            await Task.Run(() => Engine.Start(config, focus, confirm));
             IsConsoleActive = true;
             ShowPage(settings: false);
             ActiveDescText = DescribeActive(config);
             StartLoop();
+            if (confirm is not null)
+            {
+                config.ConfirmedSetup = setup;
+                TrySave(config);
+            }
         }
         catch (Exception ex)
         {
             AppLog.Write($"Start: {ex}");
-            SetStatus($"Falha ao entrar no modo console: {ex.Message}", InfoBarSeverity.Error);
+            SetStatus(ex is OperationCanceledException
+                    ? "Suas telas voltaram ao normal porque a tela de jogo não foi confirmada. Confira a tela escolhida e tente de novo."
+                    : $"Falha ao entrar no modo console: {ex.Message}",
+                ex is OperationCanceledException ? InfoBarSeverity.Warning : InfoBarSeverity.Error);
             if (Engine.State.IsActive)
             {
                 // Half-applied setup: put the desktop back instead of leaving it broken.
                 try { await Task.Run(() => Engine.Stop()); }
                 catch (Exception stopEx) { AppLog.Write($"Start rollback: {stopEx}"); }
+                rolledBack = true;
             }
         }
         finally
@@ -552,6 +564,78 @@ public partial class MainViewModel : ObservableObject
             IsStarting = false;
             _busy = false;
         }
+
+        if (rolledBack)
+        {
+            Engine.Monitors.ClearCache();
+            await ReloadAsync();
+        }
+    }
+
+    private const int ConfirmSeconds = 15;
+
+    /// <summary>Runs on the Start worker thread; shows the prompt on the UI thread and waits.</summary>
+    private bool ConfirmOnGameScreen(ScreenRect? gameScreen)
+    {
+        Task<bool>? answer = null;
+        RunOnUi(() =>
+        {
+            var window = new ConfirmWindow(gameScreen, ConfirmSeconds);
+            window.Activate();
+            answer = window.Result;
+        });
+        if (answer is null) return true; // could not show the prompt: don't block the user
+        var confirmed = answer.Wait(TimeSpan.FromSeconds(ConfirmSeconds + 10)) && answer.Result;
+        AppLog.Write($"Confirmação na tela de jogo: {(confirmed ? "sim" : "não")}");
+        return confirmed;
+    }
+
+    // ───────────── First-run tour ─────────────
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTourMap), nameof(IsTourRole), nameof(IsTourPlay))]
+    private int _tourStep;
+
+    public bool IsTourMap => TourStep == 1;
+    public bool IsTourRole => TourStep == 2;
+    public bool IsTourPlay => TourStep == 3;
+
+    public string TourMapText => FocusRow is null
+        ? "Aqui estão as suas telas, na posição em que estão na mesa. Clique na tela onde você quer jogar."
+        : $"Aqui estão as suas telas, na posição em que estão na mesa. Escolhemos {FocusRow.Name} para jogar porque ela está desligada agora; clique em outra se preferir.";
+
+    [RelayCommand]
+    private void StartTour()
+    {
+        if (!HasMonitors || IsConsoleActive) return;
+        ShowPage(settings: false);
+        IsStatusOpen = false;
+        SelectedMonitor = FocusRow ?? SelectedMonitor;
+        OnPropertyChanged(nameof(TourMapText));
+        TourStep = 1;
+    }
+
+    [RelayCommand]
+    private void TourNext()
+    {
+        if (TourStep >= 3) EndTour();
+        else TourStep++;
+    }
+
+    /// <summary>"Pular tutorial" or the X; step changes close tips programmatically and are ignored.</summary>
+    public void OnTourTipClosed(TeachingTip sender, TeachingTipClosedEventArgs args)
+    {
+        if (args.Reason != TeachingTipCloseReason.Programmatic) EndTour();
+    }
+
+    [RelayCommand]
+    private void EndTour()
+    {
+        TourStep = 0;
+        if (_loadedConfig.TourDone) return;
+        var config = BuildConfig();
+        config.TourDone = true;
+        TrySave(config);
     }
 
     [RelayCommand]
@@ -667,7 +751,9 @@ public partial class MainViewModel : ObservableObject
             AudioAutoSwitch = auto,
             FpsLimit = ReadFpsLimit(),
             HdrEnable = HdrEnable,
-            VrrEnable = VrrEnable
+            VrrEnable = VrrEnable,
+            TourDone = _loadedConfig.TourDone,
+            ConfirmedSetup = _loadedConfig.ConfirmedSetup
         };
 
         if (Monitors.Count == 0) return config;

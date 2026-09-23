@@ -64,7 +64,7 @@ public partial class App : Application
             ListenForSignals();
 
             if (!autoStart) _window.Activate();
-            await ViewModel.InitializeAsync();
+            await ViewModel.InitializeAsync(interactive: !autoStart);
 
             if (autoStart && !await ViewModel.TryAutoStartAsync())
                 _window.Activate();

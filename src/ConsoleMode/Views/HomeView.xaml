@@ -23,9 +23,6 @@
                     <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
                                Text="Clique numa tela e escolha o que ela faz. As que desligam voltam sozinhas quando você sai do jogo."/>
                 </StackPanel>
-                <InfoBar IsOpen="{x:Bind ViewModel.IsWelcomeOpen, Mode=TwoWay}" Severity="Informational"
-                         Title="Primeira vez por aqui"
-                         Message="Escolhemos a tela que está desligada como a de jogo. Confira abaixo; tudo é salvo automaticamente."/>
                 <InfoBar IsOpen="{x:Bind ViewModel.IsStatusOpen, Mode=TwoWay}"
                          Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"
                          Message="{x:Bind ViewModel.StatusText, Mode=OneWay}"/>
@@ -47,7 +44,7 @@
                                       Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
 
                         <!-- Screens drawn where they sit on the desktop, like Windows display settings. -->
-                        <ItemsControl ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}"
+                        <ItemsControl x:Name="MonitorMap" ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.ShowTiles, Mode=OneWay}"
                                       HorizontalAlignment="Center" VerticalAlignment="Center">
                             <ItemsControl.ItemsPanel>
@@ -120,7 +117,7 @@
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
-                        <ctk:Segmented Grid.Column="1" VerticalAlignment="Center"
+                        <ctk:Segmented x:Name="RoleSelector" Grid.Column="1" VerticalAlignment="Center"
                                        SelectedIndex="{x:Bind ViewModel.SelectedMonitor.RoleIndex, Mode=TwoWay}"
                                        AutomationProperties.Name="O que esta tela faz">
                             <ctk:SegmentedItem Content="Jogar aqui">
@@ -174,7 +171,7 @@
                             <TextBlock Text="Ajustes"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource AccentButtonStyle}" Height="40" Padding="22,0" MinWidth="160"
+                    <Button x:Name="PlayButton" Style="{StaticResource AccentButtonStyle}" Height="40" Padding="22,0" MinWidth="160"
                             Command="{x:Bind ViewModel.StartCommand}"
                             IsEnabled="{x:Bind ViewModel.CanStart, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -185,6 +182,40 @@
                 </StackPanel>
             </Grid>
         </Grid>
+
+        <!-- ───────────── First-run tour (coach marks on the real controls) ───────────── -->
+        <TeachingTip Target="{x:Bind MonitorMap}" PreferredPlacement="Top" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourMap, Mode=OneWay}"
+                     Title="1 de 3 · Suas telas"
+                     Subtitle="{x:Bind ViewModel.TourMapText, Mode=OneWay}"
+                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE7F4;"/>
+            </TeachingTip.IconSource>
+        </TeachingTip>
+        <TeachingTip Target="{x:Bind RoleSelector}" PreferredPlacement="Top" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourRole, Mode=OneWay}"
+                     Title="2 de 3 · O que cada tela faz"
+                     Subtitle="Com uma tela selecionada, escolha aqui: jogar nela, desligar enquanto você joga ou deixar ligada. As desligadas voltam sozinhas quando você sai."
+                     ActionButtonContent="Próximo" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     CloseButtonContent="Pular tutorial" Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE7E8;"/>
+            </TeachingTip.IconSource>
+        </TeachingTip>
+        <TeachingTip Target="{x:Bind PlayButton}" PreferredPlacement="TopLeft" IsLightDismissEnabled="False"
+                     IsOpen="{x:Bind ViewModel.IsTourPlay, Mode=OneWay}"
+                     Title="3 de 3 · Um clique para jogar"
+                     Subtitle="As telas trocam e o Big Picture abre na TV. Na primeira vez a TV pergunta se você está vendo a imagem; se ninguém responder em 15 s, tudo volta sozinho. Para sair, é só fechar o Big Picture."
+                     ActionButtonContent="Entendi" ActionButtonCommand="{x:Bind ViewModel.TourNextCommand}"
+                     Closed="{x:Bind ViewModel.OnTourTipClosed}">
+            <TeachingTip.IconSource>
+                <FontIconSource Glyph="&#xE768;"/>
+            </TeachingTip.IconSource>
+            <HyperlinkButton Content="Criar atalho na Área de Trabalho" Margin="-12,4,0,0"
+                             Command="{x:Bind ViewModel.CreateShortcutCommand}"/>
+        </TeachingTip>
 
         <!-- ───────────── Active: one way back ───────────── -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" MaxWidth="460"

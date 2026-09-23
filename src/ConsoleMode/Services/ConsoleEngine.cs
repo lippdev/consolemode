@@ -26,7 +26,12 @@ public sealed class ConsoleEngine
         else UiInvoker(action);
     }
 
-    public void Start(AppConfig config, MonitorInfo? focusInfo)
+    /// <param name="confirmScreen">
+    /// Optional safety net, called once the screens are switched and before anything is launched.
+    /// Receives the game screen bounds and returns false when nobody confirmed they can see it;
+    /// Start then throws <see cref="OperationCanceledException"/> so the caller restores the setup.
+    /// </param>
+    public void Start(AppConfig config, MonitorInfo? focusInfo, Func<ScreenRect?, bool>? confirmScreen = null)
     {
         if (State.IsActive) throw new InvalidOperationException("O modo console já está ativo.");
         config = ResolveMonitorNames(config);
@@ -144,6 +149,16 @@ public sealed class ConsoleEngine
             InitializeAudioWatch();
             if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
                 CompleteAudioWatch();
+        }
+
+        if (confirmScreen is not null)
+        {
+            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+            if (!confirmScreen(State.FocusMonitorRect))
+            {
+                AppLog.Write("Start: tela de jogo não confirmada; restaurando");
+                throw new OperationCanceledException("Tela de jogo não confirmada.");
+            }
         }
 
         if (config.FpsLimit > 0 && Rtss.IsReady)
@@ -355,7 +370,9 @@ public sealed class ConsoleEngine
             FpsLimit = config.FpsLimit,
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
-            VrrEnable = config.VrrEnable
+            VrrEnable = config.VrrEnable,
+            TourDone = config.TourDone,
+            ConfirmedSetup = config.ConfirmedSetup
         };
     }
 

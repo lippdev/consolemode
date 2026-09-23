@@ -90,8 +90,14 @@
                 </StackPanel>
             </ctk:SettingsCard>
 
-            <!-- Shortcut & data -->
-            <TextBlock Text="Atalho e dados" Style="{StaticResource SettingsSectionHeader}"/>
+            <!-- Shortcut, help & data -->
+            <TextBlock Text="Atalho, ajuda e dados" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="Tutorial" Description="Mostra de novo o passo a passo da tela inicial.">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE897;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="Ver de novo" Command="{x:Bind ViewModel.StartTourCommand}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="Atalho de 1 clique"
                               Description="Cria &quot;Modo Console&quot; na Área de Trabalho. Ele entra no modo console direto, sem abrir esta janela.">
                 <ctk:SettingsCard.HeaderIcon>
