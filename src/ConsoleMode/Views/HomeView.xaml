@@ -3,7 +3,8 @@
     x:Class="ConsoleMode.Views.HomeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:ConsoleMode.ViewModels">
+    xmlns:vm="using:ConsoleMode.ViewModels"
+    xmlns:controls="using:ConsoleMode.Controls">
 
     <Grid>
         <!-- Idle: pick the game screen, then one click. -->
@@ -14,50 +15,55 @@
                     <TextBlock Style="{StaticResource Hint}" Margin="0,4,0,0"
                                Text="Clique na tela onde você quer jogar. As outras são desligadas enquanto você joga e voltam ao sair."/>
 
-                    <Grid MinHeight="176" Margin="0,18,0,0">
+                    <Grid MinHeight="212" Margin="0,18,0,0">
                         <ProgressRing Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center"
                                       IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
 
+                        <!-- Screens drawn where they sit on the desktop, like Windows display settings. -->
                         <ItemsControl ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.ShowTiles, Mode=OneWay}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                      HorizontalAlignment="Center" VerticalAlignment="Center">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="12"/>
+                                    <controls:MonitorLayoutPanel/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:MonitorRowViewModel">
-                                    <Button Style="{StaticResource TileBtn}" VerticalAlignment="Bottom"
-                                            Width="{x:Bind TileWidth, Mode=OneWay}"
-                                            Height="{x:Bind TileHeight, Mode=OneWay}"
-                                            Background="{x:Bind TileBackground, Mode=OneWay}"
-                                            BorderBrush="{x:Bind TileBorder, Mode=OneWay}"
-                                            Opacity="{x:Bind TileOpacity, Mode=OneWay}"
-                                            Click="{x:Bind MakeFocus}"
-                                            ToolTipService.ToolTip="{x:Bind Title}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <TextBlock Style="{StaticResource IconText}" FontSize="13"
-                                                           Text="{x:Bind RoleGlyph, Mode=OneWay}"
-                                                           Foreground="{x:Bind RoleBrush, Mode=OneWay}"/>
-                                                <TextBlock FontSize="12" FontWeight="SemiBold"
-                                                           Text="{x:Bind RoleLabel, Mode=OneWay}"
-                                                           Foreground="{x:Bind RoleBrush, Mode=OneWay}"/>
-                                            </StackPanel>
-                                            <TextBlock Grid.Row="2" Text="{x:Bind Name}" FontWeight="SemiBold"
-                                                       TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextBrush}"/>
-                                            <TextBlock Grid.Row="3" Text="{x:Bind Details}" FontSize="11"
-                                                       TextTrimming="CharacterEllipsis" Foreground="{StaticResource MutedBrush}"/>
-                                        </Grid>
-                                    </Button>
+                                    <Grid Width="{x:Bind TileWidth, Mode=OneWay}" Height="{x:Bind TileHeight, Mode=OneWay}"
+                                          Opacity="{x:Bind TileOpacity, Mode=OneWay}">
+                                        <Button Style="{StaticResource TileBtn}"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                                Background="{x:Bind TileBackground, Mode=OneWay}"
+                                                BorderBrush="{x:Bind TileBorder, Mode=OneWay}"
+                                                Click="{x:Bind MakeFocus}"
+                                                ToolTipService.ToolTip="{x:Bind Title}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Style="{StaticResource IconText}" FontSize="13"
+                                                               Text="{x:Bind RoleGlyph, Mode=OneWay}"
+                                                               Foreground="{x:Bind RoleBrush, Mode=OneWay}"/>
+                                                    <TextBlock FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                                               Text="{x:Bind RoleLabel, Mode=OneWay}"
+                                                               Foreground="{x:Bind RoleBrush, Mode=OneWay}"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Row="2" Text="{x:Bind Name}" FontWeight="SemiBold" TextWrapping="WrapWholeWords"
+                                                           MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextBrush}"/>
+                                                <TextBlock Grid.Row="3" Text="{x:Bind Details}" FontSize="11" TextWrapping="WrapWholeWords"
+                                                           MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource MutedBrush}"/>
+                                            </Grid>
+                                        </Button>
+                                        <Rectangle RadiusX="12" RadiusY="12" Stroke="{StaticResource MutedBrush}" StrokeThickness="1.5"
+                                                   StrokeDashArray="4,3" Margin="1" IsHitTestVisible="False"
+                                                   Visibility="{x:Bind IsOff}"/>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

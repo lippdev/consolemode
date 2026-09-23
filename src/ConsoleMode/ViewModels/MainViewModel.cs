@@ -20,8 +20,9 @@ public partial class MainViewModel : ObservableObject
 
     private static readonly int[] FpsPresets = [30, 48, 50, 59, 60, 72, 75, 90, 120, 144];
     private const int FpsCustomValue = -1;
-    private const double TilesMaxWidth = 760;
-    private const double TilesMaxHeight = 170;
+    private const double LayoutMaxWidth = 760;
+    private const double LayoutMaxHeight = 200;
+    private const double TileInset = 3;
 
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private CancellationTokenSource? _loopCts;
@@ -57,6 +58,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _modeXbox;
     [ObservableProperty] private bool _hdrEnable;
     [ObservableProperty] private bool _vrrEnable;
+    [ObservableProperty] private MonitorRowViewModel? _selectedMonitor;
+
+    public bool HasSelectedMonitor => SelectedMonitor is not null;
 
     public bool IsIdle => !IsConsoleActive;
     public bool CanStart => HasMonitors && !IsLoading && !IsStarting && !IsConsoleActive;
@@ -227,6 +231,7 @@ public partial class MainViewModel : ObservableObject
 
     private void ApplyMonitors(AppConfig config, List<LoadedMonitor> loaded)
     {
+        SelectedMonitor = null;
         Monitors.Clear();
         HasMonitors = loaded.Count > 0;
         if (loaded.Count == 0) return;
@@ -263,33 +268,95 @@ public partial class MainViewModel : ObservableObject
             else if (firstRun || config.HideMonitors.Any(monitor.Matches)) role = MonitorRole.Hide;
             else role = MonitorRole.Keep;
 
-            Monitors.Add(new MonitorRowViewModel(monitor, role, selected, modes, OnRoleChanged));
+            Monitors.Add(new MonitorRowViewModel(monitor, role, selected, modes, OnRoleChanged, OnMonitorSelected));
         }
 
         LayoutTiles();
+        SelectedMonitor = Monitors.FirstOrDefault(m => m.IsFocus) ?? Monitors[0];
     }
 
-    /// <summary>Sizes the home-screen tiles in proportion to each screen's resolution.</summary>
+    private readonly record struct DesktopRect(double X, double Y, double W, double H)
+    {
+        public double Right => X + W;
+        public double Bottom => Y + H;
+        public bool Overlaps(DesktopRect o) => X < o.Right && o.X < Right && Y < o.Bottom && o.Y < Bottom;
+    }
+
+    /// <summary>
+    /// Maps each screen to its desktop position (like Windows display settings), scaled to fit.
+    /// Screens that are off keep a stale position that often overlaps the live ones, so those
+    /// are parked to the right of the arrangement instead.
+    /// </summary>
     private void LayoutTiles()
     {
         if (Monitors.Count == 0) return;
-        const double gap = 12;
-        var sizes = Monitors.Select(r =>
-        {
-            var w = r.Monitor.Width > 0 ? r.Monitor.Width : r.Monitor.MaxWidth;
-            var h = r.Monitor.Height > 0 ? r.Monitor.Height : r.Monitor.MaxHeight;
-            return (W: w > 0 ? w : 1920.0, H: h > 0 ? h : 1080.0);
-        }).ToList();
 
-        var scale = Math.Min(
-            (TilesMaxWidth - gap * (Monitors.Count - 1)) / sizes.Sum(s => s.W),
-            TilesMaxHeight / sizes.Max(s => s.H));
-
-        for (var i = 0; i < Monitors.Count; i++)
+        var rects = new Dictionary<MonitorRowViewModel, DesktopRect>();
+        var parked = new List<MonitorRowViewModel>();
+        foreach (var row in Monitors.OrderBy(r => r.IsOff))
         {
-            Monitors[i].TileWidth = Math.Max(150, sizes[i].W * scale);
-            Monitors[i].TileHeight = Math.Max(92, sizes[i].H * scale);
+            var (w, h) = DesktopSize(row.Monitor);
+            if (TryParsePoint(row.Monitor.LeftTop, out var x, out var y))
+            {
+                var rect = new DesktopRect(x, y, w, h);
+                if (!row.IsOff || !rects.Values.Any(rect.Overlaps))
+                {
+                    rects[row] = rect;
+                    continue;
+                }
+            }
+            parked.Add(row);
         }
+
+        foreach (var row in parked)
+        {
+            var (w, h) = DesktopSize(row.Monitor);
+            var right = rects.Count > 0 ? rects.Values.Max(r => r.Right) : 0;
+            var top = rects.Count > 0 ? rects.Values.Min(r => r.Y) : 0;
+            rects[row] = new DesktopRect(right + 240, top, w, h);
+        }
+
+        var left = rects.Values.Min(r => r.X);
+        var minY = rects.Values.Min(r => r.Y);
+        var width = rects.Values.Max(r => r.Right) - left;
+        var height = rects.Values.Max(r => r.Bottom) - minY;
+        var scale = Math.Min(LayoutMaxWidth / width, LayoutMaxHeight / height);
+
+        foreach (var (row, rect) in rects)
+        {
+            // Small inset so neighbouring screens read as separate tiles.
+            row.LayoutX = (rect.X - left) * scale + TileInset;
+            row.LayoutY = (rect.Y - minY) * scale + TileInset;
+            row.TileWidth = Math.Max(24, rect.W * scale - TileInset * 2);
+            row.TileHeight = Math.Max(24, rect.H * scale - TileInset * 2);
+        }
+    }
+
+    private static (double W, double H) DesktopSize(MonitorInfo m)
+    {
+        var w = m.Width > 0 ? m.Width : m.MaxWidth;
+        var h = m.Height > 0 ? m.Height : m.MaxHeight;
+        return (w > 0 ? w : 1920, h > 0 ? h : 1080);
+    }
+
+    private static bool TryParsePoint(string? text, out double x, out double y)
+    {
+        x = y = 0;
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        var m = Regex.Match(text, @"(-?\d+)\s*,\s*(-?\d+)");
+        if (!m.Success) return false;
+        x = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
+        y = int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture);
+        return true;
+    }
+
+    private void OnMonitorSelected(MonitorRowViewModel row) => SelectedMonitor = row;
+
+    partial void OnSelectedMonitorChanged(MonitorRowViewModel? oldValue, MonitorRowViewModel? newValue)
+    {
+        if (oldValue is not null) oldValue.IsSelected = false;
+        if (newValue is not null) newValue.IsSelected = true;
+        OnPropertyChanged(nameof(HasSelectedMonitor));
     }
 
     private void ApplyAudio(AppConfig config, List<AudioDevice> devices)
