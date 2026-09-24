@@ -23,6 +23,7 @@
     <Compile Include="../../src/ConsoleMode/Services/LocalizationService.cs" Link="LocalizationService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/FeedbackService.cs" Link="FeedbackService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ProtocolService.cs" Link="ProtocolService.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControlProtocol.cs" Link="ControlProtocol.cs" />
     <Compile Include="../../src/ConsoleMode/Services/UiModeResolver.cs" Link="UiModeResolver.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlaynitePaths.cs" Link="PlaynitePaths.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
