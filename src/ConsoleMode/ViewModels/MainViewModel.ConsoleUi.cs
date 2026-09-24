@@ -37,7 +37,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
         if (value) IsRolePanelOpen = false;
-        else IsConsoleSettingsOpen = false;
+        else { IsConsoleSettingsOpen = false; IsPickerOpen = false; }
     }
 
     partial void OnIsHomePageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopHome));
@@ -175,6 +175,68 @@ public partial class MainViewModel
         return index < 0 ? current : options[index];
     }
 
+    // ── Option picker (modal list): A on a card opens it, A on a row picks, B closes ──
+
+
+    public ObservableCollection<PickerItem> PickerOptions { get; } = [];
+
+    [ObservableProperty] private bool _isPickerOpen;
+    [ObservableProperty] private string _pickerTitle = "";
+    private string _pickerKey = "";
+
+    /// <summary>"launch", "audio", "mode", "fps", "hide", "language", "ui".</summary>
+    [RelayCommand]
+    private void OpenPicker(string key)
+    {
+        if (IsConsoleActive) return;
+        var (title, options, selected) = key switch
+        {
+            "launch" => (LocalizationService.Get("LaunchCard"), LaunchOptions.Select(o => (o.Text, o.Value)), SelectedLaunch?.Value),
+            "audio" => (LocalizationService.Get("AudioOutputCard"), AudioOptions.Select(o => (o.Text, o.Value)), SelectedAudio?.Value),
+            "fps" => (LocalizationService.Get("FpsCard"), FpsOptions.Where(o => o.Value != FpsCustomValue.ToString()).Select(o => (o.Text, o.Value)), SelectedFps?.Value),
+            "hide" => (LocalizationService.Get("HideOtherScreensCard"), HideStrategies.Select(o => (o.Text, o.Value)), SelectedHideStrategy?.Value),
+            "language" => (LocalizationService.Get("LanguageCard"), LanguageOptions.Select(o => (o.Text, o.Value)), SelectedLanguage?.Value),
+            "ui" => (LocalizationService.Get("UiModeCard"), UiModeOptions.Select(o => (o.Text, o.Value)), SelectedUiMode?.Value),
+            "mode" when FocusRow is not null => (LocalizationService.Get("ResolutionRefreshCard"), FocusRow.Modes.Select(m => (m.Text, m.Key)), FocusRow.SelectedMode?.Key),
+            _ => (null, null, null)
+        };
+        if (title is null || options is null) return;
+
+        _pickerKey = key;
+        PickerTitle = title;
+        PickerOptions.Clear();
+        foreach (var (text, value) in options)
+            PickerOptions.Add(new PickerItem(text, value, value == selected));
+        IsRolePanelOpen = false;
+        IsPickerOpen = true;
+    }
+
+    [RelayCommand]
+    private void PickOption(PickerItem? item)
+    {
+        if (item is null) return;
+        switch (_pickerKey)
+        {
+            case "launch": SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLaunch; break;
+            case "audio": SelectedAudio = AudioOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedAudio; break;
+            case "fps": SelectedFps = FpsOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFps; break;
+            case "hide": SelectedHideStrategy = HideStrategies.FirstOrDefault(o => o.Value == item.Value) ?? SelectedHideStrategy; break;
+            case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
+            case "ui": SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedUiMode; break;
+            case "mode":
+                if (FocusRow?.Modes.FirstOrDefault(m => m.Key == item.Value) is { } mode)
+                {
+                    FocusRow.SelectedMode = mode;
+                    SaveQuietly();
+                }
+                break;
+        }
+        IsPickerOpen = false;
+    }
+
+    [RelayCommand]
+    private void ClosePicker() => IsPickerOpen = false;
+
     [RelayCommand]
     private void OpenRolePanel(MonitorRowViewModel? row)
     {
@@ -194,3 +256,6 @@ public partial class MainViewModel
     [RelayCommand]
     private void CloseRolePanel() => IsRolePanelOpen = false;
 }
+
+/// <summary>One row of the console option picker.</summary>
+public sealed record PickerItem(string Text, string Value, bool IsSelected);
