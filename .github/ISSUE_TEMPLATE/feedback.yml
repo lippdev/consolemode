@@ -1,0 +1,39 @@
+# Opened from the "Send feedback" button in the app (FeedbackService.cs).
+# The app prefills the field whose id is "environment"; keep the ids in sync with FeedbackService.
+name: Feedback
+description: Sugestões, bugs e ideias para o Console Mode / Suggestions, bugs and ideas for Console Mode
+title: "[Feedback] "
+labels: [feedback]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a melhorar o Console Mode! Escreva em português ou em inglês.
+        Thanks for helping improve Console Mode! Write in Portuguese or English.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Tipo / Type
+      options:
+        - Sugestão / Suggestion
+        - Bug
+        - Outro / Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: O que aconteceu ou o que você gostaria? / What happened, or what would you like?
+      description: |
+        Para bugs, conte o que você fez, o que esperava e o que aconteceu. Prints ajudam: arraste as imagens para cá.
+        For bugs, tell us what you did, what you expected and what happened. Screenshots help: drag them here.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente / Environment
+      description: Preenchido pelo aplicativo. / Filled in by the app.
+      render: text
+    validations:
+      required: false

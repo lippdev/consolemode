@@ -576,6 +576,19 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenFeedback()
+    {
+        var environment = FeedbackService.BuildEnvironment(
+            UpdateService.CurrentVersion, AppPaths.IsInstalled,
+            Environment.OSVersion.Version.ToString(),
+            System.Runtime.InteropServices.RuntimeInformation.OSArchitecture.ToString(),
+            LocalizationService.Language);
+        var url = FeedbackService.BuildIssueUrl(UpdateService.Repository, environment);
+        try { Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true }); }
+        catch (Exception ex) { SetStatus(LocalizationService.Get("BrowserOpenFailure", ex.Message), InfoBarSeverity.Error); }
+    }
+
+    [RelayCommand]
     public async Task StartAsync()
     {
         if (_busy || IsConsoleActive) return;
