@@ -128,7 +128,7 @@ São planos, não promessas: a ordem pode mudar conforme o feedback. Vote com �
 **Próximos**
 - 1.5.0 estável, fechando as betas
 - Overlay de FPS, ligado pelo menu da sessão ([#66](https://github.com/lippdev/consolemode/issues/66))
-- Gravar os últimos 30 segundos pelo menu da sessão
+- Gravar os últimos 30 segundos pelo menu da sessão ([#77](https://github.com/lippdev/consolemode/issues/77))
 - Salvar e restaurar a posição dos ícones da área de trabalho ([#30](https://github.com/lippdev/consolemode/issues/30))
 
 **Depois**
