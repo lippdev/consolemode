@@ -52,6 +52,8 @@ const COLUMNS: Column[] = [
       { icon: "🗣", title: "Voice triggers", note: "Alexa, assistants, MCP", issue: 12 },
       { icon: "⚡", title: "WakeOn integration", note: "Wake the PC straight into console mode", issue: 71 },
       { icon: "📱", title: "Phone remote", note: "Over the local control API", issue: 72 },
+      { icon: "📺", title: "HDMI-CEC", note: "Turn the TV on and switch its input", issue: 75 },
+      { icon: "🐧", title: "Linux and macOS", note: "Beyond Windows", issue: 74 },
     ],
   },
 ];
@@ -68,7 +70,7 @@ const Card: React.FC<{ item: Item; appear: number; lit: number; color: string }>
       background: theme.card,
       border: `1px solid ${lit > 0.5 ? color : "rgba(255,255,255,0.08)"}`,
       borderRadius: 14,
-      padding: "14px 16px",
+      padding: "9px 16px",
       display: "flex",
       gap: 14,
       alignItems: "center",
@@ -120,7 +122,7 @@ export const Roadmap: React.FC = () => {
         <div style={{ fontSize: 56, fontWeight: 700 }}>Roadmap</div>
       </div>
 
-      <div style={{ position: "absolute", left: 50, right: 50, top: 170, display: "flex", gap: 24, opacity: 1 - outro * 0.9, filter: `blur(${outro * 6}px)` }}>
+      <div style={{ position: "absolute", left: 50, right: 50, top: 158, display: "flex", gap: 24, opacity: 1 - outro * 0.9, filter: `blur(${outro * 6}px)` }}>
         {COLUMNS.map((col, c) => {
           const colIn = interpolate(f, [INTRO + c * 8, INTRO + c * 8 + 14], [0, 1], ease);
           const lit = spotIndex === c ? 1 : 0;
@@ -133,7 +135,7 @@ export const Roadmap: React.FC = () => {
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                gap: 12,
+                gap: 9,
                 opacity: colIn * dim,
                 translate: `0 ${-lift * 8}px`,
                 scale: 1 + lift * 0.03,
