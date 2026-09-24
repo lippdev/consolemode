@@ -177,13 +177,14 @@
                     <ItemsControl ItemsSource="{x:Bind ViewModel.SummaryItems, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="6"/>
+                                <controls:WrapPanel Spacing="6"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Border Style="{StaticResource ChipBorder}">
-                                    <TextBlock Text="{x:Bind}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                <Border Style="{StaticResource ChipBorder}" ToolTipService.ToolTip="{x:Bind}">
+                                    <TextBlock Text="{x:Bind}" Style="{StaticResource CaptionTextBlockStyle}"
+                                               MaxWidth="320" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
