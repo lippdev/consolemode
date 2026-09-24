@@ -2,6 +2,13 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [1.5.0-beta.8]
+### Fixes
+- Desktop home screen: the "press A for console mode" hint is capped in width with an ellipsis and shows the full text on hover; long translations no longer stretch the header. (#56)
+
+### Beta release
+- This beta is the main download. People on 1.4.0 or an earlier beta get the notice in the app: just click **Update now**. Your settings are kept.
+
 ## [1.5.0-beta.7]
 ### What's new
 - Settings → "Test controller": shows live what Windows delivers from each pad (source, buttons by index, D-pad, sticks) and copies a diagnostic for the issue. The startup log lists the pads. For when a pad shows up but does nothing (DualSense with Steam running, for example).
