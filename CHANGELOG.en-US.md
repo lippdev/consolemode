@@ -4,6 +4,11 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Desktop interface navigable with the controller: D-pad/stick move, A activates (lists, switches, cards), B closes a list or leaves Settings, Start toggles Settings, Y goes to the console interface; in the tour, A advances and B skips. Based on PR #17 by @nextestudios.
+
+### Fixes
+- The controller went dead for good if a pad disconnected mid-read; the read now just skips that sample. Also from PR #17.
+- Controller navigation: the first press only reveals the focus ring; in scrolled lists focus falls back to tab order when the spatial search finds nothing; D-pad diagonals count as vertical; reads only count while the window is in the foreground (checked per window, not per event).
 - Session menu: while the game is open, hold Select + Y for a menu over the game with volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode". Also via `consolemode://menu`.
 
 ## [1.5.0-beta.5]

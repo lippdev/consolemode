@@ -80,6 +80,9 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Trocar o idioma em Ajustes e voltar para Console: todos os textos, incluindo os cartões, trocam. Resultado: ______
 
 ### Navegação por controle (Xbox **e** PlayStation; a janela precisa estar em primeiro plano)
+- [ ] **Interface Desktop:** D-pad move o foco entre tiles, o seletor de papel, os cards de Ajustes e os ComboBoxes; A abre um ComboBox, D-pad percorre, A escolhe, B fecha; Start abre e fecha Ajustes; Y vai para a interface Console; no tutorial, A avança e B pula. Resultado: ______
+- [ ] Desconectar o controle no meio do uso e reconectar: a navegação volta a funcionar sem reiniciar o app (log mostra no máximo uma linha `Controles: ...`). Resultado: ______
+- [ ] O primeiro toque após um clique de mouse só mostra o anel de foco; o segundo age. Resultado: ______
 - [ ] Ao abrir, o foco está em **Jogar agora** (anel grosso). Resultado: ______
 - [ ] D-pad e analógico esquerdo movem o foco: Jogar → cartões de ajustes → cartões de telas → "Modo desktop", e de volta. Segurar uma direção repete. Resultado: ______
 - [ ] **A** num cartão de tela abre o painel "O que a tela X faz?" com foco em "Jogar aqui"; A escolhe; **B** fecha sem mudar. Resultado: ______

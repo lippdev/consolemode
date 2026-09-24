@@ -122,8 +122,22 @@ public sealed class ControllerInput : IDisposable
 
     public void Dispose() => _timer.Stop();
 
+    /// <summary>
+    /// Only act while this returns true (e.g. our window is in the foreground). Reading resumes
+    /// primed, so a button held while inactive doesn't fire on the way back.
+    /// </summary>
+    public Func<bool>? IsActive { get; set; }
+
+    private bool _loggedError;
+
     private void Poll()
     {
+        if (IsActive is not null && !IsActive())
+        {
+            _primed = false;
+            return;
+        }
+
         var held = new bool[AllActions.Length];
         try
         {
@@ -132,10 +146,17 @@ public sealed class ControllerInput : IDisposable
         }
         catch (Exception ex)
         {
-            AppLog.Write($"Controles: {ex.Message}");
-            _timer.Stop();
+            // A pad unplugged mid-read throws; skip the sample instead of going deaf for good
+            // (ported from nextestudios' controller PR, #17).
+            if (!_loggedError) AppLog.Write($"Controles: {ex.Message}");
+            _loggedError = true;
+            _primed = false;
             return;
         }
+
+        // A diagonal on the D-pad or stick moves vertically, the common case in these lists.
+        if (held[(int)ControllerAction.Up] || held[(int)ControllerAction.Down])
+            held[(int)ControllerAction.Left] = held[(int)ControllerAction.Right] = false;
 
         // First sample only records state, so a button already held when the prompt opens
         // (e.g. the A that launched console mode) doesn't answer it.

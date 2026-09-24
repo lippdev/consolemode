@@ -43,7 +43,7 @@ public sealed partial class SessionMenuWindow : Window
         }
         WindowPlacement.CenterOn(appWindow, target, WidthDip, HeightDip);
 
-        _navigator = new GamepadNavigator(DispatcherQueue, Root)
+        _navigator = new GamepadNavigator(DispatcherQueue, Root, _hwnd)
         {
             // Left/Right on the volume row adjust it instead of moving focus.
             BeforeMove = direction =>

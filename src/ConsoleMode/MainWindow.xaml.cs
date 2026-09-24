@@ -52,10 +52,51 @@ public sealed partial class MainWindow : Window
         // The console interface fills the screen, like a console; the desktop one gets its size back.
         ViewModel.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName != nameof(MainViewModel.IsConsoleUi) || appWindow.Presenter is not OverlappedPresenter p) return;
-            if (ViewModel.IsConsoleUi) p.Maximize();
-            else if (p.State == OverlappedPresenterState.Maximized) p.Restore();
+            if (e.PropertyName == nameof(MainViewModel.IsConsoleUi) && appWindow.Presenter is OverlappedPresenter p)
+            {
+                if (ViewModel.IsConsoleUi) p.Maximize();
+                else if (p.State == OverlappedPresenterState.Maximized) p.Restore();
+            }
+            if (e.PropertyName is nameof(MainViewModel.IsConsoleUi) or nameof(MainViewModel.IsConsoleActive))
+                RefreshDesktopNavigator();
         };
+        WatchDesktopPad(hwnd);
+    }
+
+    // The desktop interface, driven by the pad like a console menu (ported from PR #17):
+    // D-pad/stick move, A activates (lists, toggles, cards), B closes a list or leaves Settings,
+    // Start toggles Settings, Y jumps to the console interface, tour: A next / B skip.
+    // The console interface has its own navigator inside ConsoleHomeView.
+    private GamepadNavigator? _desktopPad;
+
+    private void WatchDesktopPad(nint hwnd)
+    {
+        _desktopPad = new GamepadNavigator(DispatcherQueue, (DependencyObject)Content, hwnd)
+        {
+            Intercept = action =>
+            {
+                if (ViewModel.TourStep <= 0) return false;
+                if (action == ControllerAction.Confirm) ViewModel.TourNextCommand.Execute(null);
+                else if (action == ControllerAction.Back) ViewModel.EndTourCommand.Execute(null);
+                return true;
+            }
+        };
+        _desktopPad.MenuRequested += () =>
+        {
+            if (ViewModel.IsSettingsPage) ViewModel.GoHomeCommand.Execute(null);
+            else ViewModel.OpenSettingsCommand.Execute(null);
+        };
+        _desktopPad.BackRequested += () => { if (ViewModel.IsSettingsPage) ViewModel.GoHomeCommand.Execute(null); };
+        _desktopPad.AltRequested += () => ViewModel.SwitchUiCommand.Execute("console");
+        RefreshDesktopNavigator();
+    }
+
+    private void RefreshDesktopNavigator()
+    {
+        if (_desktopPad is null) return;
+        var listen = !ViewModel.IsConsoleUi && !ViewModel.IsConsoleActive;
+        if (listen && !_desktopPad.IsRunning) _desktopPad.Start();
+        else if (!listen && _desktopPad.IsRunning) _desktopPad.Stop();
     }
 
     private static class Win32Dpi

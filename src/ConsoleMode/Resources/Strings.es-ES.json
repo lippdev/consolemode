@@ -51,7 +51,7 @@
   "UiModeConsole": "Consola",
   "SwitchToDesktop": "Modo escritorio",
   "SwitchToConsole": "Modo consola",
-  "ControllerHintDesktop": "Mando detectado · pulsa A para el modo consola",
+  "ControllerHintDesktop": "Mando detectado · A navega, Y abre el modo consola",
   "SessionMenuTitle": "Menú de la sesión",
   "BackToGame": "Volver al juego",
   "VolumeRow": "Volumen",

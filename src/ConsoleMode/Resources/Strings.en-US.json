@@ -51,7 +51,7 @@
   "UiModeConsole": "Console",
   "SwitchToDesktop": "Desktop mode",
   "SwitchToConsole": "Console mode",
-  "ControllerHintDesktop": "Controller detected · press A for console mode",
+  "ControllerHintDesktop": "Controller detected · A navigates, Y opens console mode",
   "SessionMenuTitle": "Session menu",
   "BackToGame": "Back to the game",
   "VolumeRow": "Volume",
