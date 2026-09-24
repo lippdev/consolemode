@@ -13,7 +13,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - In the console interface the controller sometimes didn't respond until you changed screens: the listener didn't start the first time.
 
 ### Beta release
-- Pre-release: people on any 1.5.0 beta get the notice in the app. People on 1.4.0 don't; to try it, download the files below.
+- This beta is the main download. People on 1.4.0 or an earlier beta get the notice in the app: just click **Update now**. Your settings are kept.
 
 ## [1.5.0-beta.4]
 ### What's new
