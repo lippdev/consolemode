@@ -4,7 +4,12 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- In the desktop interface, with a controller detected, a "press A for console mode" hint appears; A or Start switch the interface.
 - Spanish interface. With no saved choice, the app follows the Windows language (Portuguese, Spanish or English). Adding a language is now just a `Strings.<code>.json` file.
+
+### Fixes
+- Automatic mode missed controllers that Windows lists late (PlayStation, Bluetooth) and opened in Desktop. The app now re-detects when a controller appears and also 1.5 s and 4 s after opening.
+- In the console interface the controller sometimes didn't respond until you changed screens: the listener didn't start the first time.
 
 ## [1.5.0-beta.4]
 ### What's new

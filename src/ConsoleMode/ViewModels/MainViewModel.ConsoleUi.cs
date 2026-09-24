@@ -68,12 +68,37 @@ public partial class MainViewModel
         SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == current) ?? UiModeOptions[0];
     }
 
+    [ObservableProperty] private bool _controllerDetected;
+
     /// <summary>Called after the config is applied and whenever the choice changes.</summary>
     private void ResolveUi()
     {
         var family = ControllerInput.DetectFamily();
         IsPlayStationHints = family == ControllerFamily.PlayStation;
-        IsConsoleUi = UiModeResolver.IsConsole(SelectedUiMode?.Value, family != ControllerFamily.None, LaunchedByController);
+        ControllerDetected = family != ControllerFamily.None;
+        IsConsoleUi = UiModeResolver.IsConsole(SelectedUiMode?.Value, ControllerDetected, LaunchedByController);
+    }
+
+    /// <summary>
+    /// A pad appeared or went away. Windows lists HID pads asynchronously, so the startup check
+    /// often misses them; re-resolving here is what makes "Automatic" pick the console interface.
+    /// Never flips the interface during a session.
+    /// </summary>
+    public void OnControllerPresenceChanged()
+    {
+        if (IsConsoleActive) return;
+        ResolveUi();
+    }
+
+    /// <summary>Startup safety net for pads that enumerate late (Bluetooth, DualSense).</summary>
+    private async Task RecheckControllerAsync()
+    {
+        foreach (var delay in new[] { 1500, 4000 })
+        {
+            await Task.Delay(delay);
+            if (ControllerDetected) return;
+            OnControllerPresenceChanged();
+        }
     }
 
     private void RefreshConsoleTexts()

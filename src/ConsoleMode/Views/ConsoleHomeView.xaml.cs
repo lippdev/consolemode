@@ -79,7 +79,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private void RefreshNavigator()
     {
         if (_navigator is null) return;
-        var listen = ViewModel.IsConsoleUi && _windowActive && Visibility == Visibility.Visible;
+        // Not Visibility: this runs from the IsConsoleUi change, before the binding has updated it.
+        var listen = ViewModel.IsConsoleUi && _windowActive;
         if (listen && !_navigator.IsRunning) _navigator.Start();
         else if (!listen && _navigator.IsRunning) _navigator.Stop();
     }

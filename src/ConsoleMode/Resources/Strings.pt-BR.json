@@ -51,6 +51,7 @@
   "UiModeConsole": "Console",
   "SwitchToDesktop": "Modo desktop",
   "SwitchToConsole": "Modo console",
+  "ControllerHintDesktop": "Controle detectado · aperte A para o modo console",
   "ConsoleScreensHeading": "Telas",
   "ConsoleQuickHeading": "Ajustes rápidos",
   "FullSettings": "Todos os ajustes",

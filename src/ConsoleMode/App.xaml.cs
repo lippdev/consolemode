@@ -162,6 +162,7 @@ public partial class App : Application
         {
             CanTrigger = () => ViewModel.AutoStartOnController && !ViewModel.IsConsoleActive && !_window.AppWindow.IsVisible
         };
+        _connect.PresenceChanged += () => ViewModel?.OnControllerPresenceChanged();
         _connect.Connected += () =>
         {
             if (ViewModel is not null) ViewModel.LaunchedByController = true;

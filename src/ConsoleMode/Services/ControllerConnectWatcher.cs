@@ -20,12 +20,16 @@ public sealed class ControllerConnectWatcher : IDisposable
 
     public event Action? Connected;
 
+    /// <summary>Any pad added or removed, no conditions; for UI that shows what's plugged in.</summary>
+    public event Action? PresenceChanged;
+
     public ControllerConnectWatcher(DispatcherQueue dispatcher)
     {
         _dispatcher = dispatcher;
         try
         {
             RawGameController.RawGameControllerAdded += OnAdded;
+            RawGameController.RawGameControllerRemoved += OnRemoved;
         }
         catch (Exception ex)
         {
@@ -41,12 +45,24 @@ public sealed class ControllerConnectWatcher : IDisposable
         var now = DateTime.UtcNow;
         var can = CanTrigger?.Invoke() ?? false;
         AppLog.Write($"Controle conectado: {controller.DisplayName}; auto-start {(ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can) ? "sim" : "não")}");
+        _dispatcher.TryEnqueue(() => PresenceChanged?.Invoke());
         if (!ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can)) return;
         _dispatcher.TryEnqueue(() => Connected?.Invoke());
     }
 
+    private void OnRemoved(object? sender, RawGameController controller)
+    {
+        AppLog.Write($"Controle desconectado: {controller.DisplayName}");
+        _dispatcher.TryEnqueue(() => PresenceChanged?.Invoke());
+    }
+
     public void Dispose()
     {
-        try { RawGameController.RawGameControllerAdded -= OnAdded; } catch { /* ignore */ }
+        try
+        {
+            RawGameController.RawGameControllerAdded -= OnAdded;
+            RawGameController.RawGameControllerRemoved -= OnRemoved;
+        }
+        catch { /* ignore */ }
     }
 }
