@@ -20,6 +20,9 @@ public sealed class AppConfig
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }
 
+    /// <summary>"auto" | "desktop" | "console": which interface to show (UiModeResolver).</summary>
+    public string UiMode { get; set; } = "auto";
+
     /// <summary>The first-run tour was finished or skipped.</summary>
     public bool TourDone { get; set; }
 

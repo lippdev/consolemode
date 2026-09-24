@@ -77,6 +77,52 @@
                 <Setter Property="Padding" Value="10,3"/>
             </Style>
 
+            <!-- Console (10-foot) interface: big cards with a thick accent focus ring for controller navigation. -->
+            <Style x:Key="ConsoleCard" TargetType="Button">
+                <Setter Property="MinWidth" Value="220"/>
+                <Setter Property="MinHeight" Value="120"/>
+                <Setter Property="Padding" Value="22,18"/>
+                <Setter Property="CornerRadius" Value="14"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="UseSystemFocusVisuals" Value="True"/>
+                <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="4"/>
+                <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+                <Setter Property="FocusVisualMargin" Value="-6"/>
+            </Style>
+            <!-- One settings row in the console settings list: label left, value right. -->
+            <Style x:Key="ConsoleRow" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <Setter Property="MinHeight" Value="76"/>
+                <Setter Property="Height" Value="76"/>
+                <Setter Property="Padding" Value="24,0"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="ConsolePlayButton" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+                <Setter Property="Height" Value="64"/>
+                <Setter Property="MinWidth" Value="280"/>
+                <Setter Property="Padding" Value="32,0"/>
+                <Setter Property="CornerRadius" Value="14"/>
+                <Setter Property="FocusVisualPrimaryBrush" Value="White"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="4"/>
+                <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+                <Setter Property="FocusVisualMargin" Value="-6"/>
+            </Style>
+            <Style x:Key="ConsoleSmallButton" TargetType="Button">
+                <Setter Property="Height" Value="44"/>
+                <Setter Property="Padding" Value="18,0"/>
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="4"/>
+                <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+                <Setter Property="FocusVisualMargin" Value="-6"/>
+            </Style>
+
             <Style x:Key="SettingsSectionHeader" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
                 <Setter Property="Margin" Value="1,24,0,6"/>
             </Style>
