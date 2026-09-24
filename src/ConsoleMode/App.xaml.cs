@@ -22,6 +22,7 @@ public partial class App : Application
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
     private EventWaitHandle? _stopSignal;
+    private ControlPipeService? _control;
     private readonly List<RegisteredWaitHandle> _signalWaits = [];
 
     public static MainWindow? MainWindowInstance { get; private set; }
@@ -78,6 +79,11 @@ public partial class App : Application
             MainWindowInstance = _window;
             _tray = new TrayService(_window, ViewModel);
             ListenForSignals();
+            // same requests as consolemode:// links, plus a status reply (see ControlPipeService)
+            _control = new ControlPipeService(ViewModel, _window.DispatcherQueue,
+                requestStart: () => _startSignal?.Set(),
+                requestStop: () => _stopSignal?.Set(),
+                requestShow: () => _showSignal?.Set());
             WatchGuideButton();
 
             // A stop request with nothing running just opens the window.

@@ -53,7 +53,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 2. On first launch a short tour shows the screen map: pick the screen you play on (the others turn off)
 3. From then on it is one click: **Play now**, or the **Console Mode 1 Click** desktop shortcut (Settings → Create shortcut). The first time with a new game screen, the TV asks "Can you see this screen?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
 4. Or skip the PC altogether: with the app in the tray (turn on **Start with Windows**), **hold the Xbox button on the controller for 1 second** and console mode starts from the couch. **Hold Start + Select for 1 second** during a session to go back to the PC. Xbox (XInput) controllers only. In Settings you can switch to a **short press**: the app then turns off the controller shortcut for Game Bar in Windows (Win+G keeps working); if Steam is open, also turn off "Guide button focuses Steam" in Steam
-5. Automation: `consolemode://start`, `consolemode://stop` and `consolemode://show` links work from Stream Deck, launchers, scripts or any shortcut
+5. Automation: `consolemode://start`, `consolemode://stop` and `consolemode://show` links work from Stream Deck, launchers, scripts or any shortcut. Tools that also need to know the state (a remote-control agent, a Stream Deck plugin) can use the local control API below
 6. Two interfaces: the **Desktop** one (mouse, screen map) and the **Console** one (full screen, big cards, D-pad/stick + A/B, works with Xbox and PlayStation pads). By default the app picks Console whenever a controller is connected; change it in Settings → Interface or with the switch button on either screen
 4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 5. New versions are announced in the app from GitHub Releases (installed: updates silently; portable: swaps the exe)
@@ -84,6 +84,17 @@ The previous PowerShell + WPF implementation (1.2 and earlier) lives on the [`le
 | **Xbox mode** | Manual — use *Restore now*, the tray menu, or reopen the window |
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
+
+## Local control API
+
+`consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.
+
+```
+→ {"cmd":"status"}          // or "start", "stop", "show"
+← {"ok":true,"active":true,"restoring":false,"mode":"xboxMode","version":"1.5.0"}
+```
+
+`start`, `stop` and `show` do exactly what the matching `consolemode://` link does, then reply once the app has settled (`ok:false` with an `error` if console mode didn't start or the restore didn't finish). `status` only reads. Only the signed-in user and LocalSystem can connect; nothing is exposed to the network.
 
 ## Optional extras
 
@@ -191,7 +202,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 2. Na primeira vez, um tour curto mostra o mapa das telas: escolha a tela onde você joga (as outras desligam)
 3. Depois é 1 clique: **Jogar agora**, ou o atalho **Console Mode 1 Click** na Área de Trabalho (Ajustes → Criar atalho). Na primeira vez com uma tela de jogo nova, a TV pergunta "Está vendo esta tela?" e tudo volta sozinho se ninguém responder (mouse, teclado ou controle de Xbox/PlayStation)
 4. Ou nem encoste no PC: com o app na bandeja (ligue **Iniciar com o Windows**), **segure o botão Xbox do controle por 1 segundo** e o modo console entra direto do sofá. **Segure Start + Select por 1 segundo** durante a sessão para voltar ao PC. Só controles Xbox (XInput). Em Ajustes dá para trocar por um **toque curto**: aí o app desliga o atalho do controle para a Game Bar no Windows (Win+G continua funcionando); se a Steam estiver aberta, desligue também "Botão Guide foca a Steam" na Steam
-5. Automação: os links `consolemode://start`, `consolemode://stop` e `consolemode://show` funcionam em Stream Deck, launchers, scripts ou qualquer atalho
+5. Automação: os links `consolemode://start`, `consolemode://stop` e `consolemode://show` funcionam em Stream Deck, launchers, scripts ou qualquer atalho. Ferramentas que também precisam saber o estado (um agente de controle remoto, um plugin de Stream Deck) podem usar a API de controle local abaixo
 6. Duas interfaces: a **Desktop** (mouse, mapa de telas) e a **Console** (tela cheia, cartões grandes, D-pad/analógico + A/B, funciona com controles Xbox e PlayStation). Por padrão o app escolhe Console sempre que há um controle conectado; mude em Ajustes → Interface ou pelo botão de troca em qualquer uma das telas
 4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
 5. O app avisa das versões novas pelas releases do GitHub (instalado: atualiza sozinho; portátil: troca o exe)
@@ -221,6 +232,17 @@ A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [
 | **Modo Xbox** | Manual — *Restaurar agora*, menu da bandeja ou reabrir a janela |
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
+
+### API de controle local
+
+Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
+
+```
+→ {"cmd":"status"}          // ou "start", "stop", "show"
+← {"ok":true,"active":true,"restoring":false,"mode":"xboxMode","version":"1.5.0"}
+```
+
+`start`, `stop` e `show` fazem o mesmo que o link `consolemode://` correspondente e respondem quando o app terminou (`ok:false` com `error` se o modo console não entrou ou a restauração não terminou). `status` só consulta. Só o usuário logado e o LocalSystem conseguem conectar; nada fica exposto na rede.
 
 ### Extras opcionais
 
