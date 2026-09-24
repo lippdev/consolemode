@@ -22,8 +22,10 @@ public static class ReleaseNotes
         var lines = notes.Replace("\r\n", "\n").Split('\n');
         var bilingual = lines.Any(l => IsHeading(l, PortugueseHeading) || IsHeading(l, EnglishHeading));
 
-        // Legacy single-language body: it is pt-BR, so English gets nothing.
-        if (!bilingual && isEnglish) return null;
+        // Since 1.5.0-beta.6 the body is English only (Portuguese lives in CHANGELOG.md, linked
+        // from the body), so a body without language headings is shown to everyone. The old
+        // pt-only bodies (1.4.0 and earlier) are older than any client that would read them.
+        if (!bilingual) isEnglish = false;
 
         var wanted = isEnglish ? EnglishHeading : PortugueseHeading;
         var other = isEnglish ? PortugueseHeading : EnglishHeading;

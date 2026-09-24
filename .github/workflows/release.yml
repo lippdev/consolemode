@@ -42,7 +42,7 @@ jobs:
           "version=$v" >> $env:GITHUB_OUTPUT
           "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
-      - name: Prepare release notes (pt-BR + en-US)
+      - name: Prepare release notes (English, with a link to the Portuguese changelog)
         if: github.event_name == 'push'
         shell: pwsh
         env:
@@ -57,32 +57,24 @@ jobs:
             if ([string]::IsNullOrWhiteSpace($notes)) { throw "A seção $($env:VERSION) de $file está vazia." }
             return $notes
           }
-          $pt = Get-Notes "CHANGELOG.md"
+          # Both changelogs must have the section; the Portuguese one is linked, not pasted.
+          $null = Get-Notes "CHANGELOG.md"
           $en = Get-Notes "CHANGELOG.en-US.md"
-          # The section headings are fixed: ReleaseNotes.cs uses them to show the update notice
-          # in the interface language. pt-BR must stay first, because 1.4.0 and older show the
-          # first item of the body.
+          # English only, no language headings: ReleaseNotes.cs shows the first item to every
+          # language. A "(#NN)" at the end of an item becomes a link to that PR on GitHub.
+          $tag = "v$($env:VERSION)"
           $releaseNotes = @(
-            "## Português (Brasil)"
-            ""
-            $pt
-            ""
-            "### Arquivos para baixar"
-            ""
-            # Single quotes: in double-quoted pwsh strings the backtick is an escape and the Markdown code spans vanish.
-            '- **Instalador:** `ConsoleMode-Setup-x64.exe` — instala o aplicativo e oferece atalhos e inicialização com o Windows.'
-            '- **Versão portátil:** `ConsoleMode-Portable-x64.exe` — um único executável; mantém os dados na pasta `ConsoleMode_Data` ao lado do arquivo.'
-            ""
-            "---"
-            ""
-            "## English (US)"
-            ""
             $en
             ""
             "### Downloads"
             ""
+            # Single quotes: in double-quoted pwsh strings the backtick is an escape and the Markdown code spans vanish.
             '- **Installer:** `ConsoleMode-Setup-x64.exe` — installs the app and offers shortcuts and starting with Windows.'
             '- **Portable:** `ConsoleMode-Portable-x64.exe` — a single executable; keeps its data in the `ConsoleMode_Data` folder next to the file.'
+            ""
+            "---"
+            ""
+            "🇧🇷 Notas em português: [CHANGELOG.md](https://github.com/lippdev/consolemode/blob/$tag/CHANGELOG.md)"
           ) -join "`n"
           Set-Content -LiteralPath "release-notes.md" -Value $releaseNotes -Encoding utf8
 

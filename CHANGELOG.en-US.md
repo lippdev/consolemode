@@ -4,21 +4,21 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [1.5.0-beta.6]
 ### What's new
-- Desktop interface navigable with the controller: D-pad/stick move, A activates (lists, switches, cards), B closes a list or leaves Settings, Start toggles Settings, Y goes to the console interface; in the tour, A advances and B skips. Based on PR #17 by @nextestudios.
+- Session menu: while the game is open, hold Select + Y for a menu over the game with volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode". Also via `consolemode://menu`. (#46)
+- Desktop interface navigable with the controller: D-pad/stick move, A activates (lists, switches, cards), B closes a list or leaves Settings, Start toggles Settings, Y goes to the console interface; in the tour, A advances and B skips. Based on PR #17 by @nextestudios. (#47)
 
 ### Fixes
-- The controller went dead for good if a pad disconnected mid-read; the read now just skips that sample. Also from PR #17.
-- Controller navigation: the first press only reveals the focus ring; in scrolled lists focus falls back to tab order when the spatial search finds nothing; D-pad diagonals count as vertical; reads only count while the window is in the foreground (checked per window, not per event).
-- Session menu: while the game is open, hold Select + Y for a menu over the game with volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode". Also via `consolemode://menu`.
+- The controller went dead for good if a pad disconnected mid-read; the read now just skips that sample. Also from PR #17. (#47)
+- Controller navigation: the first press only reveals the focus ring; in scrolled lists focus falls back to tab order when the spatial search finds nothing; D-pad diagonals count as vertical; reads only count while the window is in the foreground (checked per window, not per event). (#47)
 
 ### Beta release
 - Pre-release: people on any 1.5.0 beta get the notice in the app. People on 1.4.0 don't; to try it, download the files below.
 
 ## [1.5.0-beta.5]
 ### What's new
-- Console interface: list settings (launcher, audio, resolution, FPS, hide strategy, language, interface) open a picker with every option, focused on the current one; A picks, B goes back. Before, you had to keep pressing A to cycle.
-- In the desktop interface, with a controller detected, a "press A for console mode" hint appears; A or Start switch the interface.
-- Spanish interface. With no saved choice, the app follows the Windows language (Portuguese, Spanish or English). Adding a language is now just a `Strings.<code>.json` file.
+- Console interface: list settings (launcher, audio, resolution, FPS, hide strategy, language, interface) open a picker with every option, focused on the current one; A picks, B goes back. Before, you had to keep pressing A to cycle. (#42)
+- In the desktop interface, with a controller detected, a "press A for console mode" hint appears; A or Start switch the interface. (#41)
+- Spanish interface. With no saved choice, the app follows the Windows language (Portuguese, Spanish or English). Adding a language is now just a `Strings.<code>.json` file. (#40)
 
 ### Fixes
 - Automatic mode missed controllers that Windows lists late (PlayStation, Bluetooth) and opened in Desktop. The app now re-detects when a controller appears and also 1.5 s and 4 s after opening.
