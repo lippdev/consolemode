@@ -225,6 +225,27 @@
                 </ctk:SettingsCard.ActionIcon>
             </ctk:SettingsCard>
 
+            <!-- More apps from the developer -->
+            <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="WakeOn" Description="{x:Bind ViewModel.Texts.WakeOnDescription, Mode=OneWay}"
+                              IsClickEnabled="True" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://wake.nextestudios.com">
+                <ctk:SettingsCard.HeaderIcon>
+                    <ImageIcon Source="{x:Bind ViewModel.WakeOnLogo}"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ctk:SettingsCard.ActionIcon>
+                    <FontIcon Glyph="&#xE8A7;"/>
+                </ctk:SettingsCard.ActionIcon>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="Next Boost" Description="{x:Bind ViewModel.Texts.NextBoostDescription, Mode=OneWay}"
+                              IsClickEnabled="True" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://nextboost.pro">
+                <ctk:SettingsCard.HeaderIcon>
+                    <ImageIcon Source="{x:Bind ViewModel.NextBoostLogo}"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ctk:SettingsCard.ActionIcon>
+                    <FontIcon Glyph="&#xE8A7;"/>
+                </ctk:SettingsCard.ActionIcon>
+            </ctk:SettingsCard>
+
             <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Margin="1,16,0,0"
                        Foreground="{ThemeResource TextFillColorTertiaryBrush}">
                 <Run Text="Console Mode"/>
