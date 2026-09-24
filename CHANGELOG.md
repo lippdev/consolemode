@@ -4,6 +4,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Ajustes → "Testar controle": mostra ao vivo o que o Windows entrega de cada controle (origem, botões por índice, D-pad, analógicos) e copia um diagnóstico para a issue. O log de abertura lista os controles. Para quem o controle aparece mas não responde (DualSense com Steam aberto, por exemplo).
+
+### Correções
+- Controle: um dispositivo que falha na leitura não silencia mais os outros; controles que o Windows expõe como Gamepad sem XInput responder passam a ser lidos (antes eram pulados); DualSense/DualShock via HID caem no mesmo caminho quando o XInput está vazio.
 - API de controle local: com o app aberto, o named pipe `\.pipeConsoleMode.Control` recebe uma linha JSON (`status`, `start`, `stop`, `show`) e responde com o estado (ativo, restaurando, modo, versão). Só o usuário logado e o LocalSystem conectam. Por @nextestudios. (#24)
 - `ConsoleMode.exe --stop` restaura a mesa pela linha de comando, como o `consolemode://stop`. Por @nextestudios. (#23)
 

@@ -177,6 +177,24 @@
 
             <!-- Shortcut, help & data -->
             <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.ControllerTestCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.ControllerTestDescription, Mode=OneWay}"
+                                  IsExpanded="{x:Bind ViewModel.IsControllerTestOpen, Mode=TwoWay}">
+                <ctk:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsExpander.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Texts.CopyDiagnostics, Mode=OneWay}" Command="{x:Bind ViewModel.CopyControllerDiagnosticsCommand}"/>
+                <ctk:SettingsExpander.Items>
+                    <ctk:SettingsCard ContentAlignment="Vertical">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerTestSteamHint, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerDevicesHeading, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{x:Bind ViewModel.ControllerDevicesText, Mode=OneWay}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSampleHeading, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{x:Bind ViewModel.ControllerSampleText, Mode=OneWay}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                        </StackPanel>
+                    </ctk:SettingsCard>
+                </ctk:SettingsExpander.Items>
+            </ctk:SettingsExpander>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvConfirmationCard, Mode=OneWay}"
                               Description="{x:Bind ViewModel.Texts.TvConfirmationDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>

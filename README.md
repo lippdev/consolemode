@@ -128,6 +128,10 @@ Open the tray menu and choose **Restore setup**. If the layout still looks wrong
 
 Check that the target output is connected and available in Windows before starting console mode. For HDMI/TV outputs, reconnecting the cable and starting the mode again may be necessary.
 
+### The controller shows up but does nothing (DualSense / DualShock)
+
+Open **Settings → Test controller**: it shows live what Windows delivers from each pad. If the reading stays empty while you press buttons, Steam is most likely capturing the pad (Steam running with PlayStation support in Steam Input turns it into keyboard/mouse on the desktop). Close Steam, or turn off PlayStation support in Steam Input, and test again. If the reading still shows nothing, use **Copy diagnostics** and paste it into the feedback form.
+
 ### HDR or VRR did not change
 
 Confirm that the focus monitor supports the feature and that HDR is enabled in Windows. For VRR, also enable G-SYNC or FreeSync in the GPU control panel when applicable.
@@ -265,6 +269,10 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 - Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
 - O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
+
+### Solução de problemas
+
+**O controle aparece mas não faz nada (DualSense / DualShock):** abra **Ajustes → Testar controle**; ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
 
 ### Feedback
 

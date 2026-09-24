@@ -33,7 +33,7 @@ public sealed partial class ConsoleHomeView : UserControl
         _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen) ViewModel.StartCommand.Execute(null); };
         _navigator.AltRequested += () =>
         {
-            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen) return;
+            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsControllerTestOpen) return;
             if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
             else ViewModel.OpenFullSettingsCommand.Execute(null);
         };
@@ -67,6 +67,14 @@ public sealed partial class ConsoleHomeView : UserControl
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsPickerOpen) FocusPickerSelection();
+                    else if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
+                    else FocusDefault();
+                });
+                break;
+            case nameof(MainViewModel.IsControllerTestOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsControllerTestOpen) CopyDiagnosticsButton.Focus(FocusState.Keyboard);
                     else if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
                     else FocusDefault();
                 });
@@ -124,7 +132,8 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void GoBack()
     {
-        if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
+        if (ViewModel.IsControllerTestOpen) ViewModel.CloseControllerTestCommand.Execute(null);
+        else if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
         else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
         else if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
     }
