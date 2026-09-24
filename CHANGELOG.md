@@ -7,7 +7,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Interface Desktop navegável pelo controle: D-pad/analógico movem, A ativa (listas, interruptores, cards), B fecha a lista ou volta de Ajustes, Start abre/fecha Ajustes, Y vai para a interface Console; no tutorial, A avança e B pula. Baseado no PR #17 de @nextestudios.
 
 ### Correções
-- O controle deixava de responder de vez se um controle desconectasse no meio de uma leitura; agora a leitura só pula a amostra. Também vindo do PR #17.
+- O controle deixava de responder de vez se um controle desconectasse no meio de uma leitura; agora a leitura só pula a amostra. Também vindo do PR #17. (#47)
 - Navegação por controle: o primeiro toque só mostra o anel de foco; em listas roladas o foco cai na ordem de tabulação quando a busca espacial não acha nada; diagonais no D-pad contam como vertical; a leitura só vale com a janela em primeiro plano (verificação por janela, não por evento).
 - Menu da sessão: com o jogo aberto, segure Select + Y para abrir um menu sobre o jogo com volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode". Também por `consolemode://menu`.
 
