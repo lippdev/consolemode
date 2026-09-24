@@ -2,6 +2,22 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [1.5.0-beta.1]
+### Novidades
+- Botão de feedback na tela inicial: abre uma issue no GitHub já preenchida com a versão do aplicativo e do Windows, para enviar sugestões e relatar bugs.
+- O aviso de nova versão mostra as novidades no idioma da interface.
+- O instalador pergunta o idioma, já sugerindo o do Windows. As atualizações feitas pelo aplicativo mantêm a escolha anterior.
+
+### Correções
+- Os itens do menu do ícone na bandeja voltaram a funcionar.
+- O aplicativo espera a tela do jogo ligar antes de desligar as demais.
+- A janela comum da Steam não é mais confundida com o Big Picture.
+- As informações do resumo na tela inicial quebram linha em vez de ficarem cortadas.
+- O atalho de um clique agora se chama "Console Mode 1 Click".
+
+### Versão beta
+- Esta é uma versão de testes. Quem usa a 1.4.0 não recebe o aviso dela: para testar, baixe o instalador ou a versão portátil abaixo. Depois disso, o aplicativo avisa sobre as próximas betas e sobre a 1.5.0 final.
+
 ## [1.4.0]
 ### Novidades
 - Interface em inglês (Estados Unidos), além do português do Brasil. O idioma é escolhido em Ajustes e muda na hora, sem reiniciar o aplicativo.
