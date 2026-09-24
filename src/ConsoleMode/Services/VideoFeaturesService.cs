@@ -30,12 +30,37 @@ public sealed class VideoFeaturesService
 
     public void RestoreHdr(ConsoleRuntimeState state)
     {
+        // The session menu turned off an HDR that was on before: put it back.
+        if (state.HdrTurnedOffByUser && !string.IsNullOrWhiteSpace(state.FocusMonitor))
+        {
+            CcdHelper.SetHdrState(state.FocusMonitor, true);
+            state.HdrTurnedOffByUser = false;
+        }
         if (!state.HdrApplied) return;
         if (!string.IsNullOrWhiteSpace(state.HdrMonitor))
             CcdHelper.SetHdrState(state.HdrMonitor, false);
         state.HdrApplied = false;
         state.HdrMonitor = null;
     }
+
+    /// <summary>Session menu toggle. Tracks what to undo at Stop(): only what the user changed.</summary>
+    public bool SetHdrFromMenu(string monitorName, bool on, ConsoleRuntimeState state)
+    {
+        if (CcdHelper.SetHdrState(monitorName, on) != 0) return false;
+        if (on)
+        {
+            if (state.HdrTurnedOffByUser) state.HdrTurnedOffByUser = false;   // back to how it was
+            else { state.HdrApplied = true; state.HdrMonitor = monitorName; }
+        }
+        else
+        {
+            if (state.HdrApplied) { state.HdrApplied = false; state.HdrMonitor = null; }
+            else state.HdrTurnedOffByUser = true;
+        }
+        return true;
+    }
+
+    public bool IsHdrOn(string monitorName) => CcdHelper.GetHdrStatus(monitorName) == 2;
 
     public bool EnableVrr(ConsoleRuntimeState state)
     {

@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- Session menu: while the game is open, hold Select + Y for a menu over the game with volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode". Also via `consolemode://menu`.
+
 ## [1.5.0-beta.5]
 ### What's new
 - Console interface: list settings (launcher, audio, resolution, FPS, hide strategy, language, interface) open a picker with every option, focused on the current one; A picks, B goes back. Before, you had to keep pressing A to cycle.
