@@ -66,6 +66,21 @@ public static class NativeWindows
         public int Bottom;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MONITORINFO
+    {
+        public int cbSize;
+        public RECT rcMonitor;
+        public RECT rcWork;
+        public uint dwFlags;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern nint MonitorFromWindow(nint hwnd, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFO info);
+
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct DEVMODE
     {
@@ -130,6 +145,17 @@ public static class NativeWindows
         long h = r.Bottom - r.Top;
         if (w <= 0 || h <= 0) return 0;
         return w * h;
+    }
+
+    /// <summary>True when the window covers the whole screen it is on (borderless fullscreen).</summary>
+    public static bool IsFullscreen(nint hWnd)
+    {
+        if (hWnd == 0 || !GetWindowRect(hWnd, out var r)) return false;
+        var monitor = MonitorFromWindow(hWnd, 2 /* MONITOR_DEFAULTTONEAREST */);
+        var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        if (monitor == 0 || !GetMonitorInfo(monitor, ref info)) return false;
+        var m = info.rcMonitor;
+        return r.Left <= m.Left && r.Top <= m.Top && r.Right >= m.Right && r.Bottom >= m.Bottom;
     }
 
     public static bool IsWindowCenterOnRect(nint hWnd, int left, int top, int width, int height)
