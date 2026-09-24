@@ -2,6 +2,14 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [1.5.0-beta.9]
+### Fixes
+- Updates: the download no longer fails with "HttpClient.Timeout of 15 seconds elapsing" on slow connections. It is now cancelled only after 30 s with no data. If you are on beta.8 and hit this error, download the installer below once; later updates from the app work. (#58)
+- Desktop home screen: "Controller detected" is now a toast shown for a few seconds when a pad connects, instead of a permanent chip in the header. (#58)
+
+### Beta release
+- This beta is the main download. People on 1.4.0 or an earlier beta get the notice in the app: just click **Update now**. Your settings are kept.
+
 ## [1.5.0-beta.8]
 ### Fixes
 - Desktop home screen: the "press A for console mode" hint is capped in width with an ellipsis and shows the full text on hover; long translations no longer stretch the header. (#56)
