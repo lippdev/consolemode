@@ -13,6 +13,9 @@ public sealed class AppConfig
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
     public string FullscreenMode { get; set; } = "bigPicture";
+
+    /// <summary>Playnite folder or exe chosen by the user (portable installs); empty = auto-detect.</summary>
+    public string PlaynitePath { get; set; } = "";
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
