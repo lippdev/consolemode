@@ -294,7 +294,9 @@ public partial class MainViewModel : ObservableObject
         {
             var config = data.Config;
             _loadedConfig = config;
-            SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Value == config.AppLanguage) ?? LanguageOptions.FirstOrDefault();
+            // No saved choice: show the language the app resolved at startup, not the first option.
+            SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Value == config.AppLanguage)
+                               ?? LanguageOptions.FirstOrDefault(x => x.Value == LocalizationService.Language);
             ApplyMonitors(config, data.Monitors);
             ApplyAudio(config, data.Audio);
 

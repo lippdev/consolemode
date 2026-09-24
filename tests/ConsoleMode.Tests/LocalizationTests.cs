@@ -82,10 +82,10 @@ public sealed class LocalizationTests
     }
 
     [Fact]
-    public void App_language_config_defaults_for_existing_users_and_roundtrips()
+    public void App_language_config_is_empty_until_chosen_and_roundtrips()
     {
         var existingConfig = JsonSerializer.Deserialize<AppConfig>("{}")!;
-        Assert.Equal(LocalizationService.PortugueseBrazil, existingConfig.AppLanguage);
+        Assert.Equal("", existingConfig.AppLanguage);
 
         var options = new JsonSerializerOptions
         {
@@ -98,4 +98,14 @@ public sealed class LocalizationTests
         var loaded = JsonSerializer.Deserialize<AppConfig>(saved, options)!;
         Assert.Equal(LocalizationService.EnglishUnitedStates, loaded.AppLanguage);
     }
+
+    [Theory]
+    [InlineData("pt-BR", "en-US", "en-US", "pt-BR")]   // saved choice wins
+    [InlineData("", "en-US", "pt-BR", "en-US")]        // installer dialog next
+    [InlineData(null, null, "en-GB", "en-US")]          // then the Windows language
+    [InlineData(null, null, "pt-PT", "pt-BR")]
+    [InlineData(null, null, "de-DE", "en-US")]          // unknown languages read English
+    [InlineData(null, null, null, "en-US")]
+    public void Initial_language_follows_saved_choice_then_installer_then_windows(string? saved, string? installer, string? windows, string expected) =>
+        Assert.Equal(expected, LocalizationService.ResolveInitial(saved, installer, windows));
 }

@@ -81,6 +81,9 @@ Name: "{autodesktop}\Console Mode 1 Click"; Filename: "{app}\{#AppExe}"; Paramet
 ; Same value the app's "Iniciar com o Windows" toggle writes (StartupService).
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; \
     ValueName: "ConsoleMode"; ValueData: """{app}\{#AppExe}"" --tray"; Tasks: startup; Flags: uninsdeletevalue
+; The language chosen in the installer dialog; the app reads it on first run (StartupService.ReadInstallerLanguage).
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "pt-BR"; Languages: ptbr; Flags: uninsdeletekeyifempty uninsdeletevalue
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "en-US"; Languages: en; Flags: uninsdeletekeyifempty uninsdeletevalue
 ; consolemode://start|stop|show links (ProtocolService registers the same keys at startup).
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueData: "URL:Console Mode"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""

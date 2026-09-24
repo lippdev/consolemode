@@ -50,6 +50,19 @@ public static class LocalizationService
     public static IReadOnlyCollection<string> GetKeys(string language) =>
         Catalogs[Normalize(language)].Keys.ToArray();
 
+    /// <summary>
+    /// Language for this run: the saved choice wins, then the installer's language dialog,
+    /// then the Windows display language (Portuguese → pt-BR, anything else → en-US).
+    /// </summary>
+    public static string ResolveInitial(string? saved, string? installerChoice, string? windowsCulture)
+    {
+        if (!string.IsNullOrWhiteSpace(saved)) return Normalize(saved);
+        if (!string.IsNullOrWhiteSpace(installerChoice)) return Normalize(installerChoice);
+        return windowsCulture?.StartsWith("pt", StringComparison.OrdinalIgnoreCase) == true
+            ? PortugueseBrazil
+            : EnglishUnitedStates;
+    }
+
     private static string Normalize(string? language) =>
         string.Equals(language, EnglishUnitedStates, StringComparison.OrdinalIgnoreCase)
             ? EnglishUnitedStates

@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Correções
+- O idioma escolhido no instalador agora vale para o aplicativo. Sem escolha salva, o app segue o idioma do Windows (português → pt-BR; qualquer outro → inglês) em vez de abrir sempre em português.
+
 ## [1.5.0-beta.2]
 ### Novidades
 - Segurar o botão Xbox do controle por 1 segundo, com o app na bandeja, entra no modo console sem tocar no PC. Durante a sessão, segurar Start + Select por 1 segundo volta ao PC. Só controles Xbox (XInput); pode ser desligado em Ajustes.
