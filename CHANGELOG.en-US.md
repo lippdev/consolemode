@@ -2,6 +2,18 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [1.5.0-beta.11]
+### What's new
+- Session menu (Select + Y) has a horizontal layout: tiles side by side, with "Back to the PC" / "Exit Console Mode" below. On volume, A enters adjust mode (◀ ▶ changes it, □/X mutes, A or B leaves). (#64)
+- A toast in the corner of the game screen a few seconds in says which combo opens the menu (Select + Y, or Create + △ on PlayStation). It never takes the focus from the game. (#64)
+- Settings → "More apps from the developer": WakeOn (Wake-on-LAN automation) and Next Boost (Windows optimization). (#63)
+
+### Fixes
+- Session menu: with a PlayStation pad, the menu opened but the controller did nothing in it. The menu now reads the pad directly over HID, even while the game has the foreground. (#64)
+
+### Beta release
+- This beta is the main download. People on 1.4.0 or an earlier beta get the notice in the app: just click **Update now**. Your settings are kept. On beta.8 and seeing a timeout when updating? Download the installer below once.
+
 ## [1.5.0-beta.10]
 ### Fixes
 - Select + Y (in-game menu) and Start + Back (back to the desk) now work with PlayStation pads (DualSense and DualShock 4, USB or Bluetooth) without Steam Input: the app reads the pad directly over HID. On a Sony pad: Create/Share + Triangle opens the menu; Options + Share goes back to the desk; the PS button counts as Home. (#61)

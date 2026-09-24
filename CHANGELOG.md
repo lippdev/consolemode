@@ -2,6 +2,18 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [1.5.0-beta.11]
+### Novidades
+- Menu da sessão (Select + Y) com layout horizontal: blocos lado a lado e "Voltar ao PC" / "Sair do Console Mode" embaixo. No volume, A entra no ajuste (◀ ▶ muda, □/X deixa mudo, A ou B sai). (#64)
+- Aviso no canto da tela do jogo alguns segundos depois de entrar: mostra qual combinação abre o menu (Select + Y, ou Create + △ no PlayStation). Não tira o foco do jogo. (#64)
+- Ajustes → "Outros apps do desenvolvedor": WakeOn (automação com Wake-on-LAN) e Next Boost (otimização do Windows). (#63)
+
+### Correções
+- Menu da sessão: com controle de PlayStation, o menu abria mas o controle não respondia dentro dele. Agora o menu lê o controle direto por HID, mesmo com o jogo em primeiro plano. (#64)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas. Quem está na beta.8 e vê o erro de tempo esgotado ao atualizar: baixe o instalador abaixo uma vez.
+
 ## [1.5.0-beta.10]
 ### Correções
 - Select + Y (menu sobre o jogo) e Start + Back (voltar pra mesa) agora funcionam com controles de PlayStation (DualSense e DualShock 4, USB ou Bluetooth) sem Steam Input: o app lê o controle direto por HID. No controle da Sony: Create/Share + Triângulo abre o menu; Options + Share volta pra mesa; o botão PS vale como Home. (#61)

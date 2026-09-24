@@ -9,17 +9,19 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > [!NOTE]
-> **More improvements are on the way.** I'm actively working on new features and fixes. The next ones are already in [1.5.0-beta.10](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.10). Your opinion shapes what comes next: use the **feedback button** in the app or [send feedback here](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). See [Feedback](#feedback).
+> **More improvements are on the way.** I'm actively working on new features and fixes. The next ones are already in [1.5.0-beta.11](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.11). Your opinion shapes what comes next: use the **feedback button** in the app or [send feedback here](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). See [Feedback](#feedback).
 
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
 
 Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mode focuses the TV, turns the desk displays off, launches Steam Big Picture (or Xbox), and restores your desktop automatically when you quit Big Picture.
 
-## Latest release: [1.5.0-beta.10](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.10)
+## Latest release: [1.5.0-beta.11](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.11)
 
-Includes everything since 1.5.0-beta.6 (beta.7 to beta.10).
+Includes everything since 1.5.0-beta.6 (beta.7 to beta.11).
 
 ### What's new
+- Session menu (Select + Y): horizontal tile layout, works with PlayStation pads, and a corner toast at the start of a session shows the combo. ([#64](https://github.com/lippdev/consolemode/pull/64))
+- Settings → "More apps from the developer": WakeOn and Next Boost. ([#63](https://github.com/lippdev/consolemode/pull/63))
 - Settings → "Test controller": shows live what Windows delivers from each pad (source, buttons by index, D-pad, sticks) and copies a diagnostic for the issue. The startup log lists the pads. For when a pad shows up but does nothing (DualSense with Steam running, for example).
 - Local control API: while the app runs, the named pipe `\\.\pipe\ConsoleMode.Control` takes one JSON line (`status`, `start`, `stop`, `show`) and replies with the state (active, restoring, mode, version). Only the signed-in user and LocalSystem can connect. By @nextestudios. ([#24](https://github.com/lippdev/consolemode/pull/24))
 - `ConsoleMode.exe --stop` restores the desk from the command line, like `consolemode://stop`. By @nextestudios. ([#23](https://github.com/lippdev/consolemode/pull/23))
