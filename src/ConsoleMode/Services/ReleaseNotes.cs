@@ -17,7 +17,8 @@ public static class ReleaseNotes
     public static string? FirstLine(string? notes, string language)
     {
         if (string.IsNullOrWhiteSpace(notes)) return null;
-        var isEnglish = string.Equals(language, LocalizationService.EnglishUnitedStates, StringComparison.Ordinal);
+        // The release body has pt-BR and en-US sections; every other language reads the English one.
+        var isEnglish = !string.Equals(language, LocalizationService.PortugueseBrazil, StringComparison.Ordinal);
         var lines = notes.Replace("\r\n", "\n").Split('\n');
         var bilingual = lines.Any(l => IsHeading(l, PortugueseHeading) || IsHeading(l, EnglishHeading));
 

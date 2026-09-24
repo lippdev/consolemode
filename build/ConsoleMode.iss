@@ -54,6 +54,7 @@ RestartApplications=no
 [Languages]
 Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [CustomMessages]
 ptbr.OneClickShortcut=Atalho "Console Mode 1 Click" na Área de Trabalho (entra no modo console com 1 clique)
@@ -62,6 +63,9 @@ ptbr.StartWithWindows=Iniciar com o Windows (fica na bandeja)
 en.StartWithWindows=Start with Windows (stays in the tray)
 ptbr.LaunchApp=Abrir o Console Mode
 en.LaunchApp=Open Console Mode
+es.OneClickShortcut=Acceso directo "Console Mode 1 Click" en el escritorio (entra en modo consola con 1 clic)
+es.StartWithWindows=Iniciar con Windows (queda en la bandeja)
+es.LaunchApp=Abrir Console Mode
 
 [Tasks]
 Name: "oneclick"; Description: "{cm:OneClickShortcut}"; Flags: unchecked
@@ -84,6 +88,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 ; The language chosen in the installer dialog; the app reads it on first run (StartupService.ReadInstallerLanguage).
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "pt-BR"; Languages: ptbr; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "en-US"; Languages: en; Flags: uninsdeletekeyifempty uninsdeletevalue
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "es-ES"; Languages: es; Flags: uninsdeletekeyifempty uninsdeletevalue
 ; consolemode://start|stop|show links (ProtocolService registers the same keys at startup).
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueData: "URL:Console Mode"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
