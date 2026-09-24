@@ -45,6 +45,9 @@ public sealed class AppConfig
     /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
     public bool HomeButtonShortPress { get; set; }
 
+    /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
+    public bool AutoStartOnController { get; set; }
+
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 

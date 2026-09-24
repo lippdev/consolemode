@@ -62,6 +62,8 @@
   "ChooseRoleFor": "What does the {0} screen do?",
   "HomeButtonCard": "Open with the controller Home button",
   "HomeButtonDescription": "With the app in the tray, hold the Xbox button for 1 second to enter console mode. During a session, hold Start + Select for 1 second to go back to the PC. Xbox (XInput) controllers only.",
+  "AutoStartControllerCard": "Enter when a controller connects",
+  "AutoStartControllerDescription": "With the app in the tray, turning on or plugging in a controller enters console mode. Ignores the first 15 s after opening and 30 s after restoring.",
   "HomeButtonShortPressCard": "Short press of the Xbox button",
   "HomeButtonShortPressDescription": "Just press it, no holding. Turns off the controller shortcut for Game Bar in Windows (Win+G keeps working).",
   "HomeButtonSteamHint": "Steam is open and also uses the Xbox button. In Steam, turn off \"Guide button focuses Steam\" for the short press to work.",

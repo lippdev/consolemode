@@ -62,6 +62,8 @@
   "ChooseRoleFor": "O que a tela {0} faz?",
   "HomeButtonCard": "Abrir com o botão Home do controle",
   "HomeButtonDescription": "Com o app na bandeja, segure o botão Xbox por 1 segundo para entrar no modo console. Durante a sessão, segure Start + Select por 1 segundo para voltar ao PC. Só controles Xbox (XInput).",
+  "AutoStartControllerCard": "Entrar ao conectar um controle",
+  "AutoStartControllerDescription": "Com o app na bandeja, ligar ou conectar um controle entra no modo console. Ignora os primeiros 15 s após abrir e 30 s após restaurar.",
   "HomeButtonShortPressCard": "Toque curto no botão Xbox",
   "HomeButtonShortPressDescription": "Basta apertar, sem segurar. Desliga o atalho do controle para a Game Bar no Windows (Win+G continua funcionando).",
   "HomeButtonSteamHint": "A Steam está aberta e também usa o botão Xbox. Na Steam, desligue \"Botão Guide foca a Steam\" para o toque curto funcionar.",

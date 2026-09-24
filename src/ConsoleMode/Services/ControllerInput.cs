@@ -78,7 +78,6 @@ public sealed class ControllerInput : IDisposable
         try
         {
             _ = RawGameController.RawGameControllers.Count;
-            RawGameController.RawGameControllerAdded += (_, c) => AppLog.Write($"Controle conectado: {c.DisplayName} (VID {c.HardwareVendorId:X4})");
         }
         catch (Exception ex)
         {
