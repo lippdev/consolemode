@@ -125,7 +125,7 @@ public partial class App : Application
             _window?.DispatcherQueue.TryEnqueue(() =>
             {
                 if (ViewModel is null) return;
-                if (ViewModel.IsConsoleActive) _ = ViewModel.RestoreNowAsync();
+                if (ViewModel.IsConsoleActive) _ = ViewModel.StopConsoleAsync();
                 else _tray?.ShowWindow();
             }), null, Timeout.Infinite, executeOnlyOnce: false));
     }
@@ -153,7 +153,7 @@ public partial class App : Application
             _ = HandleStartRequestAsync();
         };
         _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
-        _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
+        _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.StopConsoleAsync(); };
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
         RefreshGuideWatch();
 

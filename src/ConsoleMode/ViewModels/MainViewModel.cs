@@ -775,6 +775,22 @@ public partial class MainViewModel : ObservableObject
         TrySave(config);
     }
 
+    /// <summary>
+    /// Leave console mode on request from outside the session (consolemode://stop, the
+    /// controller exit chord): quit Big Picture / Playnite first — the loop then restores the
+    /// desk on its own, as when the user exits it — and restore explicitly if still active.
+    /// The tray's Restore keeps restoring only.
+    /// </summary>
+    public async Task StopConsoleAsync()
+    {
+        if (!IsConsoleActive) return;
+        var mode = Engine.State.FullscreenMode;
+        var closed = await Task.Run(() => Engine.Launch.CloseFrontEnd(mode, Engine.State));
+        AppLog.Write($"Stop-ConsoleMode: {mode} {(closed ? "fechado" : "ainda aberto")}");
+        for (var i = 0; i < 12 && IsConsoleActive; i++) await Task.Delay(500);
+        if (IsConsoleActive) await RestoreNowAsync();
+    }
+
     [RelayCommand]
     public async Task RestoreNowAsync()
     {
