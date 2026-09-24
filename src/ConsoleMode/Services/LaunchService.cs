@@ -56,10 +56,11 @@ public sealed class LaunchService
     public nint[] GetBigPictureHandles()
     {
         var all = NativeWindows.GetAllVisibleWindows();
+        // The regular Steam window is an SDL_app too: an SDL_app only counts when it fills its
+        // screen, otherwise console mode would follow that window and never see Big Picture close.
         var candidates = all
-            .Where(w => w.ClassName == "SDL_app" ||
-                        w.Title.Contains("Big Picture", StringComparison.OrdinalIgnoreCase) ||
-                        w.Title.Contains("Steam Big Picture", StringComparison.OrdinalIgnoreCase))
+            .Where(w => w.Title.Contains("Big Picture", StringComparison.OrdinalIgnoreCase) ||
+                        (w.ClassName == "SDL_app" && NativeWindows.IsFullscreen(w.Handle)))
             .ToList();
 
         if (candidates.Count == 0)
@@ -69,6 +70,8 @@ public sealed class LaunchService
                 if (p.MainWindowHandle == 0) continue;
                 var area = NativeWindows.GetWindowArea(p.MainWindowHandle);
                 if (area <= 0) continue;
+                if (!p.MainWindowTitle.Contains("Big Picture", StringComparison.OrdinalIgnoreCase) &&
+                    !NativeWindows.IsFullscreen(p.MainWindowHandle)) continue;
                 candidates.Add(new NativeWindows.WindowMatch
                 {
                     Handle = p.MainWindowHandle,
