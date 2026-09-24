@@ -119,6 +119,30 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 
 **O controle aparece mas não faz nada (DualSense / DualShock):** abra **Ajustes → Testar controle**; ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
 
+## Roadmap
+
+<img src="assets/roadmap.gif" alt="Roadmap do Console Mode: colunas Next, Later e Exploring." width="800">
+
+São planos, não promessas: a ordem pode mudar conforme o feedback. Vote com 👍 na issue ou [sugira algo](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml).
+
+**Próximos**
+- 1.5.0 estável, fechando as betas
+- Overlay de FPS, ligado pelo menu da sessão ([#66](https://github.com/lippdev/consolemode/issues/66))
+- Gravar os últimos 30 segundos pelo menu da sessão
+- Salvar e restaurar a posição dos ícones da área de trabalho ([#30](https://github.com/lippdev/consolemode/issues/30))
+
+**Depois**
+- Perfis por jogo: resolução, HDR e áudio para cada jogo ([#69](https://github.com/lippdev/consolemode/issues/69))
+- Bateria do controle no menu da sessão ([#70](https://github.com/lippdev/consolemode/issues/70))
+- Publicar no winget ([#13](https://github.com/lippdev/consolemode/issues/13))
+- Mais idiomas na interface ([#14](https://github.com/lippdev/consolemode/issues/14))
+
+**Explorando**
+- Widget na Xbox Game Bar ([#11](https://github.com/lippdev/consolemode/issues/11))
+- Comandos de voz e assistentes: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
+- Integração com o WakeOn: ligar o PC já no modo console ([#71](https://github.com/lippdev/consolemode/issues/71))
+- Controle pelo celular usando a API de controle local ([#72](https://github.com/lippdev/consolemode/issues/72))
+
 ## Feedback
 
 Encontrou um bug ou tem uma ideia? É o feedback que define as próximas melhorias, então todo relato conta.

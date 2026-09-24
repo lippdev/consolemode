@@ -19,3 +19,13 @@ npm run whats-new
 ```
 
 Grava `assets/whats-new.gif` (renderiza um MP4 e converte com o ffmpeg, que precisa estar no PATH, para ficar em ~3–4 MB).
+
+## Roadmap (`Roadmap`)
+
+Quadro com as colunas Next, Later e Exploring. Os itens ficam em `src/Roadmap.tsx` (`COLUMNS`) e devem acompanhar a seção "Roadmap" do README.
+
+```console
+npm run roadmap
+```
+
+Grava `assets/roadmap.gif`.
