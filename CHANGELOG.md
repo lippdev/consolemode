@@ -16,7 +16,8 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - O atalho de um clique agora se chama "Console Mode 1 Click".
 
 ### Versão beta
-- Esta é uma versão de testes. Quem usa a 1.4.0 não recebe o aviso dela: para testar, baixe o instalador ou a versão portátil abaixo. Depois disso, o aplicativo avisa sobre as próximas betas e sobre a 1.5.0 final.
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas.
+- Depois de atualizar, o aplicativo também avisa sobre as próximas betas, além da 1.5.0 final.
 
 ## [1.4.0]
 ### Novidades
