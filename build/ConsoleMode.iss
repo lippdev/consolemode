@@ -56,8 +56,8 @@ Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-ptbr.OneClickShortcut=Atalho "Modo Console" na Área de Trabalho (entra no modo console com 1 clique)
-en.OneClickShortcut="Modo Console" desktop shortcut (enters console mode in one click)
+ptbr.OneClickShortcut=Atalho "Console Mode 1 Click" na Área de Trabalho (entra no modo console com 1 clique)
+en.OneClickShortcut="Console Mode 1 Click" desktop shortcut (enters console mode in one click)
 ptbr.StartWithWindows=Iniciar com o Windows (fica na bandeja)
 en.StartWithWindows=Start with Windows (stays in the tray)
 ptbr.LaunchApp=Abrir o Console Mode
@@ -74,7 +74,7 @@ Source: "ConsoleMode.installed"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
-Name: "{autodesktop}\Modo Console"; Filename: "{app}\{#AppExe}"; Parameters: "--start"; \
+Name: "{autodesktop}\Console Mode 1 Click"; Filename: "{app}\{#AppExe}"; Parameters: "--start"; \
     Comment: "Entra no modo console com 1 clique"; Tasks: oneclick
 
 [Registry]
