@@ -9,7 +9,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![License](https://img.shields.io/badge/licença-MIT-green)
 
 > [!NOTE]
-> **Vem mais melhoria por aí.** Estou trabalhando ativamente em novos recursos e correções. As próximas já estão na [1.5.0-beta.10](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.10). Sua opinião define o que vem depois: use o **botão de feedback** no aplicativo ou [envie seu feedback aqui](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Veja [Feedback](#feedback).
+> **Vem mais melhoria por aí.** Estou trabalhando ativamente em novos recursos e correções. As próximas já estão na [1.5.0-beta.11](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.11). Sua opinião define o que vem depois: use o **botão de feedback** no aplicativo ou [envie seu feedback aqui](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Veja [Feedback](#feedback).
 
 <img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
 
