@@ -27,7 +27,8 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        _navigator ??= new GamepadNavigator(DispatcherQueue, this);
+        _navigator ??= new GamepadNavigator(DispatcherQueue, this,
+            App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0);
         _navigator.BackRequested += GoBack;
         _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen) ViewModel.StartCommand.Execute(null); };
         _navigator.AltRequested += () =>
