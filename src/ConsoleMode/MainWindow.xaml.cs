@@ -3,6 +3,7 @@ using ConsoleMode.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using WinRT.Interop;
@@ -11,6 +12,8 @@ namespace ConsoleMode;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly ControllerNavigator _controller;
+
     public MainViewModel ViewModel { get; }
 
     public MainWindow(MainViewModel viewModel)
@@ -48,7 +51,15 @@ public sealed partial class MainWindow : Window
             e.Cancel = true;
             appWindow.Hide();
         };
+
+        _controller = new ControllerNavigator(this, ViewModel, DefaultFocusTarget);
+        Closed += (_, _) => _controller.Dispose();
     }
+
+    /// <summary>Where a controller starts on each page.</summary>
+    private UIElement? DefaultFocusTarget() => ViewModel.IsSettingsPage
+        ? FocusManager.FindFirstFocusableElement(SettingsPage) as UIElement
+        : HomePage.DefaultFocusTarget;
 
     private static class Win32Dpi
     {

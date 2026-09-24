@@ -22,6 +22,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 - Optional **HDR** on the focus monitor and **VRR** (Windows setting)
 - Optional global **FPS limit** via RivaTuner (RTSS)
 - Audio routing, including “use output when connected” (e.g. TV HDMI)
+- **Controller navigation** from the couch: PlayStation (DualSense / DualShock 4) or Xbox — D-pad or left stick moves, ✕ / A selects, ○ / B goes back, Options / Start opens Settings
 - System tray icon to restore your desktop layout or reopen the app
 - **Installer** (per-user, no admin) or a **portable single-file** `.exe` — both announce new versions from GitHub Releases
 - Interface in **Brazilian Portuguese** or **English**, switchable in Settings without restarting
@@ -145,6 +146,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 - **HDR** opcional no monitor de foco e **VRR** (ajuste do Windows)
 - **Limite de FPS** opcional via RivaTuner (RTSS)
 - Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
+- **Navegação com controle** do sofá: PlayStation (DualSense / DualShock 4) ou Xbox — direcional ou analógico esquerdo movem, ✕ / A seleciona, ○ / B volta, Options / Start abre os Ajustes
 - Ícone na bandeja para restaurar o layout ou reabrir o app
 - **Instalador** (por usuário, sem admin) ou **executável portátil em um único `.exe`** — os dois avisam das versões novas pelo GitHub
 - Interface em **português do Brasil** ou **inglês**, trocável em Ajustes sem reiniciar
