@@ -36,7 +36,7 @@ public partial class MainViewModel
     {
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
-        if (value) IsRolePanelOpen = false;
+        if (value) { IsRolePanelOpen = false; IsControllerToastOpen = false; }
         else { IsConsoleSettingsOpen = false; IsPickerOpen = false; }
     }
 
@@ -69,6 +69,23 @@ public partial class MainViewModel
     }
 
     [ObservableProperty] private bool _controllerDetected;
+    [ObservableProperty] private bool _isControllerToastOpen;
+    private int _controllerToastId;
+
+    // A toast instead of a permanent chip: shown for a few seconds when a pad connects.
+    partial void OnControllerDetectedChanged(bool value)
+    {
+        var id = ++_controllerToastId;
+        IsControllerToastOpen = value && !IsConsoleUi;
+        if (!IsControllerToastOpen) return;
+        _ = HideControllerToastAsync(id);
+    }
+
+    private async Task HideControllerToastAsync(int id)
+    {
+        await Task.Delay(4000);
+        if (id == _controllerToastId) IsControllerToastOpen = false;
+    }
 
     /// <summary>Called after the config is applied and whenever the choice changes.</summary>
     private void ResolveUi()

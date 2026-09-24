@@ -25,9 +25,14 @@ public static partial class UpdateService
 
     private static readonly HttpClient Http = CreateClient();
 
+    // Deadlines are per request: a whole-client Timeout also cut off downloads that were
+    // still progressing on slow connections.
+    private static readonly TimeSpan CheckTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan StallTimeout = TimeSpan.FromSeconds(30);
+
     private static HttpClient CreateClient()
     {
-        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+        var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
         // GitHub rejects API calls without a User-Agent.
         client.DefaultRequestHeaders.UserAgent.ParseAdd($"ConsoleMode/{CurrentVersion}");
         return client;
@@ -36,6 +41,9 @@ public static partial class UpdateService
     /// <summary>Newest published release above the running version, or null when up to date.</summary>
     public static async Task<UpdateInfo?> CheckAsync(CancellationToken ct = default)
     {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(CheckTimeout);
+        ct = timeout.Token;
         using var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{Repository}/releases?per_page=15");
         request.Headers.Accept.ParseAdd("application/vnd.github+json");
         using var response = await Http.SendAsync(request, ct);
@@ -151,19 +159,30 @@ public static partial class UpdateService
 
     private static async Task DownloadAsync(string url, string file, IProgress<double>? progress, CancellationToken ct)
     {
-        using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
-        response.EnsureSuccessStatusCode();
-        var total = response.Content.Headers.ContentLength ?? -1;
-        await using var source = await response.Content.ReadAsStreamAsync(ct);
-        await using var target = File.Create(file);
-        var buffer = new byte[81920];
-        long done = 0;
-        int read;
-        while ((read = await source.ReadAsync(buffer, ct)) > 0)
+        // Cancelled only when no bytes arrive for StallTimeout, not after a fixed total time.
+        using var stall = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        stall.CancelAfter(StallTimeout);
+        try
         {
-            await target.WriteAsync(buffer.AsMemory(0, read), ct);
-            done += read;
-            if (total > 0) progress?.Report((double)done / total);
+            using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, stall.Token);
+            response.EnsureSuccessStatusCode();
+            var total = response.Content.Headers.ContentLength ?? -1;
+            await using var source = await response.Content.ReadAsStreamAsync(stall.Token);
+            await using var target = File.Create(file);
+            var buffer = new byte[81920];
+            long done = 0;
+            int read;
+            while ((read = await source.ReadAsync(buffer, stall.Token)) > 0)
+            {
+                stall.CancelAfter(StallTimeout);
+                await target.WriteAsync(buffer.AsMemory(0, read), ct);
+                done += read;
+                if (total > 0) progress?.Report((double)done / total);
+            }
+        }
+        catch (OperationCanceledException) when (stall.IsCancellationRequested && !ct.IsCancellationRequested)
+        {
+            throw new TimeoutException($"Download stalled: no data for {StallTimeout.TotalSeconds:0} s.");
         }
     }
 

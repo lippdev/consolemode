@@ -191,16 +191,6 @@
                     </ItemsControl>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Border Style="{StaticResource ChipBorder}" VerticalAlignment="Center" Margin="0,0,4,0"
-                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                            ToolTipService.ToolTip="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}"
-                            Visibility="{x:Bind ViewModel.ControllerDetected, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE7FC;" FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
-                                       VerticalAlignment="Center" MaxWidth="220" TextTrimming="CharacterEllipsis"/>
-                        </StackPanel>
-                    </Border>
                     <Button Height="40" Width="40" Padding="0" Command="{x:Bind ViewModel.SwitchUiCommand}" CommandParameter="console"
                             ToolTipService.ToolTip="{x:Bind ViewModel.Texts.SwitchToConsole, Mode=OneWay}"
                             AutomationProperties.Name="{x:Bind ViewModel.Texts.SwitchToConsole, Mode=OneWay}">
@@ -285,5 +275,22 @@
                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                        Text="{x:Bind ViewModel.Texts.RunningInTray, Mode=OneWay}"/>
         </StackPanel>
+
+        <!-- Toast: a controller was connected (shown for a few seconds, Desktop interface only) -->
+        <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,84" Padding="16,10"
+                CornerRadius="8" BorderThickness="1" IsHitTestVisible="False"
+                Background="{ThemeResource SolidBackgroundFillColorTertiaryBrush}"
+                BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
+                Visibility="{x:Bind ViewModel.IsControllerToastOpen, Mode=OneWay}">
+            <Border.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition FromVerticalOffset="24"/>
+                </TransitionCollection>
+            </Border.Transitions>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <FontIcon Glyph="&#xE7FC;" FontSize="16" VerticalAlignment="Center" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
