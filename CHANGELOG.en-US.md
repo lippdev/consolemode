@@ -16,7 +16,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - The one-click shortcut is now named "Console Mode 1 Click".
 
 ### Beta release
-- This is a test release. People on 1.4.0 don't get a notice for it: to try it, download the installer or the portable version below. From then on, the app notifies you about the next betas and about the final 1.5.0.
+- This beta is the main download. People on 1.4.0 get the notice in the app: just click **Update now**. Your settings are kept.
+- After updating, the app also notifies you about the next betas, in addition to the final 1.5.0.
 
 ## [1.4.0]
 ### What's new
