@@ -159,6 +159,30 @@ Open **Settings → Test controller**: it shows live what Windows delivers from 
 
 Confirm that the focus monitor supports the feature and that HDR is enabled in Windows. For VRR, also enable G-SYNC or FreeSync in the GPU control panel when applicable.
 
+## Roadmap
+
+<img src="assets/roadmap.gif" alt="Console Mode roadmap: Next, Later and Exploring columns." width="800">
+
+Plans, not promises: the order can change with feedback. Vote with a 👍 on the issue, or [suggest something](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml).
+
+**Next**
+- 1.5.0 stable, wrapping up the betas
+- FPS overlay, toggled from the session menu ([#66](https://github.com/lippdev/consolemode/issues/66))
+- Record the last 30 seconds from the session menu
+- Save and restore desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30))
+
+**Later**
+- Per-game profiles: resolution, HDR and audio per game
+- Controller battery in the session menu
+- Publish to winget ([#13](https://github.com/lippdev/consolemode/issues/13))
+- More interface languages ([#14](https://github.com/lippdev/consolemode/issues/14))
+
+**Exploring**
+- Windows Game Bar widget ([#11](https://github.com/lippdev/consolemode/issues/11))
+- Voice and assistant triggers: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
+- WakeOn integration: wake the PC straight into console mode
+- Phone remote over the local control API
+
 ## Feedback
 
 Found a bug or have an idea? Feedback is what decides the next improvements, so every report counts.

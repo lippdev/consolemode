@@ -26,6 +26,7 @@
     "mp4": "remotion render src/index.ts ConsoleModeExplainer out/explainer.mp4",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
-    "whats-new": "remotion render src/index.ts WhatsNew out/whats-new.mp4 && ffmpeg -y -loglevel error -i out/whats-new.mp4 -vf \"fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/whats-new.gif"
+    "whats-new": "remotion render src/index.ts WhatsNew out/whats-new.mp4 && ffmpeg -y -loglevel error -i out/whats-new.mp4 -vf \"fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/whats-new.gif",
+    "roadmap": "remotion render src/index.ts Roadmap out/roadmap.mp4 && ffmpeg -y -loglevel error -i out/roadmap.mp4 -vf \"fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/roadmap.gif"
   }
 }
