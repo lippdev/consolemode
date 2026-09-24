@@ -99,6 +99,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string SkipTour => LocalizationService.Get(nameof(SkipTour));
     public string GotIt => LocalizationService.Get(nameof(GotIt));
     public string CreateDesktopShortcut => LocalizationService.Get(nameof(CreateDesktopShortcut));
+    public string SendFeedback => LocalizationService.Get(nameof(SendFeedback));
     public string ActiveTitle => LocalizationService.Get(nameof(ActiveTitle));
     public string RestoreNow => LocalizationService.Get(nameof(RestoreNow));
     public string RunningInTray => LocalizationService.Get(nameof(RunningInTray));

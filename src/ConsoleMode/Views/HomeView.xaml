@@ -191,6 +191,11 @@
                     </ItemsControl>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Height="40" Width="40" Padding="0" Command="{x:Bind ViewModel.OpenFeedbackCommand}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.Texts.SendFeedback, Mode=OneWay}"
+                            AutomationProperties.Name="{x:Bind ViewModel.Texts.SendFeedback, Mode=OneWay}">
+                        <FontIcon Glyph="&#xED15;" FontSize="14"/>
+                    </Button>
                     <Button Height="40" Padding="14,0" Command="{x:Bind ViewModel.OpenSettingsCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE713;" FontSize="14"/>

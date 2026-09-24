@@ -115,6 +115,10 @@ Check that the target output is connected and available in Windows before starti
 
 Confirm that the focus monitor supports the feature and that HDR is enabled in Windows. For VRR, also enable G-SYNC or FreeSync in the GPU control panel when applicable.
 
+## Feedback
+
+Found a bug or have an idea? Click the feedback button (next to **Settings** on the home screen). It opens a prefilled issue on GitHub with your app and Windows version; you only need a GitHub account to submit it.
+
 If Console Mode saved you some monitor juggling, a ⭐ on the repo helps other couch gamers find it.
 
 ## License
@@ -222,6 +226,10 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 - Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
 - O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
+
+### Feedback
+
+Encontrou um bug ou tem uma ideia? Clique no botão de feedback (ao lado de **Ajustes** na tela inicial). Ele abre uma issue no GitHub já preenchida com a versão do aplicativo e do Windows; basta ter uma conta no GitHub para enviar.
 
 Se o Console Mode te poupou da dança dos monitores, uma ⭐ no repositório ajuda outras pessoas a encontrá-lo.
 
