@@ -192,6 +192,9 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string NotifyUpdatesCard => LocalizationService.Get(nameof(NotifyUpdatesCard));
     public string NotifyUpdatesDescription => LocalizationService.Get(nameof(NotifyUpdatesDescription));
     public string HelpDataSection => LocalizationService.Get(nameof(HelpDataSection));
+    public string OtherAppsSection => LocalizationService.Get(nameof(OtherAppsSection));
+    public string WakeOnDescription => LocalizationService.Get(nameof(WakeOnDescription));
+    public string NextBoostDescription => LocalizationService.Get(nameof(NextBoostDescription));
     public string TvConfirmationCard => LocalizationService.Get(nameof(TvConfirmationCard));
     public string TvConfirmationDescription => LocalizationService.Get(nameof(TvConfirmationDescription));
     public string TestNow => LocalizationService.Get(nameof(TestNow));

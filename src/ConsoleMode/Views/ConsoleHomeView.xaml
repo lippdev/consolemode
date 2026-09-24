@@ -431,6 +431,22 @@
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenFeedbackCommand}">
                         <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.SendFeedback, Mode=OneWay}"/>
                     </Button>
+
+                    <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://wake.nextestudios.com">
+                        <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <Image Source="{x:Bind ViewModel.WakeOnLogo}" Width="36" Height="36"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="WakeOn"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.Texts.WakeOnDescription, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal"/>
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://nextboost.pro">
+                        <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <Image Source="{x:Bind ViewModel.NextBoostLogo}" Width="36" Height="36"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="Next Boost"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.Texts.NextBoostDescription, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal"/>
+                        </Grid>
+                    </Button>
                     <Border Height="24"/>
                 </StackPanel>
             </ScrollViewer>
