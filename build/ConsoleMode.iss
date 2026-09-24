@@ -81,6 +81,11 @@ Name: "{autodesktop}\Console Mode 1 Click"; Filename: "{app}\{#AppExe}"; Paramet
 ; Same value the app's "Iniciar com o Windows" toggle writes (StartupService).
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; \
     ValueName: "ConsoleMode"; ValueData: """{app}\{#AppExe}"" --tray"; Tasks: startup; Flags: uninsdeletevalue
+; consolemode://start|stop|show links (ProtocolService registers the same keys at startup).
+Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueData: "URL:Console Mode"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\consolemode\DefaultIcon"; ValueType: string; ValueData: """{app}\{#AppExe}"",0"
+Root: HKCU; Subkey: "Software\Classes\consolemode\shell\open\command"; ValueType: string; ValueData: """{app}\{#AppExe}"" ""%1"""
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent

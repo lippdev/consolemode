@@ -16,6 +16,9 @@ public partial class MainViewModel
     private enum UpdateStatusKind { InstallKind, Searching, Latest, Available, Failed }
 
     [ObservableProperty] private bool _checkUpdates = true;
+    [ObservableProperty] private bool _homeButtonLaunch = true;
+    [ObservableProperty] private bool _homeButtonShortPress;
+    [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
     [ObservableProperty] private string _updateTitle = "";
@@ -75,6 +78,32 @@ public partial class MainViewModel
     }
 
     partial void OnCheckUpdatesChanged(bool value) => SaveQuietly();
+
+    partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
+
+    partial void OnHomeButtonShortPressChanged(bool value)
+    {
+        if (_applying) return;
+        try
+        {
+            GameBarService.SetGuideOpensGameBar(!value);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Game Bar: {ex}");
+            SetStatus(LocalizationService.Get("GameBarSettingError", ex.Message), InfoBarSeverity.Error);
+        }
+        SaveQuietly();
+        RefreshHomeButtonHint();
+    }
+
+    /// <summary>Steam's desktop client also grabs the Guide button; only the user can change that.</summary>
+    private void RefreshHomeButtonHint()
+    {
+        HomeButtonHint = HomeButtonShortPress && GameBarService.IsSteamRunning()
+            ? LocalizationService.Get("HomeButtonSteamHint")
+            : LocalizationService.Get("HomeButtonShortPressDescription");
+    }
 
     /// <summary>Startup check: quiet on failure, respects "ignorar esta versão".</summary>
     private async Task CheckForUpdatesOnStartupAsync()

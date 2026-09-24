@@ -2,6 +2,12 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- Segurar o botão Xbox do controle por 1 segundo, com o app na bandeja, entra no modo console sem tocar no PC. Durante a sessão, segurar Start + Select por 1 segundo volta ao PC. Só controles Xbox (XInput); pode ser desligado em Ajustes.
+- Opção "Toque curto no botão Xbox": o app desliga o atalho do controle para a Game Bar e avisa se a Steam também estiver usando o botão.
+- Links `consolemode://start`, `consolemode://stop` e `consolemode://show` para automação (Stream Deck, launchers, scripts).
+
 ## [1.5.0-beta.1]
 ### Novidades
 - Botão de feedback na tela inicial: abre uma issue no GitHub já preenchida com a versão do aplicativo e do Windows, para enviar sugestões e relatar bugs.

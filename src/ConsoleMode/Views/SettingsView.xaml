@@ -58,6 +58,21 @@
                           SelectedItem="{x:Bind ViewModel.SelectedAudio, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HomeButtonDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.HomeButtonLaunch, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}" Description="{x:Bind ViewModel.HomeButtonHint, Mode=OneWay}"
+                              IsEnabled="{x:Bind ViewModel.HomeButtonLaunch, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE945;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.HomeButtonShortPress, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
 
             <!-- Optional extras -->
             <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>

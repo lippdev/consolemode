@@ -298,6 +298,9 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
+            HomeButtonLaunch = config.HomeButtonLaunch;
+            HomeButtonShortPress = config.HomeButtonShortPress;
+            RefreshHomeButtonHint();
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -529,6 +532,7 @@ public partial class MainViewModel : ObservableObject
     private void OpenSettings()
     {
         if (IsConsoleActive) return;
+        RefreshHomeButtonHint();
         ShowPage(settings: true);
     }
 
@@ -876,6 +880,8 @@ public partial class MainViewModel : ObservableObject
             TourDone = _loadedConfig.TourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
+            HomeButtonLaunch = HomeButtonLaunch,
+            HomeButtonShortPress = HomeButtonShortPress,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
 
