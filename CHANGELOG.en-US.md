@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### Fixes
+- Console interface: the update banner buttons now have a black focus ring; it used to match the background, so with a controller you couldn't see which button was selected. (#73)
+
 ## [1.5.0-beta.11]
 ### What's new
 - Session menu (Select + Y) has a horizontal layout: tiles side by side, with "Back to the PC" / "Exit Console Mode" below. On volume, A enters adjust mode (◀ ▶ changes it, □/X mutes, A or B leaves). (#64)
