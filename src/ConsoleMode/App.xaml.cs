@@ -9,12 +9,14 @@ public partial class App : Application
     private const string InstanceMutexName = @"Local\ConsoleMode.Instance";
     private const string ShowSignalName = @"Local\ConsoleMode.Show";
     private const string StartSignalName = @"Local\ConsoleMode.Start";
+    private const string StopSignalName = @"Local\ConsoleMode.Stop";
 
     private MainWindow? _window;
     private TrayService? _tray;
     private Mutex? _instanceMutex;
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
+    private EventWaitHandle? _stopSignal;
     private readonly List<RegisteredWaitHandle> _signalWaits = [];
 
     public static MainWindow? MainWindowInstance { get; private set; }
@@ -41,10 +43,23 @@ public partial class App : Application
         var cliArgs = Environment.GetCommandLineArgs().Skip(1).ToList();
         bool HasArg(string name) => cliArgs.Any(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
         var autoStart = HasArg(ShortcutService.StartArgument);
+        // --stop: leave console mode and restore the monitors (for remote tools / scripts).
+        var stop = HasArg(ShortcutService.StopArgument);
         // --tray: launched with Windows; stay in the tray until the user opens the window.
         var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
 
         _instanceMutex = new Mutex(true, InstanceMutexName, out var isFirstInstance);
+        if (stop)
+        {
+            // Console mode only lives inside a running instance: hand it the request, or there's
+            // nothing to restore. Never open the window for --stop.
+            if (!isFirstInstance) SignalRunningInstance(StopSignalName);
+            else _instanceMutex.ReleaseMutex();
+            _instanceMutex.Dispose();
+            _instanceMutex = null;
+            Exit();
+            return;
+        }
         if (!isFirstInstance)
         {
             // Hand the request to the running instance (tray) instead of fighting over the screens.
@@ -99,6 +114,7 @@ public partial class App : Application
     {
         _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, ShowSignalName);
         _startSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StartSignalName);
+        _stopSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StopSignalName);
 
         _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_showSignal, (_, _) =>
             _window?.DispatcherQueue.TryEnqueue(() => _tray?.ShowWindow()), null, Timeout.Infinite, executeOnlyOnce: false));
@@ -109,6 +125,12 @@ public partial class App : Application
                 if (ViewModel is null) return;
                 if (ViewModel.IsConsoleActive || !await ViewModel.TryAutoStartAsync())
                     _tray?.ShowWindow();
+            }), null, Timeout.Infinite, executeOnlyOnce: false));
+
+        _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_stopSignal, (_, _) =>
+            _window?.DispatcherQueue.TryEnqueue(async () =>
+            {
+                if (ViewModel?.IsConsoleActive == true) await ViewModel.RestoreNowAsync();
             }), null, Timeout.Infinite, executeOnlyOnce: false));
     }
 }

@@ -15,7 +15,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 ## Features
 
 - **One-click home screen**: pick the screen you play on, hit **Play now**
-- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight into console mode, with the app waiting in the tray
+- **Desktop shortcut** (`ConsoleMode.exe --start`) that goes straight into console mode, with the app waiting in the tray; `ConsoleMode.exe --stop` restores the desktop (handy for remote tools and scripts)
 - Hide spare displays by **disconnect**, **black overlays**, or **DDC/CI**
 - Optional **resolution & refresh rate** per monitor for console mode
 - Launch **Steam Big Picture**, **Playnite fullscreen**, or **Xbox** (Win+F11)
@@ -138,7 +138,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ### Funcionalidades
 
 - **Tela inicial de 1 clique**: escolha a tela onde você joga e clique em **Jogar agora**
-- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, com o app aguardando na bandeja
+- **Atalho na Área de Trabalho** (`ConsoleMode.exe --start`) que entra direto no modo console, com o app aguardando na bandeja; `ConsoleMode.exe --stop` restaura a área de trabalho (útil para ferramentas remotas e scripts)
 - Esconder monitores por **desconexão**, **cortinas pretas** ou **DDC/CI**
 - **Resolução e Hz** opcionais por monitor no modo console
 - Abrir **Steam Big Picture**, **Playnite em tela cheia** ou **Modo Xbox** (Win+F11)

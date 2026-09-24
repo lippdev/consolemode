@@ -5,6 +5,8 @@ namespace ConsoleMode.Services;
 public static class ShortcutService
 {
     public const string StartArgument = "--start";
+    /// <summary>Leaves console mode and restores the desktop layout (same as the tray's "Restore").</summary>
+    public const string StopArgument = "--stop";
 
     /// <summary>Creates "Modo Console.lnk" on the desktop that runs this exe with --start.</summary>
     public static string CreateDesktopShortcut()
