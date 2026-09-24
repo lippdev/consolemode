@@ -2,6 +2,11 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- API de controle local: com o app aberto, o named pipe `\.pipeConsoleMode.Control` recebe uma linha JSON (`status`, `start`, `stop`, `show`) e responde com o estado (ativo, restaurando, modo, versão). Só o usuário logado e o LocalSystem conectam. Por @nextestudios. (#24)
+- `ConsoleMode.exe --stop` restaura a mesa pela linha de comando, como o `consolemode://stop`. Por @nextestudios. (#23)
+
 ## [1.5.0-beta.6]
 ### Novidades
 - Interface Desktop navegável pelo controle: D-pad/analógico movem, A ativa (listas, interruptores, cards), B fecha a lista ou volta de Ajustes, Start abre/fecha Ajustes, Y vai para a interface Console; no tutorial, A avança e B pula. Baseado no PR #17 de @nextestudios.

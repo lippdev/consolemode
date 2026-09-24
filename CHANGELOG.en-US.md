@@ -2,6 +2,11 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- Local control API: while the app runs, the named pipe `\.pipeConsoleMode.Control` takes one JSON line (`status`, `start`, `stop`, `show`) and replies with the state (active, restoring, mode, version). Only the signed-in user and LocalSystem can connect. By @nextestudios. (#24)
+- `ConsoleMode.exe --stop` restores the desk from the command line, like `consolemode://stop`. By @nextestudios. (#23)
+
 ## [1.5.0-beta.6]
 ### What's new
 - Session menu: while the game is open, hold Select + Y for a menu over the game with volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode". Also via `consolemode://menu`. (#46)

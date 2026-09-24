@@ -54,7 +54,7 @@ public partial class App : Application
         // consolemode://start|stop|show arrives as the only argument (ProtocolService).
         var protocolAction = cliArgs.Select(ProtocolService.ParseAction).FirstOrDefault(a => a is not null);
         var autoStart = HasArg(ShortcutService.StartArgument) || protocolAction == ProtocolService.StartAction;
-        var stopRequest = protocolAction == ProtocolService.StopAction;
+        var stopRequest = HasArg(ShortcutService.StopArgument) || protocolAction == ProtocolService.StopAction;
         var menuRequest = protocolAction == ProtocolService.MenuAction;
         // --tray: launched with Windows; stay in the tray until the user opens the window.
         var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
