@@ -2,7 +2,7 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.5.0-beta.6]
 ### Novidades
 - Interface Desktop navegável pelo controle: D-pad/analógico movem, A ativa (listas, interruptores, cards), B fecha a lista ou volta de Ajustes, Start abre/fecha Ajustes, Y vai para a interface Console; no tutorial, A avança e B pula. Baseado no PR #17 de @nextestudios.
 
@@ -10,6 +10,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - O controle deixava de responder de vez se um controle desconectasse no meio de uma leitura; agora a leitura só pula a amostra. Também vindo do PR #17.
 - Navegação por controle: o primeiro toque só mostra o anel de foco; em listas roladas o foco cai na ordem de tabulação quando a busca espacial não acha nada; diagonais no D-pad contam como vertical; a leitura só vale com a janela em primeiro plano (verificação por janela, não por evento).
 - Menu da sessão: com o jogo aberto, segure Select + Y para abrir um menu sobre o jogo com volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode". Também por `consolemode://menu`.
+
+### Versão beta
+- Pré-release: quem usa uma 1.5.0-beta recebe o aviso dentro do aplicativo. Quem está na 1.4.0 não recebe; para testar, baixe os arquivos abaixo.
 
 ## [1.5.0-beta.5]
 ### Novidades
