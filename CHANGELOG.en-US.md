@@ -2,7 +2,7 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
+## [1.5.0-beta.5]
 ### What's new
 - Console interface: list settings (launcher, audio, resolution, FPS, hide strategy, language, interface) open a picker with every option, focused on the current one; A picks, B goes back. Before, you had to keep pressing A to cycle.
 - In the desktop interface, with a controller detected, a "press A for console mode" hint appears; A or Start switch the interface.
@@ -11,6 +11,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### Fixes
 - Automatic mode missed controllers that Windows lists late (PlayStation, Bluetooth) and opened in Desktop. The app now re-detects when a controller appears and also 1.5 s and 4 s after opening.
 - In the console interface the controller sometimes didn't respond until you changed screens: the listener didn't start the first time.
+
+### Beta release
+- Pre-release: people on any 1.5.0 beta get the notice in the app. People on 1.4.0 don't; to try it, download the files below.
 
 ## [1.5.0-beta.4]
 ### What's new

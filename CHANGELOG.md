@@ -2,7 +2,7 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.5.0-beta.5]
 ### Novidades
 - Interface Console: os ajustes de lista (abrir em, áudio, resolução, FPS, como desligar, idioma, interface) abrem um seletor com todas as opções, com foco na atual; A escolhe, B volta. Antes era preciso ir apertando A para ciclar.
 - Na interface Desktop, com um controle detectado, aparece "aperte A para o modo console"; A ou Start trocam a interface.
@@ -11,6 +11,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Correções
 - O modo Automático não via controles que o Windows lista com atraso (PlayStation, Bluetooth) e abria em Desktop. Agora o app detecta de novo quando um controle aparece e também 1,5 s e 4 s após abrir.
 - Na interface Console, o controle às vezes não respondia até trocar de tela: o listener não ligava na primeira vez.
+
+### Versão beta
+- Pré-release: quem usa uma 1.5.0-beta recebe o aviso dentro do aplicativo. Quem está na 1.4.0 não recebe; para testar, baixe os arquivos abaixo.
 
 ## [1.5.0-beta.4]
 ### Novidades
