@@ -17,6 +17,7 @@ public partial class App : Application
     private TrayService? _tray;
     private ControllerHoldWatcher? _guide;
     private ControllerHoldWatcher? _exitChord;
+    private ControllerConnectWatcher? _connect;
     private Mutex? _instanceMutex;
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
@@ -155,6 +156,17 @@ public partial class App : Application
         _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
         RefreshGuideWatch();
+
+        // Issue #29: a pad connecting while we're in the tray means "I'm on the couch".
+        _connect = new ControllerConnectWatcher(_window.DispatcherQueue)
+        {
+            CanTrigger = () => ViewModel.AutoStartOnController && !ViewModel.IsConsoleActive && !_window.AppWindow.IsVisible
+        };
+        _connect.Connected += () =>
+        {
+            if (ViewModel is not null) ViewModel.LaunchedByController = true;
+            _ = HandleStartRequestAsync();
+        };
     }
 
     private void OnViewModelChangedForGuide(object? sender, PropertyChangedEventArgs e)
@@ -162,6 +174,8 @@ public partial class App : Application
         if (e.PropertyName is nameof(MainViewModel.HomeButtonLaunch) or nameof(MainViewModel.HomeButtonShortPress)
             or nameof(MainViewModel.IsConsoleActive))
             RefreshGuideWatch();
+        if (e.PropertyName == nameof(MainViewModel.IsConsoleActive) && ViewModel?.IsConsoleActive == false)
+            _connect?.QuietFor(ControllerConnectPolicy.RestoreGrace);
     }
 
     private void RefreshGuideWatch()

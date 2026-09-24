@@ -280,6 +280,12 @@
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.HomeButtonLaunch), Mode=OneWay}"/>
                         </Grid>
                     </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="autostart">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AutoStartControllerCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.AutoStartOnController), Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="shortpress" IsEnabled="{x:Bind ViewModel.HomeButtonLaunch, Mode=OneWay}">
                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}"/>

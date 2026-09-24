@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- "Enter when a controller connects" option (off by default): with the app in the tray, turning on or plugging in a controller enters console mode. Ignores the first 15 s after opening and 30 s after restoring.
+
 ## [1.5.0-beta.3]
 ### What's new
 - Settings → "Playnite folder": pick Playnite.FullscreenApp.exe by hand for portable installs, which auto-detection can't find.

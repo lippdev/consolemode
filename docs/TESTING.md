@@ -23,6 +23,18 @@ Pré-condições: controle **Xbox** (XInput) conectado; app na bandeja (minimiza
 - [ ] Com a **Steam aberta** e o toque curto ligado, o card mostra a dica sobre "Botão Guide foca a Steam". Com a Steam fechada, mostra a descrição normal. Resultado: ______
 - [ ] Com a Steam aberta e a opção da Steam ligada: o toque curto abre a Steam em vez do app (esperado; a dica cobre isso). Resultado: ______
 
+## 1b. Entrar ao conectar um controle (issue #29)
+
+Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app na bandeja (janela oculta); sessão inativa; passaram 15 s desde que o app abriu.
+
+- [ ] Ligar um controle sem fio (ou conectar por USB): a sessão inicia sozinha. Resultado: ______
+- [ ] Com a **janela aberta**, conectar o controle **não** inicia nada. Resultado: ______
+- [ ] Conectar nos **primeiros 15 s** após abrir o app: nada acontece (controles já pareados se anunciam nesse momento). Resultado: ______
+- [ ] Restaurar a mesa e, em menos de 30 s, o controle reconectar sozinho: nada acontece. Após 30 s, conectar de novo inicia. Resultado: ______
+- [ ] Durante a sessão, um controle reconectando não reinicia nada. Resultado: ______
+- [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
+- [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
+
 ## 2. Links `consolemode://`
 
 - [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______

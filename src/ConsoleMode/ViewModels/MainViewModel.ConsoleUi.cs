@@ -138,6 +138,7 @@ public partial class MainViewModel
             case "ui": SelectedUiMode = Next(UiModeOptions, SelectedUiMode, step); break;
             case "home": HomeButtonLaunch = !HomeButtonLaunch; break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
+            case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
         }

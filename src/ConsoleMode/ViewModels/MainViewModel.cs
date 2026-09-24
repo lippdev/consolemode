@@ -310,6 +310,7 @@ public partial class MainViewModel : ObservableObject
             CheckUpdates = config.CheckUpdates;
             HomeButtonLaunch = config.HomeButtonLaunch;
             HomeButtonShortPress = config.HomeButtonShortPress;
+            AutoStartOnController = config.AutoStartOnController;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -894,6 +895,7 @@ public partial class MainViewModel : ObservableObject
             CheckUpdates = CheckUpdates,
             HomeButtonLaunch = HomeButtonLaunch,
             HomeButtonShortPress = HomeButtonShortPress,
+            AutoStartOnController = AutoStartOnController,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
