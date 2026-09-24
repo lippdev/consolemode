@@ -58,6 +58,31 @@ public partial class MainViewModel
         AppLog.Write("Menu da sessão: aberto");
     }
 
+    /// <summary>
+    /// Once per session, a few seconds in (the game UI is up by then): a corner toast telling
+    /// how to open this menu, with the combo written for the pad in use.
+    /// </summary>
+    private async Task ShowSessionHintAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        _dispatcher.TryEnqueue(() =>
+        {
+            if (!IsConsoleActive || IsSessionMenuOpen) return;
+            try
+            {
+                var combo = IsPlayStationHints ? "Create + △" : "Select + Y";
+                _ = new SessionHintWindow(LocalizationService.Get("SessionHintTitle"),
+                    LocalizationService.Get("SessionHintBody", combo),
+                    Engine.State.FocusMonitorRect, TimeSpan.FromSeconds(7));
+                AppLog.Write("Menu da sessão: aviso exibido");
+            }
+            catch (Exception ex)
+            {
+                AppLog.Write($"Menu da sessão: aviso: {ex.Message}");
+            }
+        });
+    }
+
     [RelayCommand]
     private void CloseSessionMenu()
     {

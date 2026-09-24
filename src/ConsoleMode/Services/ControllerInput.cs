@@ -118,17 +118,30 @@ public sealed class ControllerInput : IDisposable
         return ControllerFamily.None;
     }
 
+    /// <summary>
+    /// Also read PlayStation pads straight from HID (SonyHidReader). Windows.Gaming.Input only
+    /// reaches the foreground window, so a menu shown over a game that keeps the focus needs this.
+    /// </summary>
+    public bool ReadSonyHid { get; init; }
+
     public bool IsRunning => _timer.IsRunning;
 
     public void Start()
     {
+        if (_timer.IsRunning) return;
         _primed = false;
+        if (ReadSonyHid) SonyHidReader.Acquire();
         _timer.Start();
     }
 
-    public void Stop() => _timer.Stop();
+    public void Stop()
+    {
+        if (!_timer.IsRunning) return;
+        _timer.Stop();
+        if (ReadSonyHid) SonyHidReader.Release();
+    }
 
-    public void Dispose() => _timer.Stop();
+    public void Dispose() => Stop();
 
     private void Poll()
     {
@@ -142,6 +155,7 @@ public sealed class ControllerInput : IDisposable
         try
         {
             ReadAll(held, null);
+            if (ReadSonyHid) ReadSony(held, SonyHidReader.Held);
         }
         catch (Exception ex)
         {
@@ -186,6 +200,20 @@ public sealed class ControllerInput : IDisposable
         var xinputPads = ReadXInput(held, diag);
         if (ControllerMapping.ShouldReadGamepads(xinputPads)) ReadGamepads(held, diag);
         ReadRaw(held, xinputPads, diag);
+    }
+
+    /// <summary>SonyHidReader bits use the XInput layout, so they map like an Xbox pad.</summary>
+    private static void ReadSony(bool[] held, ushort b)
+    {
+        held[(int)ControllerAction.Confirm] |= (b & XInputA) != 0;
+        held[(int)ControllerAction.Back] |= (b & XInputB) != 0;
+        held[(int)ControllerAction.Option] |= (b & XInputX) != 0;
+        held[(int)ControllerAction.Alt] |= (b & XInputY) != 0;
+        held[(int)ControllerAction.Menu] |= (b & XInputStart) != 0;
+        held[(int)ControllerAction.Up] |= (b & XInputDpadUp) != 0;
+        held[(int)ControllerAction.Down] |= (b & XInputDpadDown) != 0;
+        held[(int)ControllerAction.Left] |= (b & XInputDpadLeft) != 0;
+        held[(int)ControllerAction.Right] |= (b & XInputDpadRight) != 0;
     }
 
     private static int ReadXInput(bool[] held, StringBuilder? diag)

@@ -16,7 +16,7 @@ public static class SonyHidReader
     private static CancellationTokenSource? _cts;
     private static int _users;
 
-    /// <summary>XInput-style bits held on any Sony pad (see ControllerMapping.SonyChordButtons).</summary>
+    /// <summary>XInput-style bits held on any Sony pad (see ControllerMapping.SonyButtons).</summary>
     public static ushort Held
     {
         get
@@ -94,7 +94,7 @@ public static class SonyHidReader
             {
                 var read = await stream.ReadAsync(buffer.AsMemory(0, pad.ReportLength), ct);
                 if (read <= 0) break;
-                var bits = ControllerMapping.SonyChordButtons(buffer.AsSpan(0, read), pad.DualSense);
+                var bits = ControllerMapping.SonyButtons(buffer.AsSpan(0, read), pad.DualSense);
                 lock (Gate) { Buttons[path] = bits; }
             }
         }

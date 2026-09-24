@@ -41,10 +41,11 @@ public sealed class GamepadNavigator : IDisposable
     public Func<ControllerAction, bool>? Intercept { get; set; }
 
     /// <param name="hwnd">When given, presses only count while this window is in the foreground.</param>
-    public GamepadNavigator(DispatcherQueue dispatcher, DependencyObject root, nint hwnd = 0)
+    /// <param name="readSonyHid">Also read PlayStation pads over HID, for windows that may not get the foreground.</param>
+    public GamepadNavigator(DispatcherQueue dispatcher, DependencyObject root, nint hwnd = 0, bool readSonyHid = false)
     {
         _root = root;
-        _input = new ControllerInput(dispatcher);
+        _input = new ControllerInput(dispatcher) { ReadSonyHid = readSonyHid };
         if (hwnd != 0) _input.IsActive = () => NativeWindows.GetForegroundWindow() == hwnd;
         _input.Pressed += OnPressed;
     }

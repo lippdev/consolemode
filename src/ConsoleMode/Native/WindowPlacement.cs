@@ -25,6 +25,17 @@ public static class WindowPlacement
         appWindow.MoveAndResize(new Windows.Graphics.RectInt32(cx - w / 2, cy - h / 2, w, h));
     }
 
+    /// <summary>Top-right corner of the screen, <paramref name="marginDip"/> in from the edges.</summary>
+    public static void TopRightOn(AppWindow appWindow, ScreenRect? target, double widthDip, double heightDip, double marginDip)
+    {
+        if (target is null || target.Width <= 0 || target.Height <= 0) { CenterOn(appWindow, target, widthDip, heightDip); return; }
+        var scale = DpiAt(target.X + target.Width / 2, target.Y + target.Height / 2);
+        var w = (int)(widthDip * scale);
+        var h = (int)(heightDip * scale);
+        var m = (int)(marginDip * scale);
+        appWindow.MoveAndResize(new Windows.Graphics.RectInt32(target.X + target.Width - w - m, target.Y + m, w, h));
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     private struct POINT { public int X, Y; }
 

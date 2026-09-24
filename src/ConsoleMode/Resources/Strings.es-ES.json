@@ -57,6 +57,8 @@
   "VolumeRow": "Volumen",
   "Muted": "Silencio",
   "SessionMenuHint": "Select + Y abre este menú en cualquier momento.",
+  "SessionHintTitle": "Menú de Console Mode",
+  "SessionHintBody": "Mantén {0} para abrir el panel sobre el juego.",
   "RecordLast30": "Grabar los últimos 30 s",
   "ComingSoonSuffix": " · próximamente",
   "ExitConsoleMode": "Salir de Console Mode",

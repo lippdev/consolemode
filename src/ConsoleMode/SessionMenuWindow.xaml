@@ -5,9 +5,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:ConsoleMode.ViewModels"
+    xmlns:controls="using:ConsoleMode.Controls"
     Title="Console Mode">
 
-    <!-- Over the game, like a console's quick menu: dark, big rows, controller-first. -->
+    <!-- Over the game, like a console's quick menu: dark, horizontal tiles, controller-first. -->
     <Grid x:Name="Root" Background="#F20F1418" Padding="40,32" RowSpacing="18" RequestedTheme="Dark"
           XYFocusKeyboardNavigation="Enabled">
         <Grid.Resources>
@@ -24,6 +25,29 @@
                 <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                 <Setter Property="MaxWidth" Value="360"/>
+            </Style>
+            <Style x:Key="SessionTile" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <Setter Property="Width" Value="220"/>
+                <Setter Property="Height" Value="150"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="Padding" Value="14,12"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="TileLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="MaxWidth" Value="190"/>
+            </Style>
+            <Style x:Key="TileValue" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="MaxWidth" Value="190"/>
             </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -45,88 +69,88 @@
             <TextBlock Text="{x:Bind ViewModel.SessionClock, Mode=OneWay}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Top"/>
         </Grid>
 
-        <!-- Rows -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
-            <StackPanel Spacing="10">
-                <Button x:Name="FirstRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <FontIcon Glyph="&#xE768;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BackToGame, Mode=OneWay}"/>
+        <!-- Tiles, laid out horizontally like a console's quick menu -->
+        <StackPanel Grid.Row="1" Spacing="18" VerticalAlignment="Center">
+            <controls:WrapPanel Spacing="14" HorizontalAlignment="Center">
+                <Button x:Name="FirstRow" Style="{StaticResource SessionTile}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE768;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.BackToGame, Mode=OneWay}"/>
                     </StackPanel>
                 </Button>
 
-                <Button x:Name="VolumeRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.ToggleMuteCommand}">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE767;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.VolumeRow, Mode=OneWay}"/>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                            <TextBlock Text="◀" FontSize="14" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center"/>
-                            <TextBlock Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.VolumeText, Mode=OneWay}" MinWidth="64" TextAlignment="Center"/>
-                            <TextBlock Text="▶" FontSize="14" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center"/>
+                <!-- A enters adjust mode: Left/Right change the volume, X/Square mutes, A or B leaves. -->
+                <Button x:Name="VolumeRow" Style="{StaticResource SessionTile}" Click="OnVolumeClick">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE767;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.VolumeRow, Mode=OneWay}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                            <TextBlock x:Name="VolumeLeft" Text="◀" FontSize="14" VerticalAlignment="Center" Visibility="Collapsed"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.VolumeText, Mode=OneWay}"/>
+                            <TextBlock x:Name="VolumeRight" Text="▶" FontSize="14" VerticalAlignment="Center" Visibility="Collapsed"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                         </StackPanel>
-                    </Grid>
-                </Button>
-
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="mode">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE7F4;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}"/>
-                        <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SessionModeText, Mode=OneWay}"/>
-                    </Grid>
-                </Button>
-
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="audio">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE7F5;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}"/>
-                        <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SessionAudioText, Mode=OneWay}"/>
-                    </Grid>
-                </Button>
-
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="fps"
-                        Visibility="{x:Bind ViewModel.IsFpsMenuAvailable, Mode=OneWay}">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xEC4A;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}"/>
-                        <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SessionFpsText, Mode=OneWay}"/>
-                    </Grid>
-                </Button>
-
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE706;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
-                        <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.SessionHdrOn), Mode=OneWay}"/>
-                    </Grid>
-                </Button>
-
-                <Button Style="{StaticResource ConsoleRow}" IsEnabled="False">
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <FontIcon Glyph="&#xE714;" FontSize="20" VerticalAlignment="Center"/>
-                        <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.RecordRowText, Mode=OneWay}"/>
                     </StackPanel>
                 </Button>
 
-                <Border Height="6"/>
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.RestoreFromMenuCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="16">
+                <Button Style="{StaticResource SessionTile}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="mode">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE7F4;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}"/>
+                        <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionModeText, Mode=OneWay}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SessionTile}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="audio">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE7F5;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}"/>
+                        <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionAudioText, Mode=OneWay}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SessionTile}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="fps"
+                        Visibility="{x:Bind ViewModel.IsFpsMenuAvailable, Mode=OneWay}">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xEC4A;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}"/>
+                        <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionFpsText, Mode=OneWay}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SessionTile}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
+                    <StackPanel Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE706;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
+                        <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.SessionHdrOn), Mode=OneWay}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SessionTile}" IsEnabled="False">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE714;" FontSize="30"/>
+                        <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.RecordRowText, Mode=OneWay}" TextWrapping="Wrap" MaxLines="2"/>
+                    </StackPanel>
+                </Button>
+            </controls:WrapPanel>
+
+            <!-- The two ways out, side by side -->
+            <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
+                <Button Style="{StaticResource ConsoleRow}" Width="400" Command="{x:Bind ViewModel.RestoreFromMenuCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
                         <FontIcon Glyph="&#xE7A7;" FontSize="20" VerticalAlignment="Center"/>
                         <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BackToPc, Mode=OneWay}"/>
                     </StackPanel>
                 </Button>
-                <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.ExitFromMenuCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="16">
+                <Button Style="{StaticResource ConsoleRow}" Width="400" Command="{x:Bind ViewModel.ExitFromMenuCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
                         <FontIcon Glyph="&#xE7E8;" FontSize="20" VerticalAlignment="Center"/>
                         <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ExitConsoleMode, Mode=OneWay}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
-        </ScrollViewer>
+        </StackPanel>
 
         <!-- Hints -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="22" HorizontalAlignment="Right">
