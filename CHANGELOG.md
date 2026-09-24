@@ -2,9 +2,12 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.5.0-beta.4]
 ### Novidades
 - Opção "Entrar ao conectar um controle" (desligada por padrão): com o app na bandeja, ligar ou conectar um controle entra no modo console. Ignora os primeiros 15 s após abrir e 30 s após restaurar.
+
+### Versão beta
+- Pré-release: quem usa uma 1.5.0-beta recebe o aviso dentro do aplicativo. Quem está na 1.4.0 não recebe; para testar, baixe os arquivos abaixo.
 
 ## [1.5.0-beta.3]
 ### Novidades
