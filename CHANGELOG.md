@@ -2,6 +2,13 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [1.5.0-beta.8]
+### Correções
+- Tela inicial Desktop: o aviso "aperte A para o modo console" fica limitado em largura, com reticências, e mostra o texto completo ao passar o mouse; traduções longas não esticam mais o cabeçalho. (#56)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas.
+
 ## [1.5.0-beta.7]
 ### Novidades
 - Ajustes → "Testar controle": mostra ao vivo o que o Windows entrega de cada controle (origem, botões por índice, D-pad, analógicos) e copia um diagnóstico para a issue. O log de abertura lista os controles. Para quem o controle aparece mas não responde (DualSense com Steam aberto, por exemplo).
