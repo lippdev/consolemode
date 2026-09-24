@@ -31,6 +31,12 @@ public sealed class GamepadNavigator : IDisposable
     /// <summary>Return true to consume a direction (e.g. a slider row using Left/Right).</summary>
     public Func<FocusNavigationDirection, bool>? BeforeMove { get; set; }
 
+    /// <summary>
+    /// Where focus moves may land. Overlays sit on top of screens that stay visible, so the
+    /// spatial search would otherwise pick controls hidden behind the open overlay.
+    /// </summary>
+    public Func<DependencyObject>? SearchRoot { get; set; }
+
     /// <summary>Handles a press before focus logic; return true to swallow it (e.g. tour tips).</summary>
     public Func<ControllerAction, bool>? Intercept { get; set; }
 
@@ -92,7 +98,9 @@ public sealed class GamepadNavigator : IDisposable
         return true;
     }
 
-    private void FocusFirst() => (FocusManager.FindFirstFocusableElement(_root) as Control)?.Focus(FocusState.Keyboard);
+    private DependencyObject CurrentRoot() => SearchRoot?.Invoke() ?? _root;
+
+    private void FocusFirst() => (FocusManager.FindFirstFocusableElement(CurrentRoot()) as Control)?.Focus(FocusState.Keyboard);
 
     private void Move(FocusNavigationDirection direction)
     {
@@ -110,7 +118,7 @@ public sealed class GamepadNavigator : IDisposable
             return;
         }
 
-        var options = new FindNextElementOptions { SearchRoot = _root };
+        var options = new FindNextElementOptions { SearchRoot = CurrentRoot() };
         var target = FocusManager.FindNextElement(direction, options) as Control;
         // Scrolled lists: the spatial search can miss controls outside the viewport, so up/down
         // fall back to tab order, which does reach them (Focus scrolls them into view).
