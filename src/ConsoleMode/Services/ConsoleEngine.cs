@@ -63,8 +63,9 @@ public sealed class ConsoleEngine
         State.RtssLimitApplied = false;
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
-        focusInfo ??= Monitors.GetMonitors().FirstOrDefault(m => m.Name == config.FocusMonitor)
-                      ?? Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == config.FocusMonitor);
+        // Read the screens fresh: the row the window shows can be stale (the TV was switched off,
+        // or the last restore disconnected it), and a stale "active" would skip turning it on.
+        focusInfo = Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == config.FocusMonitor) ?? focusInfo;
         State.FocusWasInactive = focusInfo is null || !focusInfo.IsActive;
 
         Monitors.SaveBackup();
@@ -90,7 +91,12 @@ public sealed class ConsoleEngine
         if (focusInfo is null || !focusInfo.IsActive)
         {
             Monitors.EnableMonitors([config.FocusMonitor], windowsEnable: true);
-            Thread.Sleep(500);
+            // Never hide the other screens while the game screen is still dark.
+            if (!Monitors.EnsureActive(config.FocusMonitor))
+            {
+                AppLog.Write($"Start: {config.FocusMonitor} não ativou; restaurando");
+                throw new InvalidOperationException(LocalizationService.Get("GameScreenDidNotTurnOn"));
+            }
             focusInfo = Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == config.FocusMonitor);
             Monitors.GetDisplayModes(config.FocusMonitor, focusInfo, forceRefresh: true);
         }
