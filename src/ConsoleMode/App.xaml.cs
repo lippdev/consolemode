@@ -203,8 +203,11 @@ public partial class App : Application
     {
         if (_guide is null || _exitChord is null || _menuChord is null || ViewModel is null) return;
         _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
-        if (!ViewModel.HomeButtonLaunch) { _guide.Stop(); _exitChord.Stop(); _menuChord.Stop(); return; }
-        if (ViewModel.IsConsoleActive) { _guide.Stop(); _exitChord.Start(); _menuChord.Start(); }
-        else { _exitChord.Stop(); _menuChord.Stop(); _guide.Start(); }
+        // The session chords (Select + Y, Start + Back) do not depend on the Home button option:
+        // turning that off used to leave them dead too.
+        if (ViewModel.IsConsoleActive) { _exitChord.Start(); _menuChord.Start(); }
+        else { _exitChord.Stop(); _menuChord.Stop(); }
+        if (ViewModel.HomeButtonLaunch && !ViewModel.IsConsoleActive) _guide.Start();
+        else _guide.Stop();
     }
 }

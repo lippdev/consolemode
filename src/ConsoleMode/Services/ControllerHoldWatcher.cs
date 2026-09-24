@@ -8,7 +8,7 @@ namespace ConsoleMode.Services;
 /// (zero = fire on press). Used for the Xbox Guide button while the app idles in the tray
 /// (enter console mode) and for Start + Back during a session (restore the desk), both of
 /// which work without focus. XInputGetStateEx (ordinal 100) is the only entry point that
-/// reports the Guide button; PlayStation pads are only readable in the foreground.
+/// reports the Guide button; PlayStation pads are read through SonyHidReader.
 /// </summary>
 public sealed class ControllerHoldWatcher : IDisposable
 {
@@ -44,7 +44,8 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     public void Start()
     {
-        if (_unavailable || _timer.IsRunning) return;
+        if (_timer.IsRunning) return;
+        SonyHidReader.Acquire();
         _heldSince = null;
         // A combo already held when the watch starts must be released first.
         _fired = true;
@@ -53,12 +54,13 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     public void Stop()
     {
+        if (_timer.IsRunning) SonyHidReader.Release();
         _timer.Stop();
         _heldSince = null;
         _fired = false;
     }
 
-    public void Dispose() => _timer.Stop();
+    public void Dispose() => Stop();
 
     private void Poll()
     {
@@ -78,6 +80,8 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     private static bool IsHeld(ushort mask)
     {
+        // PlayStation pads without Steam Input: XInput never sees them (SonyHidReader).
+        if ((SonyHidReader.Held & mask) == mask) return true;
         if (_unavailable) return false;
         try
         {
