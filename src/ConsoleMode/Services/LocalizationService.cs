@@ -124,6 +124,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string StartupDescription => LocalizationService.Get(nameof(StartupDescription));
     public string UpdatesCard => LocalizationService.Get(nameof(UpdatesCard));
     public string CheckNow => LocalizationService.Get(nameof(CheckNow));
+    public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
+    public string HomeButtonDescription => LocalizationService.Get(nameof(HomeButtonDescription));
     public string NotifyUpdatesCard => LocalizationService.Get(nameof(NotifyUpdatesCard));
     public string NotifyUpdatesDescription => LocalizationService.Get(nameof(NotifyUpdatesDescription));
     public string HelpDataSection => LocalizationService.Get(nameof(HelpDataSection));

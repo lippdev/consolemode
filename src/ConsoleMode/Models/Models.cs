@@ -32,6 +32,9 @@ public sealed class AppConfig
     /// <summary>Look for new GitHub releases on startup.</summary>
     public bool CheckUpdates { get; set; } = true;
 
+    /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
+    public bool HomeButtonLaunch { get; set; } = true;
+
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 

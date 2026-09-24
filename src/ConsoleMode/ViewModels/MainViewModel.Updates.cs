@@ -16,6 +16,7 @@ public partial class MainViewModel
     private enum UpdateStatusKind { InstallKind, Searching, Latest, Available, Failed }
 
     [ObservableProperty] private bool _checkUpdates = true;
+    [ObservableProperty] private bool _homeButtonLaunch = true;
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
     [ObservableProperty] private string _updateTitle = "";
@@ -75,6 +76,8 @@ public partial class MainViewModel
     }
 
     partial void OnCheckUpdatesChanged(bool value) => SaveQuietly();
+
+    partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
 
     /// <summary>Startup check: quiet on failure, respects "ignorar esta versão".</summary>
     private async Task CheckForUpdatesOnStartupAsync()

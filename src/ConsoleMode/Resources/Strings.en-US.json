@@ -44,6 +44,8 @@
   "FpsCard": "FPS limit",
   "FpsPlaceholder": "FPS",
   "AppSection": "App",
+  "HomeButtonCard": "Open with the controller Home button",
+  "HomeButtonDescription": "With the app in the tray, hold the Xbox button for 1 second to enter console mode. Xbox (XInput) controllers only.",
   "StartupCard": "Start with Windows",
   "StartupDescription": "Opens in the system tray when your PC starts, ready for the one-click shortcut.",
   "UpdatesCard": "Updates",

@@ -52,6 +52,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
    - **`ConsoleMode-Portable-x64.exe`** — a single exe that keeps its data in `ConsoleMode_Data\` next to it
 2. On first launch a short tour shows the screen map: pick the screen you play on (the others turn off)
 3. From then on it is one click: **Play now**, or the **Console Mode 1 Click** desktop shortcut (Settings → Create shortcut). The first time with a new game screen, the TV asks "Can you see this screen?" and everything reverts on its own if nobody answers (mouse, keyboard or Xbox/PlayStation controller)
+4. Or skip the PC altogether: with the app in the tray (turn on **Start with Windows**), **hold the Xbox button on the controller for 1 second** and console mode starts from the couch. Xbox (XInput) controllers only; a short press still opens Game Bar as usual. You can turn this off in Settings
+5. Automation: `consolemode://start`, `consolemode://stop` and `consolemode://show` links work from Stream Deck, launchers, scripts or any shortcut
 4. When you are done, exit Big Picture / Playnite (or restore manually in Xbox mode)
 5. New versions are announced in the app from GitHub Releases (installed: updates silently; portable: swaps the exe)
 
@@ -187,6 +189,8 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
    - **`ConsoleMode-Portable-x64.exe`** — um único exe que guarda os dados em `ConsoleMode_Data\` ao lado dele
 2. Na primeira vez, um tour curto mostra o mapa das telas: escolha a tela onde você joga (as outras desligam)
 3. Depois é 1 clique: **Jogar agora**, ou o atalho **Console Mode 1 Click** na Área de Trabalho (Ajustes → Criar atalho). Na primeira vez com uma tela de jogo nova, a TV pergunta "Está vendo esta tela?" e tudo volta sozinho se ninguém responder (mouse, teclado ou controle de Xbox/PlayStation)
+4. Ou nem encoste no PC: com o app na bandeja (ligue **Iniciar com o Windows**), **segure o botão Xbox do controle por 1 segundo** e o modo console entra direto do sofá. Só controles Xbox (XInput); um toque curto continua abrindo a Game Bar. Dá para desligar em Ajustes
+5. Automação: os links `consolemode://start`, `consolemode://stop` e `consolemode://show` funcionam em Stream Deck, launchers, scripts ou qualquer atalho
 4. Ao terminar, saia do Big Picture / Playnite (ou restaure manualmente no Modo Xbox)
 5. O app avisa das versões novas pelas releases do GitHub (instalado: atualiza sozinho; portátil: troca o exe)
 

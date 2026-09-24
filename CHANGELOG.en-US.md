@@ -2,6 +2,11 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- Holding the controller's Xbox button for 1 second while the app is in the tray enters console mode without touching the PC. Xbox (XInput) controllers only; it can be turned off in Settings.
+- `consolemode://start`, `consolemode://stop` and `consolemode://show` links for automation (Stream Deck, launchers, scripts).
+
 ## [1.5.0-beta.1]
 ### What's new
 - Feedback button on the home screen: it opens a GitHub issue prefilled with the app and Windows version, to send suggestions and report bugs.

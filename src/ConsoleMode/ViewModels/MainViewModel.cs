@@ -298,6 +298,7 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
+            HomeButtonLaunch = config.HomeButtonLaunch;
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -876,6 +877,7 @@ public partial class MainViewModel : ObservableObject
             TourDone = _loadedConfig.TourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
+            HomeButtonLaunch = HomeButtonLaunch,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
 

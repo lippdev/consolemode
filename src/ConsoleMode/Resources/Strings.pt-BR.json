@@ -44,6 +44,8 @@
   "FpsCard": "Limite de FPS",
   "FpsPlaceholder": "FPS",
   "AppSection": "App",
+  "HomeButtonCard": "Abrir com o botão Home do controle",
+  "HomeButtonDescription": "Com o app na bandeja, segure o botão Xbox por 1 segundo para entrar no modo console. Só controles Xbox (XInput).",
   "StartupCard": "Iniciar com o Windows",
   "StartupDescription": "Abre direto na bandeja ao ligar o PC, pronto para o atalho de 1 clique.",
   "UpdatesCard": "Atualizações",

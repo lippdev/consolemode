@@ -22,6 +22,7 @@
     <Compile Include="../../src/ConsoleMode/Services/ReleaseNotes.cs" Link="ReleaseNotes.cs" />
     <Compile Include="../../src/ConsoleMode/Services/LocalizationService.cs" Link="LocalizationService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/FeedbackService.cs" Link="FeedbackService.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ProtocolService.cs" Link="ProtocolService.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
