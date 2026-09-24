@@ -32,14 +32,14 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <views:HomeView Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}">
+            <views:HomeView x:Name="HomePage" Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}">
                 <views:HomeView.Transitions>
                     <TransitionCollection>
                         <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
                     </TransitionCollection>
                 </views:HomeView.Transitions>
             </views:HomeView>
-            <views:SettingsView Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}">
+            <views:SettingsView x:Name="SettingsPage" Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}">
                 <views:SettingsView.Transitions>
                     <TransitionCollection>
                         <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>

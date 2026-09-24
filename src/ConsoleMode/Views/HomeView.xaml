@@ -252,7 +252,7 @@
             <TextBlock Text="{x:Bind ViewModel.Texts.ActiveTitle, Mode=OneWay}" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
             <TextBlock Text="{x:Bind ViewModel.ActiveDescText, Mode=OneWay}" TextAlignment="Center" TextWrapping="Wrap"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <Button Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Height="40" Padding="22,0" Margin="0,8,0,0"
+            <Button x:Name="RestoreButton" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Height="40" Padding="22,0" Margin="0,8,0,0"
                     Command="{x:Bind ViewModel.RestoreNowCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xE7A7;" FontSize="14"/>
