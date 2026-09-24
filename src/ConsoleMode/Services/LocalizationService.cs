@@ -10,13 +10,25 @@ public static class LocalizationService
 {
     public const string PortugueseBrazil = "pt-BR";
     public const string EnglishUnitedStates = "en-US";
+    public const string SpanishSpain = "es-ES";
+
+    /// <summary>A UI language: its culture code and how it names itself in the language picker.</summary>
+    public sealed record LanguageInfo(string Code, string NativeName);
+
+    /// <summary>
+    /// Every embedded catalog (Resources/Strings.{code}.json). To add one: drop the file in,
+    /// embed it in ConsoleMode.csproj and the tests project, and list it here. English is the
+    /// fallback for missing keys and for Windows languages we don't have.
+    /// </summary>
+    public static readonly IReadOnlyList<LanguageInfo> SupportedLanguages =
+    [
+        new(PortugueseBrazil, "Português (Brasil)"),
+        new(EnglishUnitedStates, "English (United States)"),
+        new(SpanishSpain, "Español")
+    ];
 
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Catalogs =
-        new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
-        {
-            [PortugueseBrazil] = Load(PortugueseBrazil),
-            [EnglishUnitedStates] = Load(EnglishUnitedStates)
-        };
+        SupportedLanguages.ToDictionary(l => l.Code, l => Load(l.Code), StringComparer.OrdinalIgnoreCase);
 
     private static string _language = PortugueseBrazil;
 
@@ -26,9 +38,7 @@ public static class LocalizationService
 
     public static bool SetLanguage(string? language)
     {
-        var next = string.Equals(language, EnglishUnitedStates, StringComparison.OrdinalIgnoreCase)
-            ? EnglishUnitedStates
-            : PortugueseBrazil;
+        var next = Normalize(language);
         if (string.Equals(_language, next, StringComparison.Ordinal)) return false;
 
         _language = next;
@@ -40,6 +50,7 @@ public static class LocalizationService
     public static string Get(string key, params object?[] arguments)
     {
         var value = Catalogs[_language].GetValueOrDefault(key)
+                    ?? Catalogs[EnglishUnitedStates].GetValueOrDefault(key)
                     ?? Catalogs[PortugueseBrazil].GetValueOrDefault(key)
                     ?? $"[{key}]";
         return arguments.Length == 0
@@ -52,21 +63,26 @@ public static class LocalizationService
 
     /// <summary>
     /// Language for this run: the saved choice wins, then the installer's language dialog,
-    /// then the Windows display language (Portuguese → pt-BR, anything else → en-US).
+    /// then the Windows display language (matched by language, so pt-PT → pt-BR, es-MX → es-ES;
+    /// anything we don't have → en-US).
     /// </summary>
     public static string ResolveInitial(string? saved, string? installerChoice, string? windowsCulture)
     {
         if (!string.IsNullOrWhiteSpace(saved)) return Normalize(saved);
         if (!string.IsNullOrWhiteSpace(installerChoice)) return Normalize(installerChoice);
-        return windowsCulture?.StartsWith("pt", StringComparison.OrdinalIgnoreCase) == true
-            ? PortugueseBrazil
-            : EnglishUnitedStates;
+        return Normalize(windowsCulture);
     }
 
-    private static string Normalize(string? language) =>
-        string.Equals(language, EnglishUnitedStates, StringComparison.OrdinalIgnoreCase)
-            ? EnglishUnitedStates
-            : PortugueseBrazil;
+    /// <summary>Exact code, else the first catalog in the same language (by prefix), else English.</summary>
+    public static string Normalize(string? language)
+    {
+        if (string.IsNullOrWhiteSpace(language)) return EnglishUnitedStates;
+        var exact = SupportedLanguages.FirstOrDefault(l => string.Equals(l.Code, language, StringComparison.OrdinalIgnoreCase));
+        if (exact is not null) return exact.Code;
+        var prefix = language.Split('-', '_')[0];
+        var sameLanguage = SupportedLanguages.FirstOrDefault(l => l.Code.StartsWith(prefix + "-", StringComparison.OrdinalIgnoreCase));
+        return sameLanguage?.Code ?? EnglishUnitedStates;
+    }
 
     private static IReadOnlyDictionary<string, string> Load(string language)
     {
@@ -173,8 +189,6 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string DataFolderDescription => LocalizationService.Get(nameof(DataFolderDescription));
     public string LanguageCard => LocalizationService.Get(nameof(LanguageCard));
     public string LanguageDescription => LocalizationService.Get(nameof(LanguageDescription));
-    public string LanguagePortuguese => LocalizationService.Get(nameof(LanguagePortuguese));
-    public string LanguageEnglish => LocalizationService.Get(nameof(LanguageEnglish));
     public string ConfirmTitle => LocalizationService.Get(nameof(ConfirmTitle));
     public string ConfirmDescription => LocalizationService.Get(nameof(ConfirmDescription));
     public string Revert => LocalizationService.Get(nameof(Revert));

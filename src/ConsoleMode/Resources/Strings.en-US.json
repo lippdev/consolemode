@@ -88,8 +88,6 @@
   "DataFolderDescription": "Settings, display backup, and the log file (consolemode.log).",
   "LanguageCard": "Language",
   "LanguageDescription": "Choose the language used in Console Mode.",
-  "LanguagePortuguese": "Português (Brasil)",
-  "LanguageEnglish": "English (United States)",
   "ConfirmTitle": "Can you see this screen?",
   "ConfirmDescription": "This is the gaming display. Confirm with your mouse, keyboard, or controller. If nobody responds, your displays will be restored automatically.",
   "Revert": "Revert",

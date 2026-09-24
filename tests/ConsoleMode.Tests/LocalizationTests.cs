@@ -12,9 +12,10 @@ public sealed class LocalizationTests
         LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
         Assert.Equal("Onde você vai jogar?", LocalizationService.Get("HomeHeading"));
 
-        var portugueseKeys = LocalizationService.GetKeys(LocalizationService.PortugueseBrazil);
-        var englishKeys = LocalizationService.GetKeys(LocalizationService.EnglishUnitedStates);
-        Assert.Equal(portugueseKeys.Order(), englishKeys.Order());
+        // Every catalog must carry exactly the English key set: no silent fallbacks in a translation.
+        var englishKeys = LocalizationService.GetKeys(LocalizationService.EnglishUnitedStates).Order().ToList();
+        foreach (var language in LocalizationService.SupportedLanguages)
+            Assert.Equal(englishKeys, LocalizationService.GetKeys(language.Code).Order());
 
         var changedProperties = new List<string?>();
         void OnChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => changedProperties.Add(e.PropertyName);
@@ -32,9 +33,13 @@ public sealed class LocalizationTests
             LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
         }
 
+        // Unknown languages read English; a known language in another region maps to its catalog.
         LocalizationService.SetLanguage("fr-FR");
-        Assert.Equal(LocalizationService.PortugueseBrazil, LocalizationService.Language);
-        Assert.Equal("Onde você vai jogar?", LocalizationService.Get("HomeHeading"));
+        Assert.Equal(LocalizationService.EnglishUnitedStates, LocalizationService.Language);
+        LocalizationService.SetLanguage("es-MX");
+        Assert.Equal(LocalizationService.SpanishSpain, LocalizationService.Language);
+        Assert.Equal("¿Dónde vas a jugar?", LocalizationService.Get("HomeHeading"));
+        LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
     }
 
     [Fact]
@@ -44,7 +49,7 @@ public sealed class LocalizationTests
             .GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)
             .Select(p => p.Name)
             .ToList();
-        foreach (var language in new[] { LocalizationService.PortugueseBrazil, LocalizationService.EnglishUnitedStates })
+        foreach (var language in LocalizationService.SupportedLanguages.Select(l => l.Code))
         {
             var keys = LocalizationService.GetKeys(language).ToHashSet();
             Assert.Empty(properties.Where(p => !keys.Contains(p)));
@@ -105,6 +110,8 @@ public sealed class LocalizationTests
     [InlineData(null, null, "en-GB", "en-US")]          // then the Windows language
     [InlineData(null, null, "pt-PT", "pt-BR")]
     [InlineData(null, null, "de-DE", "en-US")]          // unknown languages read English
+    [InlineData(null, null, "es-MX", "es-ES")]
+    [InlineData("es-ES", null, "pt-BR", "es-ES")]
     [InlineData(null, null, null, "en-US")]
     public void Initial_language_follows_saved_choice_then_installer_then_windows(string? saved, string? installer, string? windows, string expected) =>
         Assert.Equal(expected, LocalizationService.ResolveInitial(saved, installer, windows));

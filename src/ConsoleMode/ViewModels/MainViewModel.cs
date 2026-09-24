@@ -183,8 +183,8 @@ public partial class MainViewModel : ObservableObject
 
             if (LanguageOptions.Count == 0)
             {
-                LanguageOptions.Add(new ComboOption { Text = LocalizationService.Get("LanguagePortuguese"), Value = LocalizationService.PortugueseBrazil });
-                LanguageOptions.Add(new ComboOption { Text = LocalizationService.Get("LanguageEnglish"), Value = LocalizationService.EnglishUnitedStates });
+                foreach (var language in LocalizationService.SupportedLanguages)
+                    LanguageOptions.Add(new ComboOption { Text = language.NativeName, Value = language.Code });
             }
 
             BuildAudioOptions(audioValue);

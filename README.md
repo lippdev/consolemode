@@ -27,7 +27,7 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 - Audio routing, including “use output when connected” (e.g. TV HDMI)
 - System tray icon to restore your desktop layout or reopen the app
 - **Installer** (per-user, no admin) or a **portable single-file** `.exe` — both announce new versions from GitHub Releases
-- Interface in **Brazilian Portuguese** or **English**, switchable in Settings without restarting
+- Interface in **Brazilian Portuguese**, **English** or **Spanish**, following the Windows language by default and switchable in Settings without restarting. Adding a language is one JSON file ([#14](https://github.com/lippdev/consolemode/issues/14))
 - Native **C# / WinUI 3** app (Windows App SDK), unpackaged and self-contained
 
 ## Why not just…?
@@ -165,7 +165,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 - Roteamento de áudio, inclusive “usar ao conectar” (ex.: HDMI da TV)
 - Ícone na bandeja para restaurar o layout ou reabrir o app
 - **Instalador** (por usuário, sem admin) ou **executável portátil em um único `.exe`** — os dois avisam das versões novas pelo GitHub
-- Interface em **português do Brasil** ou **inglês**, trocável em Ajustes sem reiniciar
+- Interface em **português do Brasil**, **inglês** ou **espanhol**, seguindo o idioma do Windows por padrão e trocável em Ajustes sem reiniciar. Adicionar um idioma é um arquivo JSON ([#14](https://github.com/lippdev/consolemode/issues/14))
 - App nativo **C# / WinUI 3** (Windows App SDK), sem MSIX e self-contained
 
 ### Por que não só…?

@@ -88,8 +88,6 @@
   "DataFolderDescription": "Configuração, backup das telas e o log (consolemode.log).",
   "LanguageCard": "Idioma",
   "LanguageDescription": "Escolha o idioma usado no Console Mode.",
-  "LanguagePortuguese": "Português (Brasil)",
-  "LanguageEnglish": "English (United States)",
   "ConfirmTitle": "Está vendo esta tela?",
   "ConfirmDescription": "Esta é a tela de jogo. Confirme com o mouse, o teclado ou o controle. Se ninguém responder, suas telas voltam ao normal sozinhas.",
   "Revert": "Voltar ao normal",
