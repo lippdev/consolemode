@@ -172,16 +172,16 @@ Plans, not promises: the order can change with feedback. Vote with a 👍 on the
 - Save and restore desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30))
 
 **Later**
-- Per-game profiles: resolution, HDR and audio per game
-- Controller battery in the session menu
+- Per-game profiles: resolution, HDR and audio per game ([#69](https://github.com/lippdev/consolemode/issues/69))
+- Controller battery in the session menu ([#70](https://github.com/lippdev/consolemode/issues/70))
 - Publish to winget ([#13](https://github.com/lippdev/consolemode/issues/13))
 - More interface languages ([#14](https://github.com/lippdev/consolemode/issues/14))
 
 **Exploring**
 - Windows Game Bar widget ([#11](https://github.com/lippdev/consolemode/issues/11))
 - Voice and assistant triggers: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
-- WakeOn integration: wake the PC straight into console mode
-- Phone remote over the local control API
+- WakeOn integration: wake the PC straight into console mode ([#71](https://github.com/lippdev/consolemode/issues/71))
+- Phone remote over the local control API ([#72](https://github.com/lippdev/consolemode/issues/72))
 
 ## Feedback
 

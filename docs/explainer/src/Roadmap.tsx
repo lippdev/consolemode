@@ -38,8 +38,8 @@ const COLUMNS: Column[] = [
     name: "Later",
     color: "#66c0f4",
     items: [
-      { icon: "🎯", title: "Per-game profiles", note: "Resolution, HDR, audio per game" },
-      { icon: "🔋", title: "Controller battery", note: "Shown in the session menu" },
+      { icon: "🎯", title: "Per-game profiles", note: "Resolution, HDR, audio per game", issue: 69 },
+      { icon: "🔋", title: "Controller battery", note: "Shown in the session menu", issue: 70 },
       { icon: "📦", title: "winget", note: "winget install ConsoleMode", issue: 13 },
       { icon: "🌍", title: "More languages", note: "Community translations", issue: 14 },
     ],
@@ -50,8 +50,8 @@ const COLUMNS: Column[] = [
     items: [
       { icon: "🧩", title: "Game Bar widget", note: "Start and restore from Win + G", issue: 11 },
       { icon: "🗣", title: "Voice triggers", note: "Alexa, assistants, MCP", issue: 12 },
-      { icon: "⚡", title: "WakeOn integration", note: "Wake the PC straight into console mode" },
-      { icon: "📱", title: "Phone remote", note: "Over the local control API" },
+      { icon: "⚡", title: "WakeOn integration", note: "Wake the PC straight into console mode", issue: 71 },
+      { icon: "📱", title: "Phone remote", note: "Over the local control API", issue: 72 },
     ],
   },
 ];

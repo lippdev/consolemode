@@ -132,16 +132,16 @@ São planos, não promessas: a ordem pode mudar conforme o feedback. Vote com �
 - Salvar e restaurar a posição dos ícones da área de trabalho ([#30](https://github.com/lippdev/consolemode/issues/30))
 
 **Depois**
-- Perfis por jogo: resolução, HDR e áudio para cada jogo
-- Bateria do controle no menu da sessão
+- Perfis por jogo: resolução, HDR e áudio para cada jogo ([#69](https://github.com/lippdev/consolemode/issues/69))
+- Bateria do controle no menu da sessão ([#70](https://github.com/lippdev/consolemode/issues/70))
 - Publicar no winget ([#13](https://github.com/lippdev/consolemode/issues/13))
 - Mais idiomas na interface ([#14](https://github.com/lippdev/consolemode/issues/14))
 
 **Explorando**
 - Widget na Xbox Game Bar ([#11](https://github.com/lippdev/consolemode/issues/11))
 - Comandos de voz e assistentes: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
-- Integração com o WakeOn: ligar o PC já no modo console
-- Controle pelo celular usando a API de controle local
+- Integração com o WakeOn: ligar o PC já no modo console ([#71](https://github.com/lippdev/consolemode/issues/71))
+- Controle pelo celular usando a API de controle local ([#72](https://github.com/lippdev/consolemode/issues/72))
 
 ## Feedback
 
