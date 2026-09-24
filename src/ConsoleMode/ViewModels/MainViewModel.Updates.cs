@@ -216,6 +216,10 @@ public partial class MainViewModel
         IsUpdateOpen = false;
     }
 
+    /// <summary>B/Esc on the console notice: close without marking the version as skipped (it reappears next check).</summary>
+    [RelayCommand]
+    private void DismissUpdate() => IsUpdateOpen = false;
+
     /// <summary>
     /// First item of the release notes in the interface language. Releases without notes in
     /// that language (pt-BR-only ones before 1.5.0) get the generic message instead.
