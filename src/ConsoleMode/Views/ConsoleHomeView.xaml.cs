@@ -29,8 +29,13 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         _navigator ??= new GamepadNavigator(DispatcherQueue, this);
         _navigator.BackRequested += GoBack;
-        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen) ViewModel.StartCommand.Execute(null); };
-        _navigator.AltRequested += () => { if (!ViewModel.IsRolePanelOpen) ViewModel.OpenFullSettingsCommand.Execute(null); };
+        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen) ViewModel.StartCommand.Execute(null); };
+        _navigator.AltRequested += () =>
+        {
+            if (ViewModel.IsRolePanelOpen) return;
+            if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
+            else ViewModel.OpenFullSettingsCommand.Execute(null);
+        };
         if (App.MainWindowInstance is { } window)
             window.Activated += (_, args) =>
             {
@@ -54,6 +59,13 @@ public sealed partial class ConsoleHomeView : UserControl
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsRolePanelOpen) RolePlay.Focus(FocusState.Keyboard);
+                    else FocusDefault();
+                });
+                break;
+            case nameof(MainViewModel.IsConsoleSettingsOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
                     else FocusDefault();
                 });
                 break;
@@ -83,6 +95,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private void GoBack()
     {
         if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
+        else if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
     }
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)

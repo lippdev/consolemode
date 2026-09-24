@@ -94,6 +94,14 @@
                 <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
                 <Setter Property="FocusVisualMargin" Value="-6"/>
             </Style>
+            <!-- One settings row in the console settings list: label left, value right. -->
+            <Style x:Key="ConsoleRow" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <Setter Property="MinHeight" Value="76"/>
+                <Setter Property="Height" Value="76"/>
+                <Setter Property="Padding" Value="24,0"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
             <Style x:Key="ConsolePlayButton" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
                 <Setter Property="Height" Value="64"/>
                 <Setter Property="MinWidth" Value="280"/>

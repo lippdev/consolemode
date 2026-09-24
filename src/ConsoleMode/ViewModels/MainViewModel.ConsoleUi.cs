@@ -37,6 +37,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
         if (value) IsRolePanelOpen = false;
+        else IsConsoleSettingsOpen = false;
     }
 
     partial void OnIsHomePageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopHome));
@@ -92,14 +93,22 @@ public partial class MainViewModel
         if (mode == UiModeResolver.Desktop) ShowPage(settings: false);
     }
 
-    /// <summary>Console "Full settings": the desktop settings page, since it has everything.</summary>
+    [ObservableProperty] private bool _isConsoleSettingsOpen;
+
+    /// <summary>x:Bind helper for on/off rows.</summary>
+    public string OnOff(bool value) => LocalizationService.Get(value ? "ToggleOn" : "ToggleOff");
+
+    /// <summary>Console "All settings": the console-styled settings list.</summary>
     [RelayCommand]
     private void OpenFullSettings()
     {
         if (IsConsoleActive) return;
-        SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == UiModeResolver.Desktop) ?? SelectedUiMode;
-        OpenSettings();
+        IsRolePanelOpen = false;
+        IsConsoleSettingsOpen = true;
     }
+
+    [RelayCommand]
+    private void CloseConsoleSettings() => IsConsoleSettingsOpen = false;
 
     /// <summary>"launch:+1", "audio:-1", "fps:+1", "mode:+1": cycle a quick-setting card.</summary>
     [RelayCommand]
@@ -124,6 +133,13 @@ public partial class MainViewModel
                 break;
             case "hdr": HdrEnable = !HdrEnable; break;
             case "vrr": VrrEnable = !VrrEnable; break;
+            case "hide": SelectedHideStrategy = Next(HideStrategies, SelectedHideStrategy, step); break;
+            case "language": SelectedLanguage = Next(LanguageOptions, SelectedLanguage, step); break;
+            case "ui": SelectedUiMode = Next(UiModeOptions, SelectedUiMode, step); break;
+            case "home": HomeButtonLaunch = !HomeButtonLaunch; break;
+            case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
+            case "startup": StartWithWindows = !StartWithWindows; break;
+            case "updates": CheckUpdates = !CheckUpdates; break;
         }
     }
 

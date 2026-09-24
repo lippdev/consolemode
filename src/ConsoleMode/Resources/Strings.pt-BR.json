@@ -55,6 +55,8 @@
   "ConsoleQuickHeading": "Ajustes rápidos",
   "FullSettings": "Todos os ajustes",
   "HintSelect": "Selecionar",
+  "HintChange": "Alterar",
+  "ConsoleSettingsHint": "Aperte A numa linha para trocar o valor. Tudo é salvo na hora.",
   "BackToPc": "Voltar ao PC",
   "ConsoleActiveHint": "Ou segure Start + Select no controle por 1 segundo.",
   "ChooseRoleFor": "O que a tela {0} faz?",
