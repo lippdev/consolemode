@@ -30,10 +30,10 @@ public sealed partial class ConsoleHomeView : UserControl
         _navigator ??= new GamepadNavigator(DispatcherQueue, this,
             App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0);
         _navigator.BackRequested += GoBack;
-        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen) ViewModel.StartCommand.Execute(null); };
+        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen && !ViewModel.IsUpdateOpen) ViewModel.StartCommand.Execute(null); };
         _navigator.AltRequested += () =>
         {
-            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsControllerTestOpen) return;
+            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen) return;
             if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
             else ViewModel.OpenFullSettingsCommand.Execute(null);
         };
@@ -55,6 +55,13 @@ public sealed partial class ConsoleHomeView : UserControl
             case nameof(MainViewModel.IsConsoleActive):
                 RefreshNavigator();
                 DispatcherQueue.TryEnqueue(FocusDefault);
+                break;
+            case nameof(MainViewModel.IsUpdateOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsUpdateOpen) UpdateNowButton.Focus(FocusState.Keyboard);
+                    else FocusDefault();
+                });
                 break;
             case nameof(MainViewModel.IsRolePanelOpen):
                 DispatcherQueue.TryEnqueue(() =>
@@ -106,6 +113,7 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         if (!ViewModel.IsConsoleUi) return;
         if (ViewModel.IsConsoleActive) { RestoreButton.Focus(FocusState.Keyboard); return; }
+        if (ViewModel.IsUpdateOpen) { UpdateNowButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.CanStart) { PlayButton.Focus(FocusState.Keyboard); return; }
         (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard);
     }
@@ -136,6 +144,7 @@ public sealed partial class ConsoleHomeView : UserControl
         else if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
         else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
         else if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
+        else if (ViewModel.IsUpdateOpen && !ViewModel.IsUpdating) ViewModel.DismissUpdateCommand.Execute(null);
     }
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
