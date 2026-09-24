@@ -2,12 +2,15 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.5.0-beta.3]
 ### Novidades
 - Ajustes → "Pasta do Playnite": escolha o Playnite.FullscreenApp.exe manualmente para instalações portáteis, que a detecção automática não encontra.
 
 ### Correções
 - O idioma escolhido no instalador agora vale para o aplicativo. Sem escolha salva, o app segue o idioma do Windows (português → pt-BR; qualquer outro → inglês) em vez de abrir sempre em português.
+
+### Versão beta
+- Pré-release: quem usa a 1.5.0-beta.1 ou beta.2 recebe o aviso dentro do aplicativo. Quem está na 1.4.0 não recebe; para testar, baixe os arquivos abaixo.
 
 ## [1.5.0-beta.2]
 ### Novidades
