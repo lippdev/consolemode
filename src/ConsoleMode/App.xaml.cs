@@ -14,7 +14,8 @@ public partial class App : Application
 
     private MainWindow? _window;
     private TrayService? _tray;
-    private GuideButtonWatcher? _guide;
+    private ControllerHoldWatcher? _guide;
+    private ControllerHoldWatcher? _exitChord;
     private Mutex? _instanceMutex;
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
@@ -135,28 +136,34 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// The Home button only counts while the app is idle: during a session Big Picture owns it,
-    /// and a hold there must not restart anything.
+    /// Idle: the Home button enters console mode (a hold, or a press once Game Bar's shortcut
+    /// is off). In a session Big Picture owns the Home button, so Start + Back held together
+    /// restores the desk instead.
     /// </summary>
     private void WatchGuideButton()
     {
         if (_window is null || ViewModel is null) return;
-        _guide = new GuideButtonWatcher(_window.DispatcherQueue);
+        _guide = new ControllerHoldWatcher(_window.DispatcherQueue, ControllerHoldWatcher.GuideButton, "botão Home");
         _guide.Held += () => _ = HandleStartRequestAsync();
+        _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
+        _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
         RefreshGuideWatch();
     }
 
     private void OnViewModelChangedForGuide(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(MainViewModel.HomeButtonLaunch) or nameof(MainViewModel.IsConsoleActive))
+        if (e.PropertyName is nameof(MainViewModel.HomeButtonLaunch) or nameof(MainViewModel.HomeButtonShortPress)
+            or nameof(MainViewModel.IsConsoleActive))
             RefreshGuideWatch();
     }
 
     private void RefreshGuideWatch()
     {
-        if (_guide is null || ViewModel is null) return;
-        if (ViewModel.HomeButtonLaunch && !ViewModel.IsConsoleActive) _guide.Start();
-        else _guide.Stop();
+        if (_guide is null || _exitChord is null || ViewModel is null) return;
+        _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
+        if (!ViewModel.HomeButtonLaunch) { _guide.Stop(); _exitChord.Stop(); return; }
+        if (ViewModel.IsConsoleActive) { _guide.Stop(); _exitChord.Start(); }
+        else { _exitChord.Stop(); _guide.Start(); }
     }
 }

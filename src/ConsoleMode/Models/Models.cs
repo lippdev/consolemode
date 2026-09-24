@@ -35,6 +35,9 @@ public sealed class AppConfig
     /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
     public bool HomeButtonLaunch { get; set; } = true;
 
+    /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
+    public bool HomeButtonShortPress { get; set; }
+
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 

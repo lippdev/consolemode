@@ -4,28 +4,36 @@ using Microsoft.UI.Dispatching;
 namespace ConsoleMode.Services;
 
 /// <summary>
-/// Watches the Xbox Guide (Home) button while the app sits in the tray, so holding it
-/// enters console mode from the couch. A short press is left alone: Game Bar and Steam
-/// already react to it, and we only want the deliberate long hold.
-/// Only XInput pads expose the Guide button without focus (through the undocumented
-/// XInputGetStateEx, ordinal 100); PlayStation pads are only readable in the foreground.
+/// Fires when a set of XInput buttons is held together for <see cref="HoldDuration"/>
+/// (zero = fire on press). Used for the Xbox Guide button while the app idles in the tray
+/// (enter console mode) and for Start + Back during a session (restore the desk), both of
+/// which work without focus. XInputGetStateEx (ordinal 100) is the only entry point that
+/// reports the Guide button; PlayStation pads are only readable in the foreground.
 /// </summary>
-public sealed class GuideButtonWatcher : IDisposable
+public sealed class ControllerHoldWatcher : IDisposable
 {
-    public static readonly TimeSpan HoldDuration = TimeSpan.FromMilliseconds(900);
+    public const ushort GuideButton = 0x0400;
+    public const ushort StartButton = 0x0010;
+    public const ushort BackButton = 0x0020;
+    public static readonly TimeSpan LongHold = TimeSpan.FromMilliseconds(900);
 
-    private const ushort XInputGuide = 0x0400;
     private static bool _unavailable;
 
     private readonly DispatcherQueueTimer _timer;
+    private readonly ushort _mask;
+    private readonly string _name;
     private DateTime? _heldSince;
     private bool _fired;
 
     /// <summary>Raised once per hold, on the dispatcher thread.</summary>
     public event Action? Held;
 
-    public GuideButtonWatcher(DispatcherQueue dispatcher)
+    public TimeSpan HoldDuration { get; set; } = LongHold;
+
+    public ControllerHoldWatcher(DispatcherQueue dispatcher, ushort mask, string name)
     {
+        _mask = mask;
+        _name = name;
         _timer = dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(100);
         _timer.Tick += (_, _) => Poll();
@@ -37,7 +45,8 @@ public sealed class GuideButtonWatcher : IDisposable
     {
         if (_unavailable || _timer.IsRunning) return;
         _heldSince = null;
-        _fired = false;
+        // A combo already held when the watch starts must be released first.
+        _fired = true;
         _timer.Start();
     }
 
@@ -52,7 +61,7 @@ public sealed class GuideButtonWatcher : IDisposable
 
     private void Poll()
     {
-        if (!IsGuideHeld())
+        if (!IsHeld(_mask))
         {
             _heldSince = null;
             _fired = false;
@@ -62,26 +71,26 @@ public sealed class GuideButtonWatcher : IDisposable
         _heldSince ??= DateTime.UtcNow;
         if (_fired || DateTime.UtcNow - _heldSince < HoldDuration) return;
         _fired = true;
-        AppLog.Write("Controle: botão Home segurado");
+        AppLog.Write($"Controle: {_name}");
         Held?.Invoke();
     }
 
-    private static bool IsGuideHeld()
+    private static bool IsHeld(ushort mask)
     {
         if (_unavailable) return false;
         try
         {
             for (uint i = 0; i < 4; i++)
             {
-                if (XInputGetStateEx(i, out var state) == 0 && (state.Gamepad.wButtons & XInputGuide) != 0)
+                if (XInputGetStateEx(i, out var state) == 0 && (state.Gamepad.wButtons & mask) == mask)
                     return true;
             }
             return false;
         }
         catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
         {
-            // No XInput 1.4 (or no ordinal 100): the Home button simply isn't available.
-            AppLog.Write($"Controle: botão Home indisponível: {ex.Message}");
+            // No XInput 1.4 (or no ordinal 100): controller shortcuts simply aren't available.
+            AppLog.Write($"Controle: atalhos indisponíveis: {ex.Message}");
             _unavailable = true;
             return false;
         }
@@ -106,7 +115,6 @@ public sealed class GuideButtonWatcher : IDisposable
         public XInputGamepad Gamepad;
     }
 
-    // Ordinal 100 is the only XInput entry point that reports the Guide button.
     [DllImport("xinput1_4.dll", EntryPoint = "#100")]
     private static extern uint XInputGetStateEx(uint userIndex, out XInputState state);
 }
