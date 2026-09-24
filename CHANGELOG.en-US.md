@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### Fixes
+- The language chosen in the installer now applies to the app. With no saved choice, the app follows the Windows language (Portuguese → pt-BR; anything else → English) instead of always opening in Portuguese.
+
 ## [1.5.0-beta.2]
 ### What's new
 - Holding the controller's Xbox button for 1 second while the app is in the tray enters console mode without touching the PC. During a session, holding Start + Select for 1 second goes back to the PC. Xbox (XInput) controllers only; it can be turned off in Settings.

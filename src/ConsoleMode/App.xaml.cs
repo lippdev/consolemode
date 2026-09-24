@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using ConsoleMode.Services;
 using ConsoleMode.ViewModels;
 using Microsoft.UI.Xaml;
@@ -64,7 +65,8 @@ public partial class App : Application
         try
         {
             AppPaths.Initialize();
-            LocalizationService.SetLanguage(ConfigService.Load().AppLanguage);
+            LocalizationService.SetLanguage(LocalizationService.ResolveInitial(
+                ConfigService.Load().AppLanguage, StartupService.ReadInstallerLanguage(), CultureInfo.CurrentUICulture.Name));
             ControllerInput.Warmup();
             ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +

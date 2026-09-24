@@ -7,7 +7,8 @@ public sealed class AppConfig
 {
     /// <summary>2 = monitor fields hold <see cref="MonitorInfo.StableId"/>; 0/1 = GDI names (\\.\DISPLAYn).</summary>
     public int Version { get; set; }
-    public string AppLanguage { get; set; } = "pt-BR";
+    /// <summary>Empty until the user (or the installer) picks one; the app then follows Windows.</summary>
+    public string AppLanguage { get; set; } = "";
     public string FocusMonitor { get; set; } = "";
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";

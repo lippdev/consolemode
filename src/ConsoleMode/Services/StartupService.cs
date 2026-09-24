@@ -12,6 +12,25 @@ public static class StartupService
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "ConsoleMode";
 
+    private const string AppKey = @"Software\ConsoleMode";
+
+    /// <summary>
+    /// The language picked in the installer's dialog (ConsoleMode.iss writes it), so the first
+    /// run doesn't come up in the wrong language. Null for portable builds or older installs.
+    /// </summary>
+    public static string? ReadInstallerLanguage()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(AppKey);
+            return key?.GetValue("Language") as string;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static bool IsEnabled
     {
         get
