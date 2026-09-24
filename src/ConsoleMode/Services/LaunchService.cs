@@ -24,8 +24,13 @@ public sealed class LaunchService
 
     public bool IsPlayniteAvailable() => GetPlaynitePath() is not null;
 
+    /// <summary>User-chosen Playnite folder or exe (portable installs); tried before auto-detection.</summary>
+    public string CustomPlaynitePath { get; set; } = "";
+
     public string? GetPlaynitePath()
     {
+        if (PlaynitePaths.ResolveCustom(CustomPlaynitePath) is { } custom) return custom;
+
         var candidates = new List<string>();
         var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         if (!string.IsNullOrWhiteSpace(local))

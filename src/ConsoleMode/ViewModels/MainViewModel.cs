@@ -301,6 +301,9 @@ public partial class MainViewModel : ObservableObject
             ApplyAudio(config, data.Audio);
 
             SelectedHideStrategy = HideStrategies.FirstOrDefault(s => s.Value == config.HideStrategy) ?? HideStrategies[0];
+            PlaynitePath = config.PlaynitePath ?? "";
+            IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
+            BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
@@ -879,6 +882,7 @@ public partial class MainViewModel : ObservableObject
             MonitorModes = new Dictionary<string, SavedDisplayMode>(_loadedConfig.MonitorModes, StringComparer.OrdinalIgnoreCase),
             HideStrategy = SelectedHideStrategy?.Value ?? "disconnect",
             FullscreenMode = SelectedLaunch?.Value ?? "bigPicture",
+            PlaynitePath = PlaynitePath,
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,

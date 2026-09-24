@@ -124,6 +124,9 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string HideOtherScreensDescription => LocalizationService.Get(nameof(HideOtherScreensDescription));
     public string EnteringConsoleSection => LocalizationService.Get(nameof(EnteringConsoleSection));
     public string LaunchCard => LocalizationService.Get(nameof(LaunchCard));
+    public string PlaynitePathCard => LocalizationService.Get(nameof(PlaynitePathCard));
+    public string PlaynitePathChoose => LocalizationService.Get(nameof(PlaynitePathChoose));
+    public string PlaynitePathClear => LocalizationService.Get(nameof(PlaynitePathClear));
     public string AudioOutputCard => LocalizationService.Get(nameof(AudioOutputCard));
     public string OptionalExtrasSection => LocalizationService.Get(nameof(OptionalExtrasSection));
     public string HdrCard => LocalizationService.Get(nameof(HdrCard));

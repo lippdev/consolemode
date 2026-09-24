@@ -49,6 +49,16 @@
                           SelectedItem="{x:Bind ViewModel.SelectedLaunch, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.PlaynitePathCard, Mode=OneWay}" Description="{x:Bind ViewModel.PlaynitePathText, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8B7;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="{x:Bind ViewModel.Texts.PlaynitePathClear, Mode=OneWay}" Command="{x:Bind ViewModel.ClearPlaynitePathCommand}"
+                            Visibility="{x:Bind ViewModel.HasPlaynitePath, Mode=OneWay}"/>
+                    <Button Content="{x:Bind ViewModel.Texts.PlaynitePathChoose, Mode=OneWay}" Command="{x:Bind ViewModel.PickPlaynitePathCommand}"/>
+                </StackPanel>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}" Description="{x:Bind ViewModel.AudioHintText, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE767;"/>
