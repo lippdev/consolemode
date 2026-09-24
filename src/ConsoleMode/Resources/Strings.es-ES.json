@@ -51,6 +51,7 @@
   "UiModeConsole": "Consola",
   "SwitchToDesktop": "Modo escritorio",
   "SwitchToConsole": "Modo consola",
+  "ControllerHintDesktop": "Mando detectado · pulsa A para el modo consola",
   "ConsoleScreensHeading": "Pantallas",
   "ConsoleQuickHeading": "Ajustes rápidos",
   "FullSettings": "Todos los ajustes",

@@ -51,6 +51,7 @@
   "UiModeConsole": "Console",
   "SwitchToDesktop": "Desktop mode",
   "SwitchToConsole": "Console mode",
+  "ControllerHintDesktop": "Controller detected · press A for console mode",
   "ConsoleScreensHeading": "Screens",
   "ConsoleQuickHeading": "Quick settings",
   "FullSettings": "All settings",

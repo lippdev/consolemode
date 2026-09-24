@@ -160,6 +160,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string UiModeDescription => LocalizationService.Get(nameof(UiModeDescription));
     public string SwitchToDesktop => LocalizationService.Get(nameof(SwitchToDesktop));
     public string SwitchToConsole => LocalizationService.Get(nameof(SwitchToConsole));
+    public string ControllerHintDesktop => LocalizationService.Get(nameof(ControllerHintDesktop));
     public string ConsoleScreensHeading => LocalizationService.Get(nameof(ConsoleScreensHeading));
     public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));
     public string FullSettings => LocalizationService.Get(nameof(FullSettings));

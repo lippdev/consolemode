@@ -128,6 +128,7 @@ public partial class MainViewModel : ObservableObject
         if (firstRun && HasMonitors) TrySave(BuildConfig());
         InitializeAppSettings();
         ResolveUi();
+        _ = RecheckControllerAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
         _ = CheckForUpdatesOnStartupAsync();

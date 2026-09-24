@@ -4,7 +4,12 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Na interface Desktop, com um controle detectado, aparece "aperte A para o modo console"; A ou Start trocam a interface.
 - Interface em espanhol. Sem escolha salva, o app segue o idioma do Windows (português, espanhol ou inglês). Adicionar um idioma agora é só incluir um `Strings.<código>.json`.
+
+### Correções
+- O modo Automático não via controles que o Windows lista com atraso (PlayStation, Bluetooth) e abria em Desktop. Agora o app detecta de novo quando um controle aparece e também 1,5 s e 4 s após abrir.
+- Na interface Console, o controle às vezes não respondia até trocar de tela: o listener não ligava na primeira vez.
 
 ## [1.5.0-beta.4]
 ### Novidades
