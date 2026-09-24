@@ -80,7 +80,8 @@
                         <TextBlock Text="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}" FontSize="15" TextWrapping="Wrap" MaxWidth="720"
                                    Foreground="{ThemeResource TextOnAccentFillColorSecondaryBrush}"/>
                     </StackPanel>
-                    <Button x:Name="UpdateNowButton" Grid.Column="1" Style="{StaticResource ConsoleSmallButton}" Height="48" Padding="20,0"
+                    <!-- Black focus ring: the default accent ring vanishes on this accent background. -->
+                    <Button x:Name="UpdateNowButton" Grid.Column="1" Style="{StaticResource ConsoleSmallButton}" Height="48" Padding="20,0" FocusVisualPrimaryBrush="Black"
                             Command="{x:Bind ViewModel.ApplyUpdateCommand}" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <ProgressRing Width="16" Height="16" IsActive="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
@@ -88,7 +89,7 @@
                             <TextBlock Text="{x:Bind ViewModel.UpdateActionText, Mode=OneWay}"/>
                         </StackPanel>
                     </Button>
-                    <Button Grid.Column="2" Style="{StaticResource ConsoleSmallButton}" Height="48" Padding="20,0"
+                    <Button Grid.Column="2" Style="{StaticResource ConsoleSmallButton}" Height="48" Padding="20,0" FocusVisualPrimaryBrush="Black"
                             Command="{x:Bind ViewModel.SkipUpdateCommand}" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.Texts.IgnoreUpdate, Mode=OneWay}"/>
                     </Button>

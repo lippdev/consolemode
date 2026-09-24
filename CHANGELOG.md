@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Correções
+- Interface Console: no aviso de atualização, o anel de seleção dos botões agora é preto; antes tinha a mesma cor do fundo e não dava para ver qual botão estava selecionado com o controle. (#73)
+
 ## [1.5.0-beta.11]
 ### Novidades
 - Menu da sessão (Select + Y) com layout horizontal: blocos lado a lado e "Voltar ao PC" / "Sair do Console Mode" embaixo. No volume, A entra no ajuste (◀ ▶ muda, □/X deixa mudo, A ou B sai). (#64)
