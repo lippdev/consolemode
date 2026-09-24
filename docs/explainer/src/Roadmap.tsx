@@ -30,7 +30,7 @@ const COLUMNS: Column[] = [
     items: [
       { icon: "✅", title: "1.5.0 stable", note: "Wrap up the betas" },
       { icon: "📈", title: "FPS overlay", note: "Toggle it from Select + Y", issue: 66 },
-      { icon: "⏺", title: "Record last 30 s", note: "From the session menu" },
+      { icon: "⏺", title: "Record last 30 s", note: "From the session menu", issue: 77 },
       { icon: "🗂", title: "Desktop icons", note: "Saved and put back", issue: 30 },
     ],
   },

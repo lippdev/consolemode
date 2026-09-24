@@ -168,7 +168,7 @@ Plans, not promises: the order can change with feedback. Vote with a 👍 on the
 **Next**
 - 1.5.0 stable, wrapping up the betas
 - FPS overlay, toggled from the session menu ([#66](https://github.com/lippdev/consolemode/issues/66))
-- Record the last 30 seconds from the session menu
+- Record the last 30 seconds from the session menu ([#77](https://github.com/lippdev/consolemode/issues/77))
 - Save and restore desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30))
 
 **Later**
