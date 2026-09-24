@@ -39,6 +39,11 @@ public static class NativeWindows
     public static extern bool IsWindow(nint hWnd);
 
     [DllImport("user32.dll")]
+    public static extern bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
+
+    public const uint WM_CLOSE = 0x0010;
+
+    [DllImport("user32.dll")]
     public static extern nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
     [DllImport("user32.dll")]
