@@ -2,6 +2,15 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [1.5.0-beta.10]
+### Correções
+- Select + Y (menu sobre o jogo) e Start + Back (voltar pra mesa) agora funcionam com controles de PlayStation (DualSense e DualShock 4, USB ou Bluetooth) sem Steam Input: o app lê o controle direto por HID. No controle da Sony: Create/Share + Triângulo abre o menu; Options + Share volta pra mesa; o botão PS vale como Home. (#61)
+- Esses atalhos também paravam de funcionar quando "Abrir com o botão Home do controle" estava desligado. (#61)
+- Ajustes na interface Console: navegando com o controle, "Como desligar as outras telas" era pulada e o anel de foco aparecia no lugar errado. (#60)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas. Quem está na beta.8 e vê o erro de tempo esgotado ao atualizar: baixe o instalador abaixo uma vez.
+
 ## [1.5.0-beta.9]
 ### Correções
 - Atualização: o download não falha mais com "HttpClient.Timeout of 15 seconds elapsing" em conexões lentas. Agora só é cancelado se ficar 30 s sem receber dados. Quem está na beta.8 e recebe esse erro: baixe o instalador abaixo uma vez; as próximas atualizações pelo app funcionam. (#58)

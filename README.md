@@ -9,15 +9,15 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > [!NOTE]
-> **More improvements are on the way.** I'm actively working on new features and fixes. The next ones are already in [1.5.0-beta.9](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.9). Your opinion shapes what comes next: use the **feedback button** in the app or [send feedback here](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). See [Feedback](#feedback).
+> **More improvements are on the way.** I'm actively working on new features and fixes. The next ones are already in [1.5.0-beta.10](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.10). Your opinion shapes what comes next: use the **feedback button** in the app or [send feedback here](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). See [Feedback](#feedback).
 
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
 
 Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mode focuses the TV, turns the desk displays off, launches Steam Big Picture (or Xbox), and restores your desktop automatically when you quit Big Picture.
 
-## Latest release: [1.5.0-beta.9](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.9)
+## Latest release: [1.5.0-beta.10](https://github.com/lippdev/consolemode/releases/tag/v1.5.0-beta.10)
 
-Includes everything since 1.5.0-beta.6 (beta.7 to beta.9).
+Includes everything since 1.5.0-beta.6 (beta.7 to beta.10).
 
 ### What's new
 - Settings → "Test controller": shows live what Windows delivers from each pad (source, buttons by index, D-pad, sticks) and copies a diagnostic for the issue. The startup log lists the pads. For when a pad shows up but does nothing (DualSense with Steam running, for example).
@@ -25,6 +25,8 @@ Includes everything since 1.5.0-beta.6 (beta.7 to beta.9).
 - `ConsoleMode.exe --stop` restores the desk from the command line, like `consolemode://stop`. By @nextestudios. ([#23](https://github.com/lippdev/consolemode/pull/23))
 
 ### Fixes
+- Select + Y (in-game menu) and Start + Back now work with PlayStation pads (DualSense, DualShock 4) without Steam Input, and with the Home button option off. ([#61](https://github.com/lippdev/consolemode/pull/61))
+- Console Settings: controller navigation no longer skips "How to turn off the other screens" or draws the focus ring in the wrong place. ([#60](https://github.com/lippdev/consolemode/pull/60))
 - Updates: the download no longer fails with "HttpClient.Timeout of 15 seconds elapsing" on slow connections; it is cancelled only after 30 s with no data. ([#58](https://github.com/lippdev/consolemode/pull/58))
 - Desktop home screen: "Controller detected" is now a toast shown for a few seconds when a pad connects. ([#58](https://github.com/lippdev/consolemode/pull/58))
 - Controller: a device that fails to read no longer silences the others; pads Windows exposes as a Gamepad with no XInput slot answering are now read (they used to be skipped); DualSense/DualShock over HID take the same path when XInput is empty.
