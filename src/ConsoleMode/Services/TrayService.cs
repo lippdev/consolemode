@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using ConsoleMode.ViewModels;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml;
@@ -29,18 +30,20 @@ public sealed class TrayService : IDisposable
         if (File.Exists(iconPath))
             _icon.IconSource = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
 
+        // The tray menu is a native Win32 popup (ContextMenuMode.PopupMenu, the default):
+        // it runs each item's Command and never raises Click.
         var menu = new MenuFlyout();
         _showItem.Text = LocalizationService.Get("ShowWindow");
-        _showItem.Click += (_, _) => ShowWindow();
+        _showItem.Command = new RelayCommand(ShowWindow);
         _startItem.Text = LocalizationService.Get("TrayEnterConsole");
-        _startItem.Click += async (_, _) =>
+        _startItem.Command = new AsyncRelayCommand(async () =>
         {
             if (!await _vm.TryAutoStartAsync()) ShowWindow();
-        };
+        });
         _restoreItem.Text = LocalizationService.Get("RestoreSetup");
-        _restoreItem.Click += async (_, _) => await _vm.RestoreNowAsync();
+        _restoreItem.Command = new AsyncRelayCommand(_vm.RestoreNowAsync);
         _exitItem.Text = LocalizationService.Get("Exit");
-        _exitItem.Click += (_, _) =>
+        _exitItem.Command = new RelayCommand(() =>
         {
             if (_vm.IsConsoleActive)
             {
@@ -53,14 +56,14 @@ public sealed class TrayService : IDisposable
             {
                 Application.Current.Exit();
             }
-        };
+        });
         menu.Items.Add(_showItem);
         menu.Items.Add(_startItem);
         menu.Items.Add(_restoreItem);
         menu.Items.Add(new MenuFlyoutSeparator());
         menu.Items.Add(_exitItem);
         _icon.ContextFlyout = menu;
-        _icon.LeftClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(ShowWindow);
+        _icon.LeftClickCommand = new RelayCommand(ShowWindow);
         LocalizationService.LanguageChanged += OnLanguageChanged;
         try
         {
