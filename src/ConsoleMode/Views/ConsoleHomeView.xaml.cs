@@ -29,10 +29,10 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         _navigator ??= new GamepadNavigator(DispatcherQueue, this);
         _navigator.BackRequested += GoBack;
-        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen) ViewModel.StartCommand.Execute(null); };
+        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen) ViewModel.StartCommand.Execute(null); };
         _navigator.AltRequested += () =>
         {
-            if (ViewModel.IsRolePanelOpen) return;
+            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen) return;
             if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
             else ViewModel.OpenFullSettingsCommand.Execute(null);
         };
@@ -59,6 +59,14 @@ public sealed partial class ConsoleHomeView : UserControl
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsRolePanelOpen) RolePlay.Focus(FocusState.Keyboard);
+                    else FocusDefault();
+                });
+                break;
+            case nameof(MainViewModel.IsPickerOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsPickerOpen) FocusPickerSelection();
+                    else if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
                     else FocusDefault();
                 });
                 break;
@@ -93,9 +101,30 @@ public sealed partial class ConsoleHomeView : UserControl
         (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard);
     }
 
+    /// <summary>Land on the current value so A confirms it and the stick moves from there.</summary>
+    private void FocusPickerSelection()
+    {
+        var index = Math.Max(ViewModel.PickerOptions.ToList().FindIndex(o => o.IsSelected), 0);
+        if (TryFocusPickerRow(index)) return;
+        // Containers appear on the next layout pass; try once more then.
+        void OnLayout(object? s, object e)
+        {
+            PickerList.LayoutUpdated -= OnLayout;
+            TryFocusPickerRow(index);
+        }
+        PickerList.LayoutUpdated += OnLayout;
+    }
+
+    private bool TryFocusPickerRow(int index)
+    {
+        if (PickerList.ContainerFromIndex(index) is not { } container) return false;
+        return (FocusManager.FindFirstFocusableElement(container) as Control)?.Focus(FocusState.Keyboard) == true;
+    }
+
     private void GoBack()
     {
-        if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
+        if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
+        else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
         else if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
     }
 

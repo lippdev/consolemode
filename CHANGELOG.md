@@ -4,6 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Interface Console: os ajustes de lista (abrir em, áudio, resolução, FPS, como desligar, idioma, interface) abrem um seletor com todas as opções, com foco na atual; A escolhe, B volta. Antes era preciso ir apertando A para ciclar.
 - Na interface Desktop, com um controle detectado, aparece "aperte A para o modo console"; A ou Start trocam a interface.
 - Interface em espanhol. Sem escolha salva, o app segue o idioma do Windows (português, espanhol ou inglês). Adicionar um idioma agora é só incluir um `Strings.<código>.json`.
 

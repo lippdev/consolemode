@@ -4,6 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Console interface: list settings (launcher, audio, resolution, FPS, hide strategy, language, interface) open a picker with every option, focused on the current one; A picks, B goes back. Before, you had to keep pressing A to cycle.
 - In the desktop interface, with a controller detected, a "press A for console mode" hint appears; A or Start switch the interface.
 - Spanish interface. With no saved choice, the app follows the Windows language (Portuguese, Spanish or English). Adding a language is now just a `Strings.<code>.json` file.
 
