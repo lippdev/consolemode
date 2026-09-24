@@ -193,10 +193,12 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Border Style="{StaticResource ChipBorder}" VerticalAlignment="Center" Margin="0,0,4,0"
                             Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.ControllerDetected, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE7FC;" FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerHintDesktop, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                       VerticalAlignment="Center" MaxWidth="220" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Border>
                     <Button Height="40" Width="40" Padding="0" Command="{x:Bind ViewModel.SwitchUiCommand}" CommandParameter="console"
