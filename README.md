@@ -19,6 +19,8 @@ Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mod
 
 Includes everything since 1.5.0-beta.6 (beta.7 to beta.11).
 
+<img src="assets/whats-new.gif" alt="What's new in 1.5: the Select + Y session menu with horizontal tiles, the start-of-session toast, PlayStation pads, controller navigation in Settings, working updates, and the developer's other apps." width="800">
+
 ### What's new
 - Session menu (Select + Y): horizontal tile layout, works with PlayStation pads, and a corner toast at the start of a session shows the combo. ([#64](https://github.com/lippdev/consolemode/pull/64))
 - Settings → "More apps from the developer": WakeOn and Next Boost. ([#63](https://github.com/lippdev/consolemode/pull/63))
