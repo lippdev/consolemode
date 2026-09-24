@@ -142,6 +142,7 @@
   "AudioDisabledSuffix": " [Disabled]",
   "AlreadyConsoleActive": "Console mode is already active.",
   "GameScreenNotConfirmed": "Gaming display was not confirmed.",
+  "GameScreenDidNotTurnOn": "The gaming display did not turn on. Check that the TV is on and set to the right HDMI input, then try again.",
   "ActivePlaynite": "Close Playnite to restore your displays automatically.",
   "ActiveXbox": "In Xbox mode, restoration is manual: use Restore now or the system tray menu.",
   "ActiveSteam": "Close Big Picture to restore your displays automatically.",

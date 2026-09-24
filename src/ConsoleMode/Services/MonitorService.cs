@@ -268,6 +268,21 @@ public sealed class MonitorService
         MarkActive(names);
     }
 
+    /// <summary>
+    /// Waits for a screen that was just enabled to show up as active (a TV waking from
+    /// standby can take seconds), retrying /enable and then CCD "extend all".
+    /// </summary>
+    public bool EnsureActive(string name)
+    {
+        if (WaitMonitorsActive([name], 3000)) return true;
+        AppLog.Write($"Ativar {name}: ainda inativo; repetindo /enable");
+        InvokeMmt("/enable", name);
+        if (WaitMonitorsActive([name], 3000)) return true;
+        AppLog.Write($"Ativar {name}: /enable não confirmou; usando ExtendAll");
+        CcdHelper.ExtendAll();
+        return WaitMonitorsActive([name], 5000);
+    }
+
     public void DisableWindows(IReadOnlyList<string> names)
     {
         if (names.Count == 0) return;

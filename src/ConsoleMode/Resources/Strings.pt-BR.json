@@ -142,6 +142,7 @@
   "AudioDisabledSuffix": " [Desabilitado]",
   "AlreadyConsoleActive": "O modo console já está ativo.",
   "GameScreenNotConfirmed": "Tela de jogo não confirmada.",
+  "GameScreenDidNotTurnOn": "A tela de jogo não ligou. Confira se a TV está ligada e na entrada HDMI certa e tente de novo.",
   "ActivePlaynite": "Feche o Playnite e suas telas voltam sozinhas.",
   "ActiveXbox": "No Modo Xbox a volta é manual: use Restaurar agora ou o menu da bandeja.",
   "ActiveSteam": "Feche o Big Picture e suas telas voltam sozinhas.",
