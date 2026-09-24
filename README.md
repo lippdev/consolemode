@@ -8,6 +8,9 @@ Turn your Windows PC into a **game console** with one click: focus on your TV, h
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+> [!NOTE]
+> **More improvements are on the way.** I'm actively working on new features and fixes. The next ones are already in the [1.5.0 beta](https://github.com/lippdev/consolemode/releases). Your opinion shapes what comes next: use the **feedback button** in the app or [send feedback here](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). See [Feedback](#feedback).
+
 <img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
 
 Typical setup: two desk monitors and a distant HDMI TV that was off. Console Mode focuses the TV, turns the desk displays off, launches Steam Big Picture (or Xbox), and restores your desktop automatically when you quit Big Picture.
@@ -117,7 +120,12 @@ Confirm that the focus monitor supports the feature and that HDR is enabled in W
 
 ## Feedback
 
-Found a bug or have an idea? Click the feedback button (next to **Settings** on the home screen). It opens a prefilled issue on GitHub with your app and Windows version; you only need a GitHub account to submit it.
+Found a bug or have an idea? Feedback is what decides the next improvements, so every report counts.
+
+- **From the app** (1.5.0-beta.1 and later): click the feedback button, next to **Settings** on the home screen. It opens a GitHub issue that already includes your app version, whether it's installed or portable, your Windows version and the interface language. Just describe what happened or what you'd like, attach screenshots if you want, and submit.
+- **Without the app:** [open the feedback form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml) directly.
+
+You need a free GitHub account to submit. Nothing is sent automatically: no logs, no personal data, and you see the whole text before sending it. You can write in English or Portuguese.
 
 If Console Mode saved you some monitor juggling, a ⭐ on the repo helps other couch gamers find it.
 
@@ -136,6 +144,9 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![License](https://img.shields.io/badge/licença-MIT-green)
+
+> [!NOTE]
+> **Vem mais melhoria por aí.** Estou trabalhando ativamente em novos recursos e correções. As próximas já estão na [beta da 1.5.0](https://github.com/lippdev/consolemode/releases). Sua opinião define o que vem depois: use o **botão de feedback** no aplicativo ou [envie seu feedback aqui](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Veja [Feedback](#feedback-1).
 
 <img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
 
@@ -229,7 +240,12 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 
 ### Feedback
 
-Encontrou um bug ou tem uma ideia? Clique no botão de feedback (ao lado de **Ajustes** na tela inicial). Ele abre uma issue no GitHub já preenchida com a versão do aplicativo e do Windows; basta ter uma conta no GitHub para enviar.
+Encontrou um bug ou tem uma ideia? É o feedback que define as próximas melhorias, então todo relato conta.
+
+- **Pelo aplicativo** (1.5.0-beta.1 em diante): clique no botão de feedback, ao lado de **Ajustes** na tela inicial. Ele abre uma issue no GitHub que já traz a versão do aplicativo, se é instalado ou portátil, a versão do Windows e o idioma da interface. É só contar o que aconteceu ou o que você gostaria, anexar prints se quiser e enviar.
+- **Sem o aplicativo:** [abra o formulário de feedback](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml) direto.
+
+Para enviar, é preciso uma conta gratuita no GitHub. Nada é enviado automaticamente: nem logs, nem dados pessoais, e você vê o texto inteiro antes de enviar. Pode escrever em português ou em inglês.
 
 Se o Console Mode te poupou da dança dos monitores, uma ⭐ no repositório ajuda outras pessoas a encontrá-lo.
 
