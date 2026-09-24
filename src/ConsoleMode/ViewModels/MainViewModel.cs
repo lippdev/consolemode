@@ -96,6 +96,7 @@ public partial class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsIdle));
         NotifyStartState();
+        if (value) _ = ShowSessionHintAsync();
     }
     partial void OnFocusRowChanged(MonitorRowViewModel? value)
     {

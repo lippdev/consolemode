@@ -18,11 +18,12 @@ namespace ConsoleMode;
 /// </summary>
 public sealed partial class SessionMenuWindow : Window
 {
-    private const double WidthDip = 760;
-    private const double HeightDip = 680;
+    private const double WidthDip = 1100;
+    private const double HeightDip = 620;
 
     private readonly nint _hwnd;
     private readonly GamepadNavigator _navigator;
+    private bool _editingVolume;
 
     public MainViewModel ViewModel { get; }
 
@@ -43,18 +44,25 @@ public sealed partial class SessionMenuWindow : Window
         }
         WindowPlacement.CenterOn(appWindow, target, WidthDip, HeightDip);
 
-        _navigator = new GamepadNavigator(DispatcherQueue, Root, _hwnd)
+        // No foreground gate and HID for PlayStation pads: the game often keeps the focus even
+        // with the menu on top, and then the menu never heard the controller.
+        _navigator = new GamepadNavigator(DispatcherQueue, Root, readSonyHid: true)
         {
-            // Left/Right on the volume row adjust it instead of moving focus.
+            // Adjust mode on the volume tile: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
-                if (Root.XamlRoot is not { } root || !ReferenceEquals(FocusManager.GetFocusedElement(root), VolumeRow)) return false;
-                if (direction == FocusNavigationDirection.Left) { ViewModel.ChangeVolume(-1); return true; }
-                if (direction == FocusNavigationDirection.Right) { ViewModel.ChangeVolume(1); return true; }
-                return false;
+                if (!_editingVolume) return false;
+                if (direction == FocusNavigationDirection.Left) ViewModel.ChangeVolume(-1);
+                else if (direction == FocusNavigationDirection.Right) ViewModel.ChangeVolume(1);
+                return true;
             }
         };
-        _navigator.BackRequested += ViewModel.SessionMenuBack;
+        _navigator.OptionRequested += () => { if (IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null); };
+        _navigator.BackRequested += () =>
+        {
+            if (_editingVolume) SetEditingVolume(false);
+            else ViewModel.SessionMenuBack();
+        };
         _navigator.Start();
 
         // PreviewKeyDown (tunneling): the ScrollViewer would otherwise handle the arrows as scrolling
@@ -79,9 +87,11 @@ public sealed partial class SessionMenuWindow : Window
             }
             if (e.Key is not (Windows.System.VirtualKey.Escape or Windows.System.VirtualKey.GamepadB)) return;
             e.Handled = true;
+            if (_editingVolume) { SetEditingVolume(false); return; }
             ViewModel.SessionMenuBack();
         };
         ViewModel.PropertyChanged += OnViewModelChanged;
+        VolumeRow.LostFocus += (_, _) => SetEditingVolume(false);
         // BringToFront runs before the tree exists; the real first focus happens here.
         Root.Loaded += (_, _) => FirstRow.Focus(FocusState.Keyboard);
         Activated += (_, args) =>
@@ -96,6 +106,18 @@ public sealed partial class SessionMenuWindow : Window
             ViewModel.PropertyChanged -= OnViewModelChanged;
             _navigator.Dispose();
         };
+    }
+
+    private bool IsVolumeFocused() =>
+        Root.XamlRoot is { } root && ReferenceEquals(FocusManager.GetFocusedElement(root), VolumeRow);
+
+    /// <summary>A on the volume tile toggles adjust mode; the arrows show while it is on.</summary>
+    private void OnVolumeClick(object sender, RoutedEventArgs e) => SetEditingVolume(!_editingVolume);
+
+    private void SetEditingVolume(bool on)
+    {
+        _editingVolume = on;
+        VolumeLeft.Visibility = VolumeRight.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
     }
 
     /// <summary>Windows won't hand a background process the foreground; this forces it (PlayStation pads need it).</summary>

@@ -57,6 +57,8 @@
   "VolumeRow": "Volume",
   "Muted": "Muted",
   "SessionMenuHint": "Select + Y opens this menu at any time.",
+  "SessionHintTitle": "Console Mode menu",
+  "SessionHintBody": "Hold {0} to open the panel over the game.",
   "RecordLast30": "Record the last 30 s",
   "ComingSoonSuffix": " · coming soon",
   "ExitConsoleMode": "Exit Console Mode",
