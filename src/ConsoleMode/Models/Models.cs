@@ -263,6 +263,9 @@ public sealed class ConsoleRuntimeState
     public bool HdrApplied { get; set; }
     public string? HdrMonitor { get; set; }
     public bool VrrApplied { get; set; }
+    /// <summary>The session menu turned off an HDR that was on before the session; Stop() turns it back on.</summary>
+    public bool HdrTurnedOffByUser { get; set; }
+    public DateTime? SessionStartedAt { get; set; }
     public string? BackupAudioId { get; set; }
 }
 

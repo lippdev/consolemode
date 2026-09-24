@@ -631,6 +631,7 @@ public partial class MainViewModel : ObservableObject
         {
             var focus = FocusRow?.Monitor;
             await Task.Run(() => Engine.Start(config, focus, confirm));
+            Engine.State.SessionStartedAt = DateTime.Now;
             IsConsoleActive = true;
             ShowPage(settings: false);
             ActiveDescText = DescribeActive(config);

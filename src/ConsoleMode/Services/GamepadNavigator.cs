@@ -51,7 +51,7 @@ public sealed class GamepadNavigator : IDisposable
             case ControllerAction.Down: Move(FocusNavigationDirection.Down); break;
             case ControllerAction.Left: Move(FocusNavigationDirection.Left); break;
             case ControllerAction.Right: Move(FocusNavigationDirection.Right); break;
-            case ControllerAction.Confirm: Invoke(FocusManager.GetFocusedElement(GetXamlRoot())); break;
+            case ControllerAction.Confirm: if (GetXamlRoot() is { } root) Invoke(FocusManager.GetFocusedElement(root)); break;
             case ControllerAction.Back: BackRequested?.Invoke(); break;
             case ControllerAction.Menu: MenuRequested?.Invoke(); break;
             case ControllerAction.Alt: AltRequested?.Invoke(); break;
@@ -61,10 +61,14 @@ public sealed class GamepadNavigator : IDisposable
 
     private XamlRoot? GetXamlRoot() => (_root as UIElement)?.XamlRoot;
 
+    /// <summary>Return true to consume a direction (e.g. a slider row using Left/Right).</summary>
+    public Func<FocusNavigationDirection, bool>? BeforeMove { get; set; }
+
     private void Move(FocusNavigationDirection direction)
     {
+        if (BeforeMove?.Invoke(direction) == true) return;
         var options = new FindNextElementOptions { SearchRoot = _root };
-        if (FocusManager.GetFocusedElement(GetXamlRoot()) is null)
+        if (GetXamlRoot() is not { } root || FocusManager.GetFocusedElement(root) is null)
         {
             // Nothing focused yet: land on the first focusable control.
             (FocusManager.FindFirstFocusableElement(_root) as Control)?.Focus(FocusState.Keyboard);

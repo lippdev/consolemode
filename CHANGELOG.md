@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- Menu da sessão: com o jogo aberto, segure Select + Y para abrir um menu sobre o jogo com volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode". Também por `consolemode://menu`.
+
 ## [1.5.0-beta.5]
 ### Novidades
 - Interface Console: os ajustes de lista (abrir em, áudio, resolução, FPS, como desligar, idioma, interface) abrem um seletor com todas as opções, com foco na atual; A escolhe, B volta. Antes era preciso ir apertando A para ciclar.

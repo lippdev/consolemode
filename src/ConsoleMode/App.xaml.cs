@@ -12,16 +12,19 @@ public partial class App : Application
     private const string ShowSignalName = @"Local\ConsoleMode.Show";
     private const string StartSignalName = @"Local\ConsoleMode.Start";
     private const string StopSignalName = @"Local\ConsoleMode.Stop";
+    private const string MenuSignalName = @"Local\ConsoleMode.Menu";
 
     private MainWindow? _window;
     private TrayService? _tray;
     private ControllerHoldWatcher? _guide;
     private ControllerHoldWatcher? _exitChord;
+    private ControllerHoldWatcher? _menuChord;
     private ControllerConnectWatcher? _connect;
     private Mutex? _instanceMutex;
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
     private EventWaitHandle? _stopSignal;
+    private EventWaitHandle? _menuSignal;
     private readonly List<RegisteredWaitHandle> _signalWaits = [];
 
     public static MainWindow? MainWindowInstance { get; private set; }
@@ -51,6 +54,7 @@ public partial class App : Application
         var protocolAction = cliArgs.Select(ProtocolService.ParseAction).FirstOrDefault(a => a is not null);
         var autoStart = HasArg(ShortcutService.StartArgument) || protocolAction == ProtocolService.StartAction;
         var stopRequest = protocolAction == ProtocolService.StopAction;
+        var menuRequest = protocolAction == ProtocolService.MenuAction;
         // --tray: launched with Windows; stay in the tray until the user opens the window.
         var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
 
@@ -58,7 +62,7 @@ public partial class App : Application
         if (!isFirstInstance)
         {
             // Hand the request to the running instance (tray) instead of fighting over the screens.
-            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : ShowSignalName);
+            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : menuRequest ? MenuSignalName : ShowSignalName);
             Exit();
             return;
         }
@@ -114,6 +118,9 @@ public partial class App : Application
         _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, ShowSignalName);
         _startSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StartSignalName);
         _stopSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StopSignalName);
+        _menuSignal = new EventWaitHandle(false, EventResetMode.AutoReset, MenuSignalName);
+        _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_menuSignal, (_, _) =>
+            _window?.DispatcherQueue.TryEnqueue(() => ViewModel?.ToggleSessionMenu()), null, Timeout.Infinite, executeOnlyOnce: false));
 
         _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_showSignal, (_, _) =>
             _window?.DispatcherQueue.TryEnqueue(() => _tray?.ShowWindow()), null, Timeout.Infinite, executeOnlyOnce: false));
@@ -154,6 +161,12 @@ public partial class App : Application
         };
         _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
         _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
+        // Select + Y: the in-session menu (volume, resolution, audio, FPS, HDR, leave).
+        _menuChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.BackButton | ControllerHoldWatcher.YButton), "Select + Y")
+        {
+            HoldDuration = TimeSpan.FromMilliseconds(250)
+        };
+        _menuChord.Held += () => ViewModel?.ToggleSessionMenu();
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
         RefreshGuideWatch();
 
@@ -181,10 +194,10 @@ public partial class App : Application
 
     private void RefreshGuideWatch()
     {
-        if (_guide is null || _exitChord is null || ViewModel is null) return;
+        if (_guide is null || _exitChord is null || _menuChord is null || ViewModel is null) return;
         _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
-        if (!ViewModel.HomeButtonLaunch) { _guide.Stop(); _exitChord.Stop(); return; }
-        if (ViewModel.IsConsoleActive) { _guide.Stop(); _exitChord.Start(); }
-        else { _exitChord.Stop(); _guide.Start(); }
+        if (!ViewModel.HomeButtonLaunch) { _guide.Stop(); _exitChord.Stop(); _menuChord.Stop(); return; }
+        if (ViewModel.IsConsoleActive) { _guide.Stop(); _exitChord.Start(); _menuChord.Start(); }
+        else { _exitChord.Stop(); _menuChord.Stop(); _guide.Start(); }
     }
 }

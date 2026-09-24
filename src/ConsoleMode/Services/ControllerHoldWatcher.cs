@@ -15,6 +15,7 @@ public sealed class ControllerHoldWatcher : IDisposable
     public const ushort GuideButton = 0x0400;
     public const ushort StartButton = 0x0010;
     public const ushort BackButton = 0x0020;
+    public const ushort YButton = 0x8000;
     public static readonly TimeSpan LongHold = TimeSpan.FromMilliseconds(900);
 
     private static bool _unavailable;

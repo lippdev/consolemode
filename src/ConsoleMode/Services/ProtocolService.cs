@@ -14,6 +14,8 @@ public static class ProtocolService
     public const string StartAction = "start";
     public const string StopAction = "stop";
     public const string ShowAction = "show";
+    /// <summary>Opens the session menu (Stream Deck etc.); ignored when no session is running.</summary>
+    public const string MenuAction = "menu";
 
     private const string ClassKey = @"Software\Classes\" + Scheme;
 
@@ -28,7 +30,7 @@ public static class ProtocolService
         var rest = argument[(Scheme.Length + 1)..].TrimStart('/');
         var end = rest.IndexOfAny(['/', '?', '#']);
         var action = (end < 0 ? rest : rest[..end]).Trim().ToLowerInvariant();
-        return action is StartAction or StopAction or ShowAction ? action : null;
+        return action is StartAction or StopAction or ShowAction or MenuAction ? action : null;
     }
 
     /// <summary>Points the scheme at this exe; a no-op when it already does (portable moves included).</summary>

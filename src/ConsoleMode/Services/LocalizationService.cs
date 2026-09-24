@@ -161,6 +161,15 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string SwitchToDesktop => LocalizationService.Get(nameof(SwitchToDesktop));
     public string SwitchToConsole => LocalizationService.Get(nameof(SwitchToConsole));
     public string ControllerHintDesktop => LocalizationService.Get(nameof(ControllerHintDesktop));
+    public string SessionMenuTitle => LocalizationService.Get(nameof(SessionMenuTitle));
+    public string BackToGame => LocalizationService.Get(nameof(BackToGame));
+    public string VolumeRow => LocalizationService.Get(nameof(VolumeRow));
+    public string SessionMenuHint => LocalizationService.Get(nameof(SessionMenuHint));
+    public string RecordLast30 => LocalizationService.Get(nameof(RecordLast30));
+    public string ExitConsoleMode => LocalizationService.Get(nameof(ExitConsoleMode));
+    public string HintVolume => LocalizationService.Get(nameof(HintVolume));
+    public string SessionMenuCard => LocalizationService.Get(nameof(SessionMenuCard));
+    public string SessionMenuDescription => LocalizationService.Get(nameof(SessionMenuDescription));
     public string ConsoleScreensHeading => LocalizationService.Get(nameof(ConsoleScreensHeading));
     public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));
     public string FullSettings => LocalizationService.Get(nameof(FullSettings));

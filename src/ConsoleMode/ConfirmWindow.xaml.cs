@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using ConsoleMode.Native;
 using ConsoleMode.Models;
 using ConsoleMode.Services;
 using Microsoft.UI.Dispatching;
@@ -46,7 +46,7 @@ public sealed partial class ConfirmWindow : Window
             presenter.IsMinimizable = false;
             presenter.SetBorderAndTitleBar(true, false);
         }
-        CenterOn(appWindow, target);
+        WindowPlacement.CenterOn(appWindow, target, WidthDip, HeightDip);
 
         ShowControllerHints(ControllerInput.DetectFamily());
         _controller = new ControllerInput(DispatcherQueue);
@@ -109,43 +109,4 @@ public sealed partial class ConfirmWindow : Window
 
     private void OnLanguageChanged(object? sender, EventArgs e) =>
         DispatcherQueue.TryEnqueue(UpdateCountdown);
-
-    private static void CenterOn(AppWindow appWindow, ScreenRect? target)
-    {
-        if (target is null || target.Width <= 0 || target.Height <= 0)
-        {
-            appWindow.Resize(new Windows.Graphics.SizeInt32((int)WidthDip, (int)HeightDip));
-            return;
-        }
-
-        // Size in the game screen's DPI (a 4K TV is usually scaled 150-300%).
-        var cx = target.X + target.Width / 2;
-        var cy = target.Y + target.Height / 2;
-        var scale = DpiAt(cx, cy);
-        var w = (int)(WidthDip * scale);
-        var h = (int)(HeightDip * scale);
-        appWindow.MoveAndResize(new Windows.Graphics.RectInt32(cx - w / 2, cy - h / 2, w, h));
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct POINT { public int X, Y; }
-
-    [DllImport("user32.dll")]
-    private static extern nint MonitorFromPoint(POINT pt, uint flags);
-
-    [DllImport("shcore.dll")]
-    private static extern int GetDpiForMonitor(nint monitor, int dpiType, out uint dpiX, out uint dpiY);
-
-    private static double DpiAt(int x, int y)
-    {
-        try
-        {
-            var monitor = MonitorFromPoint(new POINT { X = x, Y = y }, 2 /* MONITOR_DEFAULTTONEAREST */);
-            return GetDpiForMonitor(monitor, 0, out var dpi, out _) == 0 && dpi > 0 ? dpi / 96.0 : 1.0;
-        }
-        catch
-        {
-            return 1.0;
-        }
-    }
 }

@@ -15,6 +15,40 @@ public static class NativeWindows
     public static extern nint GetForegroundWindow();
 
     [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(nint hWnd, nint processId);
+
+    [DllImport("user32.dll")]
+    private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetCurrentThreadId();
+
+    /// <summary>
+    /// Bring a window in front of a fullscreen game. Windows refuses SetForegroundWindow from a
+    /// background process, so attach to the foreground thread's input queue first.
+    /// </summary>
+    public static bool ForceForeground(nint hwnd)
+    {
+        var current = GetForegroundWindow();
+        if (current == hwnd) return true;
+        var ourThread = GetCurrentThreadId();
+        var theirThread = current == 0 ? 0 : GetWindowThreadProcessId(current, 0);
+        var attached = theirThread != 0 && theirThread != ourThread && AttachThreadInput(ourThread, theirThread, true);
+        try
+        {
+            SetWindowPos(hwnd, -1 /* HWND_TOPMOST */, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040 /* NOSIZE|NOMOVE|SHOWWINDOW */);
+            return SetForegroundWindow(hwnd);
+        }
+        finally
+        {
+            if (attached) AttachThreadInput(ourThread, theirThread, false);
+        }
+    }
+
+    [DllImport("user32.dll")]
     public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]

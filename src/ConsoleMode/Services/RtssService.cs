@@ -70,6 +70,37 @@ public sealed class RtssService
         }
     }
 
+    /// <summary>
+    /// Mid-session change from the session menu. Backs the user's settings up only the first
+    /// time (Enable may already have), so Restore still puts back what they had. 0 = no limit.
+    /// </summary>
+    public OperationResult SetLimit(int fpsLimit, ConsoleRuntimeState state)
+    {
+        if (!IsReady || !EnsureRunning())
+            return new OperationResult { Success = false, Message = "RTSS indisponível." };
+        if (SessionMenuMath.NeedsRtssBackup(state.RtssLimitApplied) && !Backup(state))
+            return new OperationResult { Success = false, Message = "Nao foi possivel ler as configuracoes atuais do RTSS." };
+        try
+        {
+            if (fpsLimit > 0)
+            {
+                Cli("limit:set", fpsLimit.ToString());
+                Cli("limiter:set", "1");
+            }
+            else
+            {
+                Cli("limiter:set", "0");
+            }
+            state.FpsLimit = fpsLimit;
+            state.RtssLimitApplied = true;
+            return new OperationResult { Success = true };
+        }
+        catch (Exception ex)
+        {
+            return new OperationResult { Success = false, Message = ex.Message };
+        }
+    }
+
     public void Restore(ConsoleRuntimeState state)
     {
         var hasFile = File.Exists(AppPaths.BackupRtssFpsFile);

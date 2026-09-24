@@ -35,6 +35,25 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
 - [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
 
+## 1c. Menu da sessão (Select + Y)
+
+Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation.
+
+- [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______
+- [ ] Select + Y de novo (ou B, ou Esc) fecha o menu e o jogo continua onde estava. Resultado: ______
+- [ ] Cabeçalho mostra o relógio, "Jogando há X min" e o controle detectado. Resultado: ______
+- [ ] **Volume:** ◀/▶ na linha muda de 5 em 5 e o Windows reflete; A alterna mudo. O valor inicial é o atual do Windows. Resultado: ______
+- [ ] **Resolução:** abre a lista com a atual marcada; escolher outra aplica na TV, o Big Picture continua aberto e a sessão não se encerra sozinha. Ao restaurar no fim, a resolução original volta. Resultado: ______
+- [ ] **Saída de áudio:** lista só saídas ativas; escolher troca o som na hora e o "ao conectar" não desfaz. Resultado: ______
+- [ ] **Limite de FPS** (só com RTSS): trocar o limite vale no jogo; "Sem limite" desliga o limitador; ao restaurar, o RTSS volta ao que era antes da sessão. Resultado: ______
+- [ ] **HDR:** alternar liga/desliga na TV; ao restaurar, o HDR volta ao estado de antes da sessão (inclusive se você desligou um que estava ligado). Resultado: ______
+- [ ] "Gravar os últimos 30 s" aparece desativado com "em breve". Resultado: ______
+- [ ] **Voltar ao PC** restaura e o app fica na bandeja; **Sair do Console Mode** restaura e fecha o app. Resultado: ______
+- [ ] Start + Select continua restaurando direto, sem abrir o menu. Resultado: ______
+- [ ] Com **PlayStation**: D-pad/✕/○ funcionam no menu (a janela toma o primeiro plano). Resultado: ______
+- [ ] Jogo em **tela cheia exclusiva**: o menu não aparece por cima (limitação documentada); Select + Y não quebra nada. Resultado: ______
+- [ ] `start consolemode://menu` no cmd abre o menu; fora da sessão, não faz nada. Resultado: ______
+
 ## 2. Links `consolemode://`
 
 - [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______
