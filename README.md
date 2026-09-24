@@ -182,6 +182,8 @@ Plans, not promises: the order can change with feedback. Vote with a 👍 on the
 - Voice and assistant triggers: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
 - WakeOn integration: wake the PC straight into console mode ([#71](https://github.com/lippdev/consolemode/issues/71))
 - Phone remote over the local control API ([#72](https://github.com/lippdev/consolemode/issues/72))
+- HDMI-CEC: turn the TV on and switch it to the PC's input ([#75](https://github.com/lippdev/consolemode/issues/75))
+- Linux and macOS support ([#74](https://github.com/lippdev/consolemode/issues/74))
 
 ## Feedback
 

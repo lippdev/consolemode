@@ -142,6 +142,8 @@ São planos, não promessas: a ordem pode mudar conforme o feedback. Vote com �
 - Comandos de voz e assistentes: Alexa, MCP ([#12](https://github.com/lippdev/consolemode/issues/12))
 - Integração com o WakeOn: ligar o PC já no modo console ([#71](https://github.com/lippdev/consolemode/issues/71))
 - Controle pelo celular usando a API de controle local ([#72](https://github.com/lippdev/consolemode/issues/72))
+- HDMI-CEC: ligar a TV e trocar para a entrada do PC ([#75](https://github.com/lippdev/consolemode/issues/75))
+- Suporte a Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74))
 
 ## Feedback
 
