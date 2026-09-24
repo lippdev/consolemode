@@ -118,6 +118,15 @@
                           SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.UiModeCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.UiModeDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.UiModeOptions, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedUiMode, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.StartupCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.StartupDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE770;"/>
