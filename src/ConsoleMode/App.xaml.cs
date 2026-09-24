@@ -144,7 +144,11 @@ public partial class App : Application
     {
         if (_window is null || ViewModel is null) return;
         _guide = new ControllerHoldWatcher(_window.DispatcherQueue, ControllerHoldWatcher.GuideButton, "botão Home");
-        _guide.Held += () => _ = HandleStartRequestAsync();
+        _guide.Held += () =>
+        {
+            if (ViewModel is not null) ViewModel.LaunchedByController = true;
+            _ = HandleStartRequestAsync();
+        };
         _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
         _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;

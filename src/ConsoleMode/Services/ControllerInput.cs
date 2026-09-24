@@ -7,7 +7,17 @@ namespace ConsoleMode.Services;
 public enum ControllerAction
 {
     Confirm,
-    Back
+    Back,
+    Up,
+    Down,
+    Left,
+    Right,
+    /// <summary>Start / Options / +</summary>
+    Menu,
+    /// <summary>X on Xbox, Square on PlayStation.</summary>
+    Option,
+    /// <summary>Y on Xbox, Triangle on PlayStation.</summary>
+    Alt
 }
 
 public enum ControllerFamily
@@ -19,22 +29,36 @@ public enum ControllerFamily
 }
 
 /// <summary>
-/// Polls game controllers for "confirm" / "back" presses while a prompt is open.
+/// Polls game controllers and raises <see cref="Pressed"/> for face buttons and directions.
 /// Xbox-style pads are read through XInput (works even without window focus); PlayStation
 /// (DualShock 4 / DualSense) and other HID pads through Windows.Gaming.Input.RawGameController,
 /// which Windows only feeds while this app owns the foreground window.
+/// Directions auto-repeat while held, like a console menu.
 /// </summary>
 public sealed class ControllerInput : IDisposable
 {
     private const ushort SonyVendorId = 0x054C;
     private const ushort NintendoVendorId = 0x057E;
+    private const ushort XInputDpadUp = 0x0001;
+    private const ushort XInputDpadDown = 0x0002;
+    private const ushort XInputDpadLeft = 0x0004;
+    private const ushort XInputDpadRight = 0x0008;
+    private const ushort XInputStart = 0x0010;
     private const ushort XInputA = 0x1000;
     private const ushort XInputB = 0x2000;
+    private const ushort XInputX = 0x4000;
+    private const ushort XInputY = 0x8000;
+    private const short StickThreshold = 16000;
+    private const double RawAxisThreshold = 0.5;
+
+    private static readonly ControllerAction[] AllActions = Enum.GetValues<ControllerAction>();
+    private static readonly TimeSpan RepeatDelay = TimeSpan.FromMilliseconds(400);
+    private static readonly TimeSpan RepeatInterval = TimeSpan.FromMilliseconds(120);
 
     private readonly DispatcherQueueTimer _timer;
+    private readonly bool[] _prev = new bool[AllActions.Length];
+    private readonly DateTime[] _nextRepeat = new DateTime[AllActions.Length];
     private bool _primed;
-    private bool _prevConfirm;
-    private bool _prevBack;
 
     public event Action<ControllerAction>? Pressed;
 
@@ -87,6 +111,8 @@ public sealed class ControllerInput : IDisposable
         return ControllerFamily.None;
     }
 
+    public bool IsRunning => _timer.IsRunning;
+
     public void Start()
     {
         _primed = false;
@@ -99,11 +125,11 @@ public sealed class ControllerInput : IDisposable
 
     private void Poll()
     {
-        bool confirm = false, back = false;
+        var held = new bool[AllActions.Length];
         try
         {
-            ReadXInput(ref confirm, ref back);
-            ReadRaw(ref confirm, ref back);
+            ReadXInput(held);
+            ReadRaw(held);
         }
         catch (Exception ex)
         {
@@ -114,27 +140,47 @@ public sealed class ControllerInput : IDisposable
 
         // First sample only records state, so a button already held when the prompt opens
         // (e.g. the A that launched console mode) doesn't answer it.
-        if (_primed)
+        var now = DateTime.UtcNow;
+        for (var i = 0; i < held.Length; i++)
         {
-            if (confirm && !_prevConfirm) Pressed?.Invoke(ControllerAction.Confirm);
-            else if (back && !_prevBack) Pressed?.Invoke(ControllerAction.Back);
+            var action = AllActions[i];
+            if (held[i] && !_prev[i])
+            {
+                if (_primed) Pressed?.Invoke(action);
+                _nextRepeat[i] = now + RepeatDelay;
+            }
+            else if (held[i] && IsDirection(action) && now >= _nextRepeat[i])
+            {
+                if (_primed) Pressed?.Invoke(action);
+                _nextRepeat[i] = now + RepeatInterval;
+            }
+            _prev[i] = held[i];
         }
         _primed = true;
-        _prevConfirm = confirm;
-        _prevBack = back;
     }
 
-    private static void ReadXInput(ref bool confirm, ref bool back)
+    private static bool IsDirection(ControllerAction action) =>
+        action is ControllerAction.Up or ControllerAction.Down or ControllerAction.Left or ControllerAction.Right;
+
+    private static void ReadXInput(bool[] held)
     {
         for (uint i = 0; i < 4; i++)
         {
-            if (!TryGetXInput(i, out var buttons)) continue;
-            confirm |= (buttons & XInputA) != 0;
-            back |= (buttons & XInputB) != 0;
+            if (!TryGetXInput(i, out var state)) continue;
+            var b = state.Gamepad.wButtons;
+            held[(int)ControllerAction.Confirm] |= (b & XInputA) != 0;
+            held[(int)ControllerAction.Back] |= (b & XInputB) != 0;
+            held[(int)ControllerAction.Option] |= (b & XInputX) != 0;
+            held[(int)ControllerAction.Alt] |= (b & XInputY) != 0;
+            held[(int)ControllerAction.Menu] |= (b & XInputStart) != 0;
+            held[(int)ControllerAction.Up] |= (b & XInputDpadUp) != 0 || state.Gamepad.sThumbLY > StickThreshold;
+            held[(int)ControllerAction.Down] |= (b & XInputDpadDown) != 0 || state.Gamepad.sThumbLY < -StickThreshold;
+            held[(int)ControllerAction.Left] |= (b & XInputDpadLeft) != 0 || state.Gamepad.sThumbLX < -StickThreshold;
+            held[(int)ControllerAction.Right] |= (b & XInputDpadRight) != 0 || state.Gamepad.sThumbLX > StickThreshold;
         }
     }
 
-    private static void ReadRaw(ref bool confirm, ref bool back)
+    private static void ReadRaw(bool[] held)
     {
         foreach (var raw in RawGameController.RawGameControllers)
         {
@@ -147,20 +193,42 @@ public sealed class ControllerInput : IDisposable
             var axes = new double[raw.AxisCount];
             raw.GetCurrentReading(buttons, switches, axes);
 
-            // HID button order: Sony = Square, Cross, Circle, Triangle…;
+            // HID button order: Sony = Square, Cross, Circle, Triangle, L1, R1, L2, R2, Share, Options…;
             // Nintendo = B, A, Y, X… (A confirms, B goes back in both layouts).
-            var (confirmIndex, backIndex) = raw.HardwareVendorId switch
+            var (confirmIndex, backIndex, optionIndex, altIndex, menuIndex) = raw.HardwareVendorId switch
             {
-                SonyVendorId => (1, 2),
-                NintendoVendorId => (1, 0),
-                _ => (0, 1)
+                SonyVendorId => (1, 2, 0, 3, 9),
+                NintendoVendorId => (1, 0, 3, 2, 9),
+                _ => (0, 1, 2, 3, 7)
             };
-            if (buttons.Length > Math.Max(confirmIndex, backIndex))
+            Set(held, ControllerAction.Confirm, buttons, confirmIndex);
+            Set(held, ControllerAction.Back, buttons, backIndex);
+            Set(held, ControllerAction.Option, buttons, optionIndex);
+            Set(held, ControllerAction.Alt, buttons, altIndex);
+            Set(held, ControllerAction.Menu, buttons, menuIndex);
+
+            // D-pad is the first hat switch; the left stick is axes 0 (X) and 1 (Y, 0 = up).
+            if (switches.Length > 0)
             {
-                confirm |= buttons[confirmIndex];
-                back |= buttons[backIndex];
+                var s = switches[0];
+                held[(int)ControllerAction.Up] |= s is GameControllerSwitchPosition.Up or GameControllerSwitchPosition.UpLeft or GameControllerSwitchPosition.UpRight;
+                held[(int)ControllerAction.Down] |= s is GameControllerSwitchPosition.Down or GameControllerSwitchPosition.DownLeft or GameControllerSwitchPosition.DownRight;
+                held[(int)ControllerAction.Left] |= s is GameControllerSwitchPosition.Left or GameControllerSwitchPosition.UpLeft or GameControllerSwitchPosition.DownLeft;
+                held[(int)ControllerAction.Right] |= s is GameControllerSwitchPosition.Right or GameControllerSwitchPosition.UpRight or GameControllerSwitchPosition.DownRight;
+            }
+            if (axes.Length > 1)
+            {
+                held[(int)ControllerAction.Left] |= axes[0] < 0.5 - RawAxisThreshold / 2;
+                held[(int)ControllerAction.Right] |= axes[0] > 0.5 + RawAxisThreshold / 2;
+                held[(int)ControllerAction.Up] |= axes[1] < 0.5 - RawAxisThreshold / 2;
+                held[(int)ControllerAction.Down] |= axes[1] > 0.5 + RawAxisThreshold / 2;
             }
         }
+    }
+
+    private static void Set(bool[] held, ControllerAction action, bool[] buttons, int index)
+    {
+        if (index < buttons.Length) held[(int)action] |= buttons[index];
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -185,14 +253,12 @@ public sealed class ControllerInput : IDisposable
     [DllImport("xinput1_4.dll", EntryPoint = "XInputGetState")]
     private static extern uint XInputGetState(uint userIndex, out XInputState state);
 
-    private static bool TryGetXInput(uint index, out ushort buttons)
+    private static bool TryGetXInput(uint index, out XInputState state)
     {
-        buttons = 0;
+        state = default;
         try
         {
-            if (XInputGetState(index, out var state) != 0) return false;
-            buttons = state.Gamepad.wButtons;
-            return true;
+            return XInputGetState(index, out state) == 0;
         }
         catch (DllNotFoundException)
         {

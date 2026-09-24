@@ -6,6 +6,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Holding the controller's Xbox button for 1 second while the app is in the tray enters console mode without touching the PC. During a session, holding Start + Select for 1 second goes back to the PC. Xbox (XInput) controllers only; it can be turned off in Settings.
 - "Short press of the Xbox button" option: the app turns off the controller shortcut for Game Bar and warns when Steam is also using the button.
+- Console interface: big full-screen cards driven by the controller (D-pad or stick, A, B, Start, Y) or the keyboard, with quick settings that cycle on A. Settings → Interface picks Automatic (Console whenever a controller is connected), Desktop or Console; an on-screen button switches right away.
 - `consolemode://start`, `consolemode://stop` and `consolemode://show` links for automation (Stream Deck, launchers, scripts).
 
 ## [1.5.0-beta.1]

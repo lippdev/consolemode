@@ -124,6 +124,16 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string StartupDescription => LocalizationService.Get(nameof(StartupDescription));
     public string UpdatesCard => LocalizationService.Get(nameof(UpdatesCard));
     public string CheckNow => LocalizationService.Get(nameof(CheckNow));
+    public string UiModeCard => LocalizationService.Get(nameof(UiModeCard));
+    public string UiModeDescription => LocalizationService.Get(nameof(UiModeDescription));
+    public string SwitchToDesktop => LocalizationService.Get(nameof(SwitchToDesktop));
+    public string SwitchToConsole => LocalizationService.Get(nameof(SwitchToConsole));
+    public string ConsoleScreensHeading => LocalizationService.Get(nameof(ConsoleScreensHeading));
+    public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));
+    public string FullSettings => LocalizationService.Get(nameof(FullSettings));
+    public string HintSelect => LocalizationService.Get(nameof(HintSelect));
+    public string BackToPc => LocalizationService.Get(nameof(BackToPc));
+    public string ConsoleActiveHint => LocalizationService.Get(nameof(ConsoleActiveHint));
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string HomeButtonDescription => LocalizationService.Get(nameof(HomeButtonDescription));
     public string HomeButtonShortPressCard => LocalizationService.Get(nameof(HomeButtonShortPressCard));
@@ -151,6 +161,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string Continue => LocalizationService.Get(nameof(Continue));
     public string Countdown => LocalizationService.Get(nameof(Countdown));
     // ToggleSwitch defaults follow the Windows display language, not the app language.
+    public string StartNow => LocalizationService.Get(nameof(StartNow));
     public string ToggleOn => LocalizationService.Get(nameof(ToggleOn));
     public string ToggleOff => LocalizationService.Get(nameof(ToggleOff));
 }

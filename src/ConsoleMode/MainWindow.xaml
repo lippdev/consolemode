@@ -20,7 +20,7 @@
             </Grid.ColumnDefinitions>
             <Button Style="{StaticResource NavigationBackButtonNormalStyle}" Margin="4,0,0,0"
                     VerticalAlignment="Center" Width="40" Height="36"
-                    Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsDesktopSettings, Mode=OneWay}"
                     Command="{x:Bind ViewModel.GoHomeCommand}"
                     ToolTipService.ToolTip="{x:Bind ViewModel.Texts.Back, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.Texts.Back, Mode=OneWay}"/>
             <Grid x:Name="AppTitleBar" Grid.Column="1" Background="Transparent">
@@ -32,14 +32,15 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <views:HomeView Visibility="{x:Bind ViewModel.IsHomePage, Mode=OneWay}">
+            <views:ConsoleHomeView Visibility="{x:Bind ViewModel.IsConsoleUi, Mode=OneWay}"/>
+            <views:HomeView Visibility="{x:Bind ViewModel.IsDesktopHome, Mode=OneWay}">
                 <views:HomeView.Transitions>
                     <TransitionCollection>
                         <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
                     </TransitionCollection>
                 </views:HomeView.Transitions>
             </views:HomeView>
-            <views:SettingsView Visibility="{x:Bind ViewModel.IsSettingsPage, Mode=OneWay}">
+            <views:SettingsView Visibility="{x:Bind ViewModel.IsDesktopSettings, Mode=OneWay}">
                 <views:SettingsView.Transitions>
                     <TransitionCollection>
                         <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>

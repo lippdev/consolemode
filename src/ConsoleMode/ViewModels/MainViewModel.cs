@@ -100,6 +100,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnFocusRowChanged(MonitorRowViewModel? value)
     {
         OnPropertyChanged(nameof(HasFocusRow));
+        OnPropertyChanged(nameof(FocusScreenName));
         OnPropertyChanged(nameof(FocusModeDescription));
         NotifyStartState();
     }
@@ -126,7 +127,9 @@ public partial class MainViewModel : ObservableObject
         // Save the detected defaults so the tray/shortcut work right away.
         if (firstRun && HasMonitors) TrySave(BuildConfig());
         InitializeAppSettings();
-        if (interactive && HasMonitors && !_loadedConfig.TourDone) StartTour();
+        ResolveUi();
+        // The tour points at desktop controls; the console interface explains itself.
+        if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
         _ = CheckForUpdatesOnStartupAsync();
     }
 
@@ -144,6 +147,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var monitor in Monitors) monitor.RefreshLocalizedText();
         UpdateSummary();
         RefreshUpdateStrings();
+        RefreshConsoleTexts();
     }
 
     private void BuildLocalizedOptions()
@@ -184,6 +188,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             BuildAudioOptions(audioValue);
+            BuildUiModeOptions();
             FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
         finally
@@ -301,6 +306,7 @@ public partial class MainViewModel : ObservableObject
             HomeButtonLaunch = config.HomeButtonLaunch;
             HomeButtonShortPress = config.HomeButtonShortPress;
             RefreshHomeButtonHint();
+            SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -514,8 +520,8 @@ public partial class MainViewModel : ObservableObject
         SettingChanged();
     }
     partial void OnSelectedHideStrategyChanged(ComboOption? value) => SettingChanged();
-    partial void OnHdrEnableChanged(bool value) => SettingChanged();
-    partial void OnVrrEnableChanged(bool value) => SettingChanged();
+    partial void OnHdrEnableChanged(bool value) { SettingChanged(); OnPropertyChanged(nameof(HdrText)); }
+    partial void OnVrrEnableChanged(bool value) { SettingChanged(); OnPropertyChanged(nameof(VrrText)); }
     partial void OnSelectedLaunchChanged(ComboOption? value)
     {
         OnPropertyChanged(nameof(LaunchDescription));
@@ -882,6 +888,7 @@ public partial class MainViewModel : ObservableObject
             CheckUpdates = CheckUpdates,
             HomeButtonLaunch = HomeButtonLaunch,
             HomeButtonShortPress = HomeButtonShortPress,
+            UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
 

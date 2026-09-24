@@ -48,6 +48,14 @@ public sealed partial class MainWindow : Window
             e.Cancel = true;
             appWindow.Hide();
         };
+
+        // The console interface fills the screen, like a console; the desktop one gets its size back.
+        ViewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName != nameof(MainViewModel.IsConsoleUi) || appWindow.Presenter is not OverlappedPresenter p) return;
+            if (ViewModel.IsConsoleUi) p.Maximize();
+            else if (p.State == OverlappedPresenterState.Maximized) p.Restore();
+        };
     }
 
     private static class Win32Dpi
