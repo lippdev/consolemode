@@ -55,6 +55,8 @@
   "ConsoleQuickHeading": "Quick settings",
   "FullSettings": "All settings",
   "HintSelect": "Select",
+  "HintChange": "Change",
+  "ConsoleSettingsHint": "Press A on a row to change its value. Everything is saved right away.",
   "BackToPc": "Back to the PC",
   "ConsoleActiveHint": "Or hold Start + Select on the controller for 1 second.",
   "ChooseRoleFor": "What does the {0} screen do?",

@@ -132,6 +132,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));
     public string FullSettings => LocalizationService.Get(nameof(FullSettings));
     public string HintSelect => LocalizationService.Get(nameof(HintSelect));
+    public string HintChange => LocalizationService.Get(nameof(HintChange));
+    public string ConsoleSettingsHint => LocalizationService.Get(nameof(ConsoleSettingsHint));
     public string BackToPc => LocalizationService.Get(nameof(BackToPc));
     public string ConsoleActiveHint => LocalizationService.Get(nameof(ConsoleActiveHint));
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
