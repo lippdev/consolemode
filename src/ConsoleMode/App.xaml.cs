@@ -74,6 +74,7 @@ public partial class App : Application
             LocalizationService.SetLanguage(LocalizationService.ResolveInitial(
                 ConfigService.Load().AppLanguage, StartupService.ReadInstallerLanguage(), CultureInfo.CurrentUICulture.Name));
             ControllerInput.Warmup();
+            AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
             ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
                          $"mmt={AppPaths.HasMmt}, svv={AppPaths.HasSvv}, rtss-cli={AppPaths.HasRtssCli}");

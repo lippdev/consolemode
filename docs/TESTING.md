@@ -97,6 +97,14 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Textos e anel de foco legíveis no sofá; nenhum cartão cortado em 1080p e em 4K com escala 150 %. Resultado: ______
 - [ ] Com 3+ monitores, os cartões de telas rolam horizontalmente ao mover o foco. Resultado: ______
 
+## 3b. DualSense / HID (controle aparece mas não responde)
+
+- [ ] Ajustes → "Testar controle" (nas duas interfaces): com o DualSense por **USB**, apertar ✕, ○, D-pad e mexer o analógico mostra os índices (Cross=1, Circle=2), o hat e os eixos na "Leitura ao vivo", e a linha "→" mostra Confirm/Back/Up… Resultado: ______
+- [ ] O mesmo por **Bluetooth**. Resultado: ______
+- [ ] Com o **Steam aberto** e suporte a PlayStation ligado: se a leitura fica vazia, fechar o Steam faz voltar (é o Steam Input capturando o controle). Resultado: ______
+- [ ] "Copiar diagnóstico" cola dispositivos + amostra; o `consolemode.log` tem a linha `Controles: …` de abertura com o DualSense listado. Resultado: ______
+- [ ] Desconectar e reconectar durante o teste: a lista atualiza e a leitura continua. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

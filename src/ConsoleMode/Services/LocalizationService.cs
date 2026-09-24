@@ -169,6 +169,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ExitConsoleMode => LocalizationService.Get(nameof(ExitConsoleMode));
     public string HintVolume => LocalizationService.Get(nameof(HintVolume));
     public string SessionMenuCard => LocalizationService.Get(nameof(SessionMenuCard));
+    public string ControllerTestCard => LocalizationService.Get(nameof(ControllerTestCard));
+    public string ControllerTestDescription => LocalizationService.Get(nameof(ControllerTestDescription));
+    public string ControllerTestSteamHint => LocalizationService.Get(nameof(ControllerTestSteamHint));
+    public string CopyDiagnostics => LocalizationService.Get(nameof(CopyDiagnostics));
+    public string ControllerDevicesHeading => LocalizationService.Get(nameof(ControllerDevicesHeading));
+    public string ControllerSampleHeading => LocalizationService.Get(nameof(ControllerSampleHeading));
     public string SessionMenuDescription => LocalizationService.Get(nameof(SessionMenuDescription));
     public string ConsoleScreensHeading => LocalizationService.Get(nameof(ConsoleScreensHeading));
     public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));

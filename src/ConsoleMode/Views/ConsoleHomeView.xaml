@@ -388,6 +388,9 @@
                     </Button>
 
                     <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenControllerTestCommand}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ControllerTestCard, Mode=OneWay}"/>
+                    </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.TestConfirmCommand}">
                         <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvConfirmationCard, Mode=OneWay}"/>
                     </Button>
@@ -409,6 +412,40 @@
                     <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintBack, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
                     <TextBlock Text="{x:Bind ViewModel.Texts.Back, Mode=OneWay}" VerticalAlignment="Center" FontSize="16"/>
                 </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- ───────────── Controller test (overlay) ───────────── -->
+        <Grid x:Name="ControllerTestPanel" Visibility="{x:Bind ViewModel.IsControllerTestOpen, Mode=OneWay}" Background="#0F1418" RowSpacing="14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Bind ViewModel.Texts.ControllerTestCard, Mode=OneWay}" FontSize="36" FontWeight="SemiBold"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.ControllerTestSteamHint, Mode=OneWay}" FontSize="17" TextWrapping="Wrap" MaxWidth="1100" HorizontalAlignment="Left"
+                           Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Spacing="6">
+                <TextBlock Text="{x:Bind ViewModel.Texts.ControllerDevicesHeading, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,8,0,4"/>
+                <TextBlock Text="{x:Bind ViewModel.ControllerDevicesText, Mode=OneWay}" FontFamily="Consolas" FontSize="16" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Spacing="6">
+                <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSampleHeading, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,8,0,4"/>
+                <TextBlock Text="{x:Bind ViewModel.ControllerSampleText, Mode=OneWay}" FontFamily="Consolas" FontSize="18" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="16">
+                <Button x:Name="CopyDiagnosticsButton" Style="{StaticResource ConsoleSmallButton}" Height="56" Padding="24,0" Command="{x:Bind ViewModel.CopyControllerDiagnosticsCommand}">
+                    <TextBlock Text="{x:Bind ViewModel.Texts.CopyDiagnostics, Mode=OneWay}"/>
+                </Button>
+                <Button Style="{StaticResource ConsoleSmallButton}" Height="56" Padding="24,0" Command="{x:Bind ViewModel.CloseControllerTestCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintBack, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
+                        <TextBlock Text="{x:Bind ViewModel.Texts.Back, Mode=OneWay}"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 

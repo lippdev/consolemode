@@ -4,6 +4,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Settings → "Test controller": shows live what Windows delivers from each pad (source, buttons by index, D-pad, sticks) and copies a diagnostic for the issue. The startup log lists the pads. For when a pad shows up but does nothing (DualSense with Steam running, for example).
+
+### Fixes
+- Controller: a device that fails to read no longer silences the others; pads Windows exposes as a Gamepad with no XInput slot answering are now read (they used to be skipped); DualSense/DualShock over HID take the same path when XInput is empty.
 - Local control API: while the app runs, the named pipe `\.pipeConsoleMode.Control` takes one JSON line (`status`, `start`, `stop`, `show`) and replies with the state (active, restoring, mode, version). Only the signed-in user and LocalSystem can connect. By @nextestudios. (#24)
 - `ConsoleMode.exe --stop` restores the desk from the command line, like `consolemode://stop`. By @nextestudios. (#23)
 
