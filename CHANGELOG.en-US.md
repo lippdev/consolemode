@@ -2,12 +2,15 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
+## [1.5.0-beta.3]
 ### What's new
 - Settings → "Playnite folder": pick Playnite.FullscreenApp.exe by hand for portable installs, which auto-detection can't find.
 
 ### Fixes
 - The language chosen in the installer now applies to the app. With no saved choice, the app follows the Windows language (Portuguese → pt-BR; anything else → English) instead of always opening in Portuguese.
+
+### Beta release
+- Pre-release: people on 1.5.0-beta.1 or beta.2 get the notice in the app. People on 1.4.0 don't; to try it, download the files below.
 
 ## [1.5.0-beta.2]
 ### What's new
