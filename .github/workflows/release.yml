@@ -21,10 +21,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "8.0.x"
 
@@ -97,7 +97,7 @@ jobs:
       - name: Upload unsigned build for signing
         id: unsigned
         if: github.event_name == 'push' && vars.SIGNPATH_ORGANIZATION_ID != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-${{ steps.version.outputs.version }}
           path: |
@@ -107,7 +107,7 @@ jobs:
 
       - name: Sign with SignPath
         if: github.event_name == 'push' && vars.SIGNPATH_ORGANIZATION_ID != ''
-        uses: signpath/github-action-submit-signing-request@v2
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
@@ -130,7 +130,7 @@ jobs:
           }
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ConsoleMode-${{ steps.version.outputs.version }}
           path: |
@@ -140,7 +140,7 @@ jobs:
 
       - name: Publish GitHub release
         if: github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Console Mode ${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.prerelease }}
