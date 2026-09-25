@@ -1,0 +1,42 @@
+name: CI
+
+# Builds the app and runs the tests on every pull request and on main, on Windows:
+# the WinUI 3 app only compiles there. Pull requests from agents (Pullfrog runs on
+# Linux and can't build the app) and from forks get the same check before merge.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test tests/ConsoleMode.Tests/ConsoleMode.Tests.csproj -c Release --nologo
+
+      - name: Build the app
+        shell: pwsh
+        # Same platform and packaging flags as build/Publish-ConsoleMode.ps1, without publishing.
+        run: >-
+          dotnet build src/ConsoleMode/ConsoleMode.csproj -c Release -r win-x64 --nologo
+          -p:Platform=x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
