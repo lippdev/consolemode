@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using ConsoleMode.Models;
 using ConsoleMode.Services;
 
@@ -6,6 +7,8 @@ namespace ConsoleMode.Tests;
 
 public sealed class LocalizationTests
 {
+    private static readonly Regex PlaceholderPattern = new(@"\{\d+\}", RegexOptions.Compiled);
+
     [Fact]
     public void Embedded_catalogs_support_en_us_and_pt_br_with_matching_keys()
     {
@@ -53,6 +56,26 @@ public sealed class LocalizationTests
         {
             var keys = LocalizationService.GetKeys(language).ToHashSet();
             Assert.Empty(properties.Where(p => !keys.Contains(p)));
+        }
+    }
+
+    [Fact]
+    public void Catalog_placeholders_match_english()
+    {
+        var english = LoadCatalog(LocalizationService.EnglishUnitedStates);
+        foreach (var language in LocalizationService.SupportedLanguages
+                     .Select(l => l.Code)
+                     .Where(code => code != LocalizationService.EnglishUnitedStates))
+        {
+            var localized = LoadCatalog(language);
+            foreach (var key in english.Keys.Order())
+            {
+                var expected = ExtractPlaceholders(english[key]);
+                var actual = ExtractPlaceholders(localized[key]);
+                Assert.True(
+                    expected.SetEquals(actual),
+                    $"{language}:{key} has placeholders {{{string.Join(", ", actual.Order())}}}; expected {{{string.Join(", ", expected.Order())}}}.");
+            }
         }
     }
 
@@ -115,4 +138,15 @@ public sealed class LocalizationTests
     [InlineData(null, null, null, "en-US")]
     public void Initial_language_follows_saved_choice_then_installer_then_windows(string? saved, string? installer, string? windows, string expected) =>
         Assert.Equal(expected, LocalizationService.ResolveInitial(saved, installer, windows));
+
+    private static Dictionary<string, string> LoadCatalog(string language)
+    {
+        var resourceName = $"ConsoleMode.Localization.Strings.{language}.json";
+        using var stream = typeof(LocalizationService).Assembly.GetManifestResourceStream(resourceName);
+        Assert.NotNull(stream);
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(stream!)!;
+    }
+
+    private static HashSet<string> ExtractPlaceholders(string value) =>
+        PlaceholderPattern.Matches(value).Select(match => match.Value).ToHashSet();
 }
