@@ -91,6 +91,44 @@ jobs:
         shell: pwsh
         run: .\build\Publish-ConsoleMode.ps1 -Runtime x64 -Target All -Version "${{ steps.version.outputs.version }}"
 
+      # Code signing (docs/CODE_SIGNING.md). Off until the SignPath repository variables exist:
+      # SIGNPATH_ORGANIZATION_ID, SIGNPATH_PROJECT_SLUG, SIGNPATH_POLICY_SLUG, plus the
+      # SIGNPATH_API_TOKEN secret. Only tag pushes are signed; each request waits for manual approval.
+      - name: Upload unsigned build for signing
+        id: unsigned
+        if: github.event_name == 'push' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ steps.version.outputs.version }}
+          path: |
+            dist/ConsoleMode-Setup-x64.exe
+            dist/ConsoleMode-Portable-x64.exe
+          if-no-files-found: error
+
+      - name: Sign with SignPath
+        if: github.event_name == 'push' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: dist-signed
+
+      - name: Use the signed files
+        if: github.event_name == 'push' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: |
+          foreach ($name in "ConsoleMode-Setup-x64.exe", "ConsoleMode-Portable-x64.exe") {
+            $signed = Join-Path "dist-signed" $name
+            if (-not (Test-Path -LiteralPath $signed)) { throw "SignPath did not return $name" }
+            if ((Get-AuthenticodeSignature -LiteralPath $signed).Status -ne "Valid") { throw "$name is not validly signed" }
+            Copy-Item -LiteralPath $signed -Destination (Join-Path "dist" $name) -Force
+          }
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

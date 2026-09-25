@@ -65,4 +65,4 @@ Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/
 - **Feedback:** o botão ao lado de Ajustes no app, ou [este formulário](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Uma ⭐ ajuda outros jogadores de sofá a encontrar o projeto.
 - Alguns antivírus podem acusar as ferramentas auxiliares incluídas; o código está todo aqui.
 
-Licença MIT · [Avisos de terceiros](THIRD_PARTY_NOTICES.md)
+Licença MIT · [Avisos de terceiros](THIRD_PARTY_NOTICES.md) · [Política de assinatura de código](docs/CODE_SIGNING.md)
