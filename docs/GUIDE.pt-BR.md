@@ -47,13 +47,28 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 
 ## Solução de problemas
 
-**O controle aparece mas não faz nada (DualSense / DualShock):** abra **Ajustes → Testar controle**; ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
+### O layout da área de trabalho não foi restaurado
+
+Abra o menu da bandeja e escolha **Restaurar setup**. Se o layout ainda estiver errado, escolha **Restaurar setup** novamente depois que o Windows terminar de aplicar a alteração do monitor. Você também pode reabrir a janela pela bandeja e restaurar manualmente.
+
+### O áudio permaneceu na saída anterior
+
+Confira se a saída de destino está conectada e disponível no Windows antes de iniciar o modo console. Para saídas HDMI/TV, pode ser necessário reconectar o cabo e iniciar o modo novamente.
+
+### O controle aparece mas não faz nada (DualSense / DualShock)
+
+Abra **Ajustes → Testar controle**: ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
+
+### HDR ou VRR não mudaram
+
+Confirme se o monitor de foco é compatível com o recurso e se o HDR está ativado no Windows. Para VRR, ative também G-SYNC ou FreeSync no painel de controle da GPU quando aplicável.
 
 ## Compilar no Windows
 
 Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
 
 ```powershell
+# Baixa MultiMonitorTool / SoundVolumeView / rtss-cli e compila os dois pacotes
 .\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 
@@ -62,4 +77,3 @@ Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (
 Para lançar uma versão, faça push de uma tag como `v1.4.0` (ou `v1.4.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
 
 A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) e não é usada pelo app WinUI.
-
