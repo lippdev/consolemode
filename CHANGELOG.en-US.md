@@ -2,9 +2,24 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
+## [1.5.0]
+### What's new
+- Console interface: a full-screen, controller-first home and Settings, driven by the D-pad/stick and A/B with Xbox and PlayStation pads. Automatic mode picks it whenever a controller is connected. (#41, #42, #47)
+- Session menu over the game: hold Select + Y (Create + △ on PlayStation) for volume, resolution, audio output, FPS limit, HDR, "Back to the PC" and "Exit Console Mode", in a horizontal tile layout. A corner toast reminds you of the combo when the game starts. (#46, #64)
+- Couch shortcuts: hold the Home button with the app in the tray to enter console mode, and Start + Select during a session to go back to the PC. They also work with DualSense and DualShock 4 over HID, without Steam Input. (#61)
+- Automation: `consolemode://start`, `stop`, `show` and `menu` links, `ConsoleMode.exe --stop`, and a local control API over the named pipe `\.\pipe\ConsoleMode.Control`. By @nextestudios. (#23, #24)
+- Settings → "Test controller" shows live what Windows reads from each pad and copies a diagnostic; "Enter when a controller connects"; a manual Playnite folder for portable installs; "More apps from the developer" (WakeOn, Next Boost). (#63)
+- Feedback button that opens a prefilled GitHub issue, release notes in the interface language, and a Spanish interface. The installer asks for the language.
+
 ### Fixes
-- Console interface: the update banner buttons now have a black focus ring; it used to match the background, so with a controller you couldn't see which button was selected. (#73)
+- Updates: the download no longer times out on slow connections, and the console interface can install an update, not just find it. (#49, #58)
+- Controller navigation in the console Settings no longer skips rows or draws the focus ring in the wrong place, and the update banner buttons have a visible (black) focus ring. (#60, #73)
+- Controllers: one failing pad no longer silences the others, and pads Windows lists late (PlayStation, Bluetooth) are picked up.
+- Tray menu items work again, the app waits for the game screen before turning the others off, and the regular Steam window is no longer mistaken for Big Picture.
+
+### Updating from 1.4.0
+- The app shows the notice: click **Update now**. Your settings are kept.
+- If the update from 1.4.0 fails with "HttpClient.Timeout of 15 seconds elapsing" (slow connection), download the installer below once. That bug is in 1.4.0's updater and is fixed from 1.5.0 on.
 
 ## [1.5.0-beta.11]
 ### What's new

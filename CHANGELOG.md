@@ -2,9 +2,24 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.5.0]
+### Novidades
+- Interface Console: tela inicial e Ajustes em tela cheia, pensados para o controle (direcional/analógico, A/B) com controles Xbox e PlayStation. O modo Automático escolhe essa interface sempre que há um controle conectado. (#41, #42, #47)
+- Menu da sessão sobre o jogo: segure Select + Y (Create + △ no PlayStation) para volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode", em blocos na horizontal. Um aviso no canto lembra a combinação quando o jogo começa. (#46, #64)
+- Atalhos do sofá: com o app na bandeja, segure o botão Home para entrar no modo console; durante a sessão, Start + Select volta para o PC. Funcionam também com DualSense e DualShock 4 via HID, sem Steam Input. (#61)
+- Automação: links `consolemode://start`, `stop`, `show` e `menu`, `ConsoleMode.exe --stop` e uma API de controle local pelo named pipe `\.\pipe\ConsoleMode.Control`. Por @nextestudios. (#23, #24)
+- Ajustes → "Testar controle" mostra ao vivo o que o Windows lê de cada controle e copia um diagnóstico; "Entrar ao conectar um controle"; pasta do Playnite manual para instalações portáteis; "Outros apps do desenvolvedor" (WakeOn, Next Boost). (#63)
+- Botão de feedback que abre uma issue no GitHub já preenchida, notas da versão no idioma da interface e interface em espanhol. O instalador pergunta o idioma.
+
 ### Correções
-- Interface Console: no aviso de atualização, o anel de seleção dos botões agora é preto; antes tinha a mesma cor do fundo e não dava para ver qual botão estava selecionado com o controle. (#73)
+- Atualização: o download não esgota mais o tempo em conexões lentas, e a interface Console consegue instalar a atualização, não só encontrar. (#49, #58)
+- A navegação pelo controle nos Ajustes da interface Console não pula mais linhas nem desenha o anel de foco no lugar errado, e os botões do aviso de atualização têm anel de foco visível (preto). (#60, #73)
+- Controles: um controle com falha não silencia mais os outros, e controles que o Windows lista com atraso (PlayStation, Bluetooth) passam a ser detectados.
+- Os itens do menu da bandeja voltaram a funcionar, o app espera a tela de jogo ligar antes de desligar as outras e a janela normal do Steam não é mais confundida com o Big Picture.
+
+### Atualizando da 1.4.0
+- O app mostra o aviso: clique em **Atualizar agora**. As configurações são mantidas.
+- Se a atualização a partir da 1.4.0 falhar com "HttpClient.Timeout of 15 seconds elapsing" (conexão lenta), baixe o instalador abaixo uma vez. Esse erro é do atualizador da 1.4.0 e está corrigido a partir da 1.5.0.
 
 ## [1.5.0-beta.11]
 ### Novidades
