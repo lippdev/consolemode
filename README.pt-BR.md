@@ -12,10 +12,12 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ## Download
 
-Baixe a última versão em [Releases](https://github.com/lippdev/consolemode/releases/latest):
+Baixe a **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
+
+Está na 1.4.0? O app oferece a atualização. Se ela falhar por tempo esgotado, baixe o instalador uma vez; as configurações são mantidas.
 
 Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) ou o app Xbox. O [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) é opcional, para o limite de FPS.
 
@@ -43,13 +45,15 @@ Prefere o sofá? Com o app na bandeja, segure o botão Home do controle e ele co
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês e espanhol
 
-## Novidades da 1.5
+## Novidades da 1.5.0
 
-- **Menu Select + Y** sobre o jogo, com blocos na horizontal, agora funcionando com controles de PlayStation
-- Navegação pelo controle em todo o app e um aviso no canto quando o jogo começa
-- Atualizações instalam pela interface Console e não esgotam mais o tempo
+- **Interface Console:** tela inicial e Ajustes em tela cheia feitos para o controle, com controles Xbox e PlayStation
+- **Menu Select + Y** sobre o jogo: volume, resolução, áudio, FPS, HDR e a saída, em blocos na horizontal
+- **Atalhos do sofá** que funcionam também com DualSense e DualShock 4, sem precisar de Steam Input
+- **Automação:** links `consolemode://`, `--stop` e uma API de controle local
+- Teste de controle nos Ajustes, botão de feedback, interface em espanhol e atualização direto do sofá
 
-Detalhes no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
+Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.5.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
 ## Roadmap
 

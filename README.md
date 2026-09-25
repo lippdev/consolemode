@@ -12,10 +12,12 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 
 ## Download
 
-Get the latest from [Releases](https://github.com/lippdev/consolemode/releases/latest):
+Get **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
+
+On 1.4.0? The app offers the update. If it fails with a timeout, download the installer once; your settings are kept.
 
 Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) or the Xbox app. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) is optional, for the FPS limit.
 
@@ -43,13 +45,15 @@ Prefer the couch? With the app in the tray, hold the controller's Home button an
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese and Spanish
 
-## What's new in 1.5
+## What's new in 1.5.0
 
-- **Select + Y menu** over the game, with horizontal tiles, now working with PlayStation pads
-- Controller navigation everywhere, and a hint in the corner when the game starts
-- Updates install from the console interface and no longer time out
+- **Console interface:** full-screen home and Settings made for the controller, with Xbox and PlayStation pads
+- **Select + Y menu** over the game: volume, resolution, audio, FPS, HDR and the way out, in horizontal tiles
+- **Couch shortcuts** that also work with DualSense and DualShock 4, no Steam Input needed
+- **Automation:** `consolemode://` links, `--stop` and a local control API
+- Controller test in Settings, feedback button, Spanish interface, and updates that install from the couch
 
-Details in the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
+All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.5.0) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
 
 ## Roadmap
 
