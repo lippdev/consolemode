@@ -65,4 +65,4 @@ All the details in the [release notes](https://github.com/lippdev/consolemode/re
 - **Feedback:** the button next to Settings in the app, or [this form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). A ⭐ helps other couch gamers find the project.
 - Antivirus may flag the bundled helper tools; the source is all here.
 
-MIT License · [Third-party notices](THIRD_PARTY_NOTICES.md)
+MIT License · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Code signing policy](docs/CODE_SIGNING.md)
