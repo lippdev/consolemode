@@ -107,6 +107,8 @@ public sealed class LaunchService
             .ToArray();
     }
 
+    public bool IsPlayniteRunning() => Process.GetProcessesByName("Playnite.FullscreenApp").Length > 0;
+
     public nint[] GetFullscreenHandles(string mode) =>
         mode == "playnite" ? GetPlayniteHandles() : GetBigPictureHandles();
 

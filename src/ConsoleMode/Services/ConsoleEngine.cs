@@ -55,6 +55,7 @@ public sealed class ConsoleEngine
         State.LaunchTime = null;
         State.AbsenceCount = 0;
         State.CachedBigPictureHandle = 0;
+        State.PlayniteWindowMissingSince = null;
         State.CachedXboxHandle = 0;
         State.AudioWatchComplete = false;
         State.BigPictureWatchActive = false;
@@ -410,9 +411,10 @@ public sealed class ConsoleEngine
 
     private bool IsExitSignaled()
     {
-        if (NativeWindows.ConsumeBigPictureExitRequest()) return true;
-        if (State.CachedBigPictureHandle != 0 && !NativeWindows.IsWindowStillVisible(State.CachedBigPictureHandle))
-            return true;
+        var watchedGone = NativeWindows.ConsumeBigPictureExitRequest() ||
+                          (State.CachedBigPictureHandle != 0 && !NativeWindows.IsWindowStillVisible(State.CachedBigPictureHandle));
+        if (State.FullscreenMode == "playnite" && State.HasAppeared) return IsPlayniteExitSignaled(watchedGone);
+        if (watchedGone) return true;
         if (!State.HasAppeared) return false;
         if (Launch.IsFullscreenActive(State.FullscreenMode, State))
         {
@@ -421,6 +423,28 @@ public sealed class ConsoleEngine
         }
         State.AbsenceCount++;
         return State.AbsenceCount >= 2;
+    }
+
+    /// <summary>
+    /// Playnite may replace the window being watched (loading screen → main window). Follow the new
+    /// window while the process runs, and end the session only when it exits or stays windowless.
+    /// </summary>
+    private bool IsPlayniteExitSignaled(bool watchedGone)
+    {
+        if (watchedGone) State.CachedBigPictureHandle = 0;
+        var showing = Launch.IsPlayniteActive(State);
+        if (showing && watchedGone)
+        {
+            var handle = State.CachedBigPictureHandle;
+            AppLog.Write("Loop: Playnite trocou de janela; acompanhando a nova");
+            OnUi(() => State.BigPictureWatchActive = NativeWindows.StartBigPictureExitWatch(handle));
+        }
+
+        if (showing) State.PlayniteWindowMissingSince = null;
+        else State.PlayniteWindowMissingSince ??= DateTime.Now;
+        var exit = PlayniteExitPolicy.IsExit(Launch.IsPlayniteRunning(), showing, State.PlayniteWindowMissingSince, DateTime.Now);
+        if (exit) AppLog.Write("Loop: Playnite fechou");
+        return exit;
     }
 
     private bool AudioWatchNeeded()
