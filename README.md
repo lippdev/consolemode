@@ -42,7 +42,7 @@ Prefer the couch? With the app in the tray, hold the controller's Home button an
 - Hide the other screens by **disconnecting** them, **black overlays** or **DDC/CI**
 - Per-screen **resolution and refresh rate**, **HDR**, **VRR** and an **FPS limit** (RTSS) while you play
 - Audio goes to the TV (or any output) and comes back afterwards
-- [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can put it in standby afterwards
+- [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network, or anything Home Assistant controls), and can put it in standby afterwards
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode
 - Two interfaces: **Desktop** (mouse) and **Console** (full screen, Xbox and PlayStation pads)
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)

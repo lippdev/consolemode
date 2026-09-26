@@ -65,8 +65,9 @@ public sealed class TvControlConfig
 {
     public const string None = "none";
     public const string AndroidTv = "androidTv";
+    public const string HomeAssistant = "homeAssistant";
 
-    /// <summary>"none" | "androidTv".</summary>
+    /// <summary>"none" | "androidTv" | "homeAssistant".</summary>
     public string Provider { get; set; } = None;
 
     /// <summary>The TV's IP address or host name, optionally with ":port".</summary>
@@ -80,6 +81,18 @@ public sealed class TvControlConfig
 
     /// <summary>Android TV: shell command that switches to the PC's input, for TVs that ignore the HDMI key codes.</summary>
     public string InputCommand { get; set; } = "";
+
+    /// <summary>Home Assistant base URL, e.g. http://homeassistant.local:8123.</summary>
+    public string HomeAssistantUrl { get; set; } = "";
+
+    /// <summary>Long-lived access token, encrypted for this Windows user (DPAPI, "dpapi:" prefix).</summary>
+    public string HomeAssistantToken { get; set; } = "";
+
+    /// <summary>Entity run when console mode starts (script, scene, automation, media_player…).</summary>
+    public string HomeAssistantOnEntity { get; set; } = "";
+
+    /// <summary>Entity run on restore; empty = turn the start entity off, when it can be.</summary>
+    public string HomeAssistantOffEntity { get; set; } = "";
 
     /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
     public bool TurnOffOnRestore { get; set; }

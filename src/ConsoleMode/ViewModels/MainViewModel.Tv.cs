@@ -20,18 +20,24 @@ public partial class MainViewModel
     [ObservableProperty] private string _tvMacAddress = "";
     [ObservableProperty] private string _tvInputCommand = "";
     [ObservableProperty] private bool _tvTurnOffOnRestore;
+    [ObservableProperty] private string _haUrl = "";
+    [ObservableProperty] private string _haToken = "";
+    [ObservableProperty] private string _haOnEntity = "";
+    [ObservableProperty] private string _haOffEntity = "";
     [ObservableProperty] private bool _isTestingTv;
 
     private string TvProvider => SelectedTvProvider?.Value ?? TvControlConfig.None;
 
     public bool IsTvEnabled => TvProvider != TvControlConfig.None;
     public bool IsTvAndroid => TvProvider == TvControlConfig.AndroidTv;
+    public bool IsTvHomeAssistant => TvProvider == TvControlConfig.HomeAssistant;
     public bool UsesTvHost => IsTvAndroid;
     public bool UsesTvHdmiInput => IsTvAndroid;
 
     public string TvProviderDescription => LocalizationService.Get(TvProvider switch
     {
         TvControlConfig.AndroidTv => "TvAndroidDescription",
+        TvControlConfig.HomeAssistant => "TvHaDescription",
         _ => "TvNoneDescription"
     });
 
@@ -39,6 +45,7 @@ public partial class MainViewModel
     {
         OnPropertyChanged(nameof(IsTvEnabled));
         OnPropertyChanged(nameof(IsTvAndroid));
+        OnPropertyChanged(nameof(IsTvHomeAssistant));
         OnPropertyChanged(nameof(UsesTvHost));
         OnPropertyChanged(nameof(UsesTvHdmiInput));
         OnPropertyChanged(nameof(TvProviderDescription));
@@ -50,6 +57,10 @@ public partial class MainViewModel
     partial void OnTvMacAddressChanged(string value) => SaveQuietly();
     partial void OnTvInputCommandChanged(string value) => SaveQuietly();
     partial void OnTvTurnOffOnRestoreChanged(bool value) => SaveQuietly();
+    partial void OnHaUrlChanged(string value) => SaveQuietly();
+    partial void OnHaTokenChanged(string value) => SaveQuietly();
+    partial void OnHaOnEntityChanged(string value) => SaveQuietly();
+    partial void OnHaOffEntityChanged(string value) => SaveQuietly();
 
     /// <summary>Part of <see cref="BuildLocalizedOptions"/>: the names follow the interface language.</summary>
     private void BuildTvOptions()
@@ -60,6 +71,7 @@ public partial class MainViewModel
         TvProviders.Clear();
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderNone"), Value = TvControlConfig.None });
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderAndroid"), Value = TvControlConfig.AndroidTv });
+        TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderHomeAssistant"), Value = TvControlConfig.HomeAssistant });
         SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == provider) ?? TvProviders[0];
 
         TvHdmiInputs.Clear();
@@ -77,6 +89,10 @@ public partial class MainViewModel
         TvMacAddress = tv.MacAddress ?? "";
         TvInputCommand = tv.InputCommand ?? "";
         TvTurnOffOnRestore = tv.TurnOffOnRestore;
+        HaUrl = tv.HomeAssistantUrl ?? "";
+        HaToken = SecretProtector.Unprotect(tv.HomeAssistantToken ?? "");
+        HaOnEntity = tv.HomeAssistantOnEntity ?? "";
+        HaOffEntity = tv.HomeAssistantOffEntity ?? "";
     }
 
     private TvControlConfig BuildTvConfig() => new()
@@ -86,7 +102,11 @@ public partial class MainViewModel
         MacAddress = TvMacAddress.Trim(),
         HdmiInput = int.TryParse(SelectedTvHdmiInput?.Value, out var hdmi) ? hdmi : 1,
         InputCommand = TvInputCommand.Trim(),
-        TurnOffOnRestore = TvTurnOffOnRestore
+        TurnOffOnRestore = TvTurnOffOnRestore,
+        HomeAssistantUrl = HaUrl.Trim(),
+        HomeAssistantToken = SecretProtector.Protect(HaToken.Trim()),
+        HomeAssistantOnEntity = HaOnEntity.Trim(),
+        HomeAssistantOffEntity = HaOffEntity.Trim()
     };
 
     /// <summary>Turns the TV on and switches the input now; the first time, pairs with the TV.</summary>

@@ -46,6 +46,16 @@ Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignor
 
 "Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
+### Home Assistant
+
+If you already run [Home Assistant](https://www.home-assistant.io/), it can reach almost any TV (HDMI-CEC from a Raspberry Pi, LG, Samsung, Sony, Roku, Android TV…). Console Mode just runs an entity there when console mode starts, and another one on restore.
+
+1. In Home Assistant, write a **script** that turns the TV on and selects the PC's input (for example `media_player.turn_on` followed by `media_player.select_source`), and optionally one that turns it off.
+2. Create a **long-lived access token**: your profile → **Security** → *Long-lived access tokens*.
+3. In Console Mode, pick *Home Assistant* and fill in the address (e.g. `http://homeassistant.local:8123`), the token and the entity to run (e.g. `script.tv_to_pc`). Press **Test now**.
+
+Scripts and scenes are run with `turn_on`, automations with `trigger`, buttons with `press`; other entities (`media_player`, `switch`…) with `turn_on`, and on restore with `turn_off` when no restore entity is set. The token is stored encrypted for your Windows user (DPAPI).
+
 ## Optional extras
 
 ### HDR
