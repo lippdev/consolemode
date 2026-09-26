@@ -35,9 +35,9 @@ public sealed class CecCommandsTests
     [Fact]
     public void Custom_path_wins_and_accepts_a_folder_or_the_exe()
     {
-        Assert.Equal([Path.Combine(@"D:\libcec", "cec-client.exe")],
+        Assert.Equal(new[] { Path.Combine(@"D:\libcec", "cec-client.exe") },
             CecCommands.Candidates(@"D:\libcec", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
-        Assert.Equal([@"D:\libcec\cec-client.exe"],
+        Assert.Equal(new[] { @"D:\libcec\cec-client.exe" },
             CecCommands.Candidates("\"D:\\libcec\\cec-client.exe\"", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
     }
 
@@ -45,12 +45,12 @@ public sealed class CecCommandsTests
     public void Default_search_is_the_libcec_install_folders_then_path()
     {
         var candidates = CecCommands.Candidates("", "PF86", "PF", "A; ;B").ToList();
-        Assert.Equal(
-        [
+        Assert.Equal(new[]
+        {
             Path.Combine("PF86", "Pulse-Eight", "USB-CEC Adapter", "cec-client.exe"),
             Path.Combine("PF", "Pulse-Eight", "USB-CEC Adapter", "cec-client.exe"),
             Path.Combine("A", "cec-client.exe"),
             Path.Combine("B", "cec-client.exe")
-        ], candidates);
+        }, candidates);
     }
 }
