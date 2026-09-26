@@ -46,6 +46,16 @@ Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 
 
 A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
+### LG webOS
+
+TVs LG de 2014 em diante, pela rede local (a mesma API do app LG ThinQ). Nada para instalar no PC.
+
+1. Na TV, ative **Ligar via Wi-Fi** (em modelos antigos: **LG Connect Apps** / **Mobile TV On**) para ela poder ser acordada da espera.
+2. No Console Mode, escolha *LG webOS*, informe o IP da TV, o **endereço MAC** (Configurações → Rede → Wi-Fi/Cabeada → Avançado na TV) e a entrada HDMI do PC.
+3. Aperte **Testar agora** e aceite o pedido na TV. A chave que a TV devolve fica guardada, então ela só pergunta uma vez.
+
+A TV liga por Wake-on-LAN e troca de entrada com `ssap://tv/switchInput` (`HDMI_1` a `HDMI_4`); a espera usa `ssap://system/turnOff`. O app tenta `ws://` na porta 3000 e, se não der, `wss://` na 3001 (firmwares novos, certificado autoassinado).
+
 ## Extras opcionais
 
 ### HDR

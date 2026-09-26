@@ -26,12 +26,14 @@ public partial class MainViewModel
 
     public bool IsTvEnabled => TvProvider != TvControlConfig.None;
     public bool IsTvAndroid => TvProvider == TvControlConfig.AndroidTv;
-    public bool UsesTvHost => IsTvAndroid;
-    public bool UsesTvHdmiInput => IsTvAndroid;
+    public bool IsTvWebOs => TvProvider == TvControlConfig.WebOs;
+    public bool UsesTvHost => IsTvAndroid || IsTvWebOs;
+    public bool UsesTvHdmiInput => IsTvAndroid || IsTvWebOs;
 
     public string TvProviderDescription => LocalizationService.Get(TvProvider switch
     {
         TvControlConfig.AndroidTv => "TvAndroidDescription",
+        TvControlConfig.WebOs => "TvWebOsDescription",
         _ => "TvNoneDescription"
     });
 
@@ -39,6 +41,7 @@ public partial class MainViewModel
     {
         OnPropertyChanged(nameof(IsTvEnabled));
         OnPropertyChanged(nameof(IsTvAndroid));
+        OnPropertyChanged(nameof(IsTvWebOs));
         OnPropertyChanged(nameof(UsesTvHost));
         OnPropertyChanged(nameof(UsesTvHdmiInput));
         OnPropertyChanged(nameof(TvProviderDescription));
@@ -60,6 +63,7 @@ public partial class MainViewModel
         TvProviders.Clear();
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderNone"), Value = TvControlConfig.None });
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderAndroid"), Value = TvControlConfig.AndroidTv });
+        TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderWebOs"), Value = TvControlConfig.WebOs });
         SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == provider) ?? TvProviders[0];
 
         TvHdmiInputs.Clear();

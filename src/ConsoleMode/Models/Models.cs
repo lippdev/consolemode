@@ -65,8 +65,9 @@ public sealed class TvControlConfig
 {
     public const string None = "none";
     public const string AndroidTv = "androidTv";
+    public const string WebOs = "webos";
 
-    /// <summary>"none" | "androidTv".</summary>
+    /// <summary>"none" | "androidTv" | "webos".</summary>
     public string Provider { get; set; } = None;
 
     /// <summary>The TV's IP address or host name, optionally with ":port".</summary>

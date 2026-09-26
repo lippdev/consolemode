@@ -46,6 +46,16 @@ Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignor
 
 "Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
+### LG webOS
+
+LG TVs from 2014 on, over the local network (the same API the LG ThinQ app uses). Nothing to install on the PC.
+
+1. On the TV, turn on **Turn on via Wi-Fi** (older models: **LG Connect Apps** / **Mobile TV On**) so it can be woken from standby.
+2. In Console Mode, pick *LG webOS*, enter the TV's IP, its **MAC address** (Settings → Network → Wi-Fi/Wired → Advanced on the TV) and the HDMI input the PC uses.
+3. Press **Test now** and accept the request on the TV. The key the TV returns is kept, so it only asks once.
+
+The TV is powered on with Wake-on-LAN, then switched with `ssap://tv/switchInput` (`HDMI_1`-`HDMI_4`); standby uses `ssap://system/turnOff`. The app tries `ws://` on port 3000 and falls back to `wss://` on 3001 (newer firmware, self-signed certificate).
+
 ## Optional extras
 
 ### HDR
