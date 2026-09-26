@@ -6,7 +6,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 - Settings → TV: console mode turns the TV on and switches it to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
-- TV control through a Pulse-Eight USB-CEC adapter (libCEC): powers on, switches input and puts any HDMI-CEC TV in standby. (#75)
+- TV control through a Pulse-Eight USB-CEC adapter (libCEC): powers on, switches input and puts any HDMI-CEC TV in standby. (#96)
 
 ### Fixes
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
