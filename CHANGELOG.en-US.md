@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### Fixes
+- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
+
 ## [1.5.0]
 ### What's new
 - Console interface: a full-screen, controller-first home and Settings, driven by the D-pad/stick and A/B with Xbox and PlayStation pads. Automatic mode picks it whenever a controller is connected. (#41, #42, #47)

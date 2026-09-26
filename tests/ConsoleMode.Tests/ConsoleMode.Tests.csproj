@@ -27,6 +27,7 @@
     <Compile Include="../../src/ConsoleMode/Services/UiModeResolver.cs" Link="UiModeResolver.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlaynitePaths.cs" Link="PlaynitePaths.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />

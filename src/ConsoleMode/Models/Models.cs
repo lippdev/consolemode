@@ -254,6 +254,7 @@ public sealed class ConsoleRuntimeState
     public string? LastAudioSwitchName { get; set; }
     public bool AudioPendingTarget { get; set; }
     public nint CachedBigPictureHandle { get; set; }
+    public DateTime? PlayniteWindowMissingSince { get; set; }
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }
