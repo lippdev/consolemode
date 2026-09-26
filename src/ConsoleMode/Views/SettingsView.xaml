@@ -128,6 +128,10 @@
                                       Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}">
                         <TextBox MinWidth="220" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}"/>
                     </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvCecClientCard, Mode=OneWay}" Description="{x:Bind ViewModel.CecClientStatus, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvCec, Mode=OneWay}">
+                        <TextBox MinWidth="260" PlaceholderText="C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter" Text="{x:Bind ViewModel.CecClientPath, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
                     <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvTurnOffDescription, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
                         <ToggleSwitch IsOn="{x:Bind ViewModel.TvTurnOffOnRestore, Mode=TwoWay}"

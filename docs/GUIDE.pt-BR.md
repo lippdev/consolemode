@@ -46,6 +46,16 @@ Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 
 
 A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
+### Adaptador USB-CEC (Pulse-Eight)
+
+Funciona com **qualquer TV com HDMI-CEC** (Samsung Anynet+, Sony Bravia Sync, LG SimpLink…), sem configurar rede, por um [adaptador USB-CEC da Pulse-Eight](https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter) colocado no cabo HDMI entre o PC e a TV.
+
+1. Instale o **libCEC** da Pulse-Eight; ele traz o `cec-client.exe` (encontrado sozinho em `Program Files (x86)\Pulse-Eight\USB-CEC Adapter` ou no PATH).
+2. Ative o CEC nas configurações da TV.
+3. No Console Mode, escolha *Adaptador USB-CEC* e a entrada HDMI da TV onde o PC está. Aperte **Testar agora**.
+
+Ao começar, o app roda `cec-client -s -t p -p <entrada>` com `on 0` (liga) e depois `as` (Active Source, para a TV trocar para essa entrada); ao restaurar, `standby 0`. Cada comando leva alguns segundos enquanto o adaptador abre.
+
 ## Extras opcionais
 
 ### HDR

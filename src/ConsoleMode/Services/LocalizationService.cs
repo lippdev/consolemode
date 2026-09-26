@@ -214,6 +214,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string TvTurnOffDescription => LocalizationService.Get(nameof(TvTurnOffDescription));
     public string TvTestCard => LocalizationService.Get(nameof(TvTestCard));
     public string TvTestDescription => LocalizationService.Get(nameof(TvTestDescription));
+    public string TvCecClientCard => LocalizationService.Get(nameof(TvCecClientCard));
     public string TutorialCard => LocalizationService.Get(nameof(TutorialCard));
     public string TutorialDescription => LocalizationService.Get(nameof(TutorialDescription));
     public string SeeAgain => LocalizationService.Get(nameof(SeeAgain));
