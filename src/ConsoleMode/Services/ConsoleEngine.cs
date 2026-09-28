@@ -385,6 +385,7 @@ public sealed class ConsoleEngine
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
             NativeAudio = config.NativeAudio,
+            NativeDisplays = config.NativeDisplays,
             FpsLimit = config.FpsLimit,
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
@@ -399,7 +400,7 @@ public sealed class ConsoleEngine
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)
     {
         if (rect is not null)
-            Monitors.MoveWindowViaMmt(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
+            Monitors.MoveProcessWindows(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
 
         if (rect is null) return;
         foreach (var handle in handles)

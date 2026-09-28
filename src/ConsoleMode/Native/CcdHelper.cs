@@ -261,7 +261,7 @@ public static class CcdHelper
         return DisplayConfigSetDeviceInfo(ref state);
     }
 
-    private static string? GetSourceGdiName(LUID adapterId, uint sourceId)
+    internal static string? GetSourceGdiName(LUID adapterId, uint sourceId)
     {
         var req = new SOURCE_DEVICE_NAME
         {
