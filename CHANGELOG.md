@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+
 ## [1.6.0-alpha.2]
 ### Mudanças
 - A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
@@ -18,6 +22,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Atenção: versão alpha
 - Esta versão ainda não foi validada em muitos setups de monitores e TV. Se algo falhar ao ligar a TV, desligar as outras telas ou restaurar a mesa, volte para a 1.5.0 e conte o que aconteceu pelo botão de feedback (anexe o `consolemode.log`).
 - Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
+## [1.5.1]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": entre nos testes da 1.6 pelo próprio app. A 1.6 controla telas e áudio com código próprio, sem as ferramentas da NirSoft. Desligado por padrão; ao ligar, o app avisa que versões de teste podem ter bugs.
 
 ## [1.5.0]
 ### Novidades

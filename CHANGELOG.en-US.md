@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
+
 ## [1.6.0-alpha.2]
 ### Changes
 - 1.6 is all the project's own code: the option to go back to MultiMonitorTool / SoundVolumeView is gone too, and their old files in the `tools` folder are deleted when the app opens. (#91)
@@ -18,6 +22,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### Heads-up: alpha release
 - This release is not verified on many monitor and TV setups yet. If turning the TV on, turning the other screens off or restoring the desk fails, go back to 1.5.0 and tell us what happened with the feedback button (attach `consolemode.log`).
 - People on the stable 1.5.0 don't get this release automatically.
+
+## [1.5.1]
+### What's new
+- Settings → "Receive test versions (alpha and beta)": join the 1.6 tests from the app. 1.6 controls displays and audio with its own code, without the NirSoft tools. Off by default; turning it on warns that test versions can have bugs.
 
 ## [1.5.0]
 ### What's new
