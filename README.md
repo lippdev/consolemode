@@ -8,7 +8,7 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
+<img src="assets/features.gif" alt="Tour of Console Mode 1.5: resolution and HDR tuned for the TV, Big Picture, Playnite or Xbox as the launcher, the desk screens and audio coming back when you quit the game, hold Home to start and Start + Select to go back to the PC." width="800">
 
 ## Download
 
