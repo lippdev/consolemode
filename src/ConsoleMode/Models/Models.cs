@@ -19,6 +19,8 @@ public sealed class AppConfig
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
+    /// <summary>Use Core Audio instead of SoundVolumeView (issue #91); off until verified on hardware.</summary>
+    public bool NativeAudio { get; set; }
     public int FpsLimit { get; set; }
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }

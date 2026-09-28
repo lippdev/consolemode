@@ -81,7 +81,7 @@ public sealed class ConsoleEngine
 
         State.IsActive = true;
 
-        if (AppPaths.HasSvv)
+        if (AudioService.IsAvailable)
         {
             State.BackupAudioId = Audio.GetDefaultId();
             if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
@@ -135,7 +135,7 @@ public sealed class ConsoleEngine
         Audio.ClearCache();
         Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
 
-        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch && AppPaths.HasSvv)
+        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch && AudioService.IsAvailable)
         {
             var devices = Audio.GetDevices(true);
             var target = devices.FirstOrDefault(d => d.FriendlyId == config.AudioDeviceId);
@@ -150,7 +150,7 @@ public sealed class ConsoleEngine
             }
         }
 
-        if (AppPaths.HasSvv)
+        if (AudioService.IsAvailable)
         {
             InitializeAudioWatch();
             if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
@@ -384,6 +384,7 @@ public sealed class ConsoleEngine
             AudioDeviceId = config.AudioDeviceId,
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
+            NativeAudio = config.NativeAudio,
             FpsLimit = config.FpsLimit,
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
@@ -425,7 +426,7 @@ public sealed class ConsoleEngine
 
     private bool AudioWatchNeeded()
     {
-        if (!AppPaths.HasSvv || State.AudioWatchComplete) return false;
+        if (!AudioService.IsAvailable || State.AudioWatchComplete) return false;
         return State.AudioAutoSwitch || State.AudioPendingTarget;
     }
 
