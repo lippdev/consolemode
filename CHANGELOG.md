@@ -23,6 +23,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Esta versão ainda não foi validada em muitos setups de monitores e TV. Se algo falhar ao ligar a TV, desligar as outras telas ou restaurar a mesa, volte para a 1.5.0 e conte o que aconteceu pelo botão de feedback (anexe o `consolemode.log`).
 - Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
 
+## [1.5.1]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": entre nos testes da 1.6 pelo próprio app. A 1.6 controla telas e áudio com código próprio, sem as ferramentas da NirSoft. Desligado por padrão; ao ligar, o app avisa que versões de teste podem ter bugs.
+
 ## [1.5.0]
 ### Novidades
 - Interface Console: tela inicial e Ajustes em tela cheia, pensados para o controle (direcional/analógico, A/B) com controles Xbox e PlayStation. O modo Automático escolhe essa interface sempre que há um controle conectado. (#41, #42, #47)
