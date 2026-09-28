@@ -114,26 +114,26 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Atualização: com uma release mais nova no GitHub, o aviso aparece nas duas interfaces (na Console, como banner no topo). Resultado: ______
 - [ ] Atalho "Console Mode 1 Click" e `--tray` no início do Windows continuam funcionando. Resultado: ______
 
-## Áudio nativo, sem SoundVolumeView (issue #91)
+## Áudio com código próprio (issue #91)
 
-Pré-condições: a partir da 1.6 o áudio nativo já vem ligado (`"NativeAudio": true` em `config.json`) e o SoundVolumeView não é mais embutido. O log (`consolemode.log`) deve mostrar `audio=native` na linha `Startup:`. Para comparar com o SoundVolumeView, coloque o `SoundVolumeView.exe` na pasta `tools` e troque para `false`.
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida). A 1.6 não usa mais o SoundVolumeView; o arquivo antigo em `tools` é apagado ao abrir o app.
 
-- [ ] Ajustes → Saída de áudio lista as mesmas saídas que com o SoundVolumeView, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
-- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada (o ID salvo é o mesmo). Resultado: ______
+- [ ] Ajustes → Saída de áudio lista as mesmas saídas que na 1.5, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
+- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada depois de atualizar da 1.5 (o ID salvo é o mesmo). Resultado: ______
 - [ ] Entrar no modo console com uma saída fixa (ex.: HDMI da TV): o som passa para ela, inclusive em apps de chamada (papel "comunicações"). O log mostra `Áudio: saída padrão = …`. Resultado: ______
 - [ ] "A que aparecer ao conectar (TV)" com a TV começando **desligada**: quando a TV liga, o som vai para o HDMI dela. Resultado: ______
 - [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
-- [ ] Com `"NativeAudio": true` e **sem** o `SoundVolumeView.exe` na pasta `tools`, tudo acima continua funcionando. Resultado: ______
+- [ ] A pasta `tools` não tem mais `SoundVolumeView.exe` nem `MultiMonitorTool.exe` depois de abrir o app. Resultado: ______
 
-## Telas nativas, sem MultiMonitorTool (issue #91)
+## Telas com código próprio (issue #91)
 
-Pré-condições: a partir da 1.6 as telas nativas já vêm ligadas (`"NativeDisplays": true` em `config.json`) e o MultiMonitorTool não é mais embutido. A linha `Startup:` do log deve mostrar `displays=native`. Para comparar com o MultiMonitorTool, coloque o `MultiMonitorTool.exe` na pasta `tools` e troque para `false` (ou use a 1.5.0).
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar. A 1.6 não usa mais o MultiMonitorTool; o arquivo antigo em `tools` é apagado ao abrir o app.
 
 ### Lista e identidade
 
-- [ ] O mapa de telas mostra os mesmos monitores que com o MultiMonitorTool, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
+- [ ] O mapa de telas mostra os mesmos monitores que na 1.5, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
 - [ ] A tela de jogo e as telas a esconder que já estavam salvas continuam marcadas (o ID estável é o mesmo). Resultado: ______
 - [ ] A lista de resoluções de cada tela continua igual. Resultado: ______
 
@@ -154,5 +154,4 @@ Pré-condições: a partir da 1.6 as telas nativas já vêm ligadas (`"NativeDis
 
 - [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______
 - [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
-- [ ] Um backup antigo, feito com o MultiMonitorTool, também é restaurado com `"NativeDisplays": true`. Resultado: ______
-- [ ] Com `"NativeDisplays": true` e **sem** o `MultiMonitorTool.exe` na pasta `tools`, tudo acima continua funcionando. Resultado: ______
+- [ ] Um backup da mesa feito pela 1.5 (sessão iniciada na 1.5, app atualizado antes de restaurar) é restaurado pela 1.6. Resultado: ______

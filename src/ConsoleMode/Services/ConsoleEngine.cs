@@ -81,12 +81,9 @@ public sealed class ConsoleEngine
 
         State.IsActive = true;
 
-        if (AudioService.IsAvailable)
-        {
-            State.BackupAudioId = Audio.GetDefaultId();
-            if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
-                File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
-        }
+        State.BackupAudioId = Audio.GetDefaultId();
+        if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
+            File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
 
         if (focusInfo is null || !focusInfo.IsActive)
         {
@@ -133,9 +130,9 @@ public sealed class ConsoleEngine
 
         Monitors.ClearCache();
         Audio.ClearCache();
-        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
 
-        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch && AudioService.IsAvailable)
+        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch)
         {
             var devices = Audio.GetDevices(true);
             var target = devices.FirstOrDefault(d => d.FriendlyId == config.AudioDeviceId);
@@ -150,16 +147,13 @@ public sealed class ConsoleEngine
             }
         }
 
-        if (AudioService.IsAvailable)
-        {
-            InitializeAudioWatch();
-            if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
-                CompleteAudioWatch();
-        }
+        InitializeAudioWatch();
+        if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
+            CompleteAudioWatch();
 
         if (confirmScreen is not null)
         {
-            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
             if (!confirmScreen(State.FocusMonitorRect))
             {
                 AppLog.Write("Start: tela de jogo não confirmada; restaurando");
@@ -384,8 +378,6 @@ public sealed class ConsoleEngine
             AudioDeviceId = config.AudioDeviceId,
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
-            NativeAudio = config.NativeAudio,
-            NativeDisplays = config.NativeDisplays,
             FpsLimit = config.FpsLimit,
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
@@ -427,7 +419,7 @@ public sealed class ConsoleEngine
 
     private bool AudioWatchNeeded()
     {
-        if (!AudioService.IsAvailable || State.AudioWatchComplete) return false;
+        if (State.AudioWatchComplete) return false;
         return State.AudioAutoSwitch || State.AudioPendingTarget;
     }
 

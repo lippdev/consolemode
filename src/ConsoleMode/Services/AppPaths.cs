@@ -50,8 +50,6 @@ public static class AppPaths
     public static string ExeDir { get; private set; } = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
     public static string DataDir { get; private set; } = "";
     public static string ToolsDir { get; private set; } = "";
-    public static string MmtPath { get; private set; } = "";
-    public static string SvvPath { get; private set; } = "";
     public static string RtssCliPath { get; private set; } = "";
     public static string ConfigPath { get; private set; } = "";
     public static string BackupMonitorConfig { get; private set; } = "";
@@ -93,19 +91,19 @@ public static class AppPaths
         EmbeddedFiles.ExtractTools(ToolsDir);
         EmbeddedFiles.ExtractIcon(Path.Combine(DataDir, "icon.ico"));
 
-        foreach (var name in new[] { "MultiMonitorTool.exe", "SoundVolumeView.exe", "rtss-cli.exe" })
+        var rtssBeside = Path.Combine(ExeDir, "rtss-cli.exe");
+        var rtssDest = Path.Combine(ToolsDir, "rtss-cli.exe");
+        if (!File.Exists(rtssDest) && File.Exists(rtssBeside))
         {
-            var dest = Path.Combine(ToolsDir, name);
-            if (File.Exists(dest)) continue;
-            var beside = Path.Combine(ExeDir, name);
-            if (File.Exists(beside))
-            {
-                try { File.Copy(beside, dest, true); } catch { /* ignore */ }
-            }
+            try { File.Copy(rtssBeside, rtssDest, true); } catch { /* ignore */ }
         }
 
-        MmtPath = FirstExisting(Path.Combine(ToolsDir, "MultiMonitorTool.exe"), Path.Combine(ExeDir, "MultiMonitorTool.exe"));
-        SvvPath = FirstExisting(Path.Combine(ToolsDir, "SoundVolumeView.exe"), Path.Combine(ExeDir, "SoundVolumeView.exe"));
+        // Up to 1.5 the NirSoft tools were extracted here; 1.6 is all our own code (issue #91).
+        foreach (var name in new[] { "MultiMonitorTool.exe", "SoundVolumeView.exe" })
+        {
+            try { File.Delete(Path.Combine(ToolsDir, name)); } catch { /* in use or read-only: harmless */ }
+        }
+
         RtssCliPath = FirstExisting(Path.Combine(ToolsDir, "rtss-cli.exe"), Path.Combine(ExeDir, "rtss-cli.exe"));
 
         ConfigPath = Path.Combine(DataDir, "config.json");
@@ -130,8 +128,6 @@ public static class AppPaths
         }
     }
 
-    public static bool HasMmt => File.Exists(MmtPath);
-    public static bool HasSvv => File.Exists(SvvPath);
     public static bool HasRtssCli => File.Exists(RtssCliPath);
 
     private static string FirstExisting(params string[] paths)
