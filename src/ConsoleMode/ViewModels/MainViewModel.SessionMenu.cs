@@ -142,7 +142,7 @@ public partial class MainViewModel
             var id = SessionAudioId;
             var name = Engine.Audio.GetDevices().FirstOrDefault(d => d.FriendlyId == id)?.Name ?? LocalizationService.Get("AudioNoChange");
             int? vol = null;
-            try { if (id is not null) vol = SessionMenuMath.ParseVolumeExitCode(Engine.Audio.InvokeSvv("/GetPercent", id)); } catch { /* svv optional */ }
+            try { if (id is not null) vol = Engine.Audio.GetVolumePercent(id); } catch { /* audio optional */ }
             return (modeText, hdrOn, name, vol);
         });
         SessionModeText = mode;
@@ -162,7 +162,7 @@ public partial class MainViewModel
         IsMuted = false;
         _ = Task.Run(() =>
         {
-            try { Engine.Audio.InvokeSvv("/SetVolume", id, next.ToString()); Engine.Audio.InvokeSvv("/Unmute", id); }
+            try { Engine.Audio.SetVolumePercent(id, next); }
             catch (Exception ex) { AppLog.Write($"Volume: {ex.Message}"); }
         });
     }
@@ -175,7 +175,7 @@ public partial class MainViewModel
         var muted = IsMuted;
         _ = Task.Run(() =>
         {
-            try { Engine.Audio.InvokeSvv(muted ? "/Mute" : "/Unmute", id); }
+            try { Engine.Audio.SetMute(id, muted); }
             catch (Exception ex) { AppLog.Write($"Mudo: {ex.Message}"); }
         });
     }

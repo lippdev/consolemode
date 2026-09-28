@@ -77,7 +77,7 @@ public partial class App : Application
             AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
             ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
-                         $"mmt={AppPaths.HasMmt}, svv={AppPaths.HasSvv}, rtss-cli={AppPaths.HasRtssCli}");
+                         $"mmt={AppPaths.HasMmt}, svv={AppPaths.HasSvv}, audio={(AudioService.UseNative ? "native" : "svv")}, rtss-cli={AppPaths.HasRtssCli}");
 
             ViewModel = new MainViewModel();
             _window = new MainWindow(ViewModel);

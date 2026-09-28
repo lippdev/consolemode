@@ -113,3 +113,16 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Fechar a janela durante a sessão vai para a bandeja; fora da sessão fecha o app. Menu da bandeja: Mostrar, Entrar, Restaurar, Sair. Resultado: ______
 - [ ] Atualização: com uma release mais nova no GitHub, o aviso aparece nas duas interfaces (na Console, como banner no topo). Resultado: ______
 - [ ] Atalho "Console Mode 1 Click" e `--tray` no início do Windows continuam funcionando. Resultado: ______
+
+## Áudio nativo, sem SoundVolumeView (issue #91)
+
+Pré-condições: app **fechado**; em `config.json` (na pasta de dados) acrescente `"NativeAudio": true` e abra o app. O log (`consolemode.log`) deve mostrar `audio=native` na linha `Startup:`. Para voltar ao SoundVolumeView, troque para `false`.
+
+- [ ] Ajustes → Saída de áudio lista as mesmas saídas que com o SoundVolumeView, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
+- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada (o ID salvo é o mesmo). Resultado: ______
+- [ ] Entrar no modo console com uma saída fixa (ex.: HDMI da TV): o som passa para ela, inclusive em apps de chamada (papel "comunicações"). O log mostra `Áudio: saída padrão = …`. Resultado: ______
+- [ ] "A que aparecer ao conectar (TV)" com a TV começando **desligada**: quando a TV liga, o som vai para o HDMI dela. Resultado: ______
+- [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
+- [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
+- [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
+- [ ] Com `"NativeAudio": true` e **sem** o `SoundVolumeView.exe` na pasta `tools`, tudo acima continua funcionando. Resultado: ______
