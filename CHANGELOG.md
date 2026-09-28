@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Mudanças
+- A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
+
 ## [1.6.0-alpha.1]
 ### Novidades
 - Telas e áudio agora são controlados pelas APIs do próprio Windows. O app não embute mais o MultiMonitorTool nem o SoundVolumeView, da NirSoft: o pacote fica só com código do projeto e o rtss-cli (MIT), o que abre caminho para assinar o executável e reduz alertas falsos de antivírus. (#91, #97, #98, #99)

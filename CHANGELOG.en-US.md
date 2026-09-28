@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### Changes
+- 1.6 is all the project's own code: the option to go back to MultiMonitorTool / SoundVolumeView is gone too, and their old files in the `tools` folder are deleted when the app opens. (#91)
+
 ## [1.6.0-alpha.1]
 ### What's new
 - Displays and audio are now controlled through Windows' own APIs. The app no longer bundles NirSoft's MultiMonitorTool or SoundVolumeView: the package holds only the project's code and rtss-cli (MIT), which paves the way for a signed executable and fewer antivirus false positives. (#91, #97, #98, #99)

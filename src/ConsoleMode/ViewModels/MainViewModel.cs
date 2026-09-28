@@ -204,20 +204,13 @@ public partial class MainViewModel : ObservableObject
         AudioOptions.Clear();
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioNoChange"), Value = "" });
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioOnConnect"), Value = ConsoleEngine.AudioOnConnectId });
-        if (AudioService.IsAvailable)
-        {
-            foreach (var device in _availableAudioDevices)
-                AudioOptions.Add(new ComboOption
-                {
-                    Text = device.IsActive ? device.Name : $"{device.Name}{LocalizationService.Get("AudioDisabledSuffix")}",
-                    Value = device.FriendlyId
-                });
-            AudioHintText = LocalizationService.Get("AudioHint");
-        }
-        else
-        {
-            AudioHintText = LocalizationService.Get("SvvMissing");
-        }
+        foreach (var device in _availableAudioDevices)
+            AudioOptions.Add(new ComboOption
+            {
+                Text = device.IsActive ? device.Name : $"{device.Name}{LocalizationService.Get("AudioDisabledSuffix")}",
+                Value = device.FriendlyId
+            });
+        AudioHintText = LocalizationService.Get("AudioHint");
         SelectedAudio = AudioOptions.FirstOrDefault(x => x.Value == selectedValue) ?? AudioOptions[0];
     }
 
@@ -250,9 +243,7 @@ public partial class MainViewModel : ObservableObject
                 monitors.Add(new LoadedMonitor(monitor, engine.Monitors.GetDisplayModes(monitor.Name, monitor)));
             if (list.Count == 0)
             {
-                error = MonitorService.IsAvailable
-                    ? LocalizationService.Get("NoDisplayTryRefresh")
-                    : LocalizationService.Get("MmtMissing", AppPaths.MmtPath);
+                error = LocalizationService.Get("NoDisplayTryRefresh");
             }
         }
         catch (Exception ex)
@@ -264,7 +255,7 @@ public partial class MainViewModel : ObservableObject
         List<AudioDevice> audio = [];
         try
         {
-            if (AudioService.IsAvailable) audio = [.. engine.Audio.GetDevices(true)];
+            audio = [.. engine.Audio.GetDevices(true)];
         }
         catch (Exception ex)
         {
@@ -890,8 +881,6 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
-            NativeAudio = _loadedConfig.NativeAudio,
-            NativeDisplays = _loadedConfig.NativeDisplays,
             FpsLimit = ReadFpsLimit(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
