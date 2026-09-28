@@ -12,12 +12,12 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ## Download
 
-Baixe a **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, a versão estável mais recente:
+Baixe a **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
 
-Quer ajudar a testar o que vem aí? A **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** é uma alpha da 1.6 que não embute mais nenhuma ferramenta de terceiros para telas e áudio. Ela ainda não foi validada em muitos setups: fique na 1.5.0 se precisa que funcione sem surpresas.
+Quer ajudar a testar o que vem aí? A **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** é uma alpha da 1.6 que não embute mais nenhuma ferramenta de terceiros para telas e áudio. Ela ainda não foi validada em muitos setups: fique na 1.5.1 se precisa que funcione sem surpresas, ou ligue Ajustes → "Receber versões de teste" na 1.5.1 para recebê-la pelo app.
 
 Está na 1.4.0? O app oferece a atualização. Se ela falhar por tempo esgotado, baixe o instalador uma vez; as configurações são mantidas.
 
