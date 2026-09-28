@@ -2,9 +2,13 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
+## [1.6.0-alpha.2]
 ### Changes
 - 1.6 is all the project's own code: the option to go back to MultiMonitorTool / SoundVolumeView is gone too, and their old files in the `tools` folder are deleted when the app opens. (#91)
+- Displays and audio are controlled through Windows' own APIs since 1.6.0-alpha.1; see its notes below. (#97, #98, #99)
+
+### Heads-up: alpha release
+- Not verified on many monitor and TV setups yet. If something fails, go back to 1.5.0 and tell us with the feedback button (attach `consolemode.log`). People on the stable 1.5.0 don't get this release automatically.
 
 ## [1.6.0-alpha.1]
 ### What's new

@@ -2,9 +2,13 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.6.0-alpha.2]
 ### Mudanças
 - A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
+- Telas e áudio são controlados pelas APIs do próprio Windows desde a 1.6.0-alpha.1; veja as notas dela abaixo. (#97, #98, #99)
+
+### Atenção: versão alpha
+- Ainda não validada em muitos setups de monitores e TV. Se algo falhar, volte para a 1.5.0 e conte pelo botão de feedback (anexe o `consolemode.log`). Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
 
 ## [1.6.0-alpha.1]
 ### Novidades

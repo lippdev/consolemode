@@ -17,7 +17,7 @@ Get **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, the
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
 
-Want to help test what comes next? **[1.6.0-alpha.1](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.1)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.0 if you need it to just work.
+Want to help test what comes next? **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.0 if you need it to just work.
 
 On 1.4.0? The app offers the update. If it fails with a timeout, download the installer once; your settings are kept.
 
