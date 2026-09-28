@@ -191,6 +191,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string AutoStartControllerDescription => LocalizationService.Get(nameof(AutoStartControllerDescription));
     public string NotifyUpdatesCard => LocalizationService.Get(nameof(NotifyUpdatesCard));
     public string NotifyUpdatesDescription => LocalizationService.Get(nameof(NotifyUpdatesDescription));
+    public string BetaUpdatesCard => LocalizationService.Get(nameof(BetaUpdatesCard));
+    public string BetaUpdatesDescription => LocalizationService.Get(nameof(BetaUpdatesDescription));
     public string HelpDataSection => LocalizationService.Get(nameof(HelpDataSection));
     public string OtherAppsSection => LocalizationService.Get(nameof(OtherAppsSection));
     public string WakeOnDescription => LocalizationService.Get(nameof(WakeOnDescription));

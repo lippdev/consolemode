@@ -38,6 +38,8 @@ public sealed class AppConfig
 
     /// <summary>Look for new GitHub releases on startup.</summary>
     public bool CheckUpdates { get; set; } = true;
+    /// <summary>Also offer alpha/beta releases (Settings → Receive test versions).</summary>
+    public bool BetaUpdates { get; set; }
 
     /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
     public bool HomeButtonLaunch { get; set; } = true;

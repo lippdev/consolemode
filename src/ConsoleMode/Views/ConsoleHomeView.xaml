@@ -412,6 +412,12 @@
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.CheckUpdates), Mode=OneWay}"/>
                         </Grid>
                     </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="betas">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BetaUpdatesCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.BetaUpdates), Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CheckNowCommand}">
                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.CheckNow, Mode=OneWay}"/>

@@ -16,6 +16,7 @@ public partial class MainViewModel
     private enum UpdateStatusKind { InstallKind, Searching, Latest, Available, Failed }
 
     [ObservableProperty] private bool _checkUpdates = true;
+    [ObservableProperty] private bool _betaUpdates;
     [ObservableProperty] private bool _homeButtonLaunch = true;
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
@@ -80,6 +81,13 @@ public partial class MainViewModel
 
     partial void OnCheckUpdatesChanged(bool value) => SaveQuietly();
 
+    partial void OnBetaUpdatesChanged(bool value)
+    {
+        SaveQuietly();
+        if (_applying || IsLoading) return;
+        if (value) SetStatus(LocalizationService.Get("BetaUpdatesWarning"), InfoBarSeverity.Warning);
+    }
+
     partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
 
     partial void OnAutoStartOnControllerChanged(bool value) => SaveQuietly();
@@ -129,7 +137,7 @@ public partial class MainViewModel
         }
         try
         {
-            var update = await UpdateService.CheckAsync();
+            var update = await UpdateService.CheckAsync(BetaUpdates);
             if (update is null)
             {
                 _updateStatusKind = UpdateStatusKind.Latest;
