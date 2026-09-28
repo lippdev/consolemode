@@ -126,3 +126,33 @@ Pré-condições: app **fechado**; em `config.json` (na pasta de dados) acrescen
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
 - [ ] Com `"NativeAudio": true` e **sem** o `SoundVolumeView.exe` na pasta `tools`, tudo acima continua funcionando. Resultado: ______
+
+## Telas nativas, sem MultiMonitorTool (issue #91)
+
+Pré-condições: app **fechado**; em `config.json` acrescente `"NativeDisplays": true` e abra o app. A linha `Startup:` do log deve mostrar `displays=native`. Para voltar ao MultiMonitorTool, troque para `false`. Faça primeiro uma rodada com `false` e anote o que aparece, para comparar.
+
+### Lista e identidade
+
+- [ ] O mapa de telas mostra os mesmos monitores que com o MultiMonitorTool, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
+- [ ] A tela de jogo e as telas a esconder que já estavam salvas continuam marcadas (o ID estável é o mesmo). Resultado: ______
+- [ ] A lista de resoluções de cada tela continua igual. Resultado: ______
+
+### Sessão com "Desconectar"
+
+- [ ] TV começando **desligada**: "Jogar agora" liga a TV, ela vira a principal e as telas da mesa desligam. O log mostra `Telas: ativar …` e `Telas: desativar …` com `=> 0`. Resultado: ______
+- [ ] Resolução/Hz salvos para a TV são aplicados. Resultado: ______
+- [ ] Ao sair do Big Picture/Playnite, a mesa volta **exatamente** como estava: mesmas telas, principal, posições e resoluções. O log mostra `Telas: layout restaurado => 0`. Resultado: ______
+- [ ] Repetir a sessão 3 vezes seguidas: nenhuma tela troca de nome (\\.\DISPLAYn) nem de posição entre uma sessão e outra. Resultado: ______
+- [ ] Com a TV já **ligada** antes de começar: mesmo resultado. Resultado: ______
+
+### Outras estratégias
+
+- [ ] "Cortinas pretas": as telas da mesa ficam pretas e voltam ao restaurar. Resultado: ______
+- [ ] "Desligar por DDC/CI" (monitor com DDC/CI ligado no menu dele): as telas da mesa apagam e voltam a acender ao restaurar. Resultado: ______
+
+### Janelas e recuperação
+
+- [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______
+- [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
+- [ ] Um backup antigo, feito com o MultiMonitorTool, também é restaurado com `"NativeDisplays": true`. Resultado: ______
+- [ ] Com `"NativeDisplays": true` e **sem** o `MultiMonitorTool.exe` na pasta `tools`, tudo acima continua funcionando. Resultado: ______

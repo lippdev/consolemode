@@ -7,6 +7,8 @@ namespace ConsoleMode.Services;
 
 public sealed class MonitorService
 {
+    private static bool? _useNative;
+    private readonly IDisplayBackend _backend = UseNative ? new NativeDisplayBackend() : new MmtDisplayBackend();
     private readonly object _gate = new();
     private List<MonitorInfo>? _cache;
     private readonly Dictionary<string, List<DisplayModeOption>> _modesCache = new(StringComparer.OrdinalIgnoreCase);
@@ -17,10 +19,19 @@ public sealed class MonitorService
         lock (_modesCache) _modesCache.Clear();
     }
 
-    public int InvokeMmt(params string[] args)
+    /// <summary>
+    /// Windows' own display APIs instead of MultiMonitorTool (issue #91). Off by default while it's
+    /// verified on real hardware: set <c>"NativeDisplays": true</c> in config.json and restart the app.
+    /// </summary>
+    public static bool UseNative => _useNative ??= LoadNativeFlag();
+
+    /// <summary>Display control works: the native backend is on, or MultiMonitorTool is present.</summary>
+    public static bool IsAvailable => UseNative || AppPaths.HasMmt;
+
+    private static bool LoadNativeFlag()
     {
-        if (!AppPaths.HasMmt) throw new InvalidOperationException(LocalizationService.Get("MmtMissing", AppPaths.MmtPath));
-        return ProcessRunner.Run(AppPaths.MmtPath, args);
+        try { return ConfigService.Load().NativeDisplays; }
+        catch { return false; }
     }
 
     public IReadOnlyList<MonitorInfo> GetMonitors(bool forceRefresh = false)
@@ -40,69 +51,22 @@ public sealed class MonitorService
     private IReadOnlyList<MonitorInfo> ReadMonitors(bool forceRefresh)
     {
         if (!forceRefresh && _cache is not null) return _cache;
-        if (!AppPaths.HasMmt)
+        if (!_backend.IsAvailable)
         {
             _cache = [];
             return _cache;
         }
 
-        var csvPath = Path.Combine(Path.GetTempPath(), $"consolemode_monitors_{Guid.NewGuid():N}.csv");
-        try
-        {
-            InvokeMmt("/HideInactiveMonitors", "0", "/scomma", csvPath);
-            if (!File.Exists(csvPath))
-            {
-                _cache = [];
-                return _cache;
-            }
+        var monitors = _backend.ListMonitors();
+        // Windows' "Display n": active monitors first, in the order they were listed.
+        var n = 1;
+        var numbers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var m in monitors.OrderBy(m => m.IsActive ? 0 : 1))
+            if (!numbers.ContainsKey(m.Name)) numbers[m.Name] = n++;
+        foreach (var m in monitors) m.WindowsDisplayNumber = numbers[m.Name];
 
-            var rows = CsvReader.Read(csvPath);
-            var winMap = BuildDisplayNumberMap(rows);
-            var monitors = new List<MonitorInfo>();
-            foreach (var row in rows)
-            {
-                var name = row.Get("Name");
-                if (string.IsNullOrWhiteSpace(name)) continue;
-                var isActive = string.Equals(row.Get("Active"), "Yes", StringComparison.OrdinalIgnoreCase);
-                var maxResolution = row.Get("Maximum Resolution");
-                var resolution = row.Get("Resolution");
-                if (string.IsNullOrWhiteSpace(resolution))
-                    resolution = string.IsNullOrWhiteSpace(maxResolution) ? "N/A" : maxResolution;
-
-                ParseRes(resolution, out var width, out var height);
-                ParseRes(maxResolution, out var maxW, out var maxH);
-                if (maxW <= 0 && width > 0) { maxW = width; maxH = height; }
-
-                monitors.Add(new MonitorInfo
-                {
-                    Name = name,
-                    WindowsDisplayNumber = winMap.GetValueOrDefault(name),
-                    Resolution = resolution,
-                    MaximumResolution = maxResolution,
-                    MaxWidth = maxW,
-                    MaxHeight = maxH,
-                    Width = width,
-                    Height = height,
-                    Frequency = row.Get("Frequency"),
-                    Colors = row.Get("Colors"),
-                    IsPrimary = string.Equals(row.Get("Primary"), "Yes", StringComparison.OrdinalIgnoreCase),
-                    IsActive = isActive,
-                    IsDisconnected = string.Equals(row.Get("Disconnected"), "Yes", StringComparison.OrdinalIgnoreCase) || !isActive,
-                    MonitorName = row.Get("Monitor Name"),
-                    ShortId = row.Get("Short Monitor ID"),
-                    MonitorId = row.Get("Monitor ID"),
-                    SerialNumber = row.Get("Monitor Serial Number"),
-                    LeftTop = row.Get("Left-Top")
-                });
-            }
-
-            _cache = [.. monitors.OrderBy(m => m.WindowsDisplayNumber > 0 ? m.WindowsDisplayNumber : 999).ThenBy(m => m.Name)];
-            return _cache;
-        }
-        finally
-        {
-            try { File.Delete(csvPath); } catch { /* ignore */ }
-        }
+        _cache = [.. monitors.OrderBy(m => m.WindowsDisplayNumber > 0 ? m.WindowsDisplayNumber : 999).ThenBy(m => m.Name)];
+        return _cache;
     }
 
     public string? GetPrimaryName()
@@ -114,7 +78,7 @@ public sealed class MonitorService
 
     public void SaveBackup()
     {
-        InvokeMmt("/SaveConfig", AppPaths.BackupMonitorConfig);
+        _backend.SaveLayout(AppPaths.BackupMonitorConfig);
     }
 
     public void SaveBackupMeta(MonitorBackupMeta meta)
@@ -160,13 +124,13 @@ public sealed class MonitorService
         }
 
         var ctx = GetRestoreContext(state);
-        var backupSpecs = GetBackupMonitorSpecs(AppPaths.BackupMonitorConfig);
+        var backupSpecs = _backend.ResolveLayout(GetBackupMonitorSpecs(AppPaths.BackupMonitorConfig));
         AppLog.Write($"Restore: iniciando (primário={ctx.OriginalPrimary}, foco={ctx.FocusMonitor}, focoInativo={ctx.FocusWasInactive}, esconder={string.Join('+', ctx.HideMonitors)})");
 
         if (ctx.HideStrategy == "turnOff" && ctx.HideMonitors.Count > 0)
         {
             foreach (var name in ctx.HideMonitors.Distinct())
-                InvokeMmt("/TurnOn", name);
+                _backend.PowerOn(name);
             Thread.Sleep(300);
         }
 
@@ -182,14 +146,12 @@ public sealed class MonitorService
 
         if (allDeviceNames.Count > 0)
         {
-            var enableArgs = new List<string> { "/enable" };
-            enableArgs.AddRange(allDeviceNames);
-            InvokeMmt(enableArgs.ToArray());
+            _backend.Enable(allDeviceNames);
 
             if (monitorsToVerify.Count > 0 && !WaitMonitorsActive(monitorsToVerify))
             {
                 foreach (var name in monitorsToVerify)
-                    InvokeMmt("/enable", name);
+                    _backend.Enable([name]);
                 if (!WaitMonitorsActive(monitorsToVerify, 3000))
                 {
                     AppLog.Write($"Restore: /enable não confirmou todos ({string.Join('+', monitorsToVerify)}); usando ExtendAll");
@@ -207,7 +169,7 @@ public sealed class MonitorService
                 result.Issues.Add($"Não foi possível restaurar o primário para {ctx.OriginalPrimary}");
         }
 
-        InvokeMmt("/LoadConfig", AppPaths.BackupMonitorConfig);
+        _backend.LoadLayout(AppPaths.BackupMonitorConfig);
         Thread.Sleep(800);
 
         if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
@@ -242,7 +204,7 @@ public sealed class MonitorService
 
     public void SetPrimary(string monitorName)
     {
-        InvokeMmt("/SetPrimary", monitorName);
+        _backend.SetPrimary(monitorName);
         if (WaitPrimary(monitorName, 2000)) return;
         CcdHelper.SetPrimary(monitorName);
         WaitPrimary(monitorName, 3000);
@@ -253,17 +215,15 @@ public sealed class MonitorService
         if (names.Count == 0) return;
         if (windowsEnable)
         {
-            var args = new List<string> { "/enable" };
-            args.AddRange(names);
-            InvokeMmt(args.ToArray());
+            _backend.Enable(names);
             MarkActive(names);
             return;
         }
 
         foreach (var name in names)
         {
-            InvokeMmt("/TurnOn", name);
-            InvokeMmt("/enable", name);
+            _backend.PowerOn(name);
+            _backend.Enable([name]);
         }
         MarkActive(names);
     }
@@ -276,7 +236,7 @@ public sealed class MonitorService
     {
         if (WaitMonitorsActive([name], 3000)) return true;
         AppLog.Write($"Ativar {name}: ainda inativo; repetindo /enable");
-        InvokeMmt("/enable", name);
+        _backend.Enable([name]);
         if (WaitMonitorsActive([name], 3000)) return true;
         AppLog.Write($"Ativar {name}: /enable não confirmou; usando ExtendAll");
         CcdHelper.ExtendAll();
@@ -286,15 +246,13 @@ public sealed class MonitorService
     public void DisableWindows(IReadOnlyList<string> names)
     {
         if (names.Count == 0) return;
-        var args = new List<string> { "/disable" };
-        args.AddRange(names);
-        InvokeMmt(args.ToArray());
+        _backend.Disable(names);
     }
 
     public void DisableDdc(IReadOnlyList<string> names)
     {
         foreach (var name in names)
-            InvokeMmt("/TurnOff", name);
+            _backend.PowerOff(name);
     }
 
     public void ApplyFocusMode(string focusMonitor, SavedDisplayMode mode)
@@ -379,28 +337,11 @@ public sealed class MonitorService
         return true;
     }
 
-    public void MoveWindowViaMmt(string monitorName, ScreenRect rect, string processName)
-    {
-        InvokeMmt(
-            "/MoveWindow", monitorName,
-            "Process", processName,
-            "/WindowLeft", rect.X.ToString(),
-            "/WindowTop", rect.Y.ToString(),
-            "/WindowWidth", rect.Width.ToString(),
-            "/WindowHeight", rect.Height.ToString());
-    }
+    public void MoveProcessWindows(string monitorName, ScreenRect rect, string processName) =>
+        _backend.MoveProcessWindows(monitorName, processName, rect);
 
-    private void SetMonitorMode(string name, int width, int height, int frequency, string? colors, int? x, int? y, bool primary)
-    {
-        var spec = primary ? $"Name={name} Primary=Yes" : $"Name={name}";
-        if (width > 0) spec += $" Width={width}";
-        if (height > 0) spec += $" Height={height}";
-        if (frequency > 0) spec += $" DisplayFrequency={frequency}";
-        if (!string.IsNullOrWhiteSpace(colors)) spec += $" BitsPerPixel={colors}";
-        if (x is not null) spec += $" PositionX={x}";
-        if (y is not null) spec += $" PositionY={y}";
-        InvokeMmt("/SetMonitors", spec);
-    }
+    private void SetMonitorMode(string name, int width, int height, int frequency, string? colors, int? x, int? y, bool primary) =>
+        _backend.SetMode(name, width, height, frequency, colors, x, y, primary);
 
     private bool IsCurrentMode(string name, int width, int height, int frequency)
     {
@@ -427,7 +368,7 @@ public sealed class MonitorService
             }
             else
             {
-                InvokeMmt("/SetPrimary", monitorName);
+                _backend.SetPrimary(monitorName);
             }
 
             if (WaitPrimary(monitorName)) return true;
@@ -446,14 +387,14 @@ public sealed class MonitorService
             SetMonitorMode(monitorName, w, h, frequency, spec.GetValueOrDefault("BitsPerPixel"), null, null, true);
             return;
         }
-        InvokeMmt("/SetPrimary", monitorName);
+        _backend.SetPrimary(monitorName);
     }
 
     private bool DisableWithRetry(string monitorName, int maxAttempts = 3)
     {
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            if (attempt == 1) InvokeMmt("/disable", monitorName);
+            if (attempt == 1) _backend.Disable([monitorName]);
             else
             {
                 var code = CcdHelper.DetachDisplay(monitorName);
@@ -513,53 +454,8 @@ public sealed class MonitorService
         }
     }
 
-    private static Dictionary<string, int> BuildDisplayNumberMap(List<Dictionary<string, string>> rows)
-    {
-        var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        var ordered = rows
-            .Where(r => !string.IsNullOrWhiteSpace(r.Get("Name")))
-            .OrderBy(r => string.Equals(r.Get("Active"), "Yes", StringComparison.OrdinalIgnoreCase) ? 0 : 1);
-        var n = 1;
-        foreach (var row in ordered)
-        {
-            var name = row.Get("Name");
-            if (map.ContainsKey(name)) continue;
-            map[name] = n++;
-        }
-        return map;
-    }
-
-    private static Dictionary<string, Dictionary<string, string>> GetBackupMonitorSpecs(string path)
-    {
-        var specs = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
-        Dictionary<string, string>? current = null;
-        string? currentName = null;
-        foreach (var line in File.ReadAllLines(path))
-        {
-            if (Regex.IsMatch(line, @"^\[Monitor\d+\]"))
-            {
-                if (currentName is not null && current is not null) specs[currentName] = current;
-                current = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                currentName = null;
-                continue;
-            }
-
-            var m = Regex.Match(line, @"^Name=(.+)$");
-            if (m.Success && current is not null)
-            {
-                currentName = m.Groups[1].Value.Trim();
-                current["Name"] = currentName;
-                continue;
-            }
-
-            var kv = Regex.Match(line, @"^(\w+)=(.+)$");
-            if (kv.Success && current is not null)
-                current[kv.Groups[1].Value] = kv.Groups[2].Value.Trim();
-        }
-
-        if (currentName is not null && current is not null) specs[currentName] = current;
-        return specs;
-    }
+    private static Dictionary<string, Dictionary<string, string>> GetBackupMonitorSpecs(string path) =>
+        DisplayIdentity.ParseLayout(File.ReadAllLines(path));
 
     private static bool IsBackupSpecActive(Dictionary<string, string> spec)
     {
@@ -568,7 +464,7 @@ public sealed class MonitorService
         return w > 0 && h > 0;
     }
 
-    private static void ParseRes(string? text, out int w, out int h)
+    internal static void ParseRes(string? text, out int w, out int h)
     {
         w = 0; h = 0;
         if (string.IsNullOrWhiteSpace(text)) return;
@@ -592,7 +488,7 @@ public sealed class MonitorService
         };
     }
 
-    private static void ParseLeftTop(string? leftTop, out int? x, out int? y)
+    internal static void ParseLeftTop(string? leftTop, out int? x, out int? y)
     {
         x = y = null;
         if (string.IsNullOrWhiteSpace(leftTop)) return;

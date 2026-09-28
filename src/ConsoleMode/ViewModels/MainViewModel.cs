@@ -250,7 +250,7 @@ public partial class MainViewModel : ObservableObject
                 monitors.Add(new LoadedMonitor(monitor, engine.Monitors.GetDisplayModes(monitor.Name, monitor)));
             if (list.Count == 0)
             {
-                error = AppPaths.HasMmt
+                error = MonitorService.IsAvailable
                     ? LocalizationService.Get("NoDisplayTryRefresh")
                     : LocalizationService.Get("MmtMissing", AppPaths.MmtPath);
             }
@@ -891,6 +891,7 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
             NativeAudio = _loadedConfig.NativeAudio,
+            NativeDisplays = _loadedConfig.NativeDisplays,
             FpsLimit = ReadFpsLimit(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
