@@ -183,6 +183,7 @@ public partial class MainViewModel
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
+            case "betas": BetaUpdates = !BetaUpdates; break;
         }
     }
 

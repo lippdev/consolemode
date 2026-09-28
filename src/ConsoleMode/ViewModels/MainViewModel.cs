@@ -310,6 +310,7 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
+            BetaUpdates = config.BetaUpdates;
             HomeButtonLaunch = config.HomeButtonLaunch;
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
@@ -896,6 +897,7 @@ public partial class MainViewModel : ObservableObject
             TourDone = _loadedConfig.TourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
+            BetaUpdates = BetaUpdates,
             HomeButtonLaunch = HomeButtonLaunch,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,

@@ -391,6 +391,7 @@ public sealed class ConsoleEngine
             TourDone = config.TourDone,
             ConfirmedSetup = config.ConfirmedSetup,
             CheckUpdates = config.CheckUpdates,
+            BetaUpdates = config.BetaUpdates,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }

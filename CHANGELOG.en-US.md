@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [1.5.1]
+### What's new
+- Settings → "Receive test versions (alpha and beta)": join the 1.6 tests from the app. 1.6 controls displays and audio with its own code, without the NirSoft tools. Off by default; turning it on warns that test versions can have bugs.
+
 ## [1.5.0]
 ### What's new
 - Console interface: a full-screen, controller-first home and Settings, driven by the D-pad/stick and A/B with Xbox and PlayStation pads. Automatic mode picks it whenever a controller is connected. (#41, #42, #47)
