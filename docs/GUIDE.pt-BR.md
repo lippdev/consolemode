@@ -41,7 +41,6 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 
 - Layouts multi-monitor variam; em alguns setups a restauração pode precisar de uma nova tentativa pela bandeja
 - O Modo Xbox não detecta o fim do fullscreen — restaure manualmente
-- Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
 - O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
 
@@ -68,7 +67,7 @@ Confirme se o monitor de foco é compatível com o recurso e se o HDR está ativ
 Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
 
 ```powershell
-# Baixa MultiMonitorTool / SoundVolumeView / rtss-cli e compila os dois pacotes
+# Baixa o rtss-cli e compila os dois pacotes
 .\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 

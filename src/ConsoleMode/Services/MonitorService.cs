@@ -20,8 +20,8 @@ public sealed class MonitorService
     }
 
     /// <summary>
-    /// Windows' own display APIs instead of MultiMonitorTool (issue #91). Off by default while it's
-    /// verified on real hardware: set <c>"NativeDisplays": true</c> in config.json and restart the app.
+    /// Windows' own display APIs instead of MultiMonitorTool (issue #91). On by default since 1.6;
+    /// <c>"NativeDisplays": false</c> goes back to MultiMonitorTool, which is no longer bundled.
     /// </summary>
     public static bool UseNative => _useNative ??= LoadNativeFlag();
 

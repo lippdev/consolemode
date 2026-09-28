@@ -2,16 +2,9 @@
 
 O **Console Mode** usa as ferramentas abaixo. Algumas são baixadas automaticamente no build; outras devem ser instaladas pelo usuário.
 
-## NirSoft
+## NirSoft (até a 1.5)
 
-| Ferramenta | Site | Uso no projeto |
-|------------|------|----------------|
-| [MultiMonitorTool](https://www.nirsoft.net/utils/multi_monitor_tool.html) | nirsoft.net | Monitores: ativar/desativar, primário, layout, mover janelas |
-| [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html) | nirsoft.net | Listar e trocar saída de áudio padrão |
-
-O script `build/Get-NirSoftTools.ps1` baixa as ferramentas na hora do build e o `Publish-ConsoleMode.ps1` embute os `.exe` no `ConsoleMode.exe` portátil. Na primeira execução elas são extraídas para `ConsoleMode_Data/tools/`.
-
-Consulte os termos de uso e a licença de cada ferramenta no site do autor (Nir Sofer / NirSoft).
+Até a versão 1.5, o Console Mode embutia o [MultiMonitorTool](https://www.nirsoft.net/utils/multi_monitor_tool.html) e o [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html), da NirSoft, para controlar monitores e áudio. A partir da 1.6 isso é feito com as APIs do próprio Windows e nenhuma ferramenta da NirSoft é distribuída (issue #91).
 
 ## Limite de FPS (opcional)
 
