@@ -2,6 +2,15 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [1.6.0-alpha.1]
+### Novidades
+- Telas e áudio agora são controlados pelas APIs do próprio Windows. O app não embute mais o MultiMonitorTool nem o SoundVolumeView, da NirSoft: o pacote fica só com código do projeto e o rtss-cli (MIT), o que abre caminho para assinar o executável e reduz alertas falsos de antivírus. (#91, #97, #98, #99)
+- As telas salvas, a saída de áudio escolhida e o backup da mesa continuam valendo: os identificadores são os mesmos de antes.
+
+### Atenção: versão alpha
+- Esta versão ainda não foi validada em muitos setups de monitores e TV. Se algo falhar ao ligar a TV, desligar as outras telas ou restaurar a mesa, volte para a 1.5.0 e conte o que aconteceu pelo botão de feedback (anexe o `consolemode.log`).
+- Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
 ## [1.5.0]
 ### Novidades
 - Interface Console: tela inicial e Ajustes em tela cheia, pensados para o controle (direcional/analógico, A/B) com controles Xbox e PlayStation. O modo Automático escolhe essa interface sempre que há um controle conectado. (#41, #42, #47)

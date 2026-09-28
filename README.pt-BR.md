@@ -17,6 +17,8 @@ Baixe a **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**,
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
 
+Quer ajudar a testar o que vem aí? A **[1.6.0-alpha.1](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.1)** é uma alpha da 1.6 que não embute mais nenhuma ferramenta de terceiros para telas e áudio. Ela ainda não foi validada em muitos setups: fique na 1.5.0 se precisa que funcione sem surpresas.
+
 Está na 1.4.0? O app oferece a atualização. Se ela falhar por tempo esgotado, baixe o instalador uma vez; as configurações são mantidas.
 
 Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) ou o app Xbox. O [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) é opcional, para o limite de FPS.

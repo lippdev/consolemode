@@ -2,6 +2,15 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [1.6.0-alpha.1]
+### What's new
+- Displays and audio are now controlled through Windows' own APIs. The app no longer bundles NirSoft's MultiMonitorTool or SoundVolumeView: the package holds only the project's code and rtss-cli (MIT), which paves the way for a signed executable and fewer antivirus false positives. (#91, #97, #98, #99)
+- Saved screens, the chosen audio output and the desk backup keep working: the identifiers are the same as before.
+
+### Heads-up: alpha release
+- This release is not verified on many monitor and TV setups yet. If turning the TV on, turning the other screens off or restoring the desk fails, go back to 1.5.0 and tell us what happened with the feedback button (attach `consolemode.log`).
+- People on the stable 1.5.0 don't get this release automatically.
+
 ## [1.5.0]
 ### What's new
 - Console interface: a full-screen, controller-first home and Settings, driven by the D-pad/stick and A/B with Xbox and PlayStation pads. Automatic mode picks it whenever a controller is connected. (#41, #42, #47)
