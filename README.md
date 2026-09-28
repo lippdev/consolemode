@@ -37,6 +37,8 @@ Prefer the couch? With the app in the tray, hold the controller's Home button an
 
 ## Features
 
+<img src="assets/features.gif" alt="Quick tour of the main features: pick the TV, HDR/VRR/FPS, launchers, automatic restore, controller shortcuts, the two interfaces and automation." width="800">
+
 - Hide the other screens by **disconnecting** them, **black overlays** or **DDC/CI**
 - Per-screen **resolution and refresh rate**, **HDR**, **VRR** and an **FPS limit** (RTSS) while you play
 - Audio goes to the TV (or any output) and comes back afterwards

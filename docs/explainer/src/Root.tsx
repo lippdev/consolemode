@@ -5,6 +5,7 @@ import { Explainer } from "./Explainer";
 import { WHATS_NEW_DURATION, WhatsNew } from "./WhatsNew";
 import { ROADMAP_DURATION, Roadmap } from "./Roadmap";
 import { KEYNOTE_DURATION, Keynote } from "./Keynote";
+import { FEATURES_DURATION, Features } from "./Features";
 
 export const RemotionRoot: FC = () => {
   return (
@@ -40,6 +41,15 @@ export const RemotionRoot: FC = () => {
         fps={30}
         width={1920}
         height={1080}
+      />
+      <Composition
+        id="Features"
+        component={Features}
+        durationInFrames={FEATURES_DURATION}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{ lang: "en" as const }}
       />
     </>
   );

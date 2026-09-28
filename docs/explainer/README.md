@@ -44,3 +44,14 @@ Grava `out/keynote.mp4`. A trilha é sintetizada por `scripts/soundtrack.py` (se
 pip install numpy scipy
 npm run soundtrack
 ```
+
+## Tour dos recursos (`Features`)
+
+GIF de ~36 s com os recursos principais da 1.5.0, uma cena por recurso, no mesmo visual do `Keynote`. Sai em inglês e em português (prop `lang`):
+
+```console
+npm run features      # assets/features.gif (README.md)
+npm run features:pt   # assets/features.pt-BR.gif (README.pt-BR.md)
+```
+
+Os textos ficam em `T` em `src/Features.tsx`. Os componentes compartilhados com o `Keynote` estão em `src/kit.tsx`.

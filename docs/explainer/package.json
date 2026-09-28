@@ -31,6 +31,8 @@
     "whats-new": "remotion render src/index.ts WhatsNew out/whats-new.mp4 && ffmpeg -y -loglevel error -i out/whats-new.mp4 -vf \"fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/whats-new.gif",
     "roadmap": "remotion render src/index.ts Roadmap out/roadmap.mp4 && ffmpeg -y -loglevel error -i out/roadmap.mp4 -vf \"fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/roadmap.gif",
     "soundtrack": "python3 scripts/soundtrack.py && remotion ffmpeg -y -loglevel error -i out/soundtrack.wav -c:a libmp3lame -b:a 192k public/keynote/soundtrack.mp3",
-    "keynote": "remotion render src/index.ts Keynote out/keynote.mp4 --crf=18"
+    "keynote": "remotion render src/index.ts Keynote out/keynote.mp4 --crf=18",
+    "features": "remotion render src/index.ts Features out/features.mp4 --props=\"{\\\"lang\\\":\\\"en\\\"}\" && remotion ffmpeg -y -loglevel error -i out/features.mp4 -r 15 -vf \"scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/features.gif",
+    "features:pt": "remotion render src/index.ts Features out/features.pt-BR.mp4 --props=\"{\\\"lang\\\":\\\"pt\\\"}\" && remotion ffmpeg -y -loglevel error -i out/features.pt-BR.mp4 -r 15 -vf \"scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle\" ../../assets/features.pt-BR.gif"
   }
 }

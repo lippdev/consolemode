@@ -37,6 +37,8 @@ Prefere o sofá? Com o app na bandeja, segure o botão Home do controle e ele co
 
 ## Recursos
 
+<img src="assets/features.pt-BR.gif" alt="Tour rápido pelos recursos principais: escolher a TV, HDR/VRR/FPS, launchers, volta automática, atalhos do controle, as duas interfaces e automação." width="800">
+
 - Esconde as outras telas **desconectando**, com **cortinas pretas** ou por **DDC/CI**
 - **Resolução e Hz** por tela, **HDR**, **VRR** e **limite de FPS** (RTSS) enquanto você joga
 - O áudio vai para a TV (ou qualquer saída) e volta depois
