@@ -28,11 +28,8 @@
     <Compile Include="../../src/ConsoleMode/Services/PlaynitePaths.cs" Link="PlaynitePaths.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
-<<<<<<< HEAD
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
-=======
     <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
->>>>>>> 0b1bd5e (feat(displays): native display backend behind a config flag (#91))
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
