@@ -116,7 +116,7 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 
 ## Áudio nativo, sem SoundVolumeView (issue #91)
 
-Pré-condições: app **fechado**; em `config.json` (na pasta de dados) acrescente `"NativeAudio": true` e abra o app. O log (`consolemode.log`) deve mostrar `audio=native` na linha `Startup:`. Para voltar ao SoundVolumeView, troque para `false`.
+Pré-condições: a partir da 1.6 o áudio nativo já vem ligado (`"NativeAudio": true` em `config.json`) e o SoundVolumeView não é mais embutido. O log (`consolemode.log`) deve mostrar `audio=native` na linha `Startup:`. Para comparar com o SoundVolumeView, coloque o `SoundVolumeView.exe` na pasta `tools` e troque para `false`.
 
 - [ ] Ajustes → Saída de áudio lista as mesmas saídas que com o SoundVolumeView, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
 - [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada (o ID salvo é o mesmo). Resultado: ______
@@ -129,7 +129,7 @@ Pré-condições: app **fechado**; em `config.json` (na pasta de dados) acrescen
 
 ## Telas nativas, sem MultiMonitorTool (issue #91)
 
-Pré-condições: app **fechado**; em `config.json` acrescente `"NativeDisplays": true` e abra o app. A linha `Startup:` do log deve mostrar `displays=native`. Para voltar ao MultiMonitorTool, troque para `false`. Faça primeiro uma rodada com `false` e anote o que aparece, para comparar.
+Pré-condições: a partir da 1.6 as telas nativas já vêm ligadas (`"NativeDisplays": true` em `config.json`) e o MultiMonitorTool não é mais embutido. A linha `Startup:` do log deve mostrar `displays=native`. Para comparar com o MultiMonitorTool, coloque o `MultiMonitorTool.exe` na pasta `tools` e troque para `false` (ou use a 1.5.0).
 
 ### Lista e identidade
 

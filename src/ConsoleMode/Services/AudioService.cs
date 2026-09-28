@@ -12,8 +12,8 @@ public sealed class AudioService
     private Dictionary<string, string> _endpointIds = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Core Audio instead of SoundVolumeView (issue #91). Off by default while it's verified on real
-    /// hardware: set <c>"NativeAudio": true</c> in config.json and restart the app.
+    /// Core Audio instead of SoundVolumeView (issue #91). On by default since 1.6; <c>"NativeAudio": false</c>
+    /// in config.json goes back to SoundVolumeView, which is no longer bundled (put it in the tools folder).
     /// </summary>
     public static bool UseNative => _useNative ??= LoadNativeFlag();
 
