@@ -204,7 +204,7 @@ public partial class MainViewModel : ObservableObject
         AudioOptions.Clear();
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioNoChange"), Value = "" });
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioOnConnect"), Value = ConsoleEngine.AudioOnConnectId });
-        if (AppPaths.HasSvv)
+        if (AudioService.IsAvailable)
         {
             foreach (var device in _availableAudioDevices)
                 AudioOptions.Add(new ComboOption
@@ -250,7 +250,7 @@ public partial class MainViewModel : ObservableObject
                 monitors.Add(new LoadedMonitor(monitor, engine.Monitors.GetDisplayModes(monitor.Name, monitor)));
             if (list.Count == 0)
             {
-                error = AppPaths.HasMmt
+                error = MonitorService.IsAvailable
                     ? LocalizationService.Get("NoDisplayTryRefresh")
                     : LocalizationService.Get("MmtMissing", AppPaths.MmtPath);
             }
@@ -264,7 +264,7 @@ public partial class MainViewModel : ObservableObject
         List<AudioDevice> audio = [];
         try
         {
-            if (AppPaths.HasSvv) audio = [.. engine.Audio.GetDevices(true)];
+            if (AudioService.IsAvailable) audio = [.. engine.Audio.GetDevices(true)];
         }
         catch (Exception ex)
         {
@@ -890,6 +890,8 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
+            NativeAudio = _loadedConfig.NativeAudio,
+            NativeDisplays = _loadedConfig.NativeDisplays,
             FpsLimit = ReadFpsLimit(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
