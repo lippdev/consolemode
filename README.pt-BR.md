@@ -8,7 +8,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
+<img src="assets/features.gif" alt="Tour do Console Mode 1.5: resolução e HDR ajustados para a TV, Big Picture, Playnite ou Xbox como lançador, as telas da mesa e o áudio voltando ao sair do jogo, segurar Home para começar e Start + Select para voltar ao PC." width="800">
 
 ## Download
 
