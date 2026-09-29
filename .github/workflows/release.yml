@@ -153,3 +153,23 @@ jobs:
             dist/ConsoleMode-Portable-x64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Opens the update PR on microsoft/winget-pkgs for stable releases (pre-releases are skipped).
+  # Off until the WINGET_TOKEN secret exists: a classic PAT with the public_repo scope, from the
+  # account that owns the lippdev/winget-pkgs fork.
+  winget:
+    needs: build
+    if: github.event_name == 'push' && !contains(github.ref_name, '-')
+    runs-on: ubuntu-latest
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+    steps:
+      - name: Submit to winget-pkgs
+        if: env.WINGET_TOKEN != ''
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: lippdev.ConsoleMode
+          release-tag: ${{ github.ref_name }}
+          installers-regex: 'ConsoleMode-Setup-x64\.exe$'
+          fork-user: lippdev
+          token: ${{ env.WINGET_TOKEN }}

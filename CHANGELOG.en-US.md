@@ -6,6 +6,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
+### Behind the scenes
+- Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+
 ## [1.6.0-alpha.2]
 ### Changes
 - 1.6 is all the project's own code: the option to go back to MultiMonitorTool / SoundVolumeView is gone too, and their old files in the `tools` folder are deleted when the app opens. (#91)
