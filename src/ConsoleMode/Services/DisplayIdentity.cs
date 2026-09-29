@@ -3,9 +3,12 @@ using System.Text.RegularExpressions;
 
 namespace ConsoleMode.Services;
 
-/// <summary>One monitor in the layout backup (MultiMonitorTool's .cfg format, kept for compatibility).</summary>
+/// <summary>
+/// One monitor in the layout backup (MultiMonitorTool's .cfg format, kept for compatibility).
+/// <c>Orientation</c> is DEVMODE.dmDisplayOrientation: 0 landscape, 1 = 90°, 2 = 180°, 3 = 270°.
+/// </summary>
 public sealed record LayoutEntry(string Name, string MonitorId, string Serial, int BitsPerPixel,
-    int Width, int Height, int Frequency, int PositionX, int PositionY);
+    int Width, int Height, int Frequency, int PositionX, int PositionY, int Orientation = 0);
 
 /// <summary>What the monitor's EDID says about itself.</summary>
 public sealed record EdidInfo(string Name, string Serial, int PreferredWidth, int PreferredHeight);
@@ -123,7 +126,7 @@ public static class DisplayIdentity
             sb.Append($"Height={e.Height}\r\n");
             sb.Append("DisplayFlags=0\r\n");
             sb.Append($"DisplayFrequency={e.Frequency}\r\n");
-            sb.Append("DisplayOrientation=0\r\n");
+            sb.Append($"DisplayOrientation={e.Orientation}\r\n");
             sb.Append($"PositionX={e.PositionX}\r\n");
             sb.Append($"PositionY={e.PositionY}\r\n");
         }

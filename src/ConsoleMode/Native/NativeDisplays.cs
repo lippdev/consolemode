@@ -157,9 +157,9 @@ internal static class NativeDisplays
 
     /// <summary>
     /// Queues a mode and/or position for a monitor (applied by <see cref="ApplyPending"/>);
-    /// zero or null keeps the current value.
+    /// zero or null keeps the current value; a negative orientation leaves the rotation alone.
     /// </summary>
-    public static int QueueMode(string gdiName, int width, int height, int frequency, int bitsPerPixel, int? x, int? y)
+    public static int QueueMode(string gdiName, int width, int height, int frequency, int bitsPerPixel, int? x, int? y, int orientation = -1)
     {
         var dm = new NativeWindows.DEVMODE { dmSize = (short)Marshal.SizeOf<NativeWindows.DEVMODE>() };
         if (!NativeWindows.EnumDisplaySettings(gdiName, NativeWindows.ENUM_CURRENT_SETTINGS, ref dm)) return -1;
@@ -177,6 +177,12 @@ internal static class NativeDisplays
             dm.dmPositionX = x.Value;
             dm.dmPositionY = y.Value;
             dm.dmFields |= DmPosition;
+        }
+        // Only when it differs from the current one: setups that never rotate keep the exact same call.
+        if (orientation >= 0 && orientation != dm.dmDisplayOrientation)
+        {
+            dm.dmDisplayOrientation = orientation;
+            dm.dmFields |= DmDisplayOrientation;
         }
         if (dm.dmFields == 0) return 0;
         var code = ChangeDisplaySettingsEx(gdiName, ref dm, 0, CdsUpdateRegistry | CdsNoReset, 0);
@@ -272,7 +278,7 @@ internal static class NativeDisplays
     private static long Key(LUID id) => ((long)id.HighPart << 32) | id.LowPart;
 
     private const int ErrorInsufficientBuffer = 122;
-    private const int DmPosition = 0x20, DmBitsPerPel = 0x40000, DmPelsWidth = 0x80000, DmPelsHeight = 0x100000, DmDisplayFrequency = 0x400000;
+    private const int DmPosition = 0x20, DmDisplayOrientation = 0x80, DmBitsPerPel = 0x40000, DmPelsWidth = 0x80000, DmPelsHeight = 0x100000, DmDisplayFrequency = 0x400000;
     private const uint CdsUpdateRegistry = 0x1, CdsNoReset = 0x10000000;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

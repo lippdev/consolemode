@@ -142,6 +142,7 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] TV começando **desligada**: "Jogar agora" liga a TV, ela vira a principal e as telas da mesa desligam. O log mostra `Telas: ativar …` e `Telas: desativar …` com `=> 0`. Resultado: ______
 - [ ] Resolução/Hz salvos para a TV são aplicados. Resultado: ______
 - [ ] Ao sair do Big Picture/Playnite, a mesa volta **exatamente** como estava: mesmas telas, principal, posições e resoluções. O log mostra `Telas: layout restaurado => 0`. Resultado: ______
+- [ ] Monitor **girado (retrato)**: depois de restaurar, ele volta girado, na mesma posição e resolução (ex.: 1080×1920 a 90°). O `backup_monitores.cfg` guarda `DisplayOrientation=1` para ele. Resultado: ______
 - [ ] Repetir a sessão 3 vezes seguidas: nenhuma tela troca de nome (\\.\DISPLAYn) nem de posição entre uma sessão e outra. Resultado: ______
 - [ ] Com a TV já **ligada** antes de começar: mesmo resultado. Resultado: ______
 
