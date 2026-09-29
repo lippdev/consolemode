@@ -253,6 +253,15 @@ internal static class NativeDisplays
             : ("", "");
     }
 
+    /// <summary>Windows' own primary flag (MONITORINFOF_PRIMARY); position (0,0) is ambiguous when screens are cloned.</summary>
+    public static bool IsPrimary(string gdiName)
+    {
+        var hMonitor = FindHMonitor(gdiName);
+        if (hMonitor == 0) return false;
+        var info = new MONITORINFOEX { cbSize = Marshal.SizeOf<MONITORINFOEX>() };
+        return GetMonitorInfo(hMonitor, ref info) && (info.dwFlags & 1) != 0;
+    }
+
     private static nint FindHMonitor(string gdiName)
     {
         nint found = 0;
