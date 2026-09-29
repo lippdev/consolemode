@@ -113,3 +113,47 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Fechar a janela durante a sessão vai para a bandeja; fora da sessão fecha o app. Menu da bandeja: Mostrar, Entrar, Restaurar, Sair. Resultado: ______
 - [ ] Atualização: com uma release mais nova no GitHub, o aviso aparece nas duas interfaces (na Console, como banner no topo). Resultado: ______
 - [ ] Atalho "Console Mode 1 Click" e `--tray` no início do Windows continuam funcionando. Resultado: ______
+
+## Áudio com código próprio (issue #91)
+
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida). A 1.6 não usa mais o SoundVolumeView; o arquivo antigo em `tools` é apagado ao abrir o app.
+
+- [ ] Ajustes → Saída de áudio lista as mesmas saídas que na 1.5, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
+- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada depois de atualizar da 1.5 (o ID salvo é o mesmo). Resultado: ______
+- [ ] Entrar no modo console com uma saída fixa (ex.: HDMI da TV): o som passa para ela, inclusive em apps de chamada (papel "comunicações"). O log mostra `Áudio: saída padrão = …`. Resultado: ______
+- [ ] Se a troca de saída falhar (ex.: o dispositivo some no meio), a sessão continua e o log mostra `Áudio: não foi possível trocar para …`; a mesa não é desfeita. Resultado: ______
+- [ ] "A que aparecer ao conectar (TV)" com a TV começando **desligada**: quando a TV liga, o som vai para o HDMI dela. Resultado: ______
+- [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
+- [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
+- [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
+- [ ] A pasta `tools` não tem mais `SoundVolumeView.exe` nem `MultiMonitorTool.exe` depois de abrir o app. Resultado: ______
+
+## Telas com código próprio (issue #91)
+
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar. A 1.6 não usa mais o MultiMonitorTool; o arquivo antigo em `tools` é apagado ao abrir o app.
+
+### Lista e identidade
+
+- [ ] O mapa de telas mostra os mesmos monitores que na 1.5, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
+- [ ] A tela de jogo e as telas a esconder que já estavam salvas continuam marcadas (o ID estável é o mesmo). Resultado: ______
+- [ ] A lista de resoluções de cada tela continua igual. Resultado: ______
+
+### Sessão com "Desconectar"
+
+- [ ] TV começando **desligada**: "Jogar agora" liga a TV, ela vira a principal e as telas da mesa desligam. O log mostra `Telas: ativar …` e `Telas: desativar …` com `=> 0`. Resultado: ______
+- [ ] Resolução/Hz salvos para a TV são aplicados. Resultado: ______
+- [ ] Ao sair do Big Picture/Playnite, a mesa volta **exatamente** como estava: mesmas telas, principal, posições e resoluções. O log mostra `Telas: layout restaurado => 0`. Resultado: ______
+- [ ] Monitor **girado (retrato)**: depois de restaurar, ele volta girado, na mesma posição e resolução (ex.: 1080×1920 a 90°). O `backup_monitores.cfg` guarda `DisplayOrientation=1` para ele. Resultado: ______
+- [ ] Repetir a sessão 3 vezes seguidas: nenhuma tela troca de nome (\\.\DISPLAYn) nem de posição entre uma sessão e outra. Resultado: ______
+- [ ] Com a TV já **ligada** antes de começar: mesmo resultado. Resultado: ______
+
+### Outras estratégias
+
+- [ ] "Cortinas pretas": as telas da mesa ficam pretas e voltam ao restaurar. Resultado: ______
+- [ ] "Desligar por DDC/CI" (monitor com DDC/CI ligado no menu dele): as telas da mesa apagam e voltam a acender ao restaurar. Resultado: ______
+
+### Janelas e recuperação
+
+- [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______
+- [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
+- [ ] Um backup da mesa feito pela 1.5 (sessão iniciada na 1.5, app atualizado antes de restaurar) é restaurado pela 1.6. Resultado: ______

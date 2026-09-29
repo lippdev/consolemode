@@ -14,15 +14,6 @@ public class SessionMenuTests
         Assert.Equal(expected, SessionMenuMath.StepVolume(current, direction));
 
     [Theory]
-    [InlineData(500, 50)]
-    [InlineData(1000, 100)]
-    [InlineData(0, 0)]
-    [InlineData(-1, null)]
-    [InlineData(1001, null)]
-    public void GetPercent_exit_code_is_the_level_times_ten(int exitCode, int? expected) =>
-        Assert.Equal(expected, SessionMenuMath.ParseVolumeExitCode(exitCode));
-
-    [Theory]
     [InlineData(0, 12, "12 min")]
     [InlineData(1, 5, "1 h 05 min")]
     [InlineData(2, 0, "2 h 00 min")]

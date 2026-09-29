@@ -1,4 +1,5 @@
 using ConsoleMode.Models;
+using ConsoleMode.Native;
 
 namespace ConsoleMode.Services;
 
@@ -6,6 +7,8 @@ public sealed class AudioService
 {
     private List<AudioDevice>? _cache;
     private string? _cachedDefaultId;
+    // Friendly ID (what config and backups store) -> Core Audio endpoint ID.
+    private Dictionary<string, string> _endpointIds = new(StringComparer.OrdinalIgnoreCase);
 
     public void ClearCache()
     {
@@ -13,67 +16,45 @@ public sealed class AudioService
         _cachedDefaultId = null;
     }
 
-    public int InvokeSvv(params string[] args)
-    {
-        if (!AppPaths.HasSvv) throw new InvalidOperationException(LocalizationService.Get("SvvMissing"));
-        return ProcessRunner.Run(AppPaths.SvvPath, args);
-    }
-
     public IReadOnlyList<AudioDevice> GetDevices(bool forceRefresh = false)
     {
-        if (!AppPaths.HasSvv) return [];
         if (!forceRefresh && _cache is not null) return _cache;
 
-        var csvPath = Path.Combine(Path.GetTempPath(), $"consolemode_audio_{Guid.NewGuid():N}.csv");
         try
         {
-            InvokeSvv("/ShowDisabledDevices", "1", "/ShowUnpluggedDevices", "1", "/scomma", csvPath);
-            if (!File.Exists(csvPath))
-            {
-                _cache = [];
-                return _cache;
-            }
-
-            var devices = new List<AudioDevice>();
-            foreach (var row in CsvReader.Read(csvPath))
-            {
-                var friendlyId = row.Get("Command-Line Friendly ID");
-                if (string.IsNullOrWhiteSpace(friendlyId)) continue;
-                if (!string.Equals(row.Get("Type"), "Device", StringComparison.OrdinalIgnoreCase)) continue;
-                if (!string.Equals(row.Get("Direction"), "Render", StringComparison.OrdinalIgnoreCase)) continue;
-
-                var deviceState = row.Get("Device State");
-                var isActive = deviceState.Contains("Active", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(deviceState);
-                var friendlyName = row.Get("Name");
-                var driverName = row.Get("Device Name");
-                string displayName;
-                if (string.IsNullOrWhiteSpace(friendlyName)) displayName = driverName;
-                else if (!string.IsNullOrWhiteSpace(driverName) && driverName != friendlyName) displayName = $"{friendlyName} ({driverName})";
-                else displayName = friendlyName;
-
-
-                devices.Add(new AudioDevice
-                {
-                    Name = displayName,
-                    FriendlyId = friendlyId,
-                    IsDefault = row.Get("Default").Contains("Render", StringComparison.OrdinalIgnoreCase),
-                    IsActive = isActive
-                });
-            }
-
+            var devices = ReadNativeDevices();
             _cache = [.. devices.OrderBy(d => d.IsActive ? 0 : 1).ThenBy(d => d.Name)];
-            _cachedDefaultId = _cache.FirstOrDefault(d => d.IsDefault)?.FriendlyId;
-            return _cache;
         }
-        catch
+        catch (Exception ex)
         {
+            AppLog.Write($"Áudio: não foi possível listar as saídas: {ex.Message}");
             _cache = [];
-            return _cache;
         }
-        finally
+        _cachedDefaultId = _cache.FirstOrDefault(d => d.IsDefault)?.FriendlyId;
+        return _cache;
+    }
+
+    private List<AudioDevice> ReadNativeDevices()
+    {
+        var devices = new List<AudioDevice>();
+        var ids = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var endpoint in CoreAudio.ListRenderEndpoints())
         {
-            try { File.Delete(csvPath); } catch { /* ignore */ }
+            var friendlyId = AudioNaming.FriendlyId(endpoint.AdapterName, endpoint.Name);
+            // Two outputs with the same names: keep the active / default one, like the ID can only name one.
+            if (ids.ContainsKey(friendlyId) && !endpoint.IsActive && !endpoint.IsDefault) continue;
+            ids[friendlyId] = endpoint.Id;
+            devices.RemoveAll(d => string.Equals(d.FriendlyId, friendlyId, StringComparison.OrdinalIgnoreCase));
+            devices.Add(new AudioDevice
+            {
+                Name = AudioNaming.DisplayName(endpoint.Name, endpoint.AdapterName),
+                FriendlyId = friendlyId,
+                IsDefault = endpoint.IsDefault,
+                IsActive = endpoint.IsActive
+            });
         }
+        _endpointIds = ids;
+        return devices;
     }
 
     public string? GetDefaultId()
@@ -84,17 +65,45 @@ public sealed class AudioService
 
     public void SetOutput(string friendlyId)
     {
-        InvokeSvv("/Enable", friendlyId);
-        InvokeSvv("/SetDefault", friendlyId, "all");
+        var endpointId = ResolveEndpoint(friendlyId);
+        if (GetDevices().FirstOrDefault(d => d.FriendlyId == friendlyId) is { IsActive: false })
+            CoreAudio.Enable(endpointId);
+        CoreAudio.SetDefault(endpointId);
+        AppLog.Write($"Áudio: saída padrão = {friendlyId}");
         _cachedDefaultId = friendlyId;
         _cache = null;
     }
 
     public void Restore(string? backupId)
     {
-        if (string.IsNullOrWhiteSpace(backupId) || !AppPaths.HasSvv) return;
-        try { InvokeSvv("/SetDefault", backupId, "all"); }
+        if (string.IsNullOrWhiteSpace(backupId)) return;
+        try { CoreAudio.SetDefault(ResolveEndpoint(backupId)); }
         catch (Exception ex) { AppLog.Write($"Não foi possível restaurar o áudio: {ex.Message}"); }
+    }
+
+    /// <summary>Output volume from 0 to 100, or null when it can't be read.</summary>
+    public int? GetVolumePercent(string friendlyId) => CoreAudio.GetVolumePercent(ResolveEndpoint(friendlyId));
+
+    /// <summary>Sets the volume and unmutes, like turning the knob.</summary>
+    public void SetVolumePercent(string friendlyId, int percent)
+    {
+        var endpointId = ResolveEndpoint(friendlyId);
+        CoreAudio.SetVolumePercent(endpointId, percent);
+        CoreAudio.SetMute(endpointId, false);
+    }
+
+    public void SetMute(string friendlyId, bool mute)
+    {
+        CoreAudio.SetMute(ResolveEndpoint(friendlyId), mute);
+    }
+
+    private string ResolveEndpoint(string friendlyId)
+    {
+        if (_endpointIds.TryGetValue(friendlyId, out var id)) return id;
+        GetDevices(forceRefresh: true);
+        return _endpointIds.TryGetValue(friendlyId, out id)
+            ? id
+            : throw new InvalidOperationException($"Saída de áudio não encontrada: {friendlyId}");
     }
 
     public AudioDevice? PickNewDevice(IReadOnlyList<AudioDevice> candidates, string? hint, MonitorInfo? focus)

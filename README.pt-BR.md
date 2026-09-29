@@ -6,16 +6,18 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
-![License](https://img.shields.io/badge/licença-MIT-green)
+![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
+<img src="assets/features.gif" alt="Tour do Console Mode 1.5: resolução e HDR ajustados para a TV, Big Picture, Playnite ou Xbox como lançador, as telas da mesa e o áudio voltando ao sair do jogo, segurar Home para começar e Start + Select para voltar ao PC." width="800">
 
 ## Download
 
-Baixe a **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, a versão estável mais recente:
+Baixe a **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
+
+Quer ajudar a testar o que vem aí? A **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** é uma alpha da 1.6 que não embute mais nenhuma ferramenta de terceiros para telas e áudio. Ela ainda não foi validada em muitos setups: fique na 1.5.1 se precisa que funcione sem surpresas, ou ligue Ajustes → "Receber versões de teste" na 1.5.1 para recebê-la pelo app.
 
 Está na 1.4.0? O app oferece a atualização. Se ela falhar por tempo esgotado, baixe o instalador uma vez; as configurações são mantidas.
 
@@ -65,4 +67,4 @@ Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/
 - **Feedback:** o botão ao lado de Ajustes no app, ou [este formulário](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Uma ⭐ ajuda outros jogadores de sofá a encontrar o projeto.
 - Alguns antivírus podem acusar as ferramentas auxiliares incluídas; o código está todo aqui.
 
-Licença MIT · [Avisos de terceiros](THIRD_PARTY_NOTICES.md)
+Licença [GNU Affero General Public License v3.0 only](LICENSE) · [Avisos de terceiros](THIRD_PARTY_NOTICES.md) · [Política de assinatura de código](docs/CODE_SIGNING.md)

@@ -348,4 +348,11 @@ public static class NativeWindows
         return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel,
             ConsoleMode.Services.LocalizationService.Get("CurrentModeSuffix"));
     }
+
+    /// <summary>DEVMODE.dmDisplayOrientation of the current mode (0 landscape, 1 = 90°, 2 = 180°, 3 = 270°); 0 when unreadable.</summary>
+    public static int GetCurrentOrientation(string deviceName)
+    {
+        var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf<DEVMODE>() };
+        return EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm) ? dm.dmDisplayOrientation : 0;
+    }
 }

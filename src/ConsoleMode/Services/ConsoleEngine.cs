@@ -82,12 +82,9 @@ public sealed class ConsoleEngine
 
         State.IsActive = true;
 
-        if (AppPaths.HasSvv)
-        {
-            State.BackupAudioId = Audio.GetDefaultId();
-            if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
-                File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
-        }
+        State.BackupAudioId = Audio.GetDefaultId();
+        if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
+            File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
 
         if (focusInfo is null || !focusInfo.IsActive)
         {
@@ -134,15 +131,15 @@ public sealed class ConsoleEngine
 
         Monitors.ClearCache();
         Audio.ClearCache();
-        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
 
-        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch && AppPaths.HasSvv)
+        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch)
         {
             var devices = Audio.GetDevices(true);
             var target = devices.FirstOrDefault(d => d.FriendlyId == config.AudioDeviceId);
             if (target is { IsActive: true })
             {
-                Audio.SetOutput(config.AudioDeviceId);
+                TrySetOutput(config.AudioDeviceId);
                 CompleteAudioWatch();
             }
             else
@@ -151,16 +148,13 @@ public sealed class ConsoleEngine
             }
         }
 
-        if (AppPaths.HasSvv)
-        {
-            InitializeAudioWatch();
-            if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
-                CompleteAudioWatch();
-        }
+        InitializeAudioWatch();
+        if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
+            CompleteAudioWatch();
 
         if (confirmScreen is not null)
         {
-            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
             if (!confirmScreen(State.FocusMonitorRect))
             {
                 AppLog.Write("Start: tela de jogo não confirmada; restaurando");
@@ -392,6 +386,7 @@ public sealed class ConsoleEngine
             TourDone = config.TourDone,
             ConfirmedSetup = config.ConfirmedSetup,
             CheckUpdates = config.CheckUpdates,
+            BetaUpdates = config.BetaUpdates,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
@@ -399,7 +394,7 @@ public sealed class ConsoleEngine
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)
     {
         if (rect is not null)
-            Monitors.MoveWindowViaMmt(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
+            Monitors.MoveProcessWindows(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
 
         if (rect is null) return;
         foreach (var handle in handles)
@@ -449,7 +444,7 @@ public sealed class ConsoleEngine
 
     private bool AudioWatchNeeded()
     {
-        if (!AppPaths.HasSvv || State.AudioWatchComplete) return false;
+        if (State.AudioWatchComplete) return false;
         return State.AudioAutoSwitch || State.AudioPendingTarget;
     }
 
@@ -494,9 +489,11 @@ public sealed class ConsoleEngine
 
         var pick = Audio.PickNewDevice(newly, State.AudioDeviceHint, focus);
         if (pick is null) return;
-        Audio.SetOutput(pick.FriendlyId);
-        State.AudioDeviceId = pick.FriendlyId;
-        State.LastAudioSwitchName = pick.Name;
+        if (TrySetOutput(pick.FriendlyId))
+        {
+            State.AudioDeviceId = pick.FriendlyId;
+            State.LastAudioSwitchName = pick.Name;
+        }
         CompleteAudioWatch();
     }
 
@@ -506,8 +503,26 @@ public sealed class ConsoleEngine
         var devices = Audio.GetDevices(true);
         var target = devices.FirstOrDefault(d => d.FriendlyId == State.AudioDeviceId);
         if (target is not { IsActive: true }) return;
-        Audio.SetOutput(target.FriendlyId);
-        State.LastAudioSwitchName = target.Name;
+        if (TrySetOutput(target.FriendlyId)) State.LastAudioSwitchName = target.Name;
         CompleteAudioWatch();
+    }
+
+    /// <summary>
+    /// Switching the output is best effort, as it was with SoundVolumeView (its failures were ignored):
+    /// a Core Audio error is logged and the session goes on, instead of rolling back the whole start
+    /// after the screens were already switched.
+    /// </summary>
+    private bool TrySetOutput(string friendlyId)
+    {
+        try
+        {
+            Audio.SetOutput(friendlyId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Áudio: não foi possível trocar para {friendlyId}: {ex.Message}");
+            return false;
+        }
     }
 }

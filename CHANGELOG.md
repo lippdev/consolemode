@@ -3,8 +3,35 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+
 ### Correções
-- Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos. Se o Playnite troca a janela de carregamento pela principal, o Console Mode passa a acompanhar a nova e só restaura a mesa quando o Playnite fecha de verdade. (#81)
+- Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
+
+### Por trás dos panos
+- Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
+
+## [1.6.0-alpha.2]
+### Mudanças
+- A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
+- Telas e áudio são controlados pelas APIs do próprio Windows desde a 1.6.0-alpha.1; veja as notas dela abaixo. (#97, #98, #99)
+
+### Atenção: versão alpha
+- Ainda não validada em muitos setups de monitores e TV. Se algo falhar, volte para a 1.5.0 e conte pelo botão de feedback (anexe o `consolemode.log`). Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
+## [1.6.0-alpha.1]
+### Novidades
+- Telas e áudio agora são controlados pelas APIs do próprio Windows. O app não embute mais o MultiMonitorTool nem o SoundVolumeView, da NirSoft: o pacote fica só com código do projeto e o rtss-cli (MIT), o que abre caminho para assinar o executável e reduz alertas falsos de antivírus. (#91, #97, #98, #99)
+- As telas salvas, a saída de áudio escolhida e o backup da mesa continuam valendo: os identificadores são os mesmos de antes.
+
+### Atenção: versão alpha
+- Esta versão ainda não foi validada em muitos setups de monitores e TV. Se algo falhar ao ligar a TV, desligar as outras telas ou restaurar a mesa, volte para a 1.5.0 e conte o que aconteceu pelo botão de feedback (anexe o `consolemode.log`).
+- Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
+## [1.5.1]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": entre nos testes da 1.6 pelo próprio app. A 1.6 controla telas e áudio com código próprio, sem as ferramentas da NirSoft. Desligado por padrão; ao ligar, o app avisa que versões de teste podem ter bugs.
 
 ## [1.5.0]
 ### Novidades

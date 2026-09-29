@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Explainer animation for the Console Mode README",
   "repository": {},
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "private": true,
   "dependencies": {
     "@remotion/cli": "4.0.526",

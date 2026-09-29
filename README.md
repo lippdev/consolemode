@@ -6,16 +6,18 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
+<img src="assets/features.gif" alt="Tour of Console Mode 1.5: resolution and HDR tuned for the TV, Big Picture, Playnite or Xbox as the launcher, the desk screens and audio coming back when you quit the game, hold Home to start and Start + Select to go back to the PC." width="800">
 
 ## Download
 
-Get **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, the latest stable version:
+Get **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
+
+Want to help test what comes next? **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.1 if you need it to just work, or turn on Settings → "Receive test versions" in 1.5.1 to get it from the app.
 
 On 1.4.0? The app offers the update. If it fails with a timeout, download the installer once; your settings are kept.
 
@@ -65,4 +67,4 @@ All the details in the [release notes](https://github.com/lippdev/consolemode/re
 - **Feedback:** the button next to Settings in the app, or [this form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). A ⭐ helps other couch gamers find the project.
 - Antivirus may flag the bundled helper tools; the source is all here.
 
-MIT License · [Third-party notices](THIRD_PARTY_NOTICES.md)
+[GNU Affero General Public License v3.0 only](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Code signing policy](docs/CODE_SIGNING.md)

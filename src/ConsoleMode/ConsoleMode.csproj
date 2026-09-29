@@ -17,10 +17,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <Platform Condition="'$(Platform)' == ''">x64</Platform>
-    <Version>1.5.0</Version>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
-    <InformationalVersion>1.5.0</InformationalVersion>
+    <Version>1.6.0-alpha.2</Version>
+    <AssemblyVersion>1.6.0.0</AssemblyVersion>
+    <FileVersion>1.6.0.0</FileVersion>
+    <InformationalVersion>1.6.0-alpha.2</InformationalVersion>
     <AssemblyTitle>Console Mode</AssemblyTitle>
     <Product>Console Mode</Product>
     <Authors>lippdev</Authors>
@@ -39,7 +39,7 @@
   <ItemGroup>
     <EmbeddedResource Include="..\..\assets\icon.ico" LogicalName="ConsoleMode.Assets.icon.ico" />
     <EmbeddedResource Include="Assets\OtherApps\*.png" LogicalName="ConsoleMode.Assets.OtherApps.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="..\..\artifacts\tools\*.exe" LogicalName="ConsoleMode.Tools.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\artifacts\tools\rtss-cli*.exe" LogicalName="ConsoleMode.Tools.%(Filename)%(Extension)" />
     <EmbeddedResource Include="Resources\Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="Resources\Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
     <EmbeddedResource Include="Resources\Strings.es-ES.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.es-ES.json" />

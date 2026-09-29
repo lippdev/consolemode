@@ -3,8 +3,35 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
+
 ### Fixes
-- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
+- Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
+
+### Behind the scenes
+- Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+
+## [1.6.0-alpha.2]
+### Changes
+- 1.6 is all the project's own code: the option to go back to MultiMonitorTool / SoundVolumeView is gone too, and their old files in the `tools` folder are deleted when the app opens. (#91)
+- Displays and audio are controlled through Windows' own APIs since 1.6.0-alpha.1; see its notes below. (#97, #98, #99)
+
+### Heads-up: alpha release
+- Not verified on many monitor and TV setups yet. If something fails, go back to 1.5.0 and tell us with the feedback button (attach `consolemode.log`). People on the stable 1.5.0 don't get this release automatically.
+
+## [1.6.0-alpha.1]
+### What's new
+- Displays and audio are now controlled through Windows' own APIs. The app no longer bundles NirSoft's MultiMonitorTool or SoundVolumeView: the package holds only the project's code and rtss-cli (MIT), which paves the way for a signed executable and fewer antivirus false positives. (#91, #97, #98, #99)
+- Saved screens, the chosen audio output and the desk backup keep working: the identifiers are the same as before.
+
+### Heads-up: alpha release
+- This release is not verified on many monitor and TV setups yet. If turning the TV on, turning the other screens off or restoring the desk fails, go back to 1.5.0 and tell us what happened with the feedback button (attach `consolemode.log`).
+- People on the stable 1.5.0 don't get this release automatically.
+
+## [1.5.1]
+### What's new
+- Settings → "Receive test versions (alpha and beta)": join the 1.6 tests from the app. 1.6 controls displays and audio with its own code, without the NirSoft tools. Off by default; turning it on warns that test versions can have bugs.
 
 ## [1.5.0]
 ### What's new

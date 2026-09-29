@@ -41,7 +41,6 @@ Write-Host "Versao: $Version"
 New-Item -ItemType Directory -Path $embedDir, $distDir -Force | Out-Null
 
 if (-not $SkipTools) {
-    & (Join-Path $PSScriptRoot "Get-NirSoftTools.ps1") -TargetDir $embedDir
     & (Join-Path $PSScriptRoot "Get-RtssCli.ps1") -TargetDir $embedDir
 }
 

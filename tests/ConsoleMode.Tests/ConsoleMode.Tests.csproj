@@ -10,15 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="coverlet.collector" Version="10.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
     <Compile Include="../../src/ConsoleMode/Services/UpdateIntegrity.cs" Link="UpdateIntegrity.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/UpdateChannel.cs" Link="UpdateChannel.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ReleaseNotes.cs" Link="ReleaseNotes.cs" />
     <Compile Include="../../src/ConsoleMode/Services/LocalizationService.cs" Link="LocalizationService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/FeedbackService.cs" Link="FeedbackService.cs" />
@@ -29,6 +30,8 @@
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />

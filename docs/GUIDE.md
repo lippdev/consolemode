@@ -41,7 +41,6 @@ Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requi
 
 - Multi-monitor layouts vary; on some setups restore may need a second try from the tray
 - Xbox mode does not detect when fullscreen ends — restore manually
-- Monitor and audio switching rely on bundled [NirSoft](https://www.nirsoft.net/) tools
 - The FPS limit is global (RTSS limitation), not per display
 - The WinUI 3 build currently requires Windows to compile (`net8.0-windows`)
 
@@ -68,7 +67,7 @@ Confirm that the focus monitor supports the feature and that HDR is enabled in W
 Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Windows application development** workload, or the .NET 8 SDK plus the Windows App SDK.
 
 ```powershell
-# Downloads MultiMonitorTool / SoundVolumeView / rtss-cli, then builds both packages
+# Downloads rtss-cli, then builds both packages
 .\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 

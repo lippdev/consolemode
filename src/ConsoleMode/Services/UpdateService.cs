@@ -39,7 +39,7 @@ public static partial class UpdateService
     }
 
     /// <summary>Newest published release above the running version, or null when up to date.</summary>
-    public static async Task<UpdateInfo?> CheckAsync(CancellationToken ct = default)
+    public static async Task<UpdateInfo?> CheckAsync(bool optedIntoPrereleases = false, CancellationToken ct = default)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
         timeout.CancelAfter(CheckTimeout);
@@ -52,8 +52,8 @@ public static partial class UpdateService
         using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
         var current = SemVer.Parse(CurrentVersion);
-        // Betas see betas; stable builds only get stable releases.
-        var allowPrerelease = current.IsPrerelease;
+        // Test builds see test builds; stable builds only get them when the user opted in.
+        var allowPrerelease = UpdateChannel.IncludePrereleases(current.IsPrerelease, optedIntoPrereleases);
 
         UpdateInfo? best = null;
         SemVer? bestVersion = null;
