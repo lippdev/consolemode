@@ -6,6 +6,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Novidades
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
 
+### Correções
+- Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
+
 ### Por trás dos panos
 - Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
 

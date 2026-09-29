@@ -82,7 +82,8 @@ internal sealed class DisplayBackend
             var current = m.IsActive ? NativeWindows.GetCurrentDisplayMode(m.Name) : null;
             MonitorService.ParseLeftTop(m.LeftTop, out var x, out var y);
             return new LayoutEntry(m.Name, m.MonitorId, m.SerialNumber, current?.BitsPerPel ?? 0,
-                current?.Width ?? 0, current?.Height ?? 0, current?.Frequency ?? 0, x ?? 0, y ?? 0);
+                current?.Width ?? 0, current?.Height ?? 0, current?.Frequency ?? 0, x ?? 0, y ?? 0,
+                m.IsActive ? NativeWindows.GetCurrentOrientation(m.Name) : 0);
         });
         File.WriteAllText(path, DisplayIdentity.FormatLayout(entries));
     }
@@ -99,7 +100,9 @@ internal sealed class DisplayBackend
             int.TryParse(spec.GetValueOrDefault("BitsPerPixel"), out var bits);
             int? x = int.TryParse(spec.GetValueOrDefault("PositionX"), out var px) ? px : null;
             int? y = int.TryParse(spec.GetValueOrDefault("PositionY"), out var py) ? py : null;
-            NativeDisplays.QueueMode(name, w, h, f, bits, x, y);
+            // Missing (older backup) means: leave the rotation alone.
+            var orientation = int.TryParse(spec.GetValueOrDefault("DisplayOrientation"), out var o) ? o : -1;
+            NativeDisplays.QueueMode(name, w, h, f, bits, x, y, orientation);
         }
         var code = NativeDisplays.ApplyPending();
         AppLog.Write($"Telas: layout restaurado => {code}");
