@@ -38,7 +38,17 @@ Vídeo de ~70 s em 1920×1080, no estilo de keynote: fundo preto, tipografia gra
 npm run keynote
 ```
 
-Grava `out/keynote.mp4`. A trilha é sintetizada por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Se mudar os tempos em `src/Keynote.tsx`, ajuste o script e regenere `public/keynote/soundtrack.mp3`:
+Grava `out/keynote.mp4`.
+
+Versão curta para redes sociais (`KeynoteCut`, ~32 s): menos cenas (sem launchers, interfaces nem a legenda da volta), e a composição roda a 45 fps, então tudo fica 1,5× mais rápido (180 BPM). O script converte para 30 fps, H.264 + AAC, que é o que o X aceita:
+
+```console
+npm run keynote:x
+```
+
+Grava `out/keynote-x.mp4`. Os tempos ficam em `S_CUT` em `src/Keynote.tsx` e em `CUT` no script da trilha.
+
+A trilha é sintetizada por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Se mudar os tempos em `src/Keynote.tsx`, ajuste o script e regenere `public/keynote/soundtrack.mp3` e `soundtrack-cut.mp3`:
 
 ```console
 pip install numpy scipy

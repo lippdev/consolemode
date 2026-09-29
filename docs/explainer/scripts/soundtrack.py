@@ -1,21 +1,34 @@
 """Synthesises the soundtrack of the Keynote film (src/Keynote.tsx).
 
 Everything is generated here, so there is no third-party audio to license. The hits follow
-the scene timings in Keynote.tsx (30 fps, 120 BPM: one beat = 15 frames, one bar = 60 frames).
+the scene timings in Keynote.tsx (one beat = 15 frames, one bar = 60 frames): 120 BPM for the
+full film at 30 fps, 180 BPM for the short cut, which plays the same frames at 45 fps.
 
     pip install numpy scipy
     python scripts/soundtrack.py          # writes out/soundtrack.wav
+    python scripts/soundtrack.py --cut    # writes out/soundtrack-cut.wav
 """
 
 import os
+import sys
 import wave
 
 import numpy as np
 from scipy.signal import butter, sosfilt
 
 SR = 44100
-FPS = 30
-TOTAL_FRAMES = 2100
+
+# Scene starts in frames, as in S / S_CUT in Keynote.tsx. `claps` is where the claps come in.
+FULL = dict(fps=30, title=150, click=300, restore=540, claps=720, home=900, menu=1020, bento=1140,
+            automate=1380, trust=1740, finale=1860, end=2100,
+            whooshes=[300, 540, 720, 1020, 1140, 1380, 1560, 1740], out="out/soundtrack.wav")
+CUT = dict(fps=45, title=135, click=240, restore=480, claps=720, home=600, menu=720, bento=840,
+           automate=1005, trust=1155, finale=1260, end=1440,
+           whooshes=[240, 480, 720, 840, 1005, 1155], out="out/soundtrack-cut.wav")
+TL = CUT if "--cut" in sys.argv else FULL
+
+FPS = TL["fps"]
+TOTAL_FRAMES = TL["end"]
 N = int(TOTAL_FRAMES / FPS * SR) + SR * 2
 BEAT = 15  # frames
 
@@ -151,8 +164,10 @@ drums = np.zeros(N)
 music = np.zeros(N)  # goes through the reverb
 fx = np.zeros(N)
 
-# Beat runs 300–1860, drops out while the Home button fills (900–1020) and before the finale.
-DROP = [(900, 1020), (1830, 1860)]
+# Beat runs from the click to the finale, drops out while the Home button fills and just
+# before the finale.
+BEAT_FROM, BEAT_TO = TL["click"], TL["finale"]
+DROP = [(TL["home"], TL["menu"]), (TL["finale"] - 30, TL["finale"])]
 
 
 def dropped(frame):
@@ -162,13 +177,13 @@ def dropped(frame):
 K = kick()
 H = hat()
 CL = clap()
-for f in range(300, 1860, BEAT):
+for f in range(BEAT_FROM, BEAT_TO, BEAT):
     if dropped(f):
         continue
     add(drums, at(f), K, 0.9)
     add(drums, at(f + BEAT / 2), H, 0.22)
     beat_in_bar = (f // BEAT) % 4
-    if f >= 720 and beat_in_bar in (1, 3):
+    if f >= TL["claps"] and beat_in_bar in (1, 3):
         add(drums, at(f), CL, 0.35)
 
 # Pad from the start, opening up with the beat.
@@ -182,13 +197,13 @@ for bar in range(TOTAL_FRAMES // 60 + 1):
     add(pad, s, chord * env, 0.05)
 pad_cut = lowpass(pad, 700)
 pad_open = lowpass(pad, 2600)
-mixer = np.clip((np.arange(N) - at(270)) / (at(330) - at(270)), 0, 1)
+mixer = np.clip((np.arange(N) - at(BEAT_FROM - 30)) / (at(BEAT_FROM + 30) - at(BEAT_FROM - 30)), 0, 1)
 music += pad_cut * (1 - mixer) + pad_open * mixer * 0.8
 
 # Bass (8ths) and arpeggio (16ths) with the beat.
 eighth = BEAT / 2
-f = 300.0
-while f < 1860:
+f = float(BEAT_FROM)
+while f < BEAT_TO:
     if not dropped(f):
         c = chord_at(f)
         add(music, at(f), bass(midi(ROOTS[c]), int(0.22 * SR)), 0.28)
@@ -196,8 +211,8 @@ while f < 1860:
 
 sixteenth = BEAT / 4
 step = 0
-f = 540.0
-while f < 1860:
+f = float(TL["restore"])
+while f < BEAT_TO:
     if not dropped(f):
         c = chord_at(f)
         notes = CHORDS[c] + [n + 12 for n in CHORDS[c]]
@@ -206,29 +221,30 @@ while f < 1860:
     f += sixteenth
 
 # Hits and transitions.
-add(fx, at(95), riser(at(150) - at(95)), 0.25)
-add(fx, at(150), impact(), 0.9)
-add(music, at(150), chime(), 0.25)
-for f in [300, 540, 720, 1020, 1140, 1380, 1560, 1740]:
+title, menu, finale = TL["title"], TL["menu"], TL["finale"]
+add(fx, at(title - 55), riser(at(title) - at(title - 55)), 0.25)
+add(fx, at(title), impact(), 0.9)
+add(music, at(title), chime(), 0.25)
+for f in TL["whooshes"]:
     add(fx, at(f) - int(0.35 * SR), whoosh(), 0.18)
-add(fx, at(960), riser(at(1020) - at(960)), 0.3)  # Home ring filling
-add(fx, at(1020), impact(int(2.0 * SR)), 0.55)
-add(fx, at(1780), riser(at(1860) - at(1780)), 0.3)
-add(fx, at(1860), impact(), 1.0)
-add(music, at(1860), chime(), 0.35)
+add(fx, at(menu - 60), riser(at(menu) - at(menu - 60)), 0.3)  # Home ring filling
+add(fx, at(menu), impact(int(2.0 * SR)), 0.55)
+add(fx, at(finale - 80), riser(at(finale) - at(finale - 80)), 0.3)
+add(fx, at(finale), impact(), 1.0)
+add(music, at(finale), chime(), 0.35)
 
 # UI sounds that match what is on screen.
-add(fx, at(390), blip(1200), 0.25)  # click on Play now
-for f in [585, 600, 615]:  # restore checks
-    add(fx, at(f), blip(1568), 0.18)
-for f in range(1400, 1442, 3):  # typing consolemode://start
-    add(fx, at(f), highpass(rng.standard_normal(int(0.02 * SR)), 3000) * np.exp(-np.arange(int(0.02 * SR)) / SR * 200), 0.08)
-for f in [1485, 1500, 1515]:  # Start / Menu / Stop keys
-    add(fx, at(f), blip(1320), 0.18)
+add(fx, at(TL["click"] + 90), blip(1200), 0.25)  # click on Play now
+for f in [45, 60, 75]:  # restore checks
+    add(fx, at(TL["restore"] + f), blip(1568), 0.18)
+for f in range(20, 62, 3):  # typing consolemode://start
+    add(fx, at(TL["automate"] + f), highpass(rng.standard_normal(int(0.02 * SR)), 3000) * np.exp(-np.arange(int(0.02 * SR)) / SR * 200), 0.08)
+for f in [105, 120, 135]:  # Start / Menu / Stop keys
+    add(fx, at(TL["automate"] + f), blip(1320), 0.18)
 
 # Mix.
 mix = drums + reverb(music, 2.8, 0.35) + reverb(fx, 2.2, 0.25)
-fade = np.clip((at(2100) - np.arange(N)) / (at(2100) - at(2010)), 0, 1)
+fade = np.clip((at(TOTAL_FRAMES) - np.arange(N)) / (at(TOTAL_FRAMES) - at(TOTAL_FRAMES - 90)), 0, 1)
 mix *= fade
 mix = np.tanh(mix * 1.2)
 mix /= np.max(np.abs(mix)) / 0.89
@@ -241,9 +257,9 @@ stereo = np.stack([left, right], axis=1)
 stereo /= np.max(np.abs(stereo)) / 0.89
 
 os.makedirs("out", exist_ok=True)
-with wave.open("out/soundtrack.wav", "wb") as w:
+with wave.open(TL["out"], "wb") as w:
     w.setnchannels(2)
     w.setsampwidth(2)
     w.setframerate(SR)
     w.writeframes((stereo * 32767).astype("<i2").tobytes())
-print("out/soundtrack.wav", len(mix) / SR, "s")
+print(TL["out"], len(mix) / SR, "s")
