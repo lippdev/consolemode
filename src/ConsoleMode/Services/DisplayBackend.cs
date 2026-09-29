@@ -44,7 +44,7 @@ internal sealed class DisplayBackend
                 Height = height,
                 Frequency = current?.Frequency > 0 ? current.Frequency.ToString() : "",
                 Colors = current?.BitsPerPel > 0 ? current.BitsPerPel.ToString() : "",
-                IsPrimary = m.IsActive && m.PositionX == 0 && m.PositionY == 0,
+                IsPrimary = m.IsActive && NativeDisplays.IsPrimary(m.GdiName),
                 IsActive = m.IsActive,
                 IsDisconnected = !m.IsActive,
                 MonitorName = !string.IsNullOrWhiteSpace(m.FriendlyName) ? m.FriendlyName : edid.Name,
