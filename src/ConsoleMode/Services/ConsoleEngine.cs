@@ -138,7 +138,7 @@ public sealed class ConsoleEngine
             var target = devices.FirstOrDefault(d => d.FriendlyId == config.AudioDeviceId);
             if (target is { IsActive: true })
             {
-                Audio.SetOutput(config.AudioDeviceId);
+                TrySetOutput(config.AudioDeviceId);
                 CompleteAudioWatch();
             }
             else
@@ -465,9 +465,11 @@ public sealed class ConsoleEngine
 
         var pick = Audio.PickNewDevice(newly, State.AudioDeviceHint, focus);
         if (pick is null) return;
-        Audio.SetOutput(pick.FriendlyId);
-        State.AudioDeviceId = pick.FriendlyId;
-        State.LastAudioSwitchName = pick.Name;
+        if (TrySetOutput(pick.FriendlyId))
+        {
+            State.AudioDeviceId = pick.FriendlyId;
+            State.LastAudioSwitchName = pick.Name;
+        }
         CompleteAudioWatch();
     }
 
@@ -477,8 +479,26 @@ public sealed class ConsoleEngine
         var devices = Audio.GetDevices(true);
         var target = devices.FirstOrDefault(d => d.FriendlyId == State.AudioDeviceId);
         if (target is not { IsActive: true }) return;
-        Audio.SetOutput(target.FriendlyId);
-        State.LastAudioSwitchName = target.Name;
+        if (TrySetOutput(target.FriendlyId)) State.LastAudioSwitchName = target.Name;
         CompleteAudioWatch();
+    }
+
+    /// <summary>
+    /// Switching the output is best effort, as it was with SoundVolumeView (its failures were ignored):
+    /// a Core Audio error is logged and the session goes on, instead of rolling back the whole start
+    /// after the screens were already switched.
+    /// </summary>
+    private bool TrySetOutput(string friendlyId)
+    {
+        try
+        {
+            Audio.SetOutput(friendlyId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Áudio: não foi possível trocar para {friendlyId}: {ex.Message}");
+            return false;
+        }
     }
 }
