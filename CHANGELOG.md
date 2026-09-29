@@ -6,6 +6,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Novidades
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
 
+### Por trás dos panos
+- Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
+
 ## [1.6.0-alpha.2]
 ### Mudanças
 - A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
