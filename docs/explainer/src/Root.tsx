@@ -4,8 +4,9 @@ import { Composition } from "remotion";
 import { Explainer } from "./Explainer";
 import { WHATS_NEW_DURATION, WhatsNew } from "./WhatsNew";
 import { ROADMAP_DURATION, Roadmap } from "./Roadmap";
-import { KEYNOTE_CUT_DURATION, KEYNOTE_DURATION, Keynote } from "./Keynote";
+import { KEYNOTE_DURATION, Keynote } from "./Keynote";
 import { FEATURES_DURATION, Features } from "./Features";
+import { LAUNCH_DURATION, Launch } from "./Launch";
 
 export const RemotionRoot: FC = () => {
   return (
@@ -43,13 +44,12 @@ export const RemotionRoot: FC = () => {
         height={1080}
       />
       <Composition
-        id="KeynoteCut"
-        component={Keynote}
-        durationInFrames={KEYNOTE_CUT_DURATION}
-        fps={45}
+        id="Launch"
+        component={Launch}
+        durationInFrames={LAUNCH_DURATION}
+        fps={30}
         width={1920}
         height={1080}
-        defaultProps={{ cut: true }}
       />
       <Composition
         id="Features"

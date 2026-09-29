@@ -40,15 +40,19 @@ npm run keynote
 
 Grava `out/keynote.mp4`.
 
-Versão curta para redes sociais (`KeynoteCut`, ~32 s): menos cenas (sem launchers, interfaces nem a legenda da volta), e a composição roda a 45 fps, então tudo fica 1,5× mais rápido (180 BPM). O script converte para 30 fps, H.264 + AAC, que é o que o X aceita:
+## Filme curto (`Launch`)
+
+Versão de ~32 s para redes sociais, com edição própria (não é o `Keynote` acelerado): um clique apaga a mesa e liga a TV, a câmera entra na TV e o jogo toma a tela, o menu Select + Y abre sobre a corrida, as specs passam uma por batida, sair do jogo traz a mesa de volta, e depois Home, launchers e o final.
+
+O jogo é `src/RacingGame.tsx`, uma corrida synthwave desenhada em SVG (sem imagens de jogos de terceiros). Tudo nele é função do frame, então passar o frame global do filme mantém a mesma corrida entre as cenas.
 
 ```console
-npm run keynote:x
+npm run launch
 ```
 
-Grava `out/keynote-x.mp4`. Os tempos ficam em `S_CUT` em `src/Keynote.tsx` e em `CUT` no script da trilha.
+Grava `out/launch.mp4` e `out/launch-x.mp4` (H.264 yuv420p + AAC, faststart), que é o arquivo para postar.
 
-A trilha é sintetizada por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Se mudar os tempos em `src/Keynote.tsx`, ajuste o script e regenere `public/keynote/soundtrack.mp3` e `soundtrack-cut.mp3`:
+As trilhas dos dois filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx` ou `src/Launch.tsx`, ajuste o script e regenere `public/keynote/soundtrack.mp3` e `launch.mp3`:
 
 ```console
 pip install numpy scipy

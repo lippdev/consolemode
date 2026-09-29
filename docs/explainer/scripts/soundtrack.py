@@ -1,12 +1,11 @@
 """Synthesises the soundtrack of the Keynote film (src/Keynote.tsx).
 
 Everything is generated here, so there is no third-party audio to license. The hits follow
-the scene timings in Keynote.tsx (one beat = 15 frames, one bar = 60 frames): 120 BPM for the
-full film at 30 fps, 180 BPM for the short cut, which plays the same frames at 45 fps.
+the scene timings of the films (30 fps, 120 BPM: one beat = 15 frames, one bar = 60 frames).
 
     pip install numpy scipy
-    python scripts/soundtrack.py          # writes out/soundtrack.wav
-    python scripts/soundtrack.py --cut    # writes out/soundtrack-cut.wav
+    python scripts/soundtrack.py          # writes out/soundtrack.wav (Keynote)
+    python scripts/soundtrack.py launch   # writes out/launch.wav (Launch)
 """
 
 import os
@@ -18,14 +17,32 @@ from scipy.signal import butter, sosfilt
 
 SR = 44100
 
-# Scene starts in frames, as in S / S_CUT in Keynote.tsx. `claps` is where the claps come in.
-FULL = dict(fps=30, title=150, click=300, restore=540, claps=720, home=900, menu=1020, bento=1140,
-            automate=1380, trust=1740, finale=1860, end=2100,
-            whooshes=[300, 540, 720, 1020, 1140, 1380, 1560, 1740], out="out/soundtrack.wav")
-CUT = dict(fps=45, title=135, click=240, restore=480, claps=720, home=600, menu=720, bento=840,
-           automate=1005, trust=1155, finale=1260, end=1440,
-           whooshes=[240, 480, 720, 840, 1005, 1155], out="out/soundtrack-cut.wav")
-TL = CUT if "--cut" in sys.argv else FULL
+# What happens when, in frames. `full` is the Keynote film (src/Keynote.tsx, S) and `launch`
+# the short film (src/Launch.tsx, L).
+TIMELINES = {
+    "full": dict(
+        fps=30, end=2100, out="out/soundtrack.wav",
+        beat=(300, 1860), drops=[(900, 1020), (1830, 1860)], claps=720, arp=540,
+        risers=[(95, 150, 0.25), (960, 1020, 0.3), (1780, 1860, 0.3)],
+        impacts=[(150, 3.5, 0.9, 0.25), (1020, 2.0, 0.55, 0), (1860, 3.5, 1.0, 0.35)],
+        whooshes=[300, 540, 720, 1020, 1140, 1380, 1560, 1740],
+        blips=[(390, 1200, 0.25), (585, 1568, 0.18), (600, 1568, 0.18), (615, 1568, 0.18),
+               (1485, 1320, 0.18), (1500, 1320, 0.18), (1515, 1320, 0.18)],
+        typing=(1400, 1442), engine=[],
+    ),
+    "launch": dict(
+        fps=30, end=960, out="out/launch.wav",
+        beat=(150, 810), drops=[(780, 810)], claps=270, arp=150,
+        risers=[(100, 150, 0.3), (740, 810, 0.3)],
+        impacts=[(60, 2.0, 0.45, 0), (150, 3.5, 0.9, 0.25), (810, 3.5, 1.0, 0.35)],
+        whooshes=[270, 390, 510, 630, 720],
+        blips=[(30, 1200, 0.25), (390, 988, 0.16), (405, 988, 0.16), (420, 988, 0.16), (435, 988, 0.16),
+               (450, 988, 0.16), (585, 1568, 0.18), (600, 1568, 0.18), (615, 1568, 0.18),
+               (686, 1760, 0.2), (725, 1320, 0.15), (740, 1320, 0.15), (755, 1320, 0.15)],
+        typing=None, engine=[(60, 150, 0.1), (150, 546, 0.2)],
+    ),
+}
+TL = TIMELINES[sys.argv[1] if len(sys.argv) > 1 else "full"]
 
 FPS = TL["fps"]
 TOTAL_FRAMES = TL["end"]
@@ -164,10 +181,19 @@ drums = np.zeros(N)
 music = np.zeros(N)  # goes through the reverb
 fx = np.zeros(N)
 
-# Beat runs from the click to the finale, drops out while the Home button fills and just
-# before the finale.
-BEAT_FROM, BEAT_TO = TL["click"], TL["finale"]
-DROP = [(TL["home"], TL["menu"]), (TL["finale"] - 30, TL["finale"])]
+def engine(n, start):
+    """Engine hum whose pitch follows the speedometer in RacingGame.tsx."""
+    t = np.arange(n) / SR
+    frame = start + t * FPS
+    hz = 62 * (1 + 0.02 * np.sin(frame / 13) + 0.014 * np.sin(frame / 5))
+    ph = 2 * np.pi * np.cumsum(hz) / SR
+    s = sum(np.sin(k * ph) / k for k in range(1, 7)) + 0.25 * np.sign(np.sin(ph))
+    env = np.minimum(1, t / 0.25) * np.minimum(1, (t[-1] - t) / 0.25)
+    return lowpass(s, 700) * env
+
+
+BEAT_FROM, BEAT_TO = TL["beat"]
+DROP = TL["drops"]
 
 
 def dropped(frame):
@@ -211,7 +237,7 @@ while f < BEAT_TO:
 
 sixteenth = BEAT / 4
 step = 0
-f = float(TL["restore"])
+f = float(TL["arp"])
 while f < BEAT_TO:
     if not dropped(f):
         c = chord_at(f)
@@ -221,26 +247,23 @@ while f < BEAT_TO:
     f += sixteenth
 
 # Hits and transitions.
-title, menu, finale = TL["title"], TL["menu"], TL["finale"]
-add(fx, at(title - 55), riser(at(title) - at(title - 55)), 0.25)
-add(fx, at(title), impact(), 0.9)
-add(music, at(title), chime(), 0.25)
+for a, b, gain in TL["risers"]:
+    add(fx, at(a), riser(at(b) - at(a)), gain)
+for f, seconds, gain, chime_gain in TL["impacts"]:
+    add(fx, at(f), impact(int(seconds * SR)), gain)
+    if chime_gain:
+        add(music, at(f), chime(), chime_gain)
 for f in TL["whooshes"]:
     add(fx, at(f) - int(0.35 * SR), whoosh(), 0.18)
-add(fx, at(menu - 60), riser(at(menu) - at(menu - 60)), 0.3)  # Home ring filling
-add(fx, at(menu), impact(int(2.0 * SR)), 0.55)
-add(fx, at(finale - 80), riser(at(finale) - at(finale - 80)), 0.3)
-add(fx, at(finale), impact(), 1.0)
-add(music, at(finale), chime(), 0.35)
 
-# UI sounds that match what is on screen.
-add(fx, at(TL["click"] + 90), blip(1200), 0.25)  # click on Play now
-for f in [45, 60, 75]:  # restore checks
-    add(fx, at(TL["restore"] + f), blip(1568), 0.18)
-for f in range(20, 62, 3):  # typing consolemode://start
-    add(fx, at(TL["automate"] + f), highpass(rng.standard_normal(int(0.02 * SR)), 3000) * np.exp(-np.arange(int(0.02 * SR)) / SR * 200), 0.08)
-for f in [105, 120, 135]:  # Start / Menu / Stop keys
-    add(fx, at(TL["automate"] + f), blip(1320), 0.18)
+# UI sounds that match what is on screen, and the engine under the race.
+for f, hz, gain in TL["blips"]:
+    add(fx, at(f), blip(hz), gain)
+if TL["typing"]:
+    for f in range(TL["typing"][0], TL["typing"][1], 3):
+        add(fx, at(f), highpass(rng.standard_normal(int(0.02 * SR)), 3000) * np.exp(-np.arange(int(0.02 * SR)) / SR * 200), 0.08)
+for a, b, gain in TL["engine"]:
+    add(drums, at(a), engine(at(b) - at(a), a), gain)
 
 # Mix.
 mix = drums + reverb(music, 2.8, 0.35) + reverb(fx, 2.2, 0.25)
