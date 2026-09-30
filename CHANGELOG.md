@@ -9,6 +9,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Correções
 - Steam: ao voltar ao PC (botão, menu, atalho, link `stop` ou saindo do Big Picture) o Big Picture é sempre fechado e a Steam é chamada para fechar do jeito normal, o "Sair" dela, sem encerrar o processo à força. Antes ela ficava aberta e costumava ficar bugada. Não fecha a Steam se houver um jogo rodando, e dá para desligar em Ajustes → "Fechar a Steam ao voltar ao PC". (#121)
 - Menu da sessão: o aviso que mostra o atalho no início da sessão não fica mais preso na tela; ele some sozinho depois de alguns segundos. (#114)
+- Controles: um controle que manda leituras impossíveis pelo driver HID genérico (muitos botões apertados ao mesmo tempo, direcional preso) agora é ignorado também quando o Windows o expõe por Windows.Gaming.Input. O log avisa, e reabrir o app tenta de novo. (#115)
 - Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
 - Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos. Se o Playnite troca a janela de carregamento pela principal, o Console Mode passa a acompanhar a nova e só restaura a mesa quando o Playnite fecha de verdade. (#83)
 - Áudio: se a troca da saída falhar, a sessão continua em vez de ser desfeita depois de as telas já terem sido trocadas. (#109)
