@@ -238,6 +238,23 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao 
 - [ ] Lançador Playnite ou Modo Xbox: a Steam não é tocada. Resultado: ______
 - [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
 
+## 3c. Controle da TV: Google TV / Android TV (issue #75)
+
+Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuração USB** (ou "Depuração pela rede") ativada nas Opções do desenvolvedor; Ajustes → TV → *Google TV / Android TV* com o IP e a entrada HDMI do PC.
+
+- [ ] **Testar agora** na primeira vez: a TV pede "Permitir depuração"; com "Sempre permitir" + "Permitir", a TV acorda e vai para a entrada do PC. O status mostra sucesso. Resultado: ______
+- [ ] **Testar agora** de novo: não pede mais permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
+- [ ] Recusar o pedido na TV (ou esperar 60 s): o status explica que a TV não autorizou este PC. Resultado: ______
+- [ ] IP errado / TV fora da rede: o status diz que a TV não respondeu, em poucos segundos. Resultado: ______
+- [ ] **Jogar agora** com a TV em espera: ela liga, troca para o PC e o modo console segue normal. O log tem `TV: ligar (androidTv) ok`. Resultado: ______
+- [ ] Com a TV desligada da tomada: o modo console não trava; o log tem `TV: ligar ... falhou` e o fluxo segue (a TV não aparece, o app avisa como antes). Resultado: ______
+- [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
+- [ ] **Colocar a TV em espera ao restaurar** ligado: ao sair do Big Picture, a mesa volta e depois a TV entra em espera. Desligado (padrão): a TV continua ligada. Resultado: ______
+- [ ] TV que ignora a tecla HDMI: preencher **Comando da entrada** faz a troca funcionar. Resultado: ______
+- [ ] Escolher "Não controlar": os campos somem e nada é enviado à TV, e **Jogar agora** não demora mais do que antes (nenhuma linha `TV:` no log). Resultado: ______
+- [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
+- [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
+
 Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
 
 - [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
@@ -245,7 +262,6 @@ Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV
 - [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
 - [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
 - [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
-
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______
