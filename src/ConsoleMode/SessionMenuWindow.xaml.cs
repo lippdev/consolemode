@@ -66,7 +66,7 @@ public sealed partial class SessionMenuWindow : Window
         {
             Sounds = true,
             // Focus may only land inside the picker while it is open (it covers the tiles).
-            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard : Root,
+            SearchRoot = () => ViewModel.IsSessionSwitcherOpen ? SwitcherCard : ViewModel.IsSessionPickerOpen ? PickerCard : Root,
             // Adjust mode on the volume tile: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
@@ -76,7 +76,11 @@ public sealed partial class SessionMenuWindow : Window
                 return true;
             }
         };
-        _navigator.OptionRequested += () => { if (IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null); };
+        _navigator.OptionRequested += () =>
+        {
+            if (ViewModel.IsSessionSwitcherOpen) CloseFocusedWindow();
+            else if (IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null);
+        };
         _navigator.BackRequested += () =>
         {
             if (_editingVolume) SetEditingVolume(false);
@@ -103,6 +107,8 @@ public sealed partial class SessionMenuWindow : Window
                 _navigator.Navigate(direction);
                 return;
             }
+            // Delete closes the highlighted window in the switcher (the keyboard's X / Square).
+            if (e.Key == Windows.System.VirtualKey.Delete && ViewModel.IsSessionSwitcherOpen) { e.Handled = true; CloseFocusedWindow(); return; }
             // The pad's B comes from the navigator's polling; handling GamepadB here too would count it twice.
             if (e.Key is not Windows.System.VirtualKey.Escape) return;
             e.Handled = true;
@@ -266,22 +272,22 @@ public sealed partial class SessionMenuWindow : Window
         _closeTimer.Start();
     }
 
-    /// <summary>The sub-picker fades and rises in over the tiles.</summary>
-    private void PlayPickerEntrance()
+    /// <summary>A panel over the tiles (the picker, the window switcher): the veil fades in, the card fades and rises in.</summary>
+    private void PlayOverlayEntrance(UIElement overlay, UIElement card)
     {
         if (!Animate) return;
         try
         {
-            ElementCompositionPreview.GetElementVisual(PickerOverlay).Opacity = 0f;
-            Enter(PickerOverlay, 0f, 200, 0);
-            ElementCompositionPreview.GetElementVisual(PickerCard).Opacity = 0f;
-            Enter(PickerCard, 22f, 240, 30);
+            ElementCompositionPreview.GetElementVisual(overlay).Opacity = 0f;
+            Enter(overlay, 0f, 200, 0);
+            ElementCompositionPreview.GetElementVisual(card).Opacity = 0f;
+            Enter(card, 22f, 240, 30);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Menu da sessão: animação: {ex.Message}");
-            ElementCompositionPreview.GetElementVisual(PickerOverlay).Opacity = 1f;
-            ElementCompositionPreview.GetElementVisual(PickerCard).Opacity = 1f;
+            ElementCompositionPreview.GetElementVisual(overlay).Opacity = 1f;
+            ElementCompositionPreview.GetElementVisual(card).Opacity = 1f;
         }
     }
 
@@ -354,11 +360,42 @@ public sealed partial class SessionMenuWindow : Window
             case nameof(MainViewModel.IsSessionPickerOpen):
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    if (ViewModel.IsSessionPickerOpen) { PlayPickerEntrance(); FocusPickerSelection(); }
+                    if (ViewModel.IsSessionPickerOpen) { PlayOverlayEntrance(PickerOverlay, PickerCard); FocusPickerSelection(); }
+                    else FirstRow.Focus(FocusState.Keyboard);
+                });
+                break;
+            case nameof(MainViewModel.IsSessionSwitcherOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsSessionSwitcherOpen) { PlayOverlayEntrance(SwitcherOverlay, SwitcherCard); FocusSwitcherCard(); }
                     else FirstRow.Focus(FocusState.Keyboard);
                 });
                 break;
         }
+    }
+
+    /// <summary>X / Delete in the switcher: ask the highlighted window to close.</summary>
+    private void CloseFocusedWindow()
+    {
+        if (Root.XamlRoot is not { } root) return;
+        if (FocusManager.GetFocusedElement(root) is FrameworkElement { DataContext: SwitchWindowItem item })
+            _ = ViewModel.CloseSwitcherWindowAsync(item);
+    }
+
+    /// <summary>Opens on the second card (the first is the window that was in front), like Alt + Tab.</summary>
+    private void FocusSwitcherCard()
+    {
+        var index = AltTabRules.InitialIndex(ViewModel.SwitcherWindows.Count);
+        bool TryFocus() =>
+            SwitcherList.ContainerFromIndex(index) is { } container
+            && (FocusManager.FindFirstFocusableElement(container) as Control)?.Focus(FocusState.Keyboard) == true;
+        if (ViewModel.SwitcherWindows.Count == 0 || TryFocus()) return;
+        void OnLayout(object? s, object e)
+        {
+            SwitcherList.LayoutUpdated -= OnLayout;
+            TryFocus();
+        }
+        SwitcherList.LayoutUpdated += OnLayout;
     }
 
     private void FocusPickerSelection()

@@ -120,6 +120,9 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O painel sobe e aparece, os blocos entram em cascata (~45 ms entre cada), e ao fechar (B, Esc ou o atalho) ele some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
 - [ ] O bloco em foco cresce e ganha contorno branco; há som ao mover, confirmar e voltar; o seletor (resolução, áudio, FPS) anima ao abrir e já vem com a opção atual em foco. Resultado: ______
 - [ ] Cima/baixo/esquerda/direita nunca ficam "mortos" entre os blocos e as duas saídas; com o seletor aberto o foco não escapa para os blocos de trás. Resultado: ______
+- [ ] Bloco **Janelas** ("N abertas"): A abre uma faixa com as janelas abertas (ícone, programa e título), em ordem de frente para trás, já com o foco na segunda (como o Alt+Tab). A traz a janela escolhida para a frente (restaura se estiver minimizada) e fecha o menu; X (□ no PlayStation) ou Delete pede para fechar a janela e o card some quando ela fecha; B volta ao menu. Resultado: ______
+- [ ] A faixa não lista o próprio menu, a barra de tarefas, a área de trabalho nem apps UWP suspensos; com nenhuma janela mostra "Nenhuma janela aberta". Resultado: ______
+- [ ] Em sessão (Big Picture/Playnite aberto): trocar para outra janela **não** restaura a mesa, e voltar ao Big Picture pela faixa funciona; uma janela aberta na tela de jogo aparece na lista. Resultado: ______
 - [ ] O fundo é vidro fosco com cantos arredondados; se o Windows não aplicar o efeito, o menu continua escuro e legível. Resultado: ______
 
 Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation; atalhos do menu e de voltar ao PC definidos. Nos passos abaixo, "Select + Y" e "Start + Select" são os atalhos sugeridos: use os que você escolheu.

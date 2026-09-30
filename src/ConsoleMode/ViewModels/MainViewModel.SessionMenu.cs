@@ -111,13 +111,15 @@ public partial class MainViewModel
     private void CloseSessionMenu()
     {
         IsSessionPickerOpen = false;
+        IsSessionSwitcherOpen = false;
         _sessionMenu?.CloseAnimated();
     }
 
-    /// <summary>B: closes the picker first, then the menu.</summary>
+    /// <summary>B: closes the window switcher or the picker first, then the menu.</summary>
     public void SessionMenuBack()
     {
-        if (IsSessionPickerOpen) IsSessionPickerOpen = false;
+        if (IsSessionSwitcherOpen) IsSessionSwitcherOpen = false;
+        else if (IsSessionPickerOpen) IsSessionPickerOpen = false;
         else CloseSessionMenu();
     }
 
@@ -174,6 +176,7 @@ public partial class MainViewModel
         SessionAudioText = audioName;
         VolumePercent = volume ?? -1;
         SessionFpsText = state.FpsLimit > 0 ? $"{state.FpsLimit} FPS" : LocalizationService.Get("FpsNoLimit");
+        SessionWindowsText = LocalizationService.Get("SessionWindowsCount", await Task.Run(() => WindowSwitcher.List().Count));
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
     }
 

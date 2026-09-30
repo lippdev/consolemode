@@ -30,6 +30,7 @@ public partial class MainViewModel
     public string HintConfirm => IsPlayStationHints ? "✕" : "A";
     public string HintBack => IsPlayStationHints ? "○" : "B";
     public string HintAlt => IsPlayStationHints ? "△" : "Y";
+    public string HintOption => IsPlayStationHints ? "□" : "X";
     public string HintMenu => IsPlayStationHints ? "OPTIONS" : "☰";
 
     partial void OnIsConsoleUiChanged(bool value)
@@ -48,6 +49,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HintConfirm));
         OnPropertyChanged(nameof(HintBack));
         OnPropertyChanged(nameof(HintAlt));
+        OnPropertyChanged(nameof(HintOption));
         OnPropertyChanged(nameof(HintMenu));
         OnPropertyChanged(nameof(HintLb));
         OnPropertyChanged(nameof(HintRb));
