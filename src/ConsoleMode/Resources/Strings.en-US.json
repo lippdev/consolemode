@@ -86,6 +86,8 @@
   "HintChange": "Change",
   "ConsoleSettingsHint": "Press A on a row to change its value. Everything is saved right away.",
   "BackToPc": "Back to the PC",
+  "CloseMenu": "Close menu",
+  "SessionPreviewBadge": "Preview · outside a session",
   "ConsoleActiveHint": "Or hold {0} on the controller for 1 second.",
   "ChooseRoleFor": "What does the {0} screen do?",
   "HomeButtonCard": "Controller shortcut to open Console Mode",

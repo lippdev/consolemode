@@ -4,6 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Menu da sessão (o atalho do controle, Select + Y na sugestão) redesenhado: vidro acrílico com cantos arredondados, blocos com ícone e medidor de volume, anel de foco que cresce, sons, e animações (o painel sobe e os blocos entram em cascata; ao fechar ele some suavemente, e o seletor também anima). Nesta alpha ele abre também **fora da sessão**, como prévia, com um selo no topo, para testar sem ligar o modo console (nessa prévia o limite de FPS não aparece e "Voltar ao PC" vira "Fechar menu"). (#120)
 - Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation) com uma animação de deslize, blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR), que abre cada escolha. (#117)
 - Plano de fundo do modo Console: por padrão, uma colagem com as capas dos seus jogos instalados na Steam sob um gradiente escuro (o app só lê as imagens que a Steam já baixou; nada é embutido). Dá para trocar por só o gradiente ou por uma imagem sua, em Sistema → Plano de fundo. (#117)
 - Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)

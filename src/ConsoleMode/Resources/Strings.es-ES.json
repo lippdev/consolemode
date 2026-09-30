@@ -86,6 +86,8 @@
   "HintChange": "Cambiar",
   "ConsoleSettingsHint": "Pulsa A en una fila para cambiar su valor. Todo se guarda al momento.",
   "BackToPc": "Volver al PC",
+  "CloseMenu": "Cerrar menú",
+  "SessionPreviewBadge": "Vista previa · fuera de la sesión",
   "ConsoleActiveHint": "O mantén {0} en el mando durante 1 segundo.",
   "ChooseRoleFor": "¿Qué hace la pantalla {0}?",
   "HomeButtonCard": "Atajo del mando para abrir Console Mode",

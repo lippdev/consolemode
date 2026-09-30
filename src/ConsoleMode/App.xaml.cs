@@ -211,7 +211,8 @@ public partial class App : Application
         // that isn't set never runs, and the three do not depend on each other.
         var idle = !ViewModel.IsCapturingShortcut;
         Apply(_guide, idle && _guide.Mask != 0 && !ViewModel.IsConsoleActive);
-        Apply(_menuChord, idle && _menuChord.Mask != 0 && ViewModel.IsConsoleActive);
+        // The menu also opens outside a session in this alpha (a preview, to try it without console mode).
+        Apply(_menuChord, idle && _menuChord.Mask != 0);
         Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
     }
 

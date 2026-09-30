@@ -112,6 +112,16 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
+### Prévia fora da sessão (alpha) e visual novo
+
+- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu na tela de jogo (ou na principal, se a da TV estiver desligada), com o selo "Prévia · fora da sessão". O link `consolemode://menu` e o item da bandeja também abrem. Resultado: ______
+- [ ] Na prévia: o bloco de FPS não aparece, "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Resultado: ______
+- [ ] Volume (A, ◀/▶, X muda o mudo), saída de áudio, resolução e HDR funcionam na prévia e valem de verdade (não há sessão para desfazê-los). Resultado: ______
+- [ ] O painel sobe e aparece, os blocos entram em cascata (~45 ms entre cada), e ao fechar (B, Esc ou o atalho) ele some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
+- [ ] O bloco em foco cresce e ganha contorno branco; há som ao mover, confirmar e voltar; o seletor (resolução, áudio, FPS) anima ao abrir e já vem com a opção atual em foco. Resultado: ______
+- [ ] Cima/baixo/esquerda/direita nunca ficam "mortos" entre os blocos e as duas saídas; com o seletor aberto o foco não escapa para os blocos de trás. Resultado: ______
+- [ ] O fundo é vidro fosco com cantos arredondados; se o Windows não aplicar o efeito, o menu continua escuro e legível. Resultado: ______
+
 Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation; atalhos do menu e de voltar ao PC definidos. Nos passos abaixo, "Select + Y" e "Start + Select" são os atalhos sugeridos: use os que você escolheu.
 
 - [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______

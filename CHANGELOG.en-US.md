@@ -4,6 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Session menu (the controller shortcut, Select + Y in the suggestion) redesigned: acrylic glass with rounded corners, icon tiles and a volume gauge, a focus ring that grows, sounds, and animations (the panel slides up and the tiles come in one after another; closing fades it out, and the picker animates too). In this alpha it also opens **outside a session**, as a preview with a badge on top, so it can be tried without turning on console mode (in that preview the FPS limit is hidden and "Back to the PC" becomes "Close menu"). (#120)
 - Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation) with a slide animation, screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR), each opening its choices. (#117)
 - Console background: by default, a collage of the covers of your installed Steam games under a dark gradient (the app only reads images Steam already downloaded; nothing is bundled). You can switch to just the gradient or to a picture of your own, in System → Background. (#117)
 - Sounds in the Console interface when you move the focus, pick and go back (made by the app itself, at a low volume). Turn them off in Settings → Interface sounds. (#117)
