@@ -18,7 +18,7 @@ public sealed class DisplayIdentityTests
     }
 
     [Fact]
-    public void Monitor_id_has_MultiMonitorTools_format()
+    public void Monitor_id_has_the_format_saved_by_1_5()
     {
         Assert.Equal(@"MONITOR\GSM5B7F\{4d36e96e-e325-11ce-bfc1-08002be10318}\0004",
             DisplayIdentity.MonitorId("GSM5B7F", @"{4d36e96e-e325-11ce-bfc1-08002be10318}\0004"));
@@ -115,7 +115,7 @@ public sealed class DisplayIdentityTests
     [Fact]
     public void A_backup_made_by_1_5_is_written_back_unchanged()
     {
-        // The shape of a real 1.5 backup (MultiMonitorTool): a portrait side monitor and a TV that was off.
+        // The shape of a real 1.5 backup: a portrait side monitor and a TV that was off.
         string[] original =
         [
             "[Monitor0]", @"Name=\\.\DISPLAY1", @"MonitorID=MONITOR\TCL1003\{4d36e96e-e325-11ce-bfc1-08002be10318}\0003",
