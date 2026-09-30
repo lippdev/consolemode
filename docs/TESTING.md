@@ -266,7 +266,7 @@ Pré-condições: Home Assistant acessível pelo PC; um script que liga a TV e t
 - [ ] Copiar a pasta de dados para outro usuário do Windows (ou outro PC): o card do token explica que o token salvo não pode ser lido e pede para informar de novo; **Testar agora** diz o mesmo em vez de falhar em silêncio. Resultado: ______
 - [ ] Token errado: o status diz que o Home Assistant recusou o token. Entidade inexistente: diz que não encontrou a entidade. Endereço errado: diz que não respondeu. Resultado: ______
 - [ ] **Jogar agora**: o script roda antes das telas mudarem; o log tem `TV: Home Assistant script.turn_on ... → 200`. Resultado: ______
-- [ ] "Colocar a TV em espera ao restaurar" com entidade de restauração: ela roda depois que a mesa volta. Sem entidade de restauração e entidade inicial `media_player`: roda `media_player.turn_off`. Com script como entidade inicial e sem a de restauração: nada acontece (log explica). Resultado: ______
+- [ ] "Colocar a TV em espera ao restaurar" com entidade de restauração: ela roda depois que a mesa volta. Sem entidade de restauração e entidade inicial `media_player`: roda `media_player.turn_off`. Com script como entidade inicial e sem a de restauração: nada acontece (log explica). Com uma entidade de restauração inválida: o erro é registrado e a entidade inicial não recebe `turn_off`. Resultado: ______
 
 Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
 

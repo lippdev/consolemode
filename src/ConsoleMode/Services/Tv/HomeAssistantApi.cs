@@ -37,7 +37,12 @@ public static class HomeAssistantApi
     /// </summary>
     public static ServiceCall? TurnOff(string onEntity, string offEntity)
     {
-        if (IsValidEntity(offEntity)) return For(offEntity, turnOn: true);
+        if (!string.IsNullOrWhiteSpace(offEntity))
+        {
+            if (!IsValidEntity(offEntity))
+                throw new ArgumentException("The restore entity is invalid.", nameof(offEntity));
+            return For(offEntity, turnOn: true);
+        }
         if (!IsValidEntity(onEntity) || Actions.ContainsKey(Domain(onEntity))) return null;
         return For(onEntity, turnOn: false);
     }

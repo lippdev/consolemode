@@ -25,6 +25,15 @@ public sealed class HomeAssistantApiTests
         Assert.Equal(("script", "turn_on", "script.tv_off"), (call!.Value.Domain, call.Value.Service, call.Value.EntityId));
     }
 
+    [Theory]
+    [InlineData("bad entity")]
+    [InlineData("script.")]
+    [InlineData("script.tv.pc")]
+    public void Restore_rejects_a_malformed_explicit_off_entity_instead_of_falling_back(string offEntity)
+    {
+        Assert.Throws<ArgumentException>(() => HomeAssistantApi.TurnOff("media_player.tv", offEntity));
+    }
+
     [Fact]
     public void Restore_turns_a_stateful_start_entity_off()
     {

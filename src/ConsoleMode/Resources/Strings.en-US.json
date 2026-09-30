@@ -164,6 +164,7 @@
   "TvHaUrlMissing": "Enter the Home Assistant address, e.g. http://homeassistant.local:8123.",
   "TvHaTokenMissing": "Enter a Home Assistant long-lived access token.",
   "TvHaEntityMissing": "Enter the entity to run, e.g. script.tv_to_pc.",
+  "TvHaEntityInvalid": "The restore entity is invalid. Use a Home Assistant entity ID such as script.tv_off or switch.tv.",
   "TvHaUnreachable": "Home Assistant at {0} didn't answer. If it uses http, type http:// in the address.",
   "TvHaUnauthorized": "Home Assistant refused the token. Create a new one under Profile → Security.",
   "TvHaNotFound": "Home Assistant couldn't find {0}. Check the entity name.",

@@ -164,6 +164,7 @@
   "TvHaUrlMissing": "Indica la dirección de Home Assistant, p. ej.: http://homeassistant.local:8123.",
   "TvHaTokenMissing": "Indica un token de acceso de larga duración de Home Assistant.",
   "TvHaEntityMissing": "Indica la entidad a ejecutar, p. ej.: script.encender_tv_pc.",
+  "TvHaEntityInvalid": "La entidad de restauración no es válida. Usa un ID de entidad de Home Assistant, como script.apagar_tv o switch.tv.",
   "TvHaUnreachable": "Home Assistant en {0} no respondió. Si usa http, escribe http:// en la dirección.",
   "TvHaUnauthorized": "Home Assistant rechazó el token. Crea uno nuevo en Perfil → Seguridad.",
   "TvHaNotFound": "Home Assistant no encontró {0}. Revisa el nombre de la entidad.",

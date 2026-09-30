@@ -32,7 +32,15 @@ public sealed class HomeAssistantController : ITvController
 
     public Task TurnOffAsync(TvControlConfig config, CancellationToken ct)
     {
-        var call = HomeAssistantApi.TurnOff(config.HomeAssistantOnEntity, config.HomeAssistantOffEntity);
+        HomeAssistantApi.ServiceCall? call;
+        try
+        {
+            call = HomeAssistantApi.TurnOff(config.HomeAssistantOnEntity, config.HomeAssistantOffEntity);
+        }
+        catch (ArgumentException)
+        {
+            throw new TvControlException(LocalizationService.Get("TvHaEntityInvalid"));
+        }
         if (call is null)
         {
             AppLog.Write("TV: Home Assistant sem entidade para desligar; nada a fazer");
