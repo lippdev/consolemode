@@ -29,8 +29,11 @@ public static class CecCommands
         output.Contains("could not open a connection", StringComparison.OrdinalIgnoreCase) ||
         output.Contains("no serial port given", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Where libCEC's installer puts cec-client, then the PATH.</summary>
-    public static IEnumerable<string> Candidates(string? customPath, string? programFilesX86, string? programFiles, string? pathVariable)
+    /// <summary>
+    /// A custom path (the setting) wins; otherwise next to Console Mode's exe, libCEC's install
+    /// folders, then the PATH. Nothing is bundled: cec-client comes from the user's libCEC install.
+    /// </summary>
+    public static IEnumerable<string> Candidates(string? customPath, string? exeDir, string? programFilesX86, string? programFiles, string? pathVariable)
     {
         if (!string.IsNullOrWhiteSpace(customPath))
         {
@@ -38,6 +41,8 @@ public static class CecCommands
             yield return custom.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? custom : Path.Combine(custom, ExeName);
             yield break;
         }
+
+        if (!string.IsNullOrWhiteSpace(exeDir)) yield return Path.Combine(exeDir, ExeName);
 
         foreach (var root in new[] { programFilesX86, programFiles })
         {

@@ -26,6 +26,7 @@ public sealed class CecController : ITvController
     /// <summary>The cec-client that will be used, or null (for the Settings description).</summary>
     public static string? Locate(string? customPath) =>
         CecCommands.Candidates(customPath,
+                AppPaths.ExeDir,
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                 Environment.GetEnvironmentVariable("PATH"))
@@ -34,6 +35,11 @@ public sealed class CecController : ITvController
     private static string FindClient(TvControlConfig config) =>
         Locate(config.CecClientPath) ?? throw new TvControlException(LocalizationService.Get("TvCecClientMissing"));
 
+    /// <summary>
+    /// One cec-client run. Nothing from the user's settings reaches its command line except the
+    /// executable path (<see cref="ProcessStartInfo.FileName"/>, no shell): the arguments are fixed
+    /// flags plus an HDMI port clamped to 1-4, and the CEC command is a constant written to stdin.
+    /// </summary>
     private static async Task RunAsync(string exe, int hdmiInput, string command, CancellationToken ct)
     {
         var psi = new ProcessStartInfo
@@ -50,29 +56,50 @@ public sealed class CecController : ITvController
 
         using var process = new Process { StartInfo = psi };
         process.Start();
-        var stdout = process.StandardOutput.ReadToEndAsync(ct);
-        var stderr = process.StandardError.ReadToEndAsync(ct);
-        await process.StandardInput.WriteLineAsync(command.AsMemory(), ct);
-        process.StandardInput.Close();
-
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        timeout.CancelAfter(CommandTimeout);
         try
         {
-            await process.WaitForExitAsync(timeout.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            try { process.Kill(true); } catch { /* already gone */ }
-            if (ct.IsCancellationRequested) throw;
-            throw new TvControlException(LocalizationService.Get("TvCecNoAnswer"));
-        }
+            var stdout = process.StandardOutput.ReadToEndAsync(ct);
+            var stderr = process.StandardError.ReadToEndAsync(ct);
+            await process.StandardInput.WriteLineAsync(command.AsMemory(), ct);
+            process.StandardInput.Close();
 
-        var output = await stdout + await stderr;
-        AppLog.Write($"TV: cec-client \"{command}\" → {process.ExitCode}");
-        if (CecCommands.NoAdapter(output))
-            throw new TvControlException(LocalizationService.Get("TvCecNoAdapter"));
-        if (process.ExitCode != 0)
-            throw new TvControlException(LocalizationService.Get("TvCecFailed", process.ExitCode));
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeout.CancelAfter(CommandTimeout);
+            try
+            {
+                await process.WaitForExitAsync(timeout.Token);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                AppLog.Write($"TV: cec-client \"{command}\" sem resposta em {CommandTimeout.TotalSeconds:0}s; encerrando");
+                throw new TvControlException(LocalizationService.Get("TvCecNoAnswer"));
+            }
+
+            var output = await stdout + await stderr;
+            AppLog.Write($"TV: cec-client \"{command}\" → {process.ExitCode}");
+            if (CecCommands.NoAdapter(output))
+                throw new TvControlException(LocalizationService.Get("TvCecNoAdapter"));
+            if (process.ExitCode != 0)
+                throw new TvControlException(LocalizationService.Get("TvCecFailed", process.ExitCode));
+        }
+        finally
+        {
+            // Every way out (timeout, cancel, error): never leave a cec-client running, it holds the adapter.
+            KillIfRunning(process);
+        }
+    }
+
+    private static void KillIfRunning(Process process)
+    {
+        try
+        {
+            if (process.HasExited) return;
+            process.Kill(entireProcessTree: true);
+            process.WaitForExit(2000);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            // Already gone.
+        }
     }
 }

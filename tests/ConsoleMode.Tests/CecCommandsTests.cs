@@ -36,21 +36,34 @@ public sealed class CecCommandsTests
     public void Custom_path_wins_and_accepts_a_folder_or_the_exe()
     {
         Assert.Equal(new[] { Path.Combine(@"D:\libcec", "cec-client.exe") },
-            CecCommands.Candidates(@"D:\libcec", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
+            CecCommands.Candidates(@"D:\libcec", @"C:\app", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
         Assert.Equal(new[] { @"D:\libcec\cec-client.exe" },
-            CecCommands.Candidates("\"D:\\libcec\\cec-client.exe\"", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
+            CecCommands.Candidates("\"D:\\libcec\\cec-client.exe\"", @"C:\app", @"C:\PF86", @"C:\PF", @"C:\bin").ToList());
     }
 
     [Fact]
-    public void Default_search_is_the_libcec_install_folders_then_path()
+    public void Default_search_is_next_to_the_exe_then_the_libcec_install_folders_then_path()
     {
-        var candidates = CecCommands.Candidates("", "PF86", "PF", "A; ;B").ToList();
+        var candidates = CecCommands.Candidates("", "EXE", "PF86", "PF", "A; ;B").ToList();
         Assert.Equal(new[]
         {
+            Path.Combine("EXE", "cec-client.exe"),
             Path.Combine("PF86", "Pulse-Eight", "USB-CEC Adapter", "cec-client.exe"),
             Path.Combine("PF", "Pulse-Eight", "USB-CEC Adapter", "cec-client.exe"),
             Path.Combine("A", "cec-client.exe"),
             Path.Combine("B", "cec-client.exe")
         }, candidates);
+    }
+
+    [Theory]
+    [InlineData(int.MinValue)]
+    [InlineData(-1)]
+    [InlineData(5)]
+    [InlineData(int.MaxValue)]
+    public void Arguments_are_fixed_flags_plus_a_clamped_port_whatever_the_input(int hdmi)
+    {
+        var arguments = CecCommands.Arguments(hdmi);
+        Assert.Equal(new[] { "-s", "-d", "1", "-t", "p", "-p" }, arguments[..6]);
+        Assert.Contains(arguments[6], new[] { "1", "2", "3", "4" });
     }
 }
