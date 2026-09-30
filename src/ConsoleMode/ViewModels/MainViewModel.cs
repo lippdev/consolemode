@@ -306,6 +306,7 @@ public partial class MainViewModel : ObservableObject
             LoadShortcuts(config);
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
+            CloseSteamOnRestore = config.CloseSteamOnRestore;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -899,6 +900,7 @@ public partial class MainViewModel : ObservableObject
             ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
+            CloseSteamOnRestore = CloseSteamOnRestore,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };

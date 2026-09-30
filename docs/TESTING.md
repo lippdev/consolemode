@@ -116,6 +116,21 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Um controle HID que manda leitura impossível (ex.: Switch Pro pelo driver genérico, com 6 ou mais botões "apertados" sozinhos) é ignorado mesmo quando também aparece em Windows.Gaming.Input: o app não navega nem inicia a sessão sozinho, e o log mostra `Controles: … ignorado: leitura inválida`. Reabrir o app tenta de novo. Resultado: ______
 - [ ] Com um controle HID defeituoso e outro controle normal conectados, o defeituoso não gera ações pelo HID nem pela projeção Windows.Gaming.Input, e o controle normal continua navegando. Resultado: ______
 
+## 3c. Fechar a Steam ao voltar ao PC
+
+Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
+
+- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha** e some da mesa, e a **Steam fecha sozinha** em alguns segundos (o ícone sai da bandeja, sem janela de erro). Resultado: ______
+- [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam também fecha. Resultado: ______
+- [ ] A Steam **não é encerrada à força**: no Gerenciador de Tarefas ela some sem o aviso "o programa não está respondendo", e o log mostra `Steam: pedindo para fechar (sair normal)`. Resultado: ______
+- [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
+- [ ] Com o ajuste **desligado**: o Big Picture fecha, a Steam fica aberta (`Steam: mantida aberta (desligado nos ajustes)`). Resultado: ______
+- [ ] Desligar o ajuste, fechar e reabrir o Console Mode e iniciar uma sessão Big Picture: a preferência continua desligada e a Steam fica aberta. Resultado: ______
+- [ ] Com o Steam aberto e o estado do jogo indisponível no Registro (valor `RunningAppID` ausente ou ilegível): a Steam fica aberta e o log informa que não foi possível verificar se há jogo em execução. Resultado: ______
+- [ ] Steam **já fechada** antes de voltar: nada é aberto nem pedido (`Steam: não estava aberta`); a Steam não é iniciada de novo por engano. Resultado: ______
+- [ ] Lançador Playnite ou Modo Xbox: a Steam não é tocada. Resultado: ______
+- [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

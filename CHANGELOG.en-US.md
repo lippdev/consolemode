@@ -8,6 +8,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes
+- Steam: when you go back to the PC (button, menu, shortcut, `stop` link or leaving Big Picture) Big Picture is always closed and Steam is asked to quit the normal way, its own Exit, without killing the process. Before, it stayed open and was often left glitchy. It does not close Steam if a game is running, and you can turn it off in Settings → "Close Steam when going back to the PC". (#121)
 - Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
 - Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored even when Windows also exposes it through Windows.Gaming.Input. The log says so, and reopening the app tries again. (#115)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)

@@ -42,6 +42,7 @@ public sealed class ConsoleEngine
         State.HideMonitors = [.. config.HideMonitors];
         State.HideStrategy = config.HideStrategy;
         State.FullscreenMode = config.FullscreenMode;
+        State.CloseSteamOnRestore = config.CloseSteamOnRestore;
         State.AudioDeviceId = config.AudioAutoSwitch ? null : config.AudioDeviceId;
         State.AudioAutoSwitch = config.AudioAutoSwitch;
         State.AudioDeviceHint = config.AudioDeviceName;
@@ -281,6 +282,7 @@ public sealed class ConsoleEngine
         AppLog.Write("Stop-ConsoleMode: iniciando restauração");
         try
         {
+            CloseSteamForRestore();
             OnUi(BlackCurtain.Close);
             Video.RestoreHdr(State);
             Video.RestoreVrr(State);
@@ -337,6 +339,29 @@ public sealed class ConsoleEngine
         }
     }
 
+    /// <summary>
+    /// Going back to the PC: Big Picture is closed (it would otherwise be left on the desk monitor when the
+    /// screens come back), and Steam is asked to quit its own way, because after Big Picture it is often left
+    /// half-working. Never a kill, never when a game is running, and never a reason to fail the restore.
+    /// </summary>
+    private void CloseSteamForRestore()
+    {
+        if (State.FullscreenMode != "bigPicture") return;
+        try
+        {
+            var closed = Launch.CloseBigPicture(State);
+            AppLog.Write($"Steam: Big Picture {(closed ? "fechado" : "ainda aberto")}");
+            var appId = SteamSession.RunningAppId();
+            var decision = SteamShutdown.Decide(State.FullscreenMode, State.CloseSteamOnRestore, SteamSession.IsRunning(), appId);
+            AppLog.Write(SteamShutdown.Describe(decision, appId));
+            if (decision == SteamShutdown.Decision.Shutdown) SteamSession.RequestShutdown();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Steam: fechar ao voltar: {ex.Message}");
+        }
+    }
+
     public void RequestExit() => State.ShouldExit = true;
 
     private void ShowCurtains(IReadOnlyList<string> names)
@@ -372,10 +397,12 @@ public sealed class ConsoleEngine
         return new AppConfig
         {
             Version = config.Version,
+            AppLanguage = config.AppLanguage,
             FocusMonitor = focus,
             HideMonitors = hide,
             HideStrategy = config.HideStrategy,
             FullscreenMode = config.FullscreenMode,
+            PlaynitePath = config.PlaynitePath,
             AudioDeviceId = config.AudioDeviceId,
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
@@ -383,10 +410,18 @@ public sealed class ConsoleEngine
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
             VrrEnable = config.VrrEnable,
+            UiMode = config.UiMode,
             TourDone = config.TourDone,
             ConfirmedSetup = config.ConfirmedSetup,
             CheckUpdates = config.CheckUpdates,
             BetaUpdates = config.BetaUpdates,
+            HomeShortcut = config.HomeShortcut,
+            MenuShortcut = config.MenuShortcut,
+            ExitShortcut = config.ExitShortcut,
+            ShortcutsOnboardingDone = config.ShortcutsOnboardingDone,
+            HomeButtonShortPress = config.HomeButtonShortPress,
+            CloseSteamOnRestore = config.CloseSteamOnRestore,
+            AutoStartOnController = config.AutoStartOnController,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }

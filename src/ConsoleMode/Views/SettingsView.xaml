@@ -90,6 +90,13 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStartOnController, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CloseSteamCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CloseSteamDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.CloseSteamOnRestore, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}" Description="{x:Bind ViewModel.HomeButtonHint, Mode=OneWay}"
                               IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
