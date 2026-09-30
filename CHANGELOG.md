@@ -7,6 +7,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Ajustes → TV: o modo console liga a Google TV / Android TV pela rede e troca para a entrada HDMI do PC; também pode colocá-la em espera ao restaurar. (#126)
 
 ### Correções
+- Menu da sessão: fechar uma janela pelo Alt+Tab interno agora pede confirmação; Cancelar mantém a janela aberta e devolve o foco ao cartão. (#127)
 - Revertida a PR #45: restaurado o comportamento anterior ao encerrar uma sessão. (#125)
 
 ## [1.6.0-alpha.3]
