@@ -7,6 +7,7 @@ import { ROADMAP_DURATION, Roadmap } from "./Roadmap";
 import { KEYNOTE_DURATION, Keynote } from "./Keynote";
 import { FEATURES_DURATION, Features } from "./Features";
 import { LAUNCH_DURATION, Launch } from "./Launch";
+import { ALPHA3_DURATION, Alpha3 } from "./Alpha3";
 
 export const RemotionRoot: FC = () => {
   return (
@@ -47,6 +48,14 @@ export const RemotionRoot: FC = () => {
         id="Launch"
         component={Launch}
         durationInFrames={LAUNCH_DURATION}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Alpha3"
+        component={Alpha3}
+        durationInFrames={ALPHA3_DURATION}
         fps={30}
         width={1920}
         height={1080}

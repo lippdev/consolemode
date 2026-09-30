@@ -52,7 +52,17 @@ npm run launch
 
 Grava `out/launch.mp4` e `out/launch-x.mp4` (H.264 yuv420p + AAC, faststart), que é o arquivo para postar.
 
-As trilhas dos dois filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx` ou `src/Launch.tsx`, ajuste o script e regenere `public/keynote/soundtrack.mp3` e `launch.mp3`:
+## Novidades da 1.6.0-alpha.3 (`Alpha3`)
+
+Vídeo de ~46 s em inglês com o que entrou na alpha.3: o novo menu da sessão sobre a corrida (painel lateral, janelas abertas, ControlFS), a interface Console redesenhada (Home, Session e System), o fundo com capas da Steam, os atalhos do controle escolhidos pelo usuário e as correções. As telas seguem o XAML do app (tamanhos em DIPs num palco de 1536 × 864, ampliado 1,25×) e usam as strings de `Strings.en-US.json`. As capas são inventadas, sem arte de jogos reais.
+
+```console
+npm run alpha3
+```
+
+Grava `out/alpha3-x.mp4` (H.264 yuv420p + AAC, faststart).
+
+As trilhas dos filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx`, `src/Launch.tsx` ou `src/Alpha3.tsx`, ajuste o script e regenere os MP3 em `public/keynote/`:
 
 ```console
 pip install numpy scipy
