@@ -28,6 +28,9 @@ public sealed class GamepadNavigator : IDisposable
     public event Action? AltRequested;
     public event Action? OptionRequested;
 
+    /// <summary>L1/LB (-1) and R1/RB (+1): switch tab.</summary>
+    public event Action<int>? TabRequested;
+
     /// <summary>Return true to consume a direction (e.g. a slider row using Left/Right).</summary>
     public Func<FocusNavigationDirection, bool>? BeforeMove { get; set; }
 
@@ -36,6 +39,14 @@ public sealed class GamepadNavigator : IDisposable
     /// spatial search would otherwise pick controls hidden behind the open overlay.
     /// </summary>
     public Func<DependencyObject>? SearchRoot { get; set; }
+
+    /// <summary>Play the interface sounds for moves, confirms and backs (the console interface).</summary>
+    public bool Sounds { get; set; }
+
+    private void Play(UiSound sound)
+    {
+        if (Sounds) UiSounds.Play(sound);
+    }
 
     /// <summary>Handles a press before focus logic; return true to swallow it (e.g. tour tips).</summary>
     public Func<ControllerAction, bool>? Intercept { get; set; }
@@ -74,10 +85,12 @@ public sealed class GamepadNavigator : IDisposable
                 case ControllerAction.Left: Move(FocusNavigationDirection.Left); break;
                 case ControllerAction.Right: Move(FocusNavigationDirection.Right); break;
                 case ControllerAction.Confirm: Confirm(); break;
-                case ControllerAction.Back: Back(); break;
+                case ControllerAction.Back: Play(UiSound.Back); Back(); break;
                 case ControllerAction.Menu: MenuRequested?.Invoke(); break;
                 case ControllerAction.Alt: AltRequested?.Invoke(); break;
                 case ControllerAction.Option: OptionRequested?.Invoke(); break;
+                case ControllerAction.PreviousTab: TabRequested?.Invoke(-1); break;
+                case ControllerAction.NextTab: TabRequested?.Invoke(1); break;
             }
         }
         catch (Exception ex)
@@ -103,6 +116,60 @@ public sealed class GamepadNavigator : IDisposable
 
     private void FocusFirst() => (FocusManager.FindFirstFocusableElement(CurrentRoot()) as Control)?.Focus(FocusState.Keyboard);
 
+    /// <summary>Move the focus one step (also used by the keyboard arrows, so both behave the same).</summary>
+    public void Navigate(FocusNavigationDirection direction) => Move(direction);
+
+    private Control? FindSpatial(FocusNavigationDirection direction) =>
+        FocusManager.FindNextElement(direction, new FindNextElementOptions { SearchRoot = CurrentRoot() }) as Control;
+
+    /// <summary>The closest control in the direction even when it doesn't overlap the current one's row or column.</summary>
+    private Control? FindNearest(FocusNavigationDirection direction) =>
+        // Left/right stay on their own row: jumping to another row from the end of one is confusing.
+        direction is not (FocusNavigationDirection.Up or FocusNavigationDirection.Down) ? null :
+        FocusManager.FindNextElement(direction, new FindNextElementOptions
+        {
+            SearchRoot = CurrentRoot(),
+            XYFocusNavigationStrategyOverride = XYFocusNavigationStrategyOverride.NavigationDirectionDistance
+        }) as Control;
+
+    /// <summary>
+    /// Up/down through everything that can take focus, top to bottom then left to right. (The
+    /// Next/Previous directions can't be used with a search root: they throw.)
+    /// </summary>
+    private Control? FindInReadingOrder(Control current, FocusNavigationDirection direction)
+    {
+        if (direction is not (FocusNavigationDirection.Up or FocusNavigationDirection.Down)) return null;
+        var root = CurrentRoot();
+        var all = new List<Control>();
+        Collect(root, all);
+        if (root is not UIElement rootElement) return null;
+
+        (double Y, double X) Position(Control c)
+        {
+            var point = c.TransformToVisual(rootElement).TransformPoint(new Windows.Foundation.Point(0, 0));
+            return (Math.Round(point.Y / 8) * 8, point.X);
+        }
+        var ordered = all.OrderBy(c => Position(c).Y).ThenBy(c => Position(c).X).ToList();
+        var index = ordered.IndexOf(current);
+        if (index < 0) return null;
+        var next = index + (direction == FocusNavigationDirection.Down ? 1 : -1);
+        return next >= 0 && next < ordered.Count ? ordered[next] : null;
+    }
+
+    private static void Collect(DependencyObject node, List<Control> into)
+    {
+        var count = VisualTreeHelper.GetChildrenCount(node);
+        for (var i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(node, i);
+            if (child is UIElement { Visibility: Visibility.Collapsed }) continue;
+            if (child is Control { IsTabStop: true, IsEnabled: true, ActualWidth: > 0, ActualHeight: > 0 } control
+                && control is not ComboBoxItem)
+                into.Add(control);
+            Collect(child, into);
+        }
+    }
+
     private void Move(FocusNavigationDirection direction)
     {
         if (BeforeMove?.Invoke(direction) == true) return;
@@ -115,27 +182,29 @@ public sealed class GamepadNavigator : IDisposable
             if (direction is not (FocusNavigationDirection.Up or FocusNavigationDirection.Down)) return;
             var index = combo.IndexFromContainer(item) + (direction == FocusNavigationDirection.Down ? 1 : -1);
             if (index >= 0 && index < combo.Items.Count && combo.ContainerFromIndex(index) is Control next)
+            {
                 next.Focus(FocusState.Keyboard);
+                Play(UiSound.Move);
+            }
             return;
         }
 
-        var options = new FindNextElementOptions { SearchRoot = CurrentRoot() };
-        var target = FocusManager.FindNextElement(direction, options) as Control;
-        // Scrolled lists: the spatial search can miss controls outside the viewport, so up/down
-        // fall back to tab order, which does reach them (Focus scrolls them into view).
-        target ??= direction switch
-        {
-            FocusNavigationDirection.Down => FocusManager.FindNextElement(FocusNavigationDirection.Next, options) as Control,
-            FocusNavigationDirection.Up => FocusManager.FindNextElement(FocusNavigationDirection.Previous, options) as Control,
-            _ => null
-        };
-        target?.Focus(FocusState.Keyboard);
+        var target = FindSpatial(direction)
+                     // Nothing lines up (a tile far to the right, going up to a row that only reaches the left):
+                     // take the nearest one in that direction instead of doing nothing.
+                     ?? FindNearest(direction)
+                     // Scrolled lists: controls outside the viewport aren't in a spatial search at all.
+                     ?? FindInReadingOrder(control, direction);
+        if (target is null) return;
+        target.Focus(FocusState.Keyboard);
+        Play(UiSound.Move);
     }
 
     private void Confirm()
     {
         if (Focused() is not { } control) { FocusFirst(); return; }
         if (RevealFocus(control)) return;
+        Play(UiSound.Confirm);
         Invoke(control);
     }
 

@@ -66,6 +66,10 @@ public partial class MonitorRowViewModel : ObservableObject
             OnPropertyChanged(nameof(TileForeground));
             OnPropertyChanged(nameof(TileSecondaryForeground));
             OnPropertyChanged(nameof(TileOpacity));
+            OnPropertyChanged(nameof(ConsoleTileBackground));
+            OnPropertyChanged(nameof(ScreenFill));
+            OnPropertyChanged(nameof(RolePillBackground));
+            OnPropertyChanged(nameof(RolePillForeground));
             _onRoleChanged(this);
         }
     }
@@ -137,6 +141,29 @@ public partial class MonitorRowViewModel : ObservableObject
     public Brush TileForeground => Resource(IsFocus ? "TextOnAccentFillColorPrimaryBrush" : "TextFillColorPrimaryBrush");
     public Brush TileSecondaryForeground => Resource(IsFocus ? "TextOnAccentFillColorSecondaryBrush" : "TextFillColorSecondaryBrush");
     public double TileOpacity => IsHide ? 0.55 : 1.0;
+
+    // Console home tiles: the screen drawn as art, lit by what will happen to it (play = bright
+    // green, keep on = dim blue, turn off = dark), plus a role pill under the name.
+    public Brush ConsoleTileBackground => IsFocus ? Gradient(0xFF1F6B4A, 0xFF10362B) : Gradient(0xFF262D34, 0xFF151A1F);
+    public Brush ScreenFill => IsFocus ? Gradient(0xFF7DF0CB, 0xFF23A67F) : IsHide ? Solid(0xFF0A0D10u) : Gradient(0xFF48698D, 0xFF22344A);
+    public Brush RolePillBackground => Solid(IsFocus ? 0xFF6FDDB9u : 0x26FFFFFFu);
+    public Brush RolePillForeground => Solid(IsFocus ? 0xFF0B1F18u : 0xFFDDE3E8u);
+
+    private static SolidColorBrush Solid(uint argb) => new(Argb(argb));
+
+    private static LinearGradientBrush Gradient(uint top, uint bottom) => new()
+    {
+        StartPoint = new Windows.Foundation.Point(0, 0),
+        EndPoint = new Windows.Foundation.Point(0, 1),
+        GradientStops =
+        {
+            new GradientStop { Color = Argb(top), Offset = 0 },
+            new GradientStop { Color = Argb(bottom), Offset = 1 }
+        }
+    };
+
+    private static Windows.UI.Color Argb(uint v) =>
+        Microsoft.UI.ColorHelper.FromArgb((byte)(v >> 24), (byte)(v >> 16), (byte)(v >> 8), (byte)v);
 
     /// <summary>Tile click on the home screen.</summary>
     public void MakeFocus() => Role = MonitorRole.Focus;
