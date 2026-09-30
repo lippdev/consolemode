@@ -2,7 +2,7 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
+## [1.6.0-alpha.3]
 ### What's new
 - Session menu (the controller shortcut, Select + Y in the suggestion) redesigned like Steam's overlay (Shift + Tab): it covers the whole screen, the game dims and blurs behind it, a side panel gathers the options (volume with a gauge, resolution, audio, FPS, HDR) and the **open windows** are always visible in the middle, an in-menu Alt + Tab: the D-pad picks, A brings the window to the front, X closes it and B goes back to the game (switching windows does not end the session). The frosted glass only shows when Windows' transparency effects are on (otherwise the panel is dark and solid, and it changes live if you flip the setting), and in high contrast it uses the system colours. It has a focus that grows, sounds and animations (the panel slides in, the rows follow one after another and closing fades it out). In this alpha it also opens **outside a session**, as a preview with a badge on top, so it can be tried without turning on console mode (in it the FPS limit is hidden and "Back to the PC" becomes "Close menu"). (#120)
 - Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation) with a slide animation, screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR), each opening its choices. (#117)
@@ -25,6 +25,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
 - The package embeds only rtss-cli; leftover MultiMonitorTool/SoundVolumeView files no longer end up in the executable. (#110)
 - The code no longer mentions MultiMonitorTool or SoundVolumeView, and the cleanup of their old files in the `tools` folder is gone: anyone updating straight from 1.5 keeps those two files until they delete them by hand. (#119)
+
+### Heads-up: alpha release
+- Not verified on many monitor, TV and controller setups yet. If something fails, go back to 1.5.1 and tell us with the feedback button (attach `consolemode.log`). People on the stable release don't get this version automatically.
 
 ## [1.6.0-alpha.2]
 ### Changes

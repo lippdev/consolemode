@@ -2,7 +2,7 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
-## [Unreleased]
+## [1.6.0-alpha.3]
 ### Novidades
 - Menu da sessão (o atalho do controle, Select + Y na sugestão) redesenhado como o overlay do Steam (Shift+Tab): cobre a tela inteira, o jogo escurece e desfoca por trás, um painel lateral reúne as opções (volume com medidor, resolução, áudio, FPS, HDR) e no meio ficam sempre visíveis as **janelas abertas**, um ALT+TAB interno: o direcional escolhe, A traz a janela para a frente, X a fecha e B volta ao jogo (trocar de janela não encerra a sessão). O vidro fosco só aparece se os efeitos de transparência do Windows estiverem ligados (senão o painel fica escuro e sólido, e muda ao vivo se você trocar a configuração), e em alto contraste usa as cores do sistema. Tem foco que cresce, sons e animações (o painel entra deslizando, as linhas vêm em cascata e ao fechar ele some suavemente). Nesta alpha ele abre também **fora da sessão**, como prévia com um selo no topo, para testar sem ligar o modo console (nela o limite de FPS não aparece e "Voltar ao PC" vira "Fechar menu"). (#120)
 - Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation) com uma animação de deslize, blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR), que abre cada escolha. (#117)
@@ -25,6 +25,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
 - O pacote embute só o rtss-cli; sobras de MultiMonitorTool/SoundVolumeView não entram mais no executável. (#110)
 - O código não cita mais o MultiMonitorTool nem o SoundVolumeView, e a limpeza dos arquivos antigos deles na pasta `tools` saiu: quem atualiza direto da 1.5 mantém esses dois arquivos até apagá-los à mão. (#119)
+
+### Atenção: versão alpha
+- Ainda não validada em muitos setups de monitores, TVs e controles. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`). Quem usa a versão estável não recebe esta versão automaticamente.
 
 ## [1.6.0-alpha.2]
 ### Mudanças
