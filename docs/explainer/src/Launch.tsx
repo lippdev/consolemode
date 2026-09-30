@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, Center, Check, clamp, Cursor, Desktop, Glow, gradText, Icon, type IconName, Line, Logo, SANS, Screen, tw, useFonts } from "./kit";
-import { RacingGame } from "./RacingGame";
+import { GamePlay } from "./GamePlay";
 
 // ~32 s launch film for social media, built around a game that plays: one click turns the
 // desk off and the TV on, the camera flies into the race, the menu opens over it, and quitting
@@ -56,14 +56,14 @@ const Desk: React.FC<{ t: number; monA: number; monB: number; tv: number; zoom: 
     </Screen>
     <Screen x={TV.x} y={TV.y} w={TV.w} h={TV.h} power={1} kind="tv">
       <AbsoluteFill style={{ scale: `1 ${Math.max(0.004, tv)}`, opacity: tv > 0.002 ? 1 : 0 }}>
-        <RacingGame t={t} />
+        <GamePlay t={t} />
       </AbsoluteFill>
     </Screen>
   </AbsoluteFill>
 );
 
 /** 0–150: click Play now, the desk goes dark, the TV lights up, the camera flies in. */
-const DeskScene: React.FC = () => {
+export const DeskScene: React.FC = () => {
   const f = useCurrentFrame();
   const click = 30;
   const pressed = interpolate(f, [click - 3, click, click + 6], [0, 1, 0], clamp);
@@ -144,7 +144,7 @@ const PlayScene: React.FC = () => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
-      <RacingGame t={L.play.from + f} />
+      <GamePlay t={L.play.from + f} />
       <Shade o={tw(f, [0, 10], [0, 0.35], Easing.linear)} />
       <Punch at={4} until={58}>Your PC.</Punch>
       <Punch at={60} until={120}>
@@ -177,7 +177,7 @@ const MenuScene: React.FC = () => {
   const left = (1920 - (6 * W + 5 * GAP)) / 2;
   return (
     <AbsoluteFill>
-      <RacingGame t={L.menu.from + f} />
+      <GamePlay t={L.menu.from + f} />
       <Shade o={0.55 * open} />
       <div style={{ opacity: open }}>
         <Center top={150}>
@@ -231,7 +231,7 @@ const SpecsScene: React.FC = () => {
   const words = ["4K", "120 Hz", "HDR", "VRR", "FPS limit"];
   return (
     <AbsoluteFill>
-      <RacingGame t={L.specs.from + f} />
+      <GamePlay t={L.specs.from + f} />
       <Shade o={0.45} />
       {words.map((w, i) => (
         <Punch key={w} at={i * 15} until={i * 15 + 15} size={260}>

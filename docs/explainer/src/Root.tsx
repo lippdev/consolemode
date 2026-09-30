@@ -8,6 +8,7 @@ import { KEYNOTE_DURATION, Keynote } from "./Keynote";
 import { FEATURES_DURATION, Features } from "./Features";
 import { LAUNCH_DURATION, Launch } from "./Launch";
 import { ALPHA3_DURATION, Alpha3 } from "./Alpha3";
+import { RELEASE16_DURATION, Release16 } from "./Release16";
 
 export const RemotionRoot: FC = () => {
   return (
@@ -56,6 +57,14 @@ export const RemotionRoot: FC = () => {
         id="Alpha3"
         component={Alpha3}
         durationInFrames={ALPHA3_DURATION}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Release16"
+        component={Release16}
+        durationInFrames={RELEASE16_DURATION}
         fps={30}
         width={1920}
         height={1080}

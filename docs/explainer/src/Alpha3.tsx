@@ -1,7 +1,7 @@
 import React from "react";
-import { AbsoluteFill, Audio, Easing, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, Center, Check, clamp, Glow, Line, Logo, SANS, tw, useFonts } from "./kit";
-import { RacingGame } from "./RacingGame";
+import { GamePlay, useGameSlot } from "./GamePlay";
 
 // "What's new in 1.6.0-alpha.3": the new session menu (with ControlFS), the redesigned Console
 // interface, the Steam covers background, controller shortcuts of your choice, and the fixes.
@@ -27,7 +27,7 @@ const CARD = "linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0
 
 // ───────────────────────── shared pieces ─────────────────────────
 
-type Glyph =
+export type Glyph =
   | "controller"
   | "folder"
   | "play"
@@ -47,7 +47,7 @@ type Glyph =
   | "gamepad";
 
 /** Line icons standing in for the Segoe Fluent glyphs the app uses. */
-const G: React.FC<{ name: Glyph; size?: number; color?: string }> = ({ name, size = 24, color = "#fff" }) => {
+export const G: React.FC<{ name: Glyph; size?: number; color?: string }> = ({ name, size = 24, color = "#fff" }) => {
   const p = { fill: "none", stroke: color, strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   const d: Record<Glyph, React.ReactNode> = {
     controller: (
@@ -134,7 +134,7 @@ const G: React.FC<{ name: Glyph; size?: number; color?: string }> = ({ name, siz
 };
 
 /** Controller button badge like the app's hint pills. */
-const Badge: React.FC<{ label: string; lit?: number; h?: number }> = ({ label, lit = 0, h = 32 }) => (
+export const Badge: React.FC<{ label: string; lit?: number; h?: number }> = ({ label, lit = 0, h = 32 }) => (
   <span
     style={{
       display: "inline-flex",
@@ -299,7 +299,7 @@ const MenuIntro: React.FC = () => {
   const inOut = tw(f, [4, 14], [0, 1], Easing.linear);
   return (
     <AbsoluteFill>
-      <RacingGame t={A.intro.from + f} />
+      <GamePlay t={A.intro.from + f} />
       <AbsoluteFill style={{ background: `rgba(5,2,15,${0.35 * inOut})` }} />
       <Center>
         <Line words={["A", "new", "session", { t: "menu.", grad: true }]} at={6} size={150} stagger={5} style={{ textShadow: "0 10px 60px rgba(0,0,0,0.55)" }} />
@@ -312,7 +312,6 @@ const MenuIntro: React.FC = () => {
 
 type Win = { proc: string; title: string; color: string; letter: string };
 const WINDOWS: Win[] = [
-  { proc: "NeonDrift", title: "Neon Drift", color: "linear-gradient(135deg,#ff3ec9,#7a2cff)", letter: "N" },
   { proc: "steam", title: "Steam Big Picture Mode", color: "linear-gradient(135deg,#2a475e,#171a21)", letter: "S" },
   { proc: "Discord", title: "#general – Friends", color: "linear-gradient(135deg,#6b7cff,#4450c9)", letter: "D" },
   { proc: "firefox", title: "Best graphics settings – Firefox", color: "linear-gradient(135deg,#ff9a3c,#c2279a)", letter: "F" },
@@ -362,8 +361,11 @@ const SideRow: React.FC<{ glyph: Glyph; label: string; value?: string; focus: nu
 );
 
 /** 210–510: the session menu over the race, then the zoom into ControlFS. */
-const SessionMenu: React.FC = () => {
+/** `from` is the scene's start in the film, so the game behind keeps its place. */
+export const SessionMenu: React.FC<{ from?: number }> = ({ from = A.menu.from }) => {
   const f = useCurrentFrame();
+  const slot = useGameSlot();
+  const all = [slot.info, ...WINDOWS];
   const open = 4;
   // Focus: side rows 0 ControlFS, 1 Back to the game, 2 Volume, … ; windows are 10 + i.
   const pos = steps(
@@ -382,7 +384,7 @@ const SessionMenu: React.FC = () => {
   const vol = Math.round(interpolate(f, [52, 76], [65, 80], clamp));
   const closing = tw(f, [135, 145], [0, 1], Easing.in(Easing.cubic));
   const closed = f >= 145;
-  const wins = WINDOWS.filter((_, i) => !(closed && i === 2));
+  const wins = all.filter((_, i) => !(closed && i === 2));
   const zoom = tw(f, [192, 232], [0, 1], Easing.inOut(Easing.cubic));
   const press = interpolate(f, [248, 252, 260], [0, 1, 0], clamp);
   const burst = tw(f, [262, 292], [0, 1], Easing.inOut(Easing.cubic));
@@ -404,7 +406,7 @@ const SessionMenu: React.FC = () => {
   return (
     <AbsoluteFill>
       <div style={{ position: "absolute", inset: -40, filter: `blur(${tw(f, [0, 8], [0, 18])}px)` }}>
-        <RacingGame t={A.menu.from + f} hud={false} />
+        <GamePlay t={from + f} hud={false} />
       </div>
       <AbsoluteFill style={{ background: "rgba(7,10,14,0.6)", opacity: tw(f, [0, 8], [0, 1], Easing.linear) }} />
       <AbsoluteFill style={{ transformOrigin: `${ax * 1.25}px ${ay * 1.25}px`, scale: String(zs) }}>
@@ -474,7 +476,7 @@ const SessionMenu: React.FC = () => {
               <span style={{ fontSize: 18, color: SUB }}>{wins.length} open</span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 18 }}>
-              {WINDOWS.map((w, i) => {
+              {all.map((w, i) => {
                 if (closed && i === 2) return null;
                 const slot = closed && i > 2 ? i - 1 : i;
                 const on = near(pos, 10 + slot);
@@ -539,9 +541,13 @@ const SessionMenu: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <div style={{ opacity: tw(f, [274, 286], [0, 1], Easing.linear), scale: String(tw(f, [274, 292], [0.8, 1])) }}>
-            <G name="folder" size={220} color="#fff" />
-          </div>
+          {slot.controlFs ? (
+            <Img src={staticFile(slot.controlFs)} style={{ width: "100%", height: "100%", objectFit: "cover", scale: String(tw(f, [262, 345], [1.08, 1], Easing.out(Easing.quad))) }} />
+          ) : (
+            <div style={{ opacity: tw(f, [274, 286], [0, 1], Easing.linear), scale: String(tw(f, [274, 292], [0.8, 1])) }}>
+              <G name="folder" size={220} color="#fff" />
+            </div>
+          )}
         </div>
       )}
       <Caption pos="windows" text="Volume, resolution, audio, FPS and HDR on the side." at={20} until={86} />
@@ -558,7 +564,7 @@ const SessionMenu: React.FC = () => {
 };
 
 /** 510–570: announce the Console interface. */
-const ConsoleIntro: React.FC = () => (
+export const ConsoleIntro: React.FC = () => (
   <AbsoluteFill>
     <Glow color={C.mint} y={560} opacity={0.14} />
     <Center>
@@ -602,7 +608,7 @@ const MonitorArt: React.FC<{ role: "play" | "off" }> = ({ role }) => (
 );
 
 /** 570–810: the Console interface, walking the three tabs. */
-const ConsoleUi: React.FC = () => {
+export const ConsoleUi: React.FC = () => {
   const f = useCurrentFrame();
   const tab = f < 100 ? 0 : f < 180 ? 1 : 2;
   const tabAt = [0, 100, 180][tab];
@@ -855,7 +861,7 @@ const ConsoleUi: React.FC = () => {
 };
 
 /** 810–900: the covers background on its own. */
-const Covers: React.FC = () => {
+export const Covers: React.FC = () => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
@@ -894,7 +900,7 @@ const Covers: React.FC = () => {
 };
 
 /** 900–1080: the first-run shortcut setup, capturing each combination. */
-const Shortcuts: React.FC = () => {
+export const Shortcuts: React.FC = () => {
   const f = useCurrentFrame();
   const rows = [
     { name: "Open Console Mode", start: 26, parts: ["Xbox"] },
@@ -985,7 +991,7 @@ const Shortcuts: React.FC = () => {
 };
 
 /** 1080–1230: the rest, as a grid of tiles. */
-const More: React.FC = () => {
+export const More: React.FC = () => {
   const f = useCurrentFrame();
   const items: { glyph: Glyph; title: string; text: string }[] = [
     { glyph: "sound", title: "Interface sounds", text: "Soft sounds as you move, pick and go back." },
@@ -1070,7 +1076,7 @@ const Outro: React.FC = () => {
 // ───────────────────────── film ─────────────────────────
 
 /** Blurs and zooms out into black over the last frames; fades in from black unless `cut`. */
-const Part: React.FC<{ t: { from: number; dur: number }; cutIn?: boolean; cutOut?: boolean; children: React.ReactNode }> = ({ t, cutIn, cutOut, children }) => (
+export const Part: React.FC<{ t: { from: number; dur: number }; cutIn?: boolean; cutOut?: boolean; children: React.ReactNode }> = ({ t, cutIn, cutOut, children }) => (
   <Sequence from={t.from} durationInFrames={t.dur}>
     <PartFx dur={t.dur} cutIn={!!cutIn} cutOut={!!cutOut}>
       {children}

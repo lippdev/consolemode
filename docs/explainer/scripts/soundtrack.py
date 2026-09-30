@@ -7,6 +7,7 @@ the scene timings of the films (30 fps, 120 BPM: one beat = 15 frames, one bar =
     python scripts/soundtrack.py          # writes out/soundtrack.wav (Keynote)
     python scripts/soundtrack.py launch   # writes out/launch.wav (Launch)
     python scripts/soundtrack.py alpha3   # writes out/alpha3.wav (Alpha3)
+    python scripts/soundtrack.py v16      # writes out/release16.wav (Release16)
 """
 
 import os
@@ -55,6 +56,15 @@ TIMELINES = {
                (710, 1320, 0.14), (750, 1175, 0.16), (775, 1320, 0.14), (798, 1320, 0.14),
                (962, 1568, 0.18), (1006, 1568, 0.18), (1052, 1568, 0.18)],
         typing=None, engine=[(120, 500, 0.12)],
+    ),
+    "v16": dict(
+        fps=30, end=1605, out="out/release16.wav",
+        beat=(150, 1455), drops=[(1425, 1455)], claps=675, arp=270,
+        risers=[(100, 150, 0.3), (500, 532, 0.2), (1375, 1455, 0.3)],
+        impacts=[(60, 2.0, 0.45, 0), (150, 3.0, 0.85, 0.25), (615, 2.0, 0.45, 0), (1455, 3.5, 1.0, 0.35)],
+        whooshes=[270, 462, 615, 675, 915, 1005, 1185, 1305],
+        blips=[(30, 1200, 0.25), (300, 1320, 0.14), (315, 1320, 0.14), (322, 988, 0.1), (328, 988, 0.1), (334, 988, 0.1), (340, 988, 0.1), (360, 1320, 0.14), (375, 1320, 0.14), (390, 1320, 0.14), (405, 784, 0.18), (420, 1320, 0.14), (450, 1320, 0.14), (520, 1568, 0.2), (715, 1320, 0.14), (730, 1320, 0.14), (745, 1320, 0.14), (775, 1175, 0.16), (815, 1320, 0.14), (855, 1175, 0.16), (880, 1320, 0.14), (903, 1320, 0.14), (1067, 1568, 0.18), (1111, 1568, 0.18), (1157, 1568, 0.18), (1229, 1568, 0.16), (1239, 1568, 0.16)],
+        typing=None, engine=[],
     ),
 }
 TL = TIMELINES[sys.argv[1] if len(sys.argv) > 1 else "full"]

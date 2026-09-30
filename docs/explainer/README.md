@@ -62,7 +62,24 @@ npm run alpha3
 
 Grava `out/alpha3-x.mp4` (H.264 yuv420p + AAC, faststart).
 
-As trilhas dos filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx`, `src/Launch.tsx` ou `src/Alpha3.tsx`, ajuste o script e regenere os MP3 em `public/keynote/`:
+## Console Mode 1.6 (`Release16`)
+
+Vídeo de ~54 s em inglês com tudo da 1.6: um clique leva o jogo para a TV, o novo menu da sessão sobre o jogo, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, o código próprio de telas e áudio (sem as ferramentas da NirSoft) e as correções. Reaproveita a abertura do `Launch` e as cenas do `Alpha3`.
+
+O jogo na TV é um encaixe (`src/GamePlay.tsx`): por padrão a corrida de `RacingGame.tsx`. Para usar um vídeo de jogo e o print do ControlFS, coloque em `public/local/` (ignorada pelo git; não versione vídeo de terceiros nem prints com caminhos pessoais):
+
+- `public/local/gameplay.mp4`: 1080p, 30 fps, com áudio; o filme começa 1 s depois do início do arquivo (`CLIP` em `src/Release16.tsx`).
+- `public/local/controlfs.png`: 1920×1080.
+
+Sem esses arquivos o filme usa a corrida e a animação da pasta.
+
+```console
+npm run release16
+```
+
+Grava `out/release16-x.mp4` (H.264 yuv420p + AAC, faststart).
+
+As trilhas dos filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx`, `src/Launch.tsx`, `src/Alpha3.tsx` ou `src/Release16.tsx`, ajuste o script e regenere os MP3 em `public/keynote/`:
 
 ```console
 pip install numpy scipy
