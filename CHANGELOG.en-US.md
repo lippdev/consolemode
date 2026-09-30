@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
-- `consolemode://stop` and the configurable Back to PC shortcut now close Playnite fullscreen before restoring; an in-progress restore finishes before another attempt starts. (#45)
+- Reverted PRs #93 and #45: removed Android TV control through ADB/Wake-on-LAN and restored the previous behavior when stopping a session. (#125)
 
 ## [1.6.0-alpha.3]
 ### What's new

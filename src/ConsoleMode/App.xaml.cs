@@ -139,7 +139,7 @@ public partial class App : Application
             _window?.DispatcherQueue.TryEnqueue(() =>
             {
                 if (ViewModel is null) return;
-                if (ViewModel.IsConsoleActive) _ = ViewModel.StopConsoleAsync();
+                if (ViewModel.IsConsoleActive) _ = ViewModel.RestoreNowAsync();
                 else _tray?.ShowWindow();
             }), null, Timeout.Infinite, executeOnlyOnce: false));
     }
@@ -167,7 +167,7 @@ public partial class App : Application
             _ = HandleStartRequestAsync();
         };
         _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Voltar ao PC");
-        _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.StopConsoleAsync(); };
+        _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
         _menuChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Menu da sessão")
         {
             HoldDuration = TimeSpan.FromMilliseconds(250)

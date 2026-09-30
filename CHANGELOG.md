@@ -3,8 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
-### Correcoes
-- `consolemode://stop` e o atalho configuravel de voltar ao PC agora fecham o Playnite em tela cheia antes de restaurar; uma restauracao em andamento termina antes de uma nova tentativa. (#45)
+### Correções
+- Revertidas as PRs #93 e #45: removido o controle de TVs Android por ADB/Wake-on-LAN e restaurado o comportamento anterior ao encerrar uma sessão. (#125)
 
 ## [1.6.0-alpha.3]
 ### Novidades

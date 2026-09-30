@@ -12,8 +12,6 @@ Details that don't fit in the [README](../README.md). 🇧🇷 [Guia em portugu�
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-`consolemode://stop`, `ConsoleMode.exe --stop` and the configured **Back to PC** controller shortcut close Playnite fullscreen before restoring. The session menu's **Back to the PC** and **Exit Console Mode** actions, and the tray's **Restore setup**, keep their restore behavior; in the menu preview, **Back to the PC** only closes the preview.
-
 ## Local control API
 
 `consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.
@@ -24,29 +22,6 @@ You can also restore anytime from the tray (*Restore setup* / *Show window*). Wi
 ```
 
 `start`, `stop` and `show` do exactly what the matching `consolemode://` link does, then reply once the app has settled (`ok:false` with an `error` if console mode didn't start or the restore didn't finish). `status` only reads. Only the signed-in user and LocalSystem can connect; nothing is exposed to the network.
-
-## TV control
-
-Settings → **TV** can turn the TV on and switch it to the PC's HDMI input when console mode starts, and optionally put it back in standby after the desk is restored. A TV that doesn't answer never blocks console mode: the app logs it and waits for the game screen as usual.
-
-With the default, **Don't control it**, nothing is sent and nothing is added to starting or restoring. With a route selected, the TV step runs first when console mode starts and is capped at **30 seconds** (the worst case, when the TV doesn't answer and Wake-on-LAN is tried); the optional standby on restore is capped at **15 seconds**. A TV that is already on usually answers in about a second or two.
-
-Most PC graphics cards can't send HDMI-CEC, so the app talks to the TV over the network instead:
-
-### Google TV / Android TV
-
-TCL, Sony, Hisense, Philips and other TVs running Google TV or Android TV, through ADB (the Android debugging protocol). Nothing to install on the PC.
-
-1. On the TV: **Settings → System → About**, press **Android TV OS build** 7 times to unlock Developer options.
-2. **Settings → System → Developer options**: turn on **USB debugging** (on some TVs, **Network debugging** / **ADB over network**).
-3. In Console Mode, pick *Google TV / Android TV*, enter the TV's IP (Settings → Network on the TV; reserve it in your router) and the HDMI input the PC uses.
-4. Press **Test now**. The TV asks "Allow debugging from this computer?": tick **Always allow** and press **Allow**.
-
-The PC's ADB key is stored encrypted for your Windows user (DPAPI), so the TV only asks once. If the data folder is copied to another Windows user or PC, the key can't be read there: the app creates a new one and the TV asks "Allow debugging?" again.
-
-Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignores that key, set **Input command** to any Android shell command that opens the PC's input. If the TV drops off the network in standby, fill in its **MAC address** so the app sends Wake-on-LAN first (the TV's "Wake on network" / "Wake on Wi-Fi" option must be on).
-
-"Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
 ## Optional extras
 

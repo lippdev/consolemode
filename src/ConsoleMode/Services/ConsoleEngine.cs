@@ -1,6 +1,5 @@
 using ConsoleMode.Models;
 using ConsoleMode.Native;
-using ConsoleMode.Services.Tv;
 
 namespace ConsoleMode.Services;
 
@@ -12,7 +11,6 @@ public sealed class ConsoleEngine
     public RtssService Rtss { get; } = new();
     public LaunchService Launch { get; } = new();
     public VideoFeaturesService Video { get; } = new();
-    public TvControlService Tv { get; } = new();
 
     public const string AudioOnConnectId = "__on_connect__";
 
@@ -66,11 +64,6 @@ public sealed class ConsoleEngine
         State.RtssBackup = null;
         State.RtssLimitApplied = false;
         OnUi(NativeWindows.StopBigPictureExitWatch);
-
-        // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
-        // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
-        State.Tv = config.Tv;
-        if (config.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
 
         // Read the screens fresh: the row the window shows can be stale (the TV was switched off,
         // or the last restore disconnected it), and a stale "active" would skip turning it on.
@@ -304,7 +297,6 @@ public sealed class ConsoleEngine
             Rtss.Restore(State);
             Monitors.ClearCache();
             Audio.ClearCache();
-            if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
         }
         catch (Exception ex)
@@ -317,7 +309,6 @@ public sealed class ConsoleEngine
             State.RestoreInProgress = false;
             State.IsActive = false;
             State.ShouldExit = false;
-            State.Tv = null;
             State.SteamMoved = false;
             State.MoveCount = 0;
             State.HasAppeared = false;
@@ -434,8 +425,7 @@ public sealed class ConsoleEngine
             InterfaceSounds = config.InterfaceSounds,
             ConsoleBackground = config.ConsoleBackground,
             ConsoleBackgroundImage = config.ConsoleBackgroundImage,
-            SkippedUpdateVersion = config.SkippedUpdateVersion,
-            Tv = config.Tv
+            SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
 
