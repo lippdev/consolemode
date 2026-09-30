@@ -2,10 +2,6 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
-## [Unreleased]
-### What's new
-- Settings → TV: console mode turns the TV on and switches to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
-
 ## [1.6.0-alpha.3]
 ### What's new
 - Session menu: a pinned panel at the top of the side column with the **File explorer (ControlFS)**, the team's open-source, controller-first file manager. One press opens ControlFS on top, always full screen on the session screen (or brings it to the front if already open); if it isn't installed, its download page opens. Console Mode only calls it through its own `--start` flag, never closes it, and never sends F11 to another window if Windows denies focus. (#122)
@@ -15,7 +11,6 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Sounds in the Console interface when you move the focus, pick and go back (made by the app itself, at a low volume). Turn them off in Settings → Interface sounds. (#117)
 - Controller shortcuts of your choice: the button that opens Console Mode, the session menu's and the one that goes back to the PC are now set in Settings (hold the buttons you want and let go on the same controller). Capture never combines buttons from different controllers. None is on by default: the first time you open this version the app shows the setup, with a suggestion for each action (Home, Select + Y and Start + Select). One button can't serve two actions. If you used the Home button or Start + Select before, choose them again. (#116)
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
-- Settings → TV: console mode turns the TV on and switches it to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
 
 ### Fixes
 - Session menu: if Windows cannot activate the selected window, the menu stays open so you can try again. (#120)

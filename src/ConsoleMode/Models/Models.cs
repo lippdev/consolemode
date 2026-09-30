@@ -78,39 +78,9 @@ public sealed class AppConfig
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 
-    /// <summary>Turning the TV on / to the PC's input when console mode starts (issue #75).</summary>
-    public TvControlConfig Tv { get; set; } = new();
-
     [JsonIgnore]
     public string SetupKey =>
         $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";
-}
-
-public sealed class TvControlConfig
-{
-    public const string None = "none";
-    public const string AndroidTv = "androidTv";
-
-    /// <summary>"none" | "androidTv".</summary>
-    public string Provider { get; set; } = None;
-
-    /// <summary>The TV's IP address or host name, optionally with ":port".</summary>
-    public string Host { get; set; } = "";
-
-    /// <summary>For Wake-on-LAN when the TV is in deep standby; empty = don't send it.</summary>
-    public string MacAddress { get; set; } = "";
-
-    /// <summary>HDMI input the PC is plugged into (1-4).</summary>
-    public int HdmiInput { get; set; } = 1;
-
-    /// <summary>Android TV: shell command that switches to the PC's input, for TVs that ignore the HDMI key codes.</summary>
-    public string InputCommand { get; set; } = "";
-
-    /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
-    public bool TurnOffOnRestore { get; set; }
-
-    [JsonIgnore]
-    public bool IsEnabled => !string.IsNullOrWhiteSpace(Provider) && Provider != None;
 }
 
 public sealed class SavedDisplayMode
@@ -288,8 +258,6 @@ public sealed class ScreenRect
 public sealed class ConsoleRuntimeState
 {
     public bool IsActive { get; set; }
-    /// <summary>TV control used for this session, for the optional standby on restore.</summary>
-    public TvControlConfig? Tv { get; set; }
     public bool ShouldExit { get; set; }
     public bool RestoreInProgress { get; set; }
     public bool SteamMoved { get; set; }
