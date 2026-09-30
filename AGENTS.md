@@ -26,7 +26,9 @@ Xbox mode, and restores the desk setup afterwards.
 - `src/ConsoleMode/Native`: P/Invoke (Win32, CCD display config).
 - `src/ConsoleMode/Views`, `ViewModels`, `Controls`: UI (MVVM with CommunityToolkit.Mvvm).
 - `build/`: publish script and Inno Setup installer. `.github/workflows/release.yml`
-  publishes a release when a `v*` tag is pushed. **Never create or push tags.**
+  publishes a release when a `v*` tag is pushed, or when it is run by hand (Actions → Release → Run
+  workflow, on `main`) with "publish" ticked, which creates the tag itself. **Never create or push tags
+  and never run it with "publish" ticked unless the owner explicitly asks for a release.**
 
 ## Conventions
 
