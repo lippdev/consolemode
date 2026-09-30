@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar). Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
+- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar no mesmo controle). A captura não mistura botões de controles diferentes. Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
 
 ### Correções

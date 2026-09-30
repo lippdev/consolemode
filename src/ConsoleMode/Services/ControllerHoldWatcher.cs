@@ -93,16 +93,17 @@ public sealed class ControllerHoldWatcher : IDisposable
         Held?.Invoke();
     }
 
-    /// <summary>Buttons held right now on any pad, for the "press the shortcut you want" capture.</summary>
-    public static ushort ReadHeld()
+    /// <summary>Buttons held per XInput slot or Sony HID path, for shortcut capture.</summary>
+    public static IReadOnlyDictionary<string, ushort> ReadHeldByDevice()
     {
-        ushort held = SonyHidReader.Held;
+        var held = new Dictionary<string, ushort>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (path, buttons) in SonyHidReader.ReadStates()) held[$"sony:{path}"] = buttons;
         if (_unavailable) return held;
         try
         {
             for (uint i = 0; i < 4; i++)
             {
-                if (XInputGetStateEx(i, out var state) == 0) held |= state.Gamepad.wButtons;
+                if (XInputGetStateEx(i, out var state) == 0) held[$"xinput:{i}"] = state.Gamepad.wButtons;
             }
         }
         catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
@@ -115,8 +116,8 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     private static bool IsHeld(ushort mask)
     {
-        // PlayStation pads without Steam Input: XInput never sees them (SonyHidReader).
-        if ((SonyHidReader.Held & mask) == mask) return true;
+        // Test each physical Sony pad separately; combining their masks creates impossible chords.
+        if (ControllerShortcuts.IsHeldOnAnyDevice(mask, SonyHidReader.ReadStates().Values)) return true;
         if (_unavailable) return false;
         try
         {

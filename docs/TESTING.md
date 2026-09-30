@@ -9,6 +9,9 @@ Como testar em build de desenvolvimento: `dotnet build src/ConsoleMode -c Debug 
 Pré-condições: controle **Xbox** (XInput) conectado; app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
 
 - [ ] **Segurar o botão Xbox por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
+- [ ] Ao configurar um atalho, deixe um controle segurando um botão e use outro para montar o atalho; a captura aceita o segundo sem esperar o primeiro soltar. Resultado: ______
+- [ ] Com dois controles conectados, pressione partes diferentes do atalho em cada um, inclusive soltando um antes de pressionar o outro; a captura não combina os controles e só aceita a combinação feita em um único controle. Resultado: ______
+- [ ] Durante a captura, desconecte o controle depois de pressionar parte da combinação e continue no segundo controle; o primeiro encerra sua captura e os botões do segundo não são acrescentados a ela. Resultado: ______
 ## 1. Atalho Home do controle (PR #27)
 
 Pré-condições: atalho de "Abrir o Console Mode" definido (o padrão sugerido é o botão Xbox, controle **Xbox** (XInput)); app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
