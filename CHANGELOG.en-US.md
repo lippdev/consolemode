@@ -2,6 +2,10 @@
 
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
+## [Unreleased]
+### What's new
+- Settings → TV: console mode turns the TV on and switches to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
+
 ## [1.6.0-alpha.3]
 ### What's new
 - Session menu: a pinned panel at the top of the side column with the **File explorer (ControlFS)**, the team's open-source, controller-first file manager. One press opens ControlFS on top, always full screen on the session screen (or brings it to the front if already open); if it isn't installed, its download page opens. Console Mode only calls it through its own `--start` flag, never closes it, and never sends F11 to another window if Windows denies focus. (#122)

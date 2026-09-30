@@ -55,7 +55,7 @@ public sealed class AdbClient : IAsyncDisposable
     {
         var localId = _nextLocalId++;
         uint remoteId = 0;
-        var output = new StringBuilder();
+        var output = new AdbShellOutput();
         await SendAsync(AdbProtocol.Open, localId, 0, AdbProtocol.ShellService(command), ct);
 
         while (true)
@@ -68,7 +68,7 @@ public sealed class AdbClient : IAsyncDisposable
                     remoteId = message.Arg0;
                     break;
                 case AdbProtocol.Write:
-                    output.Append(Encoding.UTF8.GetString(message.Data));
+                    output.Append(message.Data);
                     await SendAsync(AdbProtocol.Okay, localId, message.Arg0, null, ct);
                     break;
                 case AdbProtocol.Close:
@@ -144,9 +144,10 @@ public sealed class AdbClient : IAsyncDisposable
     {
         var header = new byte[AdbProtocol.HeaderSize];
         await _stream.ReadExactlyAsync(header, ct);
-        var (command, arg0, arg1, length) = AdbProtocol.DecodeHeader(header);
+        var (command, arg0, arg1, length, checksum) = AdbProtocol.DecodeHeader(header);
         var data = new byte[length];
         if (length > 0) await _stream.ReadExactlyAsync(data, ct);
+        AdbProtocol.ValidatePayload(checksum, data);
         return new AdbProtocol.Message(command, arg0, arg1, data);
     }
 }

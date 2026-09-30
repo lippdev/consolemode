@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
+
 ## [1.6.0-alpha.3]
 ### Novidades
 - Menu da sessão: painel fixo no topo da lateral com o **Explorador de arquivos (ControlFS)**, o gerenciador de arquivos de código aberto da equipe, feito para o controle. Um toque abre o ControlFS por cima, sempre em tela cheia na tela da sessão (ou o traz para a frente se já estiver aberto); se não estiver instalado, abre a página de download. O Console Mode só o chama pelo `--start` dele, não o encerra nem envia F11 a outra janela se o Windows negar o foco. (#122)
