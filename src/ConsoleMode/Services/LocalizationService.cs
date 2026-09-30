@@ -190,7 +190,6 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string SessionPreviewBadge => LocalizationService.Get(nameof(SessionPreviewBadge));
     public string CloseMenu => LocalizationService.Get(nameof(CloseMenu));
     public string SessionWindowsCard => LocalizationService.Get(nameof(SessionWindowsCard));
-    public string SwitcherTitle => LocalizationService.Get(nameof(SwitcherTitle));
     public string SwitcherEmpty => LocalizationService.Get(nameof(SwitcherEmpty));
     public string SwitcherOpen => LocalizationService.Get(nameof(SwitcherOpen));
     public string SwitcherCloseWindow => LocalizationService.Get(nameof(SwitcherCloseWindow));

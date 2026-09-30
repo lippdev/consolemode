@@ -26,12 +26,6 @@ public static class AltTabRules
         return !window.IsToolWindow && !window.HasOwner;
     }
 
-    /// <summary>
-    /// The card to focus when the switcher opens: the second one, like Alt + Tab (the first is the
-    /// window that was in front, usually the game); the only one when there is just one.
-    /// </summary>
-    public static int InitialIndex(int count) => count > 1 ? 1 : 0;
-
     /// <summary>"chrome.exe" → "Chrome"; empty when there is no name.</summary>
     public static string ProcessDisplayName(string? processName)
     {

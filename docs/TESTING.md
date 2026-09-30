@@ -112,18 +112,18 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
-### Prévia fora da sessão (alpha) e visual novo
+### Tela cheia estilo Steam (Shift+Tab), prévia e janelas
 
-- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu na tela de jogo (ou na principal, se a da TV estiver desligada), com o selo "Prévia · fora da sessão". O link `consolemode://menu` e o item da bandeja também abrem. Resultado: ______
-- [ ] Na prévia: o bloco de FPS não aparece, "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Resultado: ______
-- [ ] Volume (A, ◀/▶, X muda o mudo), saída de áudio, resolução e HDR funcionam na prévia e valem de verdade (não há sessão para desfazê-los). Resultado: ______
-- [ ] O painel sobe e aparece, os blocos entram em cascata (~45 ms entre cada), e ao fechar (B, Esc ou o atalho) ele some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
-- [ ] O bloco em foco cresce e ganha contorno branco; há som ao mover, confirmar e voltar; o seletor (resolução, áudio, FPS) anima ao abrir e já vem com a opção atual em foco. Resultado: ______
-- [ ] Cima/baixo/esquerda/direita nunca ficam "mortos" entre os blocos e as duas saídas; com o seletor aberto o foco não escapa para os blocos de trás. Resultado: ______
-- [ ] Bloco **Janelas** ("N abertas"): A abre uma faixa com as janelas abertas (ícone, programa e título), em ordem de frente para trás, já com o foco na segunda (como o Alt+Tab). A traz a janela escolhida para a frente (restaura se estiver minimizada) e fecha o menu; X (□ no PlayStation) ou Delete pede para fechar a janela e o card some quando ela fecha; B volta ao menu. Resultado: ______
-- [ ] A faixa não lista o próprio menu, a barra de tarefas, a área de trabalho nem apps UWP suspensos; com nenhuma janela mostra "Nenhuma janela aberta". Resultado: ______
-- [ ] Em sessão (Big Picture/Playnite aberto): trocar para outra janela **não** restaura a mesa, e voltar ao Big Picture pela faixa funciona; uma janela aberta na tela de jogo aparece na lista. Resultado: ______
-- [ ] O fundo é vidro fosco com cantos arredondados; se o Windows não aplicar o efeito, o menu continua escuro e legível. Resultado: ______
+- [ ] O menu cobre a **tela inteira** do monitor do jogo (ou o principal, na prévia), com o jogo escurecido e desfocado por trás: painel lateral à esquerda com as opções e, no meio, o bloco "Janelas". Resultado: ______
+- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu (prévia), com o selo "Prévia · fora da sessão". O link `consolemode://menu` e o item da bandeja também abrem. Resultado: ______
+- [ ] Na prévia: o FPS não aparece, "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Volume, saída de áudio, resolução e HDR valem de verdade (não há sessão para desfazê-los). Resultado: ______
+- [ ] O painel lateral entra deslizando pela esquerda com as linhas em cascata, as janelas sobem e aparecem, e ao fechar (B, Esc ou o atalho) tudo some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
+- [ ] A linha/card em foco ganha contorno branco e cresce um pouco; há som ao mover, confirmar e voltar. Resultado: ______
+- [ ] Direcional entre o painel lateral e o grid de janelas (esquerda/direita) e dentro de cada um (cima/baixo) nunca fica "morto"; com o seletor (resolução, áudio, FPS) aberto o foco não escapa para trás. Resultado: ______
+- [ ] **Janelas**: lista as janelas abertas (ícone, programa e título) em ordem de frente para trás. A traz a escolhida para a frente (restaura se estiver minimizada) e fecha o menu; X (□ no PlayStation) ou Delete pede para a janela fechar e o card some quando ela fecha; uma que pergunta "salvar?" mantém o card. Resultado: ______
+- [ ] A lista não mostra o próprio menu, a barra de tarefas, a área de trabalho nem apps UWP suspensos; sem janelas mostra "Nenhuma janela aberta". Resultado: ______
+- [ ] Em sessão (Big Picture/Playnite aberto): trocar para outra janela **não** restaura a mesa, e voltar ao Big Picture pelo grid funciona; uma janela aberta na tela de jogo aparece na lista. Resultado: ______
+- [ ] Monitor com escala de 150% ou 200% (a TV 4K): nada fica cortado nem minúsculo. Resultado: ______
 
 Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation; atalhos do menu e de voltar ao PC definidos. Nos passos abaixo, "Select + Y" e "Start + Select" são os atalhos sugeridos: use os que você escolheu.
 

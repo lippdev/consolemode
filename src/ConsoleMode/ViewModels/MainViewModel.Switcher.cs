@@ -21,26 +21,17 @@ public sealed partial class SwitchWindowItem : ObservableObject
     [ObservableProperty] private ImageSource? _icon;
 }
 
-// The "Alt + Tab" inside the session menu: a strip of the open windows, picked with the pad.
+// The "Alt + Tab" inside the session menu: the open windows, always on screen, picked with the pad.
 public partial class MainViewModel
 {
     public ObservableCollection<SwitchWindowItem> SwitcherWindows { get; } = [];
 
-    [ObservableProperty] private bool _isSessionSwitcherOpen;
     [ObservableProperty] private string _sessionWindowsText = "";
 
     public bool SwitcherIsEmpty => SwitcherWindows.Count == 0;
 
-    [RelayCommand]
-    private async Task OpenSessionSwitcherAsync()
-    {
-        if (IsSessionMenuBusy) return;
-        await RefreshSwitcherAsync();
-        IsSessionSwitcherOpen = true;
-    }
-
-    /// <summary>Lists the windows off the UI thread, then fills the strip and starts loading the icons.</summary>
-    private async Task RefreshSwitcherAsync()
+    /// <summary>Lists the windows off the UI thread, then fills the grid and starts loading the icons.</summary>
+    public async Task RefreshSwitcherAsync()
     {
         var windows = await Task.Run(WindowSwitcher.List);
         SwitcherWindows.Clear();
@@ -75,7 +66,6 @@ public partial class MainViewModel
         if (item is null) return;
         var ok = WindowSwitcher.Activate(item.Window.Handle);
         AppLog.Write($"Janelas: trocar para \"{item.Title}\" ({item.ProcessName}) => {(ok ? "ok" : "não conseguiu")}");
-        IsSessionSwitcherOpen = false;
         CloseSessionMenu();
     }
 

@@ -39,14 +39,6 @@ public class AltTabRulesTests
     }
 
     [Theory]
-    [InlineData(0, 0)]
-    [InlineData(1, 0)]
-    [InlineData(2, 1)]
-    [InlineData(9, 1)]
-    public void The_switcher_opens_on_the_second_card_like_alt_tab(int count, int expected) =>
-        Assert.Equal(expected, AltTabRules.InitialIndex(count));
-
-    [Theory]
     [InlineData("chrome.exe", "Chrome")]
     [InlineData("Discord.EXE", "Discord")]
     [InlineData("steamwebhelper", "Steamwebhelper")]

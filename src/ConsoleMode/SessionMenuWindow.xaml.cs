@@ -19,16 +19,15 @@ using WinRT.Interop;
 namespace ConsoleMode;
 
 /// <summary>
-/// The Select + Y menu over the game (see MainViewModel.SessionMenu). Centered on the game
-/// screen, always on top, acrylic glass with rounded corners, driven by the controller through
-/// GamepadNavigator or by keyboard. It slides up and its tiles come in one after another; closing
-/// fades it out. Exclusive-fullscreen games can't be covered; Big Picture and borderless games can.
+/// The Select + Y menu over the game (see MainViewModel.SessionMenu), in the spirit of Steam's
+/// Shift + Tab: it covers the whole screen, the game dims and blurs behind it, the options sit in
+/// a side panel and the open windows (an always-visible Alt + Tab) fill the middle. Driven by the
+/// controller through GamepadNavigator or by keyboard. The panel slides in from the left and the
+/// rows follow one after another; closing fades it out. Exclusive-fullscreen games can't be
+/// covered; Big Picture and borderless games can.
 /// </summary>
 public sealed partial class SessionMenuWindow : Window
 {
-    private const double WidthDip = 1180;
-    private const double HeightDip = 660;
-
     private static readonly UISettings Ui = new();
 
     private readonly nint _hwnd;
@@ -54,10 +53,10 @@ public sealed partial class SessionMenuWindow : Window
             presenter.IsMinimizable = false;
             presenter.SetBorderAndTitleBar(false, false);
         }
-        WindowPlacement.CenterOn(appWindow, target, WidthDip, HeightDip);
-        TryGlassAndRoundCorners();
+        WindowPlacement.FillScreen(appWindow, target);
+        TryGlass();
 
-        // Hidden until its entrance animation runs, or the tiles would flash in place first.
+        // Hidden until its entrance animation runs, or the rows would flash in place first.
         if (Animate) HideForEntrance();
 
         // No foreground gate and HID for PlayStation pads: the game often keeps the focus even
@@ -65,9 +64,11 @@ public sealed partial class SessionMenuWindow : Window
         _navigator = new GamepadNavigator(DispatcherQueue, Root, readSonyHid: true)
         {
             Sounds = true,
-            // Focus may only land inside the picker while it is open (it covers the tiles).
-            SearchRoot = () => ViewModel.IsSessionSwitcherOpen ? SwitcherCard : ViewModel.IsSessionPickerOpen ? PickerCard : Root,
-            // Adjust mode on the volume tile: Left/Right change it, Up/Down are swallowed.
+            // The side panel and the windows grid sit next to each other, never on the same row.
+            NearestOnSides = true,
+            // Focus may only land inside the picker while it is open (it covers everything else).
+            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard : Root,
+            // Adjust mode on the volume row: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
                 if (!_editingVolume) return false;
@@ -76,10 +77,10 @@ public sealed partial class SessionMenuWindow : Window
                 return true;
             }
         };
+        // X / Square: close the highlighted window, or mute on the volume row.
         _navigator.OptionRequested += () =>
         {
-            if (ViewModel.IsSessionSwitcherOpen) CloseFocusedWindow();
-            else if (IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null);
+            if (!CloseFocusedWindow() && IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null);
         };
         _navigator.BackRequested += () =>
         {
@@ -92,7 +93,7 @@ public sealed partial class SessionMenuWindow : Window
         // before they ever bubble up to Root.
         Root.PreviewKeyDown += (_, e) =>
         {
-            // Arrows go through the same navigator as the D-pad (aligned card, then the nearest one).
+            // Arrows go through the same navigator as the D-pad (aligned, then the nearest).
             var direction = e.Key switch
             {
                 Windows.System.VirtualKey.Up => FocusNavigationDirection.Up,
@@ -107,17 +108,17 @@ public sealed partial class SessionMenuWindow : Window
                 _navigator.Navigate(direction);
                 return;
             }
-            // Delete closes the highlighted window in the switcher (the keyboard's X / Square).
-            if (e.Key == Windows.System.VirtualKey.Delete && ViewModel.IsSessionSwitcherOpen) { e.Handled = true; CloseFocusedWindow(); return; }
+            // Delete closes the highlighted window (the keyboard's X / Square).
+            if (e.Key == Windows.System.VirtualKey.Delete && CloseFocusedWindow()) { e.Handled = true; return; }
             // The pad's B comes from the navigator's polling; handling GamepadB here too would count it twice.
             if (e.Key is not Windows.System.VirtualKey.Escape) return;
             e.Handled = true;
             if (_editingVolume) { SetEditingVolume(false); return; }
             ViewModel.SessionMenuBack();
         };
-        // The focused tile grows a little, like the console interface.
-        Root.GotFocus += (_, e) => ScaleTile(e.OriginalSource, 1.06f);
-        Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
+        // The focused row / card outlines in white and grows a little, like the console interface.
+        Root.GotFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: true);
+        Root.LostFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: false);
         // Mouse clicks sound like a confirm (the pad has its own sounds in the navigator).
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
 
@@ -145,20 +146,21 @@ public sealed partial class SessionMenuWindow : Window
 
     private static bool Animate => Ui.AnimationsEnabled;
 
-    // ── Look: acrylic glass and rounded corners ──────────────────────────────────────────────
+    // ── Look: dim glass over the game ────────────────────────────────────────────────────────
 
-    private void TryGlassAndRoundCorners()
+    private void TryGlass()
     {
         try
         {
             SystemBackdrop = new DesktopAcrylicBackdrop();
-            var round = 2; // DWMWCP_ROUND
-            DwmSetWindowAttribute(_hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, ref round, sizeof(int));
+            // A full-screen overlay has no rounded corners.
+            var square = 1; // DWMWCP_DONOTROUND
+            DwmSetWindowAttribute(_hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, ref square, sizeof(int));
         }
         catch (Exception ex)
         {
-            // Plain dark panel: still a working menu.
-            AppLog.Write($"Menu da sessão: vidro/cantos: {ex.Message}");
+            // A plain dark veil: still a working menu.
+            AppLog.Write($"Menu da sessão: vidro: {ex.Message}");
         }
     }
 
@@ -170,8 +172,8 @@ public sealed partial class SessionMenuWindow : Window
     private IEnumerable<UIElement> EntranceElements()
     {
         yield return HeaderPanel;
-        foreach (var tile in TilesPanel.Children) yield return tile;
-        yield return ExitPanel;
+        yield return SidebarPanel;
+        yield return WindowsPanel;
         yield return HintsPanel;
     }
 
@@ -180,6 +182,7 @@ public sealed partial class SessionMenuWindow : Window
         try
         {
             foreach (var element in EntranceElements()) ElementCompositionPreview.GetElementVisual(element).Opacity = 0f;
+            foreach (var row in RowsPanel.Children) ElementCompositionPreview.GetElementVisual(row).Opacity = 0f;
         }
         catch (Exception ex)
         {
@@ -187,28 +190,28 @@ public sealed partial class SessionMenuWindow : Window
         }
     }
 
-    /// <summary>The header first, then each tile 45 ms after the one before, then the exits and the hints.</summary>
+    /// <summary>The header drops in, the side panel slides in from the left with its rows one after another, then the windows and the hints.</summary>
     private void PlayEntrance()
     {
         try
         {
+            Enter(HeaderPanel, 0f, -16f, 260, 0);
+            Enter(SidebarPanel, -56f, 0f, 320, 40);
             var index = 0;
-            foreach (var element in EntranceElements())
-            {
-                var isHeader = ReferenceEquals(element, HeaderPanel);
-                Enter(element, isHeader ? 14f : 26f, isHeader ? 240 : 290, isHeader ? 0 : 60 + index * 45);
-                if (!isHeader) index++;
-            }
+            foreach (var row in RowsPanel.Children) Enter(row, 0f, 14f, 260, 120 + index++ * 40);
+            Enter(WindowsPanel, 0f, 26f, 320, 180);
+            Enter(HintsPanel, 0f, 10f, 240, 320);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Menu da sessão: animação: {ex.Message}");
             foreach (var element in EntranceElements()) ElementCompositionPreview.GetElementVisual(element).Opacity = 1f;
+            foreach (var row in RowsPanel.Children) ElementCompositionPreview.GetElementVisual(row).Opacity = 1f;
         }
     }
 
-    /// <summary>Slides an element up from <paramref name="fromY"/> while it fades in.</summary>
-    private static void Enter(UIElement element, float fromY, int milliseconds, int delayMilliseconds)
+    /// <summary>Slides an element in from (<paramref name="fromX"/>, <paramref name="fromY"/>) while it fades in.</summary>
+    private static void Enter(UIElement element, float fromX, float fromY, int milliseconds, int delayMilliseconds)
     {
         ElementCompositionPreview.SetIsTranslationEnabled(element, true);
         var visual = ElementCompositionPreview.GetElementVisual(element);
@@ -216,18 +219,18 @@ public sealed partial class SessionMenuWindow : Window
         var ease = compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f));
         var delay = TimeSpan.FromMilliseconds(delayMilliseconds);
 
-        var slide = compositor.CreateScalarKeyFrameAnimation();
-        slide.InsertKeyFrame(0f, fromY);
-        slide.InsertKeyFrame(1f, 0f, ease);
+        var slide = compositor.CreateVector3KeyFrameAnimation();
+        slide.InsertKeyFrame(0f, new Vector3(fromX, fromY, 0f));
+        slide.InsertKeyFrame(1f, Vector3.Zero, ease);
         slide.Duration = TimeSpan.FromMilliseconds(milliseconds);
         slide.DelayTime = delay;
         slide.DelayBehavior = AnimationDelayBehavior.SetInitialValueBeforeDelay;
-        visual.StartAnimation("Translation.Y", slide);
+        visual.StartAnimation("Translation", slide);
 
         var fade = compositor.CreateScalarKeyFrameAnimation();
         fade.InsertKeyFrame(0f, 0f);
         fade.InsertKeyFrame(1f, 1f, ease);
-        fade.Duration = TimeSpan.FromMilliseconds(milliseconds - 40);
+        fade.Duration = TimeSpan.FromMilliseconds(Math.Max(milliseconds - 40, 120));
         fade.DelayTime = delay;
         fade.DelayBehavior = AnimationDelayBehavior.SetInitialValueBeforeDelay;
         visual.StartAnimation("Opacity", fade);
@@ -248,7 +251,7 @@ public sealed partial class SessionMenuWindow : Window
 
             var sink = compositor.CreateScalarKeyFrameAnimation();
             sink.InsertKeyFrame(0f, 0f);
-            sink.InsertKeyFrame(1f, 26f, ease);
+            sink.InsertKeyFrame(1f, 22f, ease);
             sink.Duration = TimeSpan.FromMilliseconds(170);
             visual.StartAnimation("Translation.Y", sink);
 
@@ -272,43 +275,46 @@ public sealed partial class SessionMenuWindow : Window
         _closeTimer.Start();
     }
 
-    /// <summary>A panel over the tiles (the picker, the window switcher): the veil fades in, the card fades and rises in.</summary>
-    private void PlayOverlayEntrance(UIElement overlay, UIElement card)
+    /// <summary>The picker fades and rises in over everything.</summary>
+    private void PlayPickerEntrance()
     {
         if (!Animate) return;
         try
         {
-            ElementCompositionPreview.GetElementVisual(overlay).Opacity = 0f;
-            Enter(overlay, 0f, 200, 0);
-            ElementCompositionPreview.GetElementVisual(card).Opacity = 0f;
-            Enter(card, 22f, 240, 30);
+            ElementCompositionPreview.GetElementVisual(PickerOverlay).Opacity = 0f;
+            Enter(PickerOverlay, 0f, 0f, 200, 0);
+            ElementCompositionPreview.GetElementVisual(PickerCard).Opacity = 0f;
+            Enter(PickerCard, 0f, 22f, 240, 30);
         }
         catch (Exception ex)
         {
             AppLog.Write($"Menu da sessão: animação: {ex.Message}");
-            ElementCompositionPreview.GetElementVisual(overlay).Opacity = 1f;
-            ElementCompositionPreview.GetElementVisual(card).Opacity = 1f;
+            ElementCompositionPreview.GetElementVisual(PickerOverlay).Opacity = 1f;
+            ElementCompositionPreview.GetElementVisual(PickerCard).Opacity = 1f;
         }
     }
 
     /// <summary>
-    /// Tiles (not the picker rows) grow when focused and shrink back when it leaves. Done on the
-    /// composition visual: once a tile's visual is in use for the entrance animation, WinUI refuses
-    /// UIElement.Scale and CenterPoint on it.
+    /// Window cards grow 6% and side rows 2.5% when focused (Tag "card" / "row") and shrink back when it
+    /// leaves. Done on the composition visual: once a visual is used for the entrance animation, WinUI
+    /// refuses UIElement.Scale and CenterPoint on it.
     /// </summary>
-    private static void ScaleTile(object source, float scale)
+    private static void ScaleFocused(object source, bool grow)
     {
-        if (source is not Button { Tag: "card" } button) return;
+        if (source is not Button button) return;
+        var factor = button.Tag switch { "card" => 1.06f, "row" => 1.025f, _ => 0f };
+        if (factor == 0f) return;
         try
         {
+            var scale = grow ? factor : 1f;
             var visual = ElementCompositionPreview.GetElementVisual(button);
             visual.CenterPoint = new Vector3((float)button.ActualWidth / 2, (float)button.ActualHeight / 2, 0);
             var compositor = visual.Compositor;
-            var grow = compositor.CreateVector3KeyFrameAnimation();
-            grow.InsertKeyFrame(1f, new Vector3(scale, scale, 1f),
+            var animation = compositor.CreateVector3KeyFrameAnimation();
+            animation.InsertKeyFrame(1f, new Vector3(scale, scale, 1f),
                 compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f)));
-            grow.Duration = TimeSpan.FromMilliseconds(140);
-            visual.StartAnimation("Scale", grow);
+            animation.Duration = TimeSpan.FromMilliseconds(140);
+            visual.StartAnimation("Scale", animation);
         }
         catch (Exception ex)
         {
@@ -333,13 +339,22 @@ public sealed partial class SessionMenuWindow : Window
     private bool IsVolumeFocused() =>
         Root.XamlRoot is { } root && ReferenceEquals(FocusManager.GetFocusedElement(root), VolumeRow);
 
-    /// <summary>A on the volume tile toggles adjust mode; the arrows show while it is on.</summary>
+    /// <summary>A on the volume row toggles adjust mode; the arrows show while it is on.</summary>
     private void OnVolumeClick(object sender, RoutedEventArgs e) => SetEditingVolume(!_editingVolume);
 
     private void SetEditingVolume(bool on)
     {
         _editingVolume = on;
         VolumeLeft.Visibility = VolumeRight.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    /// <summary>X / Delete on a window card: ask that window to close. False when the focus is not on a window card.</summary>
+    private bool CloseFocusedWindow()
+    {
+        if (Root.XamlRoot is not { } root) return false;
+        if (FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem item }) return false;
+        _ = ViewModel.CloseSwitcherWindowAsync(item);
+        return true;
     }
 
     /// <summary>Windows won't hand a background process the foreground; this forces it (PlayStation pads need it).</summary>
@@ -360,42 +375,11 @@ public sealed partial class SessionMenuWindow : Window
             case nameof(MainViewModel.IsSessionPickerOpen):
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    if (ViewModel.IsSessionPickerOpen) { PlayOverlayEntrance(PickerOverlay, PickerCard); FocusPickerSelection(); }
-                    else FirstRow.Focus(FocusState.Keyboard);
-                });
-                break;
-            case nameof(MainViewModel.IsSessionSwitcherOpen):
-                DispatcherQueue.TryEnqueue(() =>
-                {
-                    if (ViewModel.IsSessionSwitcherOpen) { PlayOverlayEntrance(SwitcherOverlay, SwitcherCard); FocusSwitcherCard(); }
+                    if (ViewModel.IsSessionPickerOpen) { PlayPickerEntrance(); FocusPickerSelection(); }
                     else FirstRow.Focus(FocusState.Keyboard);
                 });
                 break;
         }
-    }
-
-    /// <summary>X / Delete in the switcher: ask the highlighted window to close.</summary>
-    private void CloseFocusedWindow()
-    {
-        if (Root.XamlRoot is not { } root) return;
-        if (FocusManager.GetFocusedElement(root) is FrameworkElement { DataContext: SwitchWindowItem item })
-            _ = ViewModel.CloseSwitcherWindowAsync(item);
-    }
-
-    /// <summary>Opens on the second card (the first is the window that was in front), like Alt + Tab.</summary>
-    private void FocusSwitcherCard()
-    {
-        var index = AltTabRules.InitialIndex(ViewModel.SwitcherWindows.Count);
-        bool TryFocus() =>
-            SwitcherList.ContainerFromIndex(index) is { } container
-            && (FocusManager.FindFirstFocusableElement(container) as Control)?.Focus(FocusState.Keyboard) == true;
-        if (ViewModel.SwitcherWindows.Count == 0 || TryFocus()) return;
-        void OnLayout(object? s, object e)
-        {
-            SwitcherList.LayoutUpdated -= OnLayout;
-            TryFocus();
-        }
-        SwitcherList.LayoutUpdated += OnLayout;
     }
 
     private void FocusPickerSelection()

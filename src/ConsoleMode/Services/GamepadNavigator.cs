@@ -40,6 +40,12 @@ public sealed class GamepadNavigator : IDisposable
     /// </summary>
     public Func<DependencyObject>? SearchRoot { get; set; }
 
+    /// <summary>
+    /// Left/right may also jump to the nearest control when nothing shares the row: for layouts of
+    /// side-by-side panels (a sidebar next to a grid), where the two sides are never on the same row.
+    /// </summary>
+    public bool NearestOnSides { get; set; }
+
     /// <summary>Play the interface sounds for moves, confirms and backs (the console interface).</summary>
     public bool Sounds { get; set; }
 
@@ -124,8 +130,9 @@ public sealed class GamepadNavigator : IDisposable
 
     /// <summary>The closest control in the direction even when it doesn't overlap the current one's row or column.</summary>
     private Control? FindNearest(FocusNavigationDirection direction) =>
-        // Left/right stay on their own row: jumping to another row from the end of one is confusing.
-        direction is not (FocusNavigationDirection.Up or FocusNavigationDirection.Down) ? null :
+        // Left/right stay on their own row (jumping to another row from the end of one is confusing)
+        // unless the layout is side-by-side panels.
+        direction is not (FocusNavigationDirection.Up or FocusNavigationDirection.Down) && !NearestOnSides ? null :
         FocusManager.FindNextElement(direction, new FindNextElementOptions
         {
             SearchRoot = CurrentRoot(),
