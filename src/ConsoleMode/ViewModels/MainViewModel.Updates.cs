@@ -20,6 +20,7 @@ public partial class MainViewModel
     [ObservableProperty] private bool _homeButtonLaunch = true;
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
+    [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
@@ -91,6 +92,8 @@ public partial class MainViewModel
     partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
 
     partial void OnAutoStartOnControllerChanged(bool value) => SaveQuietly();
+
+    partial void OnCloseSteamOnRestoreChanged(bool value) => SaveQuietly();
 
     partial void OnHomeButtonShortPressChanged(bool value)
     {

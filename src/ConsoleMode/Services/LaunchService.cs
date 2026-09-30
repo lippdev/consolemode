@@ -133,6 +133,34 @@ public sealed class LaunchService
         return false;
     }
 
+    /// <summary>
+    /// Leaves Big Picture the clean way, through Steam's own URL (back to the desktop client), so it does not
+    /// stay open on the desk once the screens are back. Halfway through the wait, if it is still there, the
+    /// window is asked to close (WM_CLOSE: the X button, not a kill). Returns whether it is gone.
+    /// </summary>
+    public bool CloseBigPicture(ConsoleRuntimeState state, int timeoutMs = 6000)
+    {
+        if (!IsBigPictureActive(state)) return true;
+        var handles = GetBigPictureHandles();
+        try { ProcessRunner.StartDetached("steam://close/bigpicture"); }
+        catch (Exception ex) { AppLog.Write($"Fechar Big Picture: {ex.Message}"); }
+
+        var deadline = Environment.TickCount64 + timeoutMs;
+        var nudged = false;
+        while (Environment.TickCount64 < deadline)
+        {
+            Thread.Sleep(400);
+            if (!IsBigPictureActive(state)) return true;
+            if (!nudged && Environment.TickCount64 > deadline - timeoutMs / 2)
+            {
+                nudged = true;
+                foreach (var handle in handles.Concat(GetBigPictureHandles()).Distinct())
+                    NativeWindows.PostMessage(handle, NativeWindows.WmClose, 0, 0);
+            }
+        }
+        return !IsBigPictureActive(state);
+    }
+
     public bool IsBigPictureActive(ConsoleRuntimeState state)
     {
         if (state.CachedBigPictureHandle != 0)

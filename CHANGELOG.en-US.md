@@ -7,6 +7,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes
+- Steam: when you go back to the PC (button, menu, shortcut, `stop` link or leaving Big Picture) Big Picture is always closed and Steam is asked to quit the normal way, its own Exit, without killing the process. Before, it stayed open and was often left glitchy. It does not close Steam if a game is running, and you can turn it off in Settings → "Close Steam when going back to the PC".
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
 - Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
 
