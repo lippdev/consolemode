@@ -7,6 +7,8 @@ namespace ConsoleMode.Tests;
 public class ControllerShortcutsTests
 {
     private static ushort[] Masks(ushort home = 0, ushort menu = 0, ushort exit = 0) => [home, menu, exit];
+    private static IReadOnlyDictionary<string, ushort> Devices(params (string Id, ushort Buttons)[] devices) =>
+        devices.ToDictionary(device => device.Id, device => device.Buttons, StringComparer.OrdinalIgnoreCase);
 
     [Fact]
     public void A_new_config_has_no_shortcut_set_and_no_setup_done()
@@ -111,12 +113,12 @@ public class ControllerShortcutsTests
     public void Capture_reports_the_whole_combo_once_the_pad_is_let_go()
     {
         var capture = new ShortcutCapture();
-        Assert.Null(capture.Feed(0));                       // armed
-        Assert.Null(capture.Feed(ControllerShortcuts.Back));
-        Assert.Null(capture.Feed(ControllerShortcuts.Back | ControllerShortcuts.Y));
-        Assert.Null(capture.Feed(ControllerShortcuts.Y));   // released one first: still counts both
-        Assert.Equal((ushort)(ControllerShortcuts.Back | ControllerShortcuts.Y), capture.Feed(0));
-        Assert.Null(capture.Feed(0));                       // reported only once
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));                       // armed
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back | ControllerShortcuts.Y))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Y))));   // released one first: still counts both
+        Assert.Equal((ushort)(ControllerShortcuts.Back | ControllerShortcuts.Y), capture.Feed(Devices(("xinput:0", 0))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));                       // reported only once
     }
 
     [Fact]
@@ -124,20 +126,68 @@ public class ControllerShortcutsTests
     {
         var capture = new ShortcutCapture();
         // The A that clicked "Set" is still down when capturing starts.
-        Assert.Null(capture.Feed(ControllerShortcuts.A));
-        Assert.Null(capture.Feed(ControllerShortcuts.A));
-        Assert.Null(capture.Feed(0));                       // released: now armed, and nothing was captured
-        Assert.Null(capture.Feed(0));
-        Assert.Null(capture.Feed(ControllerShortcuts.Y | ControllerShortcuts.B));
-        Assert.Equal((ushort)(ControllerShortcuts.Y | ControllerShortcuts.B), capture.Feed(0));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.A))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.A))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));                       // released: now armed, and nothing was captured
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Y | ControllerShortcuts.B))));
+        Assert.Equal((ushort)(ControllerShortcuts.Y | ControllerShortcuts.B), capture.Feed(Devices(("xinput:0", 0))));
     }
 
     [Fact]
     public void Capture_ignores_the_dpad_and_the_stick()
     {
         var capture = new ShortcutCapture();
-        Assert.Null(capture.Feed(0));
-        Assert.Null(capture.Feed(0x0001 | 0x0008));         // D-pad up + right
-        Assert.Null(capture.Feed(0));
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0x0001 | 0x0008))));         // D-pad up + right
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0))));
+    }
+
+    [Fact]
+    public void Capture_does_not_combine_simultaneous_inputs_from_two_controllers()
+    {
+        var capture = new ShortcutCapture();
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0), ("xinput:1", 0))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back), ("xinput:1", ControllerShortcuts.Y))));
+        Assert.Equal(ControllerShortcuts.Back, capture.CurrentHeld);
+        Assert.Equal(ControllerShortcuts.Back,
+            capture.Feed(Devices(("xinput:0", 0), ("xinput:1", ControllerShortcuts.Y))));
+
+        Assert.Null(capture.Feed(Devices(("xinput:0", 0), ("xinput:1", ControllerShortcuts.Y))));
+        Assert.Equal(ControllerShortcuts.Y, capture.CurrentHeld);
+        Assert.Equal(ControllerShortcuts.Y, capture.Feed(Devices(("xinput:0", 0), ("xinput:1", 0))));
+    }
+
+    [Fact]
+    public void A_held_unrelated_controller_does_not_delay_capture_on_an_armed_device()
+    {
+        var capture = new ShortcutCapture();
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back), ("xinput:1", 0))));
+        Assert.Null(capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back), ("xinput:1", ControllerShortcuts.Y))));
+        Assert.Equal(ControllerShortcuts.Y, capture.CurrentHeld);
+        Assert.Equal(ControllerShortcuts.Y, capture.Feed(Devices(("xinput:0", ControllerShortcuts.Back), ("xinput:1", 0))));
+    }
+
+    [Fact]
+    public void Disconnecting_a_pad_finishes_its_capture_without_using_another_pads_buttons()
+    {
+        var capture = new ShortcutCapture();
+        Assert.Null(capture.Feed(Devices(("sony:path", 0), ("xinput:1", 0))));
+        Assert.Null(capture.Feed(Devices(("sony:path", ControllerShortcuts.Back), ("xinput:1", 0))));
+        Assert.Equal(ControllerShortcuts.Back, capture.Feed(Devices(("xinput:1", ControllerShortcuts.Y))));
+
+        Assert.Null(capture.Feed(Devices(("xinput:1", ControllerShortcuts.Y))));
+        Assert.Equal(ControllerShortcuts.Y, capture.Feed(Devices(("xinput:1", 0))));
+    }
+
+    [Fact]
+    public void A_combo_must_be_held_by_one_device()
+    {
+        Assert.False(ControllerShortcuts.IsHeldOnAnyDevice(
+            ControllerShortcuts.Back | ControllerShortcuts.Y,
+            [ControllerShortcuts.Back, ControllerShortcuts.Y]));
+        Assert.True(ControllerShortcuts.IsHeldOnAnyDevice(
+            ControllerShortcuts.Back | ControllerShortcuts.Y,
+            [ControllerShortcuts.Back, ControllerShortcuts.Back | ControllerShortcuts.Y]));
     }
 }

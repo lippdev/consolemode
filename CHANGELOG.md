@@ -9,13 +9,14 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation) com uma animação de deslize, blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR), que abre cada escolha. (#117)
 - Plano de fundo do modo Console: por padrão, uma colagem com as capas dos seus jogos instalados na Steam sob um gradiente escuro (o app só lê as imagens que a Steam já baixou; nada é embutido). Dá para trocar por só o gradiente ou por uma imagem sua, em Sistema → Plano de fundo. (#117)
 - Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)
-- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar). Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
+- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar no mesmo controle). A captura não mistura botões de controles diferentes. Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
 
 ### Correções
 - Menu da sessão: se o Windows não conseguir ativar a janela escolhida, o menu continua aberto para tentar de novo. (#120)
+- Steam: ao voltar ao PC (botão, menu, atalho, link `stop` ou saindo do Big Picture) o Big Picture é sempre fechado e a Steam é chamada para fechar do jeito normal, o "Sair" dela, sem encerrar o processo à força. Antes ela ficava aberta e costumava ficar bugada. Não fecha a Steam se houver um jogo rodando, e dá para desligar em Ajustes → "Fechar a Steam ao voltar ao PC". (#121)
 - Menu da sessão: o aviso que mostra o atalho no início da sessão não fica mais preso na tela; ele some sozinho depois de alguns segundos. (#114)
-- Controles: um controle que manda leituras impossíveis pelo driver HID genérico (muitos botões apertados ao mesmo tempo, direcional preso) agora é ignorado em vez de navegar e apertar botões sozinho no app. O log avisa, e reabrir o app tenta de novo. (#115)
+- Controles: um controle que manda leituras impossíveis pelo driver HID genérico (muitos botões apertados ao mesmo tempo, direcional preso) agora é ignorado também quando o Windows o expõe por Windows.Gaming.Input. O log avisa, e reabrir o app tenta de novo. (#115)
 - Interface Console: navegar pelo controle não trava mais. "Para cima" (e "para baixo") funciona também quando o bloco de destino não está na mesma coluna, o foco não para mais em contêineres invisíveis e, ao trocar de aba, ele cai no primeiro item dela. (#117)
 - Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
 - Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos. Se o Playnite troca a janela de carregamento pela principal, o Console Mode passa a acompanhar a nova e só restaura a mesa quando o Playnite fecha de verdade. (#83)
@@ -24,6 +25,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Por trás dos panos
 - Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
+- O código não cita mais o MultiMonitorTool nem o SoundVolumeView, e a limpeza dos arquivos antigos deles na pasta `tools` saiu: quem atualiza direto da 1.5 mantém esses dois arquivos até apagá-los à mão. (#119)
 - O pacote embute só o rtss-cli; sobras de MultiMonitorTool/SoundVolumeView não entram mais no executável. (#110)
 
 ## [1.6.0-alpha.2]

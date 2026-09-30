@@ -30,6 +30,12 @@ public static class SonyHidReader
         }
     }
 
+    /// <summary>Copy each connected Sony HID pad's state without combining different devices.</summary>
+    public static IReadOnlyDictionary<string, ushort> ReadStates()
+    {
+        lock (Gate) return new Dictionary<string, ushort>(Buttons, StringComparer.OrdinalIgnoreCase);
+    }
+
     public static void Acquire()
     {
         lock (Gate)

@@ -98,12 +98,6 @@ public static class AppPaths
             try { File.Copy(rtssBeside, rtssDest, true); } catch { /* ignore */ }
         }
 
-        // Up to 1.5 the NirSoft tools were extracted here; 1.6 is all our own code (issue #91).
-        foreach (var name in new[] { "MultiMonitorTool.exe", "SoundVolumeView.exe" })
-        {
-            try { File.Delete(Path.Combine(ToolsDir, name)); } catch { /* in use or read-only: harmless */ }
-        }
-
         RtssCliPath = FirstExisting(Path.Combine(ToolsDir, "rtss-cli.exe"), Path.Combine(ExeDir, "rtss-cli.exe"));
 
         ConfigPath = Path.Combine(DataDir, "config.json");

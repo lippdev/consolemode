@@ -310,6 +310,7 @@ public partial class MainViewModel : ObservableObject
             InterfaceSounds = config.InterfaceSounds;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
+            CloseSteamOnRestore = config.CloseSteamOnRestore;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -906,6 +907,7 @@ public partial class MainViewModel : ObservableObject
             InterfaceSounds = InterfaceSounds,
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,
+            CloseSteamOnRestore = CloseSteamOnRestore,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
