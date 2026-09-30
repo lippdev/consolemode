@@ -44,6 +44,17 @@ public class SteamShutdownTests
         Assert.Equal(Decision.GameStateUnknown, Decide("bigPicture", true, true, runningAppId: null));
 
     [Fact]
+    public void Missing_running_app_id_remains_unknown_through_the_shutdown_decision_and_log()
+    {
+        var appId = ParseRunningAppId(null);
+        var decision = Decide("bigPicture", closeSteamSetting: true, steamRunning: true, appId);
+
+        Assert.Equal(Decision.GameStateUnknown, decision);
+        Assert.Contains("mantida aberta", Describe(decision, appId));
+        Assert.Contains("não foi possível verificar", Describe(decision, appId));
+    }
+
+    [Fact]
     public void The_setting_wins_over_everything_else()
     {
         Assert.Equal(Decision.SettingOff, Decide("bigPicture", false, false, 570));

@@ -35,7 +35,7 @@ public static class SteamShutdown
     }
 
     /// <summary>The line for the log.</summary>
-    public static string Describe(Decision decision, int runningAppId) => decision switch
+    public static string Describe(Decision decision, int? runningAppId) => decision switch
     {
         Decision.Shutdown => "Steam: pedindo para fechar (sair normal)",
         Decision.SettingOff => "Steam: mantida aberta (desligado nos ajustes)",
