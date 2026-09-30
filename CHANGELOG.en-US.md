@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
-- Reverted PRs #93 and #45: removed Android TV control through ADB/Wake-on-LAN and restored the previous behavior when stopping a session. (#125)
+- Reverted PR #45: restored the previous behavior when stopping a session. (#125)
 
 ## [1.6.0-alpha.3]
 ### What's new

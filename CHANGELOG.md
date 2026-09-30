@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Correções
-- Revertidas as PRs #93 e #45: removido o controle de TVs Android por ADB/Wake-on-LAN e restaurado o comportamento anterior ao encerrar uma sessão. (#125)
+- Revertida a PR #45: restaurado o comportamento anterior ao encerrar uma sessão. (#125)
 
 ## [1.6.0-alpha.3]
 ### Novidades
