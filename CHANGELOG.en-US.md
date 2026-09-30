@@ -12,6 +12,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes
+- Session menu: if Windows cannot activate the selected window, the menu stays open so you can try again. (#120)
 - Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
 - Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored instead of moving around and pressing buttons in the app by itself. The log says so, and reopening the app tries again. (#115)
 - Console interface: controller navigation no longer gets stuck. Up (and down) also works when the target card is not in the same column, the focus no longer lands on invisible containers and, when you switch tabs, it lands on the first item of the new one. (#117)
