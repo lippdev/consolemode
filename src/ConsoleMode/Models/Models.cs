@@ -88,6 +88,12 @@ public sealed class TvControlConfig
     /// <summary>Long-lived access token, encrypted for this Windows user (DPAPI, "dpapi:" prefix).</summary>
     public string HomeAssistantToken { get; set; } = "";
 
+    /// <summary>
+    /// Explicit opt-in for an https server with a self-signed certificate (the certificate is then
+    /// not validated for this server). Off by default: certificate errors fail the call.
+    /// </summary>
+    public bool HomeAssistantAllowSelfSigned { get; set; }
+
     /// <summary>Entity run when console mode starts (script, scene, automation, media_player…).</summary>
     public string HomeAssistantOnEntity { get; set; } = "";
 

@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using System.Text;
 using ConsoleMode.Models;
 
@@ -13,6 +12,16 @@ namespace ConsoleMode.Services.Tv;
 public sealed class HomeAssistantController : ITvController
 {
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
+
+    /// <summary>
+    /// Only used when the user ticked "Accept a self-signed certificate". It skips the certificate
+    /// check for every address it is used with, so it is never the default and each use is logged.
+    /// </summary>
+    private static readonly HttpClient InsecureHttp = new(new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+    })
+    { Timeout = TimeSpan.FromSeconds(15) };
 
     public Task TurnOnAsync(TvControlConfig config, TimeSpan approvalTimeout, CancellationToken ct)
     {
@@ -36,7 +45,8 @@ public sealed class HomeAssistantController : ITvController
     {
         if (string.IsNullOrWhiteSpace(config.HomeAssistantUrl))
             throw new TvControlException(LocalizationService.Get("TvHaUrlMissing"));
-        var token = SecretProtector.Unprotect(config.HomeAssistantToken);
+        if (!SecretProtector.TryUnprotect(config.HomeAssistantToken, out var token))
+            throw new TvControlException(LocalizationService.Get("TvHaTokenUnreadable"));
         if (string.IsNullOrWhiteSpace(token))
             throw new TvControlException(LocalizationService.Get("TvHaTokenMissing"));
 
@@ -56,15 +66,21 @@ public sealed class HomeAssistantController : ITvController
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+        if (HomeAssistantApi.IsPlainHttp(config.HomeAssistantUrl))
+            AppLog.Write("TV: Home Assistant por http:// — o token vai em texto puro pela rede; use só em rede confiável");
+        var selfSigned = config.HomeAssistantAllowSelfSigned && uri.Scheme == Uri.UriSchemeHttps;
+        if (selfSigned) AppLog.Write("TV: Home Assistant com certificado autoassinado aceito pelo usuário (sem validar o certificado)");
+
         HttpResponseMessage response;
         try
         {
-            response = await Http.SendAsync(request, ct);
+            response = await (selfSigned ? InsecureHttp : Http).SendAsync(request, ct);
         }
         catch (HttpRequestException ex)
         {
             AppLog.Write($"TV: Home Assistant inacessível: {ex.Message}");
-            throw new TvControlException(LocalizationService.Get("TvHaUnreachable", config.HomeAssistantUrl));
+            var certificate = ex.InnerException is System.Security.Authentication.AuthenticationException;
+            throw new TvControlException(LocalizationService.Get(certificate ? "TvHaCertificate" : "TvHaUnreachable", config.HomeAssistantUrl));
         }
 
         using (response)
@@ -77,35 +93,6 @@ public sealed class HomeAssistantController : ITvController
                 HttpStatusCode.NotFound or HttpStatusCode.BadRequest => LocalizationService.Get("TvHaNotFound", call.EntityId),
                 _ => LocalizationService.Get("TvHaFailed", (int)response.StatusCode)
             });
-        }
-    }
-}
-
-/// <summary>Secrets in config.json, encrypted for the signed-in Windows user (DPAPI).</summary>
-public static class SecretProtector
-{
-    private const string Prefix = "dpapi:";
-
-    public static string Protect(string secret)
-    {
-        if (string.IsNullOrEmpty(secret)) return "";
-        var data = ProtectedData.Protect(Encoding.UTF8.GetBytes(secret), null, DataProtectionScope.CurrentUser);
-        return Prefix + Convert.ToBase64String(data);
-    }
-
-    /// <summary>Plain text (never protected) passes through; unreadable data (other user/PC) is empty.</summary>
-    public static string Unprotect(string stored)
-    {
-        if (string.IsNullOrEmpty(stored) || !stored.StartsWith(Prefix, StringComparison.Ordinal)) return stored ?? "";
-        try
-        {
-            var data = ProtectedData.Unprotect(Convert.FromBase64String(stored[Prefix.Length..]), null, DataProtectionScope.CurrentUser);
-            return Encoding.UTF8.GetString(data);
-        }
-        catch (Exception ex) when (ex is CryptographicException or FormatException)
-        {
-            AppLog.Write($"TV: token do Home Assistant ilegível ({ex.GetType().Name}); informe de novo");
-            return "";
         }
     }
 }

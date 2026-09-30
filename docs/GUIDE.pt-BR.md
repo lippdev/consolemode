@@ -52,9 +52,11 @@ Se você já usa o [Home Assistant](https://www.home-assistant.io/), ele alcanç
 
 1. No Home Assistant, crie um **script** que liga a TV e escolhe a entrada do PC (por exemplo `media_player.turn_on` seguido de `media_player.select_source`) e, se quiser, outro que a desliga.
 2. Crie um **token de acesso de longa duração**: seu perfil → **Segurança** → *Tokens de acesso de longa duração*.
-3. No Console Mode, escolha *Home Assistant* e preencha o endereço (ex.: `http://homeassistant.local:8123`), o token e a entidade a executar (ex.: `script.ligar_tv_pc`). Aperte **Testar agora**.
+3. No Console Mode, escolha *Home Assistant* e preencha o endereço (ex.: `https://homeassistant.local:8123`), o token e a entidade a executar (ex.: `script.ligar_tv_pc`). Aperte **Testar agora**.
 
-Scripts e cenas rodam com `turn_on`, automações com `trigger`, botões com `press`; as outras entidades (`media_player`, `switch`…) com `turn_on` e, ao restaurar, com `turn_off` quando não há entidade de restauração. O token fica guardado criptografado para o seu usuário do Windows (DPAPI).
+Scripts e cenas rodam com `turn_on`, automações com `trigger`, botões com `press`; as outras entidades (`media_player`, `switch`…) com `turn_on` e, ao restaurar, com `turn_off` quando não há entidade de restauração. **Segurança do endereço e do token.** O token vai em todas as requisições, então prefira `https://`. Um endereço sem esquema é tratado como `https://`; o `http://` precisa ser digitado de propósito e serve só para rede confiável (a sua rede local): os Ajustes avisam quando você usa e o log registra. Para um servidor `https://` com certificado autoassinado, ligue **Aceitar certificado autoassinado**: vem desligado, e enquanto estiver desligado um erro de certificado faz a chamada falhar. Ligar deixa de validar o certificado, então use só numa rede em que você confia.
+
+O token fica guardado criptografado para o seu usuário do Windows (DPAPI). Os dados do DPAPI só podem ser lidos pelo mesmo usuário do Windows no mesmo PC: se a pasta de dados portátil for aberta por outro usuário ou em outro PC, os Ajustes avisam que o token salvo não pode ser lido e pedem para informá-lo de novo (nada falha em silêncio).
 
 ## Extras opcionais
 

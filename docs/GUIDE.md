@@ -52,9 +52,11 @@ If you already run [Home Assistant](https://www.home-assistant.io/), it can reac
 
 1. In Home Assistant, write a **script** that turns the TV on and selects the PC's input (for example `media_player.turn_on` followed by `media_player.select_source`), and optionally one that turns it off.
 2. Create a **long-lived access token**: your profile → **Security** → *Long-lived access tokens*.
-3. In Console Mode, pick *Home Assistant* and fill in the address (e.g. `http://homeassistant.local:8123`), the token and the entity to run (e.g. `script.tv_to_pc`). Press **Test now**.
+3. In Console Mode, pick *Home Assistant* and fill in the address (e.g. `https://homeassistant.local:8123`), the token and the entity to run (e.g. `script.tv_to_pc`). Press **Test now**.
 
-Scripts and scenes are run with `turn_on`, automations with `trigger`, buttons with `press`; other entities (`media_player`, `switch`…) with `turn_on`, and on restore with `turn_off` when no restore entity is set. The token is stored encrypted for your Windows user (DPAPI).
+Scripts and scenes are run with `turn_on`, automations with `trigger`, buttons with `press`; other entities (`media_player`, `switch`…) with `turn_on`, and on restore with `turn_off` when no restore entity is set. **Address and token safety.** The token is sent with every request, so prefer `https://`. An address without a scheme is treated as `https://`; `http://` has to be typed on purpose and is only for a trusted network (your own LAN): Settings warns when you use it, and the log notes it. For an `https://` server with a self-signed certificate, turn on **Accept a self-signed certificate**: it's off by default, and while it's off a certificate error makes the call fail. Turning it on stops validating the certificate, so use it only on a network you trust.
+
+The token is stored encrypted for your Windows user (DPAPI). DPAPI data can only be read by the same Windows user on the same PC: if the portable data folder is opened by another user or on another PC, Settings says the saved token can't be read and asks you to enter it again (nothing fails silently).
 
 ## Optional extras
 

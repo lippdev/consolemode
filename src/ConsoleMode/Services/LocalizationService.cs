@@ -217,6 +217,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string TvHaUrlCard => LocalizationService.Get(nameof(TvHaUrlCard));
     public string TvHaTokenCard => LocalizationService.Get(nameof(TvHaTokenCard));
     public string TvHaTokenDescription => LocalizationService.Get(nameof(TvHaTokenDescription));
+    public string TvHaSelfSignedCard => LocalizationService.Get(nameof(TvHaSelfSignedCard));
+    public string TvHaSelfSignedDescription => LocalizationService.Get(nameof(TvHaSelfSignedDescription));
     public string TvHaOnEntityCard => LocalizationService.Get(nameof(TvHaOnEntityCard));
     public string TvHaOnEntityDescription => LocalizationService.Get(nameof(TvHaOnEntityDescription));
     public string TvHaOffEntityCard => LocalizationService.Get(nameof(TvHaOffEntityCard));

@@ -24,6 +24,18 @@ public partial class MainViewModel
     [ObservableProperty] private string _haToken = "";
     [ObservableProperty] private string _haOnEntity = "";
     [ObservableProperty] private string _haOffEntity = "";
+    [ObservableProperty] private bool _haAllowSelfSigned;
+    [ObservableProperty] private bool _haTokenUnreadable;
+
+    /// <summary>Warns that an explicit http:// address sends the token in clear.</summary>
+    public string HaUrlDescription => HomeAssistantApi.IsPlainHttp(HaUrl)
+        ? LocalizationService.Get("TvHaUrlHttpWarning")
+        : LocalizationService.Get("TvHaUrlDescription");
+
+    /// <summary>Explains a token that DPAPI can't read here (other Windows user / PC) until a new one is typed.</summary>
+    public string HaTokenDescription => HaTokenUnreadable
+        ? LocalizationService.Get("TvHaTokenUnreadable")
+        : LocalizationService.Get("TvHaTokenDescription");
     [ObservableProperty] private bool _isTestingTv;
 
     private string TvProvider => SelectedTvProvider?.Value ?? TvControlConfig.None;
@@ -57,8 +69,20 @@ public partial class MainViewModel
     partial void OnTvMacAddressChanged(string value) => SaveQuietly();
     partial void OnTvInputCommandChanged(string value) => SaveQuietly();
     partial void OnTvTurnOffOnRestoreChanged(bool value) => SaveQuietly();
-    partial void OnHaUrlChanged(string value) => SaveQuietly();
-    partial void OnHaTokenChanged(string value) => SaveQuietly();
+    partial void OnHaUrlChanged(string value)
+    {
+        OnPropertyChanged(nameof(HaUrlDescription));
+        SaveQuietly();
+    }
+
+    partial void OnHaTokenChanged(string value)
+    {
+        if (!_applying && !string.IsNullOrEmpty(value)) HaTokenUnreadable = false;
+        SaveQuietly();
+    }
+
+    partial void OnHaTokenUnreadableChanged(bool value) => OnPropertyChanged(nameof(HaTokenDescription));
+    partial void OnHaAllowSelfSignedChanged(bool value) => SaveQuietly();
     partial void OnHaOnEntityChanged(string value) => SaveQuietly();
     partial void OnHaOffEntityChanged(string value) => SaveQuietly();
 
@@ -90,7 +114,10 @@ public partial class MainViewModel
         TvInputCommand = tv.InputCommand ?? "";
         TvTurnOffOnRestore = tv.TurnOffOnRestore;
         HaUrl = tv.HomeAssistantUrl ?? "";
-        HaToken = SecretProtector.Unprotect(tv.HomeAssistantToken ?? "");
+        // A token encrypted by another Windows user / PC can't be read: say so, instead of a silently empty box.
+        HaTokenUnreadable = !SecretProtector.TryUnprotect(tv.HomeAssistantToken, out var haToken);
+        HaToken = haToken;
+        HaAllowSelfSigned = tv.HomeAssistantAllowSelfSigned;
         HaOnEntity = tv.HomeAssistantOnEntity ?? "";
         HaOffEntity = tv.HomeAssistantOffEntity ?? "";
     }
@@ -104,7 +131,9 @@ public partial class MainViewModel
         InputCommand = TvInputCommand.Trim(),
         TurnOffOnRestore = TvTurnOffOnRestore,
         HomeAssistantUrl = HaUrl.Trim(),
-        HomeAssistantToken = SecretProtector.Protect(HaToken.Trim()),
+        // Keep an unreadable token as it is until the user types a new one.
+        HomeAssistantToken = HaTokenUnreadable && HaToken.Length == 0 ? _loadedConfig.Tv?.HomeAssistantToken ?? "" : SecretProtector.Protect(HaToken.Trim()),
+        HomeAssistantAllowSelfSigned = HaAllowSelfSigned,
         HomeAssistantOnEntity = HaOnEntity.Trim(),
         HomeAssistantOffEntity = HaOffEntity.Trim()
     };

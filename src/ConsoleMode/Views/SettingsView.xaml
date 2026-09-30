@@ -128,11 +128,16 @@
                                       Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}">
                         <TextBox MinWidth="220" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}"/>
                     </ctk:SettingsCard>
-                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaUrlCard, Mode=OneWay}"
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaUrlCard, Mode=OneWay}" Description="{x:Bind ViewModel.HaUrlDescription, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
-                        <TextBox MinWidth="260" PlaceholderText="http://homeassistant.local:8123" Text="{x:Bind ViewModel.HaUrl, Mode=TwoWay}"/>
+                        <TextBox MinWidth="260" PlaceholderText="https://homeassistant.local:8123" Text="{x:Bind ViewModel.HaUrl, Mode=TwoWay}"/>
                     </ctk:SettingsCard>
-                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaTokenCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHaTokenDescription, Mode=OneWay}"
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaSelfSignedCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHaSelfSignedDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.HaAllowSelfSigned, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaTokenCard, Mode=OneWay}" Description="{x:Bind ViewModel.HaTokenDescription, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
                         <PasswordBox MinWidth="260" Password="{x:Bind ViewModel.HaToken, Mode=TwoWay}"/>
                     </ctk:SettingsCard>

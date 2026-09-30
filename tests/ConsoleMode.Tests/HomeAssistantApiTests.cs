@@ -58,7 +58,7 @@ public sealed class HomeAssistantApiTests
     [Theory]
     [InlineData("http://homeassistant.local:8123", "http://homeassistant.local:8123/api/services/script/turn_on")]
     [InlineData("http://192.168.0.2:8123/", "http://192.168.0.2:8123/api/services/script/turn_on")]
-    [InlineData("homeassistant.local:8123", "http://homeassistant.local:8123/api/services/script/turn_on")]
+    [InlineData("homeassistant.local:8123", "https://homeassistant.local:8123/api/services/script/turn_on")]
     [InlineData("https://ha.example.com", "https://ha.example.com/api/services/script/turn_on")]
     public void Service_uri_is_built_from_the_base_url(string baseUrl, string expected)
     {
@@ -71,5 +71,17 @@ public sealed class HomeAssistantApiTests
     {
         var call = HomeAssistantApi.TurnOn("media_player.tv")!.Value;
         Assert.Equal("""{"entity_id":"media_player.tv"}""", HomeAssistantApi.Body(call));
+    }
+
+    [Theory]
+    [InlineData("http://homeassistant.local:8123", true)]
+    [InlineData("HTTP://192.168.0.2:8123/", true)]
+    [InlineData("https://ha.example.com", false)]
+    [InlineData("homeassistant.local:8123", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void Only_an_explicit_http_address_is_flagged_as_clear_text(string? url, bool plain)
+    {
+        Assert.Equal(plain, HomeAssistantApi.IsPlainHttp(url));
     }
 }

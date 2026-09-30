@@ -42,13 +42,24 @@ public static class HomeAssistantApi
         return For(onEntity, turnOn: false);
     }
 
-    /// <summary>http://host:8123 (with or without a trailing slash) + /api/services/domain/service.</summary>
-    public static Uri ServiceUri(string baseUrl, ServiceCall call)
+    /// <summary>
+    /// The base URL with a scheme. Without one it is https: the token travels in every request,
+    /// so plain http has to be typed on purpose (<c>http://homeassistant.local:8123</c>).
+    /// </summary>
+    public static string NormalizeBaseUrl(string baseUrl)
     {
         var text = baseUrl.Trim().TrimEnd('/');
-        if (!text.Contains("://")) text = "http://" + text;
-        return new Uri($"{text}/api/services/{call.Domain}/{call.Service}");
+        return text.Length == 0 || text.Contains("://") ? text : "https://" + text;
     }
+
+    /// <summary>True when the token would be sent in clear (an explicit http:// address).</summary>
+    public static bool IsPlainHttp(string? baseUrl) =>
+        !string.IsNullOrWhiteSpace(baseUrl) &&
+        NormalizeBaseUrl(baseUrl).StartsWith("http://", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>https://host:8123 (with or without a trailing slash) + /api/services/domain/service.</summary>
+    public static Uri ServiceUri(string baseUrl, ServiceCall call) =>
+        new($"{NormalizeBaseUrl(baseUrl)}/api/services/{call.Domain}/{call.Service}");
 
     public static string Body(ServiceCall call) =>
         System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string> { ["entity_id"] = call.EntityId });
