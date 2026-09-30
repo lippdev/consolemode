@@ -187,6 +187,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string ExitShortcutCard => LocalizationService.Get(nameof(ExitShortcutCard));
     public string SoundsCard => LocalizationService.Get(nameof(SoundsCard));
+    public string SessionPreviewBadge => LocalizationService.Get(nameof(SessionPreviewBadge));
+    public string CloseMenu => LocalizationService.Get(nameof(CloseMenu));
+    public string SessionWindowsCard => LocalizationService.Get(nameof(SessionWindowsCard));
+    public string SwitcherEmpty => LocalizationService.Get(nameof(SwitcherEmpty));
+    public string SwitcherOpen => LocalizationService.Get(nameof(SwitcherOpen));
+    public string SwitcherCloseWindow => LocalizationService.Get(nameof(SwitcherCloseWindow));
     public string BackgroundCard => LocalizationService.Get(nameof(BackgroundCard));
     public string BackgroundDescription => LocalizationService.Get(nameof(BackgroundDescription));
     public string BackgroundImageCard => LocalizationService.Get(nameof(BackgroundImageCard));

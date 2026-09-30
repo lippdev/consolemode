@@ -62,6 +62,7 @@ public sealed class SessionHintWindow : Window
             presenter.IsMinimizable = false;
             presenter.SetBorderAndTitleBar(false, false);
         }
+        WindowChrome.Strip(hwnd);
         WindowPlacement.TopRightOn(appWindow, target, WidthDip, HeightDip, MarginDip);
         appWindow.Show(activateWindow: false);
 

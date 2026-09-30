@@ -116,6 +116,26 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
+### Tela cheia estilo Steam (Shift+Tab), prévia e janelas
+
+- [ ] O menu cobre a **tela inteira** do monitor do jogo (ou o principal, na prévia), com o jogo escurecido e desfocado por trás: painel lateral à esquerda com as opções e, no meio, o bloco "Janelas". Resultado: ______
+- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu (prévia), com o selo "Prévia · fora da sessão". O link `consolemode://menu` e o item da bandeja também abrem. Resultado: ______
+- [ ] Na prévia: o FPS não aparece, "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Volume, saída de áudio, resolução e HDR valem de verdade (não há sessão para desfazê-los). Resultado: ______
+- [ ] O painel lateral entra deslizando pela esquerda com as linhas em cascata, as janelas sobem e aparecem, e ao fechar (B, Esc ou o atalho) tudo some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
+- [ ] A linha/card em foco ganha contorno branco e cresce um pouco; há som ao mover, confirmar e voltar. Resultado: ______
+- [ ] Direcional entre o painel lateral e o grid de janelas (esquerda/direita) e dentro de cada um (cima/baixo) nunca fica "morto"; com o seletor (resolução, áudio, FPS) aberto o foco não escapa para trás. Resultado: ______
+- [ ] **Janelas**: lista as janelas abertas (ícone, programa e título) em ordem de frente para trás. A traz a escolhida para a frente (restaura se estiver minimizada) e fecha o menu; X (□ no PlayStation) ou Delete pede para a janela fechar e o card some quando ela fecha; uma que pergunta "salvar?" mantém o card. Resultado: ______
+- [ ] **Falha ao ativar uma janela**: abra o menu com o Bloco de Notas aberto, feche o Bloco de Notas por outro meio depois de a lista carregar (por exemplo, `taskkill /IM notepad.exe /F`) e escolha o card obsoleto com A. O menu continua aberto, o foco permanece no card e o log mostra `Janelas: trocar ... => não conseguiu`; uma falha do Windows ao trazer uma janela válida para frente também deve manter o menu aberto. Resultado: ______
+- [ ] A lista não mostra o próprio menu, a barra de tarefas, a área de trabalho nem apps UWP suspensos; sem janelas mostra "Nenhuma janela aberta". Resultado: ______
+- [ ] Em sessão (Big Picture/Playnite aberto): trocar para outra janela **não** restaura a mesa, e voltar ao Big Picture pelo grid funciona; uma janela aberta na tela de jogo aparece na lista. Resultado: ______
+- [ ] Monitor com escala de 150% ou 200% (a TV 4K): nada fica cortado nem minúsculo. Resultado: ______
+- [ ] **Sem moldura**: nenhuma borda clara em volta da tela (antes havia um quadro de ~3 px do Windows); o fundo vai até as quatro bordas. Resultado: ______
+- [ ] **Vidro condicional**: com Configurações → Personalização → Cores → "Efeitos de transparência" **ligado**, o jogo aparece desfocado e escurecido atrás; **desligado**, o painel fica escuro e sólido, com o mesmo contraste; trocar a configuração com o menu aberto atualiza na hora. Resultado: ______
+- [ ] **Marcador de seleção**: um contorno branco de 2 px encostado na borda da linha ou do card (sem vão de fundo entre os dois e sem ser cortado na ponta da lista); as linhas do painel não mudam de tamanho e os cards de janela crescem ~4%. O modo de ajuste do volume mostra ◀ ▶ e o contorno acompanha. Resultado: ______
+- [ ] **Controle**: esquerda, vinda do grid, volta à linha do painel de onde você saiu; cima/baixo param nas pontas do painel e do grid (não pulam para o outro lado nem para o card ao lado); o seletor (resolução, áudio, FPS) devolve o foco à linha que o abriu; ao fechar uma janela (X) o foco vai para o card seguinte, ou para "Voltar ao jogo" se não sobrar nenhum. Resultado: ______
+- [ ] **Volume**: A liga o modo de ajuste, ◀/▶ mudam de 5 em 5, cima/baixo não fazem nada nele, X (□) muda o mudo, B (ou sair da linha) sai do ajuste sem fechar o menu. Resultado: ______
+- [ ] **Legibilidade a 3 m**: rótulos (16 px), dicas (17 px) e valores (19 px) legíveis no sofá, a 1080p e a 4K com escala; em modo de alto contraste do Windows os textos e fundos usam as cores do sistema. Resultado: ______
+
 Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation; atalhos do menu e de voltar ao PC definidos. Nos passos abaixo, "Select + Y" e "Start + Select" são os atalhos sugeridos: use os que você escolheu.
 
 - [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______

@@ -10,7 +10,9 @@ using Microsoft.UI.Xaml;
 namespace ConsoleMode.ViewModels;
 
 // The in-session menu (Select + Y): a window over the game with volume, resolution, audio,
-// FPS, HDR and the two ways out. Everything here runs only while a session is active.
+// FPS, HDR and the two ways out. In this alpha it also opens outside a session ("preview"), on the
+// game screen or the primary one, so it can be tried without entering console mode: nothing that
+// needs a restore afterwards (the FPS limit) is offered there.
 public partial class MainViewModel
 {
     private SessionMenuWindow? _sessionMenu;
@@ -21,6 +23,7 @@ public partial class MainViewModel
 
     [ObservableProperty] private bool _isSessionMenuOpen;
     [ObservableProperty] private bool _isSessionMenuBusy;
+    [ObservableProperty] private bool _isSessionMenuPreview;
     [ObservableProperty] private bool _isSessionPickerOpen;
     [ObservableProperty] private string _sessionPickerTitle = "";
     [ObservableProperty] private string _sessionClock = "";
@@ -33,7 +36,25 @@ public partial class MainViewModel
     [ObservableProperty] private string _sessionAudioText = "";
     [ObservableProperty] private string _sessionFpsText = "";
 
-    public bool IsFpsMenuAvailable => Engine.Rtss.IsReady;
+    public bool IsFpsMenuAvailable => Engine.Rtss.IsReady && !IsSessionMenuPreview;
+    public bool IsSessionMenuLive => !IsSessionMenuPreview;
+
+    /// <summary>"Back to the PC" in a session; "Close menu" in the preview, where there is no desk to restore.</summary>
+    public string BackToPcText => LocalizationService.Get(IsSessionMenuPreview ? "CloseMenu" : "BackToPc");
+
+    /// <summary>The screen the menu acts on: the session's game screen, or in the preview the chosen game screen if it is on, else the primary one.</summary>
+    private string SessionMonitorName => IsConsoleActive
+        ? Engine.State.FocusMonitor ?? ""
+        : FocusRow?.Monitor is { IsActive: true } game ? game.Name
+        // The chosen game screen is often the TV, which is off until a session starts: use a live one.
+        : (Monitors.FirstOrDefault(m => m.Monitor.IsPrimary && m.Monitor.IsActive) ?? Monitors.FirstOrDefault(m => m.Monitor.IsActive))?.Monitor.Name ?? "";
+
+    partial void OnIsSessionMenuPreviewChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsFpsMenuAvailable));
+        OnPropertyChanged(nameof(IsSessionMenuLive));
+        OnPropertyChanged(nameof(BackToPcText));
+    }
     public string VolumeText => VolumePercent < 0 ? "—" : IsMuted ? LocalizationService.Get("Muted") : $"{VolumePercent}%";
     public string RecordRowText => LocalizationService.Get("RecordLast30") + LocalizationService.Get("ComingSoonSuffix");
 
@@ -43,10 +64,23 @@ public partial class MainViewModel
     /// <summary>Select + Y, the tray, or consolemode://menu.</summary>
     public void ToggleSessionMenu()
     {
-        if (!IsConsoleActive) return;
         if (IsSessionMenuOpen) { CloseSessionMenu(); return; }
 
-        _sessionMenu = new SessionMenuWindow(this, Engine.State.FocusMonitorRect);
+        IsSessionMenuPreview = !IsConsoleActive;
+        var screen = IsConsoleActive
+            ? Engine.State.FocusMonitorRect
+            : Engine.Monitors.GetMonitorRect(SessionMonitorName, Engine.State);
+        try
+        {
+            _sessionMenu = new SessionMenuWindow(this, screen);
+        }
+        catch (Exception ex)
+        {
+            // A menu that fails to build must never take the app (and the session) down with it.
+            AppLog.Write($"Menu da sessão: não abriu: {ex}");
+            _sessionMenu = null;
+            return;
+        }
         _sessionMenu.Closed += (_, _) => { _sessionMenu = null; IsSessionMenuOpen = false; StopSessionClock(); };
         IsSessionMenuOpen = true;
         IsSessionPickerOpen = false;
@@ -55,7 +89,8 @@ public partial class MainViewModel
         _sessionMenu.Activate();
         _sessionMenu.BringToFront();
         _ = LoadSessionValuesAsync();
-        AppLog.Write("Menu da sessão: aberto");
+        _ = RefreshSwitcherAsync();
+        AppLog.Write(IsSessionMenuPreview ? "Menu da sessão: aberto (prévia, fora da sessão)" : "Menu da sessão: aberto");
     }
 
     /// <summary>
@@ -87,7 +122,7 @@ public partial class MainViewModel
     private void CloseSessionMenu()
     {
         IsSessionPickerOpen = false;
-        _sessionMenu?.Close();
+        _sessionMenu?.CloseAnimated();
     }
 
     /// <summary>B: closes the picker first, then the menu.</summary>
@@ -118,7 +153,7 @@ public partial class MainViewModel
     {
         SessionClock = DateTime.Now.ToString("HH:mm");
         var started = Engine.State.SessionStartedAt ?? DateTime.Now;
-        SessionElapsed = LocalizationService.Get("SessionElapsed", SessionMenuMath.FormatElapsed(DateTime.Now - started));
+        SessionElapsed = IsSessionMenuPreview ? "" : LocalizationService.Get("SessionElapsed", SessionMenuMath.FormatElapsed(DateTime.Now - started));
         SessionControllerText = ControllerInput.DetectFamily() switch
         {
             ControllerFamily.Xbox => LocalizationService.Get("ControllerXbox"),
@@ -133,7 +168,7 @@ public partial class MainViewModel
     private async Task LoadSessionValuesAsync()
     {
         var state = Engine.State;
-        var focus = state.FocusMonitor ?? "";
+        var focus = SessionMonitorName;
         var (mode, hdr, audioName, volume) = await Task.Run(() =>
         {
             var current = NativeWindows.GetCurrentDisplayMode(focus);
@@ -185,7 +220,7 @@ public partial class MainViewModel
     {
         if (IsSessionMenuBusy) return;
         var state = Engine.State;
-        var focus = state.FocusMonitor ?? "";
+        var focus = SessionMonitorName;
         IEnumerable<(string Text, string Value, bool Selected)> options;
         string title;
         switch (key)
@@ -226,15 +261,16 @@ public partial class MainViewModel
         await RunSessionActionAsync(() =>
         {
             var state = Engine.State;
+            var screen = SessionMonitorName;
             switch (key)
             {
                 case "mode":
                     var parts = item.Value.Split('x', '@');
-                    Engine.Monitors.ApplyFocusMode(state.FocusMonitor ?? "", new SavedDisplayMode
+                    Engine.Monitors.ApplyFocusMode(screen, new SavedDisplayMode
                     {
                         Width = int.Parse(parts[0]), Height = int.Parse(parts[1]), Frequency = int.Parse(parts[2])
                     });
-                    Engine.Monitors.UpdateFocusRect(state.FocusMonitor ?? "", state, true);
+                    Engine.Monitors.UpdateFocusRect(screen, state, true);
                     break;
                 case "audio":
                     Engine.Audio.SetOutput(item.Value);
@@ -253,7 +289,7 @@ public partial class MainViewModel
     [RelayCommand]
     private async Task ToggleSessionHdrAsync()
     {
-        var focus = Engine.State.FocusMonitor ?? "";
+        var focus = SessionMonitorName;
         var target = !SessionHdrOn;
         await RunSessionActionAsync(() =>
         {
@@ -277,15 +313,18 @@ public partial class MainViewModel
     [RelayCommand]
     private async Task RestoreFromMenuAsync()
     {
+        var preview = IsSessionMenuPreview;
         CloseSessionMenu();
-        await RestoreNowAsync();
+        // In the preview there is no session and no backup: closing is all there is to do.
+        if (!preview) await RestoreNowAsync();
     }
 
     [RelayCommand]
     private async Task ExitFromMenuAsync()
     {
+        var preview = IsSessionMenuPreview;
         CloseSessionMenu();
-        await RestoreNowAsync();
+        if (!preview) await RestoreNowAsync();
         Application.Current.Exit();
     }
 }
