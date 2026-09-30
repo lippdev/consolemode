@@ -5,8 +5,8 @@ namespace ConsoleMode.Services;
 
 /// <summary>
 /// Fires when a set of XInput buttons is held together for <see cref="HoldDuration"/>
-/// (zero = fire on press). Used for the Xbox Guide button while the app idles in the tray
-/// (enter console mode) and for Start + Back during a session (restore the desk), both of
+/// (zero = fire on press). Used for the shortcuts the user picked (see ControllerShortcuts):
+/// enter console mode from the tray, open the session menu and restore the desk, all of
 /// which work without focus. XInputGetStateEx (ordinal 100) is the only entry point that
 /// reports the Guide button; PlayStation pads are read through SonyHidReader.
 /// </summary>
@@ -21,7 +21,6 @@ public sealed class ControllerHoldWatcher : IDisposable
     private static bool _unavailable;
 
     private readonly DispatcherQueueTimer _timer;
-    private readonly ushort _mask;
     private readonly string _name;
     private DateTime? _heldSince;
     private bool _fired;
@@ -30,6 +29,21 @@ public sealed class ControllerHoldWatcher : IDisposable
     public event Action? Held;
 
     public TimeSpan HoldDuration { get; set; } = LongHold;
+
+    /// <summary>The combo to watch; changing it re-arms the watch (it must be released first).</summary>
+    public ushort Mask
+    {
+        get => _mask;
+        set
+        {
+            if (_mask == value) return;
+            _mask = value;
+            _heldSince = null;
+            _fired = true;
+        }
+    }
+
+    private ushort _mask;
 
     public ControllerHoldWatcher(DispatcherQueue dispatcher, ushort mask, string name)
     {
@@ -64,7 +78,8 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     private void Poll()
     {
-        if (!IsHeld(_mask))
+        // An empty combo is "held" by any pad state; a shortcut that isn't set never fires.
+        if (_mask == 0 || !IsHeld(_mask))
         {
             _heldSince = null;
             _fired = false;
@@ -78,10 +93,31 @@ public sealed class ControllerHoldWatcher : IDisposable
         Held?.Invoke();
     }
 
+    /// <summary>Buttons held per XInput slot or Sony HID path, for shortcut capture.</summary>
+    public static IReadOnlyDictionary<string, ushort> ReadHeldByDevice()
+    {
+        var held = new Dictionary<string, ushort>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (path, buttons) in SonyHidReader.ReadStates()) held[$"sony:{path}"] = buttons;
+        if (_unavailable) return held;
+        try
+        {
+            for (uint i = 0; i < 4; i++)
+            {
+                if (XInputGetStateEx(i, out var state) == 0) held[$"xinput:{i}"] = state.Gamepad.wButtons;
+            }
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        {
+            AppLog.Write($"Controle: atalhos indisponíveis: {ex.Message}");
+            _unavailable = true;
+        }
+        return held;
+    }
+
     private static bool IsHeld(ushort mask)
     {
-        // PlayStation pads without Steam Input: XInput never sees them (SonyHidReader).
-        if ((SonyHidReader.Held & mask) == mask) return true;
+        // Test each physical Sony pad separately; combining their masks creates impossible chords.
+        if (ControllerShortcuts.IsHeldOnAnyDevice(mask, SonyHidReader.ReadStates().Values)) return true;
         if (_unavailable) return false;
         try
         {

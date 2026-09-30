@@ -27,6 +27,7 @@ public static class AdbProtocol
     /// <summary>Version with the payload checksum, which every device still accepts.</summary>
     public const uint Version = 0x01000000;
     public const uint MaxPayload = 256 * 1024;
+    public const int MaxShellOutput = 1024 * 1024;
     public const int HeaderSize = 24;
     public const int DefaultPort = 5555;
 
@@ -53,7 +54,7 @@ public static class AdbProtocol
     }
 
     /// <summary>Reads a header; returns the command, args and payload length.</summary>
-    public static (uint Command, uint Arg0, uint Arg1, int Length) DecodeHeader(ReadOnlySpan<byte> header)
+    public static (uint Command, uint Arg0, uint Arg1, int Length, uint Checksum) DecodeHeader(ReadOnlySpan<byte> header)
     {
         if (header.Length < HeaderSize) throw new InvalidDataException("ADB: cabeçalho curto");
         var command = BinaryPrimitives.ReadUInt32LittleEndian(header);
@@ -64,7 +65,14 @@ public static class AdbProtocol
         return (command,
             BinaryPrimitives.ReadUInt32LittleEndian(header[4..]),
             BinaryPrimitives.ReadUInt32LittleEndian(header[8..]),
-            (int)length);
+            (int)length,
+            BinaryPrimitives.ReadUInt32LittleEndian(header[16..]));
+    }
+
+    public static void ValidatePayload(uint expectedChecksum, ReadOnlySpan<byte> data)
+    {
+        if (Checksum(data) != expectedChecksum)
+            throw new InvalidDataException("ADB: checksum do pacote invÃ¡lido");
     }
 
     public static uint Checksum(ReadOnlySpan<byte> data)

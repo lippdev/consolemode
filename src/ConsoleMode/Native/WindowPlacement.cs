@@ -25,6 +25,18 @@ public static class WindowPlacement
         appWindow.MoveAndResize(new Windows.Graphics.RectInt32(cx - w / 2, cy - h / 2, w, h));
     }
 
+    /// <summary>Covers the whole screen (an overlay like Steam's Shift + Tab). With no target, the primary display.</summary>
+    public static void FillScreen(AppWindow appWindow, ScreenRect? target)
+    {
+        if (target is null || target.Width <= 0 || target.Height <= 0)
+        {
+            var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(appWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).OuterBounds;
+            appWindow.MoveAndResize(area);
+            return;
+        }
+        appWindow.MoveAndResize(new Windows.Graphics.RectInt32(target.X, target.Y, target.Width, target.Height));
+    }
+
     /// <summary>Top-right corner of the screen, <paramref name="marginDip"/> in from the edges.</summary>
     public static void TopRightOn(AppWindow appWindow, ScreenRect? target, double widthDip, double heightDip, double marginDip)
     {

@@ -17,9 +17,10 @@ public partial class MainViewModel
 
     [ObservableProperty] private bool _checkUpdates = true;
     [ObservableProperty] private bool _betaUpdates;
-    [ObservableProperty] private bool _homeButtonLaunch = true;
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
+    [ObservableProperty] private bool _interfaceSounds = true;
+    [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
@@ -88,9 +89,15 @@ public partial class MainViewModel
         if (value) SetStatus(LocalizationService.Get("BetaUpdatesWarning"), InfoBarSeverity.Warning);
     }
 
-    partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
-
     partial void OnAutoStartOnControllerChanged(bool value) => SaveQuietly();
+
+    partial void OnInterfaceSoundsChanged(bool value)
+    {
+        UiSounds.Enabled = value;
+        SaveQuietly();
+        if (value && !_applying) UiSounds.Play(UiSound.Confirm);
+    }
+    partial void OnCloseSteamOnRestoreChanged(bool value) => SaveQuietly();
 
     partial void OnHomeButtonShortPressChanged(bool value)
     {

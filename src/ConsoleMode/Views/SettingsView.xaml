@@ -68,17 +68,19 @@
                           SelectedItem="{x:Bind ViewModel.SelectedAudio, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HomeButtonDescription, Mode=OneWay}">
+            <ctk:SettingsCard x:Name="HomeShortcutCard" Header="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HomeButtonDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7FC;"/>
                 </ctk:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind ViewModel.HomeButtonLaunch, Mode=TwoWay}"
-                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
-            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.SessionMenuDescription, Mode=OneWay}"
-                              IsEnabled="{x:Bind ViewModel.HomeButtonLaunch, Mode=OneWay}">
+            <ctk:SettingsCard x:Name="MenuShortcutCard" Header="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.SessionMenuDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE700;"/>
+                </ctk:SettingsCard.HeaderIcon>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard x:Name="ExitShortcutCard" Header="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.ExitShortcutDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7A7;"/>
                 </ctk:SettingsCard.HeaderIcon>
             </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.AutoStartControllerCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.AutoStartControllerDescription, Mode=OneWay}">
@@ -88,8 +90,15 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStartOnController, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CloseSteamCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CloseSteamDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.CloseSteamOnRestore, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}" Description="{x:Bind ViewModel.HomeButtonHint, Mode=OneWay}"
-                              IsEnabled="{x:Bind ViewModel.HomeButtonLaunch, Mode=OneWay}">
+                              IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE945;"/>
                 </ctk:SettingsCard.HeaderIcon>
@@ -217,6 +226,13 @@
                           ItemsSource="{x:Bind ViewModel.UiModeOptions, Mode=OneWay}"
                           SelectedItem="{x:Bind ViewModel.SelectedUiMode, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.SoundsCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.SoundsDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE767;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.InterfaceSounds, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.StartupCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.StartupDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>

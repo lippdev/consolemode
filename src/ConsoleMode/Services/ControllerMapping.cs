@@ -6,12 +6,16 @@ public static class ControllerMapping
     public const ushort SonyVendorId = 0x054C;
     public const ushort NintendoVendorId = 0x057E;
 
+    /// <summary>HID button indexes of L1/R1 (LB/RB): 4 and 5 on Sony, Nintendo and generic pads.</summary>
+    public const int HidShoulderLeft = 4;
+    public const int HidShoulderRight = 5;
+
     /// <summary>DualSense and DualSense Edge; any other Sony pad is read with the DS4 layout.</summary>
     public static bool IsDualSense(ushort productId) => productId is 0x0CE6 or 0x0DF2;
 
     /// <summary>
     /// XInput-style button bits from a raw DS4/DualSense input report (first byte = report ID):
-    /// Cross = A, Circle = B, Square = X, Triangle = Y, Options = Start, Create/Share = Back,
+    /// Cross = A, Circle = B, Square = X, Triangle = Y, L1/R1 = LB/RB, Options = Start, Create/Share = Back,
     /// PS = Guide; the hat and the left stick set the D-pad bits. Unknown reports give 0.
     /// </summary>
     public static ushort SonyButtons(ReadOnlySpan<byte> report, bool dualSense)
@@ -34,6 +38,8 @@ public static class ControllerMapping
         if ((face & 0x20) != 0) bits |= 0x1000;              // Cross -> A
         if ((face & 0x40) != 0) bits |= 0x2000;              // Circle -> B
         if ((face & 0x80) != 0) bits |= 0x8000;              // Triangle -> Y
+        if ((report[start + 1] & 0x01) != 0) bits |= 0x0100; // L1 -> LB
+        if ((report[start + 1] & 0x02) != 0) bits |= 0x0200; // R1 -> RB
         if ((report[start + 1] & 0x10) != 0) bits |= 0x0020; // Create/Share -> Back
         if ((report[start + 1] & 0x20) != 0) bits |= 0x0010; // Options -> Start
         if ((report[start + 2] & 0x01) != 0) bits |= 0x0400; // PS -> Guide
@@ -74,6 +80,27 @@ public static class ControllerMapping
 
     /// <summary>Whether to read Windows.Gaming.Input.Gamepad objects: only when XInput saw nothing.</summary>
     public static bool ShouldReadGamepads(int xinputPads) => xinputPads == 0;
+
+    /// <summary>
+    /// Most buttons a person holds on a HID pad at once. Some pads read wrong through Windows'
+    /// generic HID driver (a Switch Pro Controller reports 6 to 10 buttons down and a stuck D-pad
+    /// with nobody touching it); acting on that moves the focus and presses buttons by itself.
+    /// </summary>
+    public const int MaxSimultaneousHidButtons = 5;
+
+    /// <summary>Consecutive polls over the limit before the pad is ignored for good.</summary>
+    public const int DistrustAfterPolls = 3;
+
+    /// <summary>
+    /// Tracks one HID pad's readings: true once they were impossible for
+    /// <see cref="DistrustAfterPolls"/> polls in a row. A single reading over the limit is
+    /// skipped by the caller without judging the pad.
+    /// </summary>
+    public static bool UpdateHidTrust(int pressedButtons, ref int noisyStreak)
+    {
+        noisyStreak = pressedButtons > MaxSimultaneousHidButtons ? noisyStreak + 1 : 0;
+        return noisyStreak >= DistrustAfterPolls;
+    }
 
     /// <summary>Stick axis from 0..1 (0.5 centred) to a direction; ±0.25 dead zone.</summary>
     public static (bool Left, bool Right, bool Up, bool Down) StickDirections(double x, double y) =>
