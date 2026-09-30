@@ -17,7 +17,7 @@ Get **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, the
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
 
-Want to help test what comes next? **[1.6.0-alpha.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.2)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.1 if you need it to just work, or turn on Settings → "Receive test versions" in 1.5.1 to get it from the app.
+Want to help test what comes next? **[1.6.0-alpha.3](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.3)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.1 if you need it to just work, or turn on Settings → "Receive test versions" in 1.5.1 to get it from the app.
 
 On 1.4.0? The app offers the update. If it fails with a timeout, download the installer once; your settings are kept.
 
@@ -29,13 +29,15 @@ Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [
 2. Press **Play now**, or use the one-click desktop shortcut. The first time on a new screen, the TV asks "Can you see this screen?" and reverts on its own if nobody answers.
 3. Quit Big Picture or Playnite and everything goes back: screens, audio, resolution.
 
-Prefer the couch? With the app in the tray, hold the controller's Home button and it starts from there.
+Prefer the couch? With the app in the tray, hold your controller shortcut and it starts from there.
 
-| Controller shortcut | Does |
-|---|---|
-| Hold **Home** (Xbox / PS) | Enter console mode from the tray |
-| Hold **Select + Y** (Create + △) | Menu over the game: volume, resolution, audio, FPS, HDR, exit |
-| Hold **Start + Select** (Options + Create) | Back to the PC |
+You pick the controller shortcuts yourself: none is on at first, the app asks the first time you open it (and you can change them in Settings). No button can serve two actions.
+
+| Controller shortcut | Does | Suggested |
+|---|---|---|
+| Hold your **open** shortcut | Enter console mode from the tray | **Home** (Xbox / PS) |
+| Hold your **menu** shortcut | Menu over the game: volume, resolution, audio, FPS, HDR, exit | **Select + Y** (Create + △) |
+| Hold your **back to the PC** shortcut | Back to the PC | **Start + Select** (Options + Create) |
 
 ## Features
 

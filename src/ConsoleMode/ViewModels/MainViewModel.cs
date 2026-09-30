@@ -130,8 +130,10 @@ public partial class MainViewModel : ObservableObject
         InitializeAppSettings();
         ResolveUi();
         _ = RecheckControllerAsync();
+        _ = RefreshBackgroundAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
+        else if (interactive) RequestShortcutOnboarding();
         _ = CheckForUpdatesOnStartupAsync();
     }
 
@@ -304,9 +306,13 @@ public partial class MainViewModel : ObservableObject
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
             BetaUpdates = config.BetaUpdates;
-            HomeButtonLaunch = config.HomeButtonLaunch;
+            LoadShortcuts(config);
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
+            InterfaceSounds = config.InterfaceSounds;
+            ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
+            ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
+            CloseSteamOnRestore = config.CloseSteamOnRestore;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -765,10 +771,13 @@ public partial class MainViewModel : ObservableObject
     private void EndTour()
     {
         TourStep = 0;
-        if (_loadedConfig.TourDone) return;
-        var config = BuildConfig();
-        config.TourDone = true;
-        TrySave(config);
+        if (!_loadedConfig.TourDone)
+        {
+            var config = BuildConfig();
+            config.TourDone = true;
+            TrySave(config);
+        }
+        RequestShortcutOnboarding();
     }
 
     [RelayCommand]
@@ -891,9 +900,16 @@ public partial class MainViewModel : ObservableObject
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
             BetaUpdates = BetaUpdates,
-            HomeButtonLaunch = HomeButtonLaunch,
+            HomeShortcut = _shortcuts[(int)ShortcutSlot.Home],
+            MenuShortcut = _shortcuts[(int)ShortcutSlot.Menu],
+            ExitShortcut = _shortcuts[(int)ShortcutSlot.Exit],
+            ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
+            InterfaceSounds = InterfaceSounds,
+            ConsoleBackground = ConsoleBackgroundMode,
+            ConsoleBackgroundImage = ConsoleBackgroundImage,
+            CloseSteamOnRestore = CloseSteamOnRestore,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,
             Tv = BuildTvConfig()

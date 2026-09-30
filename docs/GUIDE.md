@@ -96,7 +96,7 @@ Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Wi
 
 Output: `dist\ConsoleMode-Portable-x64.exe` and `dist\ConsoleMode-Setup-x64.exe` (the installer needs [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Open `ConsoleMode.sln` to debug.
 
-To release, push a tag like `v1.4.0` (or `v1.4.0-beta.2` for a pre-release): the `Release` workflow builds both files and publishes them, and the app picks them up as an update.
+To release, merge the release PR into `main`, then run Actions → **Release** → Run workflow on `main` with the version (like `1.4.0`, or `1.4.0-beta.2` for a pre-release) and **publish** ticked: the workflow creates the tag and the GitHub release, builds both files and publishes them, and the app picks them up as an update. Without "publish" it only builds and uploads the files as an artifact. Pushing a `v*` tag still works and does the same.
 
 The previous PowerShell + WPF implementation (1.2 and earlier) lives on the [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) branch and is not used by the WinUI app.
 
