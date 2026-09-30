@@ -6,20 +6,90 @@ Como testar em build de desenvolvimento: `dotnet build src/ConsoleMode -c Debug 
 
 ## 0. Atalhos do controle configuráveis e primeira configuração
 
-Pré-condições: controle **Xbox** (XInput) conectado; app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
+Pré-condições: config sem `shortcutsOnboardingDone` (instalação nova, ou apague a chave/`config.json`); controle Xbox e, se tiver, um PlayStation. Nenhum atalho vem ligado.
 
-- [ ] **Segurar o botão Xbox por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
+### Primeira abertura da versão
+
+- [ ] Ao abrir o app (janela visível, interface desktop), aparece "Configure os atalhos do controle" com as três ações (Abrir o Console Mode, Menu da sessão, Voltar ao PC), todas "Não definido". Resultado: ______
+- [ ] Com o **tour** de primeiro uso pendente, o tour vem primeiro e a configuração dos atalhos aparece ao terminá-lo ou pulá-lo. Resultado: ______
+- [ ] Iniciado com `--tray` (janela oculta): nada aparece; ao abrir a janela pela bandeja, a configuração aparece. Resultado: ______
+- [ ] "Usar os atalhos sugeridos" preenche só os vazios (Xbox, Select + Y, Select + Start). Resultado: ______
+- [ ] Fechar a janela em "Concluir", com atalhos vazios, e reabrir o app: a configuração **não** volta a aparecer. Resultado: ______
+- [ ] Antes de concluir, nenhum atalho dispara (segurar Home, Select + Y, Start + Select não fazem nada). Resultado: ______
+
+### Escolher um botão
+
+- [ ] "Definir": mostra "Segure os botões e depois solte…" e, ao segurar, os nomes dos botões aparecem ao vivo. Ao soltar, o atalho é gravado. Resultado: ______
+- [ ] O botão A que clicou em "Definir" (navegação por controle) **não** é gravado como atalho e a tela não navega enquanto captura. Resultado: ______
+- [ ] Um botão sozinho (A, B, X, Y, Start, Select) é recusado com a explicação; só o botão Home pode ficar sozinho. Resultado: ______
+- [ ] O direcional e o analógico não entram na captura. Resultado: ______
+- [ ] Repetir a mesma combinação em outra ação é recusado ("… já é o atalho de …"); uma combinação que **contém** a outra (Select + Start + Y vs Select + Start) também. Resultado: ______
+- [ ] Trocar o atalho de uma ação para a combinação que ela já tinha é aceito. Resultado: ______
+- [ ] "Remover" deixa a ação sem atalho: ela não dispara mais. Resultado: ______
+- [ ] Controle **PlayStation**: os nomes aparecem como Create/Options/△✕○□ e o atalho gravado funciona na sessão (o app lê o controle por HID). Resultado: ______
+- [ ] Enquanto captura, um atalho já existente **não** dispara (ex.: capturar o Home com o Home já definido não abre o modo console). Resultado: ______
+- [ ] Os atalhos ficam salvos ao fechar e abrir o app (`homeShortcut`, `menuShortcut`, `exitShortcut` no `config.json`). Resultado: ______
+- [ ] Ajustes → cards de Home, menu da sessão e voltar ao PC mostram o mesmo estado; o "Toque curto" só fica ativo com o atalho Home definido. Resultado: ______
+- [ ] Interface Console → Ajustes: A numa linha de atalho liga com o padrão sugerido ou desliga; a dica "Ou segure … no controle" na sessão mostra o atalho de voltar (e some se não houver). Resultado: ______
+- [ ] O toast "Menu do Console Mode" no início da sessão mostra o atalho escolhido e **não** aparece se o menu não tiver atalho. Resultado: ______
+- [ ] Um `config.json` de versão anterior (com `homeButtonLaunch: true`) abre sem atalhos ligados e mostra a configuração. Resultado: ______
+
+## 0b. Interface Console: abas, fundo e sons
+
+Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou controle conectado no modo Automático); controle Xbox e, se tiver, PlayStation.
+
+### Abas (LB / RB)
+
+- [ ] Três abas no topo: Início, Sessão e Sistema. A ativa fica destacada e sublinhada; as outras, mais apagadas. Resultado: ______
+- [ ] **RB** vai para a próxima aba e **LB** para a anterior; nas pontas não dá a volta. Com **L1/R1** no PlayStation (aparece L1/R1 nas dicas). Resultado: ______
+- [ ] PageUp/PageDown no teclado e o clique do mouse nas abas também trocam. Resultado: ______
+- [ ] A página nova entra deslizando e aparecendo: RB entra pela direita e LB pela esquerda, em cerca de 0,25 s; trocar rápido várias vezes não trava nem deixa a página pela metade. Com as animações do Windows desligadas (Acessibilidade → Efeitos visuais), a troca é instantânea. Resultado: ______
+- [ ] Ao trocar de aba o foco vai para o primeiro item dela (Jogar agora, a primeira tela, a primeira linha). Resultado: ______
+- [ ] LB/RB não trocam a aba com um painel aberto por cima (papel da tela, seletor, teste do controle) nem durante a sessão. Resultado: ______
+- [ ] **B** em Sessão ou Sistema volta para Início; **Y** vai para Sistema e volta. Resultado: ______
+- [ ] **Início** mostra o banner com "Jogar agora" e, abaixo, "Setup atual" com quatro atalhos (tela de jogo, áudio, iniciador e HDR/VRR): os três primeiros abrem a escolha e o quarto leva à aba Sessão. O texto do banner cabe em até 2 linhas, também na janela pequena. Resultado: ______
+- [ ] O fundo de capas cobre a janela toda, sem faixa sem gradiente no topo (sob a barra de título). Resultado: ______
+- [ ] **Sessão** mostra as telas (papéis) e os ajustes rápidos; **Sistema** tem todas as linhas de ajustes (atalhos, sons, interface, fundo, atualizações). Resultado: ______
+- [ ] Janela pequena (960×760): nada some; Sessão rola e Sistema também. Resultado: ______
+
+### Navegação pelo controle (direcional e analógico)
+
+- [ ] Em Sessão, com o foco num ajuste rápido à direita (ex.: "Limite de FPS"), **cima** sobe para uma tela (a mais próxima), não fica parado. Resultado: ______
+- [ ] Em Sessão, **baixo** das telas vai para o ajuste rápido mais próximo; esquerda/direita andam só dentro da própria fileira e param nas pontas. Resultado: ______
+- [ ] Ao trocar de aba com LB/RB o foco cai no primeiro item (Início: Jogar agora; Sessão: primeira tela; Sistema: primeira linha), com o anel branco visível. Resultado: ______
+- [ ] Em Início, baixo de Jogar agora vai para "Setup atual"; cima volta; cima de Jogar agora vai ao botão Modo desktop do topo. Resultado: ______
+- [ ] Em Sistema, cima/baixo percorrem todas as linhas, a lista rola e o anel nunca some; nenhuma tecla "não faz nada" no meio da lista. Resultado: ______
+- [ ] Segurar cima/baixo repete sem pular nem travar; uma diagonal do analógico anda na vertical. Resultado: ______
+- [ ] O log (`consolemode.log`) não mostra `Controles: navegação: Parâmetro incorreto`. Resultado: ______
+
+### Blocos e foco
+
+- [ ] Cada tela é desenhada como um monitor: verde com ▶ para "Jogar aqui", escuro com ⏻ para "Desligar", azul para "Manter ligada"; a pílula do papel e a resolução aparecem. Trocar o papel atualiza o desenho. Resultado: ______
+- [ ] O bloco em foco cresce um pouco e ganha contorno branco; volta ao normal ao sair. As linhas de Ajustes não crescem. Resultado: ______
+
+### Plano de fundo
+
+- [ ] Padrão ("Capas da Steam"): colagem de capas dos jogos instalados sob o gradiente, o texto continua legível; sem Steam ou sem capas, só o gradiente. Resultado: ______
+- [ ] Sistema → Plano de fundo alterna Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
+- [ ] A escolha fica salva ao reabrir (`consoleBackground` e `consoleBackgroundImage` no `config.json`). Resultado: ______
+
+### Sons
+
+- [ ] Há um som ao mover o foco, outro ao confirmar (A ou clique) e outro ao voltar (B); trocar de aba toca o de mover. Resultado: ______
+- [ ] Sistema/Ajustes → "Sons da interface" desligado: silêncio total. Resultado: ______
+- [ ] Segurar o direcional não acumula sons (um novo interrompe o anterior). Resultado: ______
+
 ## 1. Atalho Home do controle (PR #27)
 
 Pré-condições: atalho de "Abrir o Console Mode" definido (o padrão sugerido é o botão Xbox, controle **Xbox** (XInput)); app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
 
 - [ ] **Segurar o atalho por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
 - [ ] **Toque curto** no botão Xbox não faz nada no app (só a Game Bar abre, se o atalho dela estiver ligado). Resultado: ______
-- [ ] Com a sessão **ativa** (Big Picture aberto), segurar o botão Xbox **não** reinicia nada. Resultado: ______
-- [ ] **Segurar Start + Select por 1 s** durante a sessão restaura a mesa (igual a "Restaurar agora"). Resultado: ______
-- [ ] Desligar "Abrir com o botão Home do controle" em Ajustes: nenhum dos gestos acima funciona. Resultado: ______
-- [ ] O log (`consolemode.log`) mostra `Controle: botão Home` / `Controle: Start + Back` a cada disparo. Resultado: ______
-- [ ] Controle **PlayStation**: confirmar que o Home **não** funciona na bandeja (limitação documentada) e que o app não registra erro. Resultado: ______
+- [ ] Com a sessão **ativa** (Big Picture aberto), segurar o atalho de abrir **não** reinicia nada. Resultado: ______
+- [ ] **Segurar o atalho de voltar ao PC por 1 s** durante a sessão restaura a mesa (igual a "Restaurar agora"). Resultado: ______
+- [ ] Remover o atalho de abrir em Ajustes: ele para de funcionar, e o de voltar ao PC continua. Resultado: ______
+- [ ] O log (`consolemode.log`) mostra `Controle: atalho Home` / `Controle: atalho Voltar ao PC` / `Controle: atalho Menu da sessão` a cada disparo. Resultado: ______
+- [ ] Controle **PlayStation**: o botão PS como atalho de abrir na bandeja só funciona com a leitura HID ativa; confirmar o comportamento e que o app não registra erro. Resultado: ______
 
 ### Toque curto (desliga o atalho da Game Bar)
 
@@ -42,7 +112,7 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
-Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation.
+Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation; atalhos do menu e de voltar ao PC definidos. Nos passos abaixo, "Select + Y" e "Start + Select" são os atalhos sugeridos: use os que você escolheu.
 
 - [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______
 - [ ] Select + Y de novo (ou B, ou Esc) fecha o menu e o jogo continua onde estava. Resultado: ______

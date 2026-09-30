@@ -60,6 +60,15 @@ public sealed class AppConfig
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 
+    /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
+    public bool InterfaceSounds { get; set; } = true;
+
+    /// <summary>Console background: "auto" (covers of the installed Steam games), "gradient" or "image".</summary>
+    public string ConsoleBackground { get; set; } = "auto";
+
+    /// <summary>The picture used when the background is "image".</summary>
+    public string ConsoleBackgroundImage { get; set; } = "";
+
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 

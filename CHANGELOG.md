@@ -4,12 +4,16 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation) com uma animação de deslize, blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR), que abre cada escolha. (#117)
+- Plano de fundo do modo Console: por padrão, uma colagem com as capas dos seus jogos instalados na Steam sob um gradiente escuro (o app só lê as imagens que a Steam já baixou; nada é embutido). Dá para trocar por só o gradiente ou por uma imagem sua, em Sistema → Plano de fundo. (#117)
+- Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)
 - Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar). Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
 
 ### Correções
 - Menu da sessão: o aviso que mostra o atalho no início da sessão não fica mais preso na tela; ele some sozinho depois de alguns segundos. (#114)
 - Controles: um controle que manda leituras impossíveis pelo driver HID genérico (muitos botões apertados ao mesmo tempo, direcional preso) agora é ignorado em vez de navegar e apertar botões sozinho no app. O log avisa, e reabrir o app tenta de novo. (#115)
+- Interface Console: navegar pelo controle não trava mais. "Para cima" (e "para baixo") funciona também quando o bloco de destino não está na mesma coluna, o foco não para mais em contêineres invisíveis e, ao trocar de aba, ele cai no primeiro item dela. (#117)
 - Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
 - Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos. Se o Playnite troca a janela de carregamento pela principal, o Console Mode passa a acompanhar a nova e só restaura a mesa quando o Playnite fecha de verdade. (#83)
 - Áudio: se a troca da saída falhar, a sessão continua em vez de ser desfeita depois de as telas já terem sido trocadas. (#109)

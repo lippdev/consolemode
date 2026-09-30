@@ -186,6 +186,16 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ConsoleActiveHint => LocalizationService.Get(nameof(ConsoleActiveHint));
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string ExitShortcutCard => LocalizationService.Get(nameof(ExitShortcutCard));
+    public string SoundsCard => LocalizationService.Get(nameof(SoundsCard));
+    public string BackgroundCard => LocalizationService.Get(nameof(BackgroundCard));
+    public string BackgroundDescription => LocalizationService.Get(nameof(BackgroundDescription));
+    public string BackgroundImageCard => LocalizationService.Get(nameof(BackgroundImageCard));
+    public string HomeSetupHeading => LocalizationService.Get(nameof(HomeSetupHeading));
+    public string TabHome => LocalizationService.Get(nameof(TabHome));
+    public string TabSession => LocalizationService.Get(nameof(TabSession));
+    public string TabSystem => LocalizationService.Get(nameof(TabSystem));
+    public string HintTabs => LocalizationService.Get(nameof(HintTabs));
+    public string SoundsDescription => LocalizationService.Get(nameof(SoundsDescription));
     public string ExitShortcutDescription => LocalizationService.Get(nameof(ExitShortcutDescription));
     public string HomeButtonDescription => LocalizationService.Get(nameof(HomeButtonDescription));
     public string HomeButtonShortPressCard => LocalizationService.Get(nameof(HomeButtonShortPressCard));

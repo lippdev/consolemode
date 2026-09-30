@@ -37,7 +37,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
         if (value) { IsRolePanelOpen = false; IsControllerToastOpen = false; }
-        else { IsConsoleSettingsOpen = false; IsPickerOpen = false; }
+        else { ConsoleTabIndex = HomeTabIndex; IsPickerOpen = false; }
     }
 
     partial void OnIsHomePageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopHome));
@@ -49,6 +49,8 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HintBack));
         OnPropertyChanged(nameof(HintAlt));
         OnPropertyChanged(nameof(HintMenu));
+        OnPropertyChanged(nameof(HintLb));
+        OnPropertyChanged(nameof(HintRb));
         NotifyShortcutTexts();
     }
 
@@ -125,6 +127,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(RolePanelTitle));
         OnPropertyChanged(nameof(HdrText));
         OnPropertyChanged(nameof(VrrText));
+        OnPropertyChanged(nameof(BackgroundModeText));
     }
 
     /// <summary>"desktop" / "console": the on-screen switch, remembered as an explicit choice.</summary>
@@ -147,11 +150,11 @@ public partial class MainViewModel
     {
         if (IsConsoleActive) return;
         IsRolePanelOpen = false;
-        IsConsoleSettingsOpen = true;
+        ConsoleTabIndex = SystemTabIndex;
     }
 
     [RelayCommand]
-    private void CloseConsoleSettings() => IsConsoleSettingsOpen = false;
+    private void CloseConsoleSettings() => ConsoleTabIndex = HomeTabIndex;
 
     /// <summary>"launch:+1", "audio:-1", "fps:+1", "mode:+1": cycle a quick-setting card.</summary>
     [RelayCommand]
@@ -184,6 +187,9 @@ public partial class MainViewModel
             case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
+            case "sounds": InterfaceSounds = !InterfaceSounds; break;
+            case "background": CycleBackgroundMode(); break;
+            case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
             case "betas": BetaUpdates = !BetaUpdates; break;

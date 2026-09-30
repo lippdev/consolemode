@@ -4,12 +4,16 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation) with a slide animation, screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR), each opening its choices. (#117)
+- Console background: by default, a collage of the covers of your installed Steam games under a dark gradient (the app only reads images Steam already downloaded; nothing is bundled). You can switch to just the gradient or to a picture of your own, in System → Background. (#117)
+- Sounds in the Console interface when you move the focus, pick and go back (made by the app itself, at a low volume). Turn them off in Settings → Interface sounds. (#117)
 - Controller shortcuts of your choice: the button that opens Console Mode, the session menu's and the one that goes back to the PC are now set in Settings (hold the buttons you want and let go). None is on by default: the first time you open this version the app shows the setup, with a suggestion for each action (Home, Select + Y and Start + Select). One button can't serve two actions. If you used the Home button or Start + Select before, choose them again. (#116)
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes
 - Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
 - Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored instead of moving around and pressing buttons in the app by itself. The log says so, and reopening the app tries again. (#115)
+- Console interface: controller navigation no longer gets stuck. Up (and down) also works when the target card is not in the same column, the focus no longer lands on invisible containers and, when you switch tabs, it lands on the first item of the new one. (#117)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
 - Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#83)
 - Audio: if switching the output fails, the session goes on instead of being rolled back after the screens were already switched. (#109)

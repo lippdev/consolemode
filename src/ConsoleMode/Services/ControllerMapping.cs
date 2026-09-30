@@ -6,12 +6,16 @@ public static class ControllerMapping
     public const ushort SonyVendorId = 0x054C;
     public const ushort NintendoVendorId = 0x057E;
 
+    /// <summary>HID button indexes of L1/R1 (LB/RB): 4 and 5 on Sony, Nintendo and generic pads.</summary>
+    public const int HidShoulderLeft = 4;
+    public const int HidShoulderRight = 5;
+
     /// <summary>DualSense and DualSense Edge; any other Sony pad is read with the DS4 layout.</summary>
     public static bool IsDualSense(ushort productId) => productId is 0x0CE6 or 0x0DF2;
 
     /// <summary>
     /// XInput-style button bits from a raw DS4/DualSense input report (first byte = report ID):
-    /// Cross = A, Circle = B, Square = X, Triangle = Y, Options = Start, Create/Share = Back,
+    /// Cross = A, Circle = B, Square = X, Triangle = Y, L1/R1 = LB/RB, Options = Start, Create/Share = Back,
     /// PS = Guide; the hat and the left stick set the D-pad bits. Unknown reports give 0.
     /// </summary>
     public static ushort SonyButtons(ReadOnlySpan<byte> report, bool dualSense)
@@ -34,6 +38,8 @@ public static class ControllerMapping
         if ((face & 0x20) != 0) bits |= 0x1000;              // Cross -> A
         if ((face & 0x40) != 0) bits |= 0x2000;              // Circle -> B
         if ((face & 0x80) != 0) bits |= 0x8000;              // Triangle -> Y
+        if ((report[start + 1] & 0x01) != 0) bits |= 0x0100; // L1 -> LB
+        if ((report[start + 1] & 0x02) != 0) bits |= 0x0200; // R1 -> RB
         if ((report[start + 1] & 0x10) != 0) bits |= 0x0020; // Create/Share -> Back
         if ((report[start + 1] & 0x20) != 0) bits |= 0x0010; // Options -> Start
         if ((report[start + 2] & 0x01) != 0) bits |= 0x0400; // PS -> Guide

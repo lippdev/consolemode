@@ -130,6 +130,7 @@ public partial class MainViewModel : ObservableObject
         InitializeAppSettings();
         ResolveUi();
         _ = RecheckControllerAsync();
+        _ = RefreshBackgroundAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
         else if (interactive) RequestShortcutOnboarding();
@@ -306,6 +307,9 @@ public partial class MainViewModel : ObservableObject
             LoadShortcuts(config);
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
+            InterfaceSounds = config.InterfaceSounds;
+            ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
+            ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -899,6 +903,9 @@ public partial class MainViewModel : ObservableObject
             ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
+            InterfaceSounds = InterfaceSounds,
+            ConsoleBackground = ConsoleBackgroundMode,
+            ConsoleBackgroundImage = ConsoleBackgroundImage,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };

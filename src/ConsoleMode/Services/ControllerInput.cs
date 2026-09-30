@@ -18,7 +18,11 @@ public enum ControllerAction
     /// <summary>X on Xbox, Square on PlayStation.</summary>
     Option,
     /// <summary>Y on Xbox, Triangle on PlayStation.</summary>
-    Alt
+    Alt,
+    /// <summary>L1 / LB: previous tab.</summary>
+    PreviousTab,
+    /// <summary>R1 / RB: next tab.</summary>
+    NextTab
 }
 
 public enum ControllerFamily
@@ -44,6 +48,8 @@ public sealed class ControllerInput : IDisposable
     private const ushort XInputDpadLeft = 0x0004;
     private const ushort XInputDpadRight = 0x0008;
     private const ushort XInputStart = 0x0010;
+    private const ushort XInputLb = 0x0100;
+    private const ushort XInputRb = 0x0200;
     private const ushort XInputA = 0x1000;
     private const ushort XInputB = 0x2000;
     private const ushort XInputX = 0x4000;
@@ -209,6 +215,8 @@ public sealed class ControllerInput : IDisposable
         held[(int)ControllerAction.Back] |= (b & XInputB) != 0;
         held[(int)ControllerAction.Option] |= (b & XInputX) != 0;
         held[(int)ControllerAction.Alt] |= (b & XInputY) != 0;
+        held[(int)ControllerAction.PreviousTab] |= (b & XInputLb) != 0;
+        held[(int)ControllerAction.NextTab] |= (b & XInputRb) != 0;
         held[(int)ControllerAction.Menu] |= (b & XInputStart) != 0;
         held[(int)ControllerAction.Up] |= (b & XInputDpadUp) != 0;
         held[(int)ControllerAction.Down] |= (b & XInputDpadDown) != 0;
@@ -228,6 +236,8 @@ public sealed class ControllerInput : IDisposable
             held[(int)ControllerAction.Back] |= (b & XInputB) != 0;
             held[(int)ControllerAction.Option] |= (b & XInputX) != 0;
             held[(int)ControllerAction.Alt] |= (b & XInputY) != 0;
+            held[(int)ControllerAction.PreviousTab] |= (b & XInputLb) != 0;
+            held[(int)ControllerAction.NextTab] |= (b & XInputRb) != 0;
             held[(int)ControllerAction.Menu] |= (b & XInputStart) != 0;
             held[(int)ControllerAction.Up] |= (b & XInputDpadUp) != 0 || state.Gamepad.sThumbLY > StickThreshold;
             held[(int)ControllerAction.Down] |= (b & XInputDpadDown) != 0 || state.Gamepad.sThumbLY < -StickThreshold;
@@ -250,6 +260,8 @@ public sealed class ControllerInput : IDisposable
                 held[(int)ControllerAction.Back] |= b.HasFlag(GamepadButtons.B);
                 held[(int)ControllerAction.Option] |= b.HasFlag(GamepadButtons.X);
                 held[(int)ControllerAction.Alt] |= b.HasFlag(GamepadButtons.Y);
+                held[(int)ControllerAction.PreviousTab] |= b.HasFlag(GamepadButtons.LeftShoulder);
+                held[(int)ControllerAction.NextTab] |= b.HasFlag(GamepadButtons.RightShoulder);
                 held[(int)ControllerAction.Menu] |= b.HasFlag(GamepadButtons.Menu);
                 held[(int)ControllerAction.Up] |= b.HasFlag(GamepadButtons.DPadUp) || r.LeftThumbstickY > 0.5;
                 held[(int)ControllerAction.Down] |= b.HasFlag(GamepadButtons.DPadDown) || r.LeftThumbstickY < -0.5;
@@ -304,6 +316,8 @@ public sealed class ControllerInput : IDisposable
                 Set(held, ControllerAction.Back, buttons, backIndex);
                 Set(held, ControllerAction.Option, buttons, optionIndex);
                 Set(held, ControllerAction.Alt, buttons, altIndex);
+                Set(held, ControllerAction.PreviousTab, buttons, ControllerMapping.HidShoulderLeft);
+                Set(held, ControllerAction.NextTab, buttons, ControllerMapping.HidShoulderRight);
                 Set(held, ControllerAction.Menu, buttons, menuIndex);
 
                 // D-pad is the first hat switch; the left stick is axes 0 (X) and 1 (Y, 0 = up).
