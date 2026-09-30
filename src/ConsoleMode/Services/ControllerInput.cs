@@ -198,8 +198,8 @@ public sealed class ControllerInput : IDisposable
     private static void ReadAll(bool[] held, StringBuilder? diag)
     {
         var xinputPads = ReadXInput(held, diag);
-        if (ControllerMapping.ShouldReadGamepads(xinputPads)) ReadGamepads(held, diag);
-        ReadRaw(held, xinputPads, diag);
+        var invalidGamepads = ReadRaw(held, xinputPads, diag);
+        if (ControllerMapping.ShouldReadGamepads(xinputPads)) ReadGamepads(held, diag, invalidGamepads);
     }
 
     /// <summary>SonyHidReader bits use the XInput layout, so they map like an Xbox pad.</summary>
@@ -238,10 +238,15 @@ public sealed class ControllerInput : IDisposable
         return count;
     }
 
-    private static void ReadGamepads(bool[] held, StringBuilder? diag)
+    private static void ReadGamepads(bool[] held, StringBuilder? diag, HashSet<Gamepad> invalidGamepads)
     {
         foreach (var pad in Gamepad.Gamepads)
         {
+            if (invalidGamepads.Contains(pad))
+            {
+                diag?.AppendLine("Gamepad: ignorado (leitura HID inválida)");
+                continue;
+            }
             try
             {
                 var r = pad.GetCurrentReading();
@@ -268,15 +273,22 @@ public sealed class ControllerInput : IDisposable
     private static readonly Dictionary<string, int> NoisyStreaks = [];
     private static readonly HashSet<string> DistrustedPads = [];
 
-    private static void ReadRaw(bool[] held, int xinputPads, StringBuilder? diag)
+    private static HashSet<Gamepad> ReadRaw(bool[] held, int xinputPads, StringBuilder? diag)
     {
+        var invalidGamepads = new HashSet<Gamepad>();
         foreach (var raw in RawGameController.RawGameControllers)
         {
             var name = SafeName(raw);
-            if (DistrustedPads.Contains(name)) { diag?.AppendLine($"HID {name}: ignorado (leitura inválida)"); continue; }
             try
             {
-                var isGamepad = Gamepad.FromGameController(raw) is not null;
+                var gamepad = Gamepad.FromGameController(raw);
+                var isGamepad = gamepad is not null;
+                if (DistrustedPads.Contains(name))
+                {
+                    if (gamepad is not null) invalidGamepads.Add(gamepad);
+                    diag?.AppendLine($"HID {name}: ignorado (leitura inválida)");
+                    continue;
+                }
                 // Xbox pads also show up here; XInput already covers them, unless XInput saw nothing.
                 if (!ControllerMapping.ShouldReadHid(isGamepad, xinputPads)) { diag?.AppendLine($"HID {name}: coberto pelo XInput"); continue; }
                 if (raw.ButtonCount < 2) continue;
@@ -295,9 +307,14 @@ public sealed class ControllerInput : IDisposable
                 {
                     DistrustedPads.Add(name);
                     AppLog.Write($"Controles: {name} ignorado: leitura inválida ({pressedCount} botões ao mesmo tempo); reabra o app para tentar de novo");
+                    if (gamepad is not null) invalidGamepads.Add(gamepad);
                     continue;
                 }
-                if (pressedCount > ControllerMapping.MaxSimultaneousHidButtons) continue;
+                if (pressedCount > ControllerMapping.MaxSimultaneousHidButtons)
+                {
+                    if (gamepad is not null) invalidGamepads.Add(gamepad);
+                    continue;
+                }
 
                 var (confirmIndex, backIndex, optionIndex, altIndex, menuIndex) = ControllerMapping.HidIndices(raw.HardwareVendorId);
                 Set(held, ControllerAction.Confirm, buttons, confirmIndex);
@@ -338,6 +355,7 @@ public sealed class ControllerInput : IDisposable
                 diag?.AppendLine($"HID {name}: erro {ex.Message}");
             }
         }
+        return invalidGamepads;
     }
 
     private static void Set(bool[] held, ControllerAction action, bool[] buttons, int index)
