@@ -114,6 +114,8 @@
   "ShortcutsOnboardingBody": "Ningún atajo viene activado: tú eliges. Define un botón o combinación para cada acción, o déjala sin atajo. Pulsa Definir, mantén los botones y suéltalos. La misma combinación no puede servir para dos acciones. Puedes cambiarlo todo después en Ajustes.",
   "ShortcutsUseSuggested": "Usar los atajos sugeridos",
   "ShortcutsOnboardingDone": "Listo",
+  "CloseSteamCard": "Cerrar Steam al volver al PC",
+  "CloseSteamDescription": "Al salir de Big Picture o volver al PC, se le pide a Steam que se cierre de la forma normal (su propio «Salir», nunca a la fuerza). Big Picture siempre se cierra. Steam sigue abierta si hay un juego en ejecución.",
   "AutoStartControllerCard": "Entrar al conectar un mando",
   "AutoStartControllerDescription": "Con la aplicación en la bandeja, encender o conectar un mando entra en modo consola. Ignora los primeros 15 s tras abrir y 30 s tras restaurar.",
   "HomeButtonShortPressCard": "Pulsación corta del botón Xbox",

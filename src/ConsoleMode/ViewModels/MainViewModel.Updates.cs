@@ -20,6 +20,7 @@ public partial class MainViewModel
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
     [ObservableProperty] private bool _interfaceSounds = true;
+    [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
@@ -96,6 +97,7 @@ public partial class MainViewModel
         SaveQuietly();
         if (value && !_applying) UiSounds.Play(UiSound.Confirm);
     }
+    partial void OnCloseSteamOnRestoreChanged(bool value) => SaveQuietly();
 
     partial void OnHomeButtonShortPressChanged(bool value)
     {
