@@ -265,11 +265,15 @@ public sealed class ControllerInput : IDisposable
         }
     }
 
+    private static readonly Dictionary<string, int> NoisyStreaks = [];
+    private static readonly HashSet<string> DistrustedPads = [];
+
     private static void ReadRaw(bool[] held, int xinputPads, StringBuilder? diag)
     {
         foreach (var raw in RawGameController.RawGameControllers)
         {
             var name = SafeName(raw);
+            if (DistrustedPads.Contains(name)) { diag?.AppendLine($"HID {name}: ignorado (leitura inválida)"); continue; }
             try
             {
                 var isGamepad = Gamepad.FromGameController(raw) is not null;
@@ -281,6 +285,19 @@ public sealed class ControllerInput : IDisposable
                 var switches = new GameControllerSwitchPosition[raw.SwitchCount];
                 var axes = new double[raw.AxisCount];
                 raw.GetCurrentReading(buttons, switches, axes);
+
+                // A pad with impossible readings is ignored (see ControllerMapping.MaxSimultaneousHidButtons).
+                var pressedCount = buttons.Count(on => on);
+                NoisyStreaks.TryGetValue(name, out var streak);
+                var distrust = ControllerMapping.UpdateHidTrust(pressedCount, ref streak);
+                NoisyStreaks[name] = streak;
+                if (distrust)
+                {
+                    DistrustedPads.Add(name);
+                    AppLog.Write($"Controles: {name} ignorado: leitura inválida ({pressedCount} botões ao mesmo tempo); reabra o app para tentar de novo");
+                    continue;
+                }
+                if (pressedCount > ControllerMapping.MaxSimultaneousHidButtons) continue;
 
                 var (confirmIndex, backIndex, optionIndex, altIndex, menuIndex) = ControllerMapping.HidIndices(raw.HardwareVendorId);
                 Set(held, ControllerAction.Confirm, buttons, confirmIndex);

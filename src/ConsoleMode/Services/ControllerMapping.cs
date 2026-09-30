@@ -75,6 +75,27 @@ public static class ControllerMapping
     /// <summary>Whether to read Windows.Gaming.Input.Gamepad objects: only when XInput saw nothing.</summary>
     public static bool ShouldReadGamepads(int xinputPads) => xinputPads == 0;
 
+    /// <summary>
+    /// Most buttons a person holds on a HID pad at once. Some pads read wrong through Windows'
+    /// generic HID driver (a Switch Pro Controller reports 6 to 10 buttons down and a stuck D-pad
+    /// with nobody touching it); acting on that moves the focus and presses buttons by itself.
+    /// </summary>
+    public const int MaxSimultaneousHidButtons = 5;
+
+    /// <summary>Consecutive polls over the limit before the pad is ignored for good.</summary>
+    public const int DistrustAfterPolls = 3;
+
+    /// <summary>
+    /// Tracks one HID pad's readings: true once they were impossible for
+    /// <see cref="DistrustAfterPolls"/> polls in a row. A single reading over the limit is
+    /// skipped by the caller without judging the pad.
+    /// </summary>
+    public static bool UpdateHidTrust(int pressedButtons, ref int noisyStreak)
+    {
+        noisyStreak = pressedButtons > MaxSimultaneousHidButtons ? noisyStreak + 1 : 0;
+        return noisyStreak >= DistrustAfterPolls;
+    }
+
     /// <summary>Stick axis from 0..1 (0.5 centred) to a direction; ±0.25 dead zone.</summary>
     public static (bool Left, bool Right, bool Up, bool Down) StickDirections(double x, double y) =>
         (x < 0.25, x > 0.75, y < 0.25, y > 0.75);
