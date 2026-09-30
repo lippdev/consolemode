@@ -12,16 +12,20 @@ public partial class App : Application
     private const string ShowSignalName = @"Local\ConsoleMode.Show";
     private const string StartSignalName = @"Local\ConsoleMode.Start";
     private const string StopSignalName = @"Local\ConsoleMode.Stop";
+    private const string MenuSignalName = @"Local\ConsoleMode.Menu";
 
     private MainWindow? _window;
     private TrayService? _tray;
     private ControllerHoldWatcher? _guide;
     private ControllerHoldWatcher? _exitChord;
+    private ControllerHoldWatcher? _menuChord;
     private ControllerConnectWatcher? _connect;
     private Mutex? _instanceMutex;
     private EventWaitHandle? _showSignal;
     private EventWaitHandle? _startSignal;
     private EventWaitHandle? _stopSignal;
+    private EventWaitHandle? _menuSignal;
+    private ControlPipeService? _control;
     private readonly List<RegisteredWaitHandle> _signalWaits = [];
 
     public static MainWindow? MainWindowInstance { get; private set; }
@@ -50,7 +54,8 @@ public partial class App : Application
         // consolemode://start|stop|show arrives as the only argument (ProtocolService).
         var protocolAction = cliArgs.Select(ProtocolService.ParseAction).FirstOrDefault(a => a is not null);
         var autoStart = HasArg(ShortcutService.StartArgument) || protocolAction == ProtocolService.StartAction;
-        var stopRequest = protocolAction == ProtocolService.StopAction;
+        var stopRequest = HasArg(ShortcutService.StopArgument) || protocolAction == ProtocolService.StopAction;
+        var menuRequest = protocolAction == ProtocolService.MenuAction;
         // --tray: launched with Windows; stay in the tray until the user opens the window.
         var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
 
@@ -58,7 +63,7 @@ public partial class App : Application
         if (!isFirstInstance)
         {
             // Hand the request to the running instance (tray) instead of fighting over the screens.
-            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : ShowSignalName);
+            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : menuRequest ? MenuSignalName : ShowSignalName);
             Exit();
             return;
         }
@@ -69,15 +74,21 @@ public partial class App : Application
             LocalizationService.SetLanguage(LocalizationService.ResolveInitial(
                 ConfigService.Load().AppLanguage, StartupService.ReadInstallerLanguage(), CultureInfo.CurrentUICulture.Name));
             ControllerInput.Warmup();
+            AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
             ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
-                         $"mmt={AppPaths.HasMmt}, svv={AppPaths.HasSvv}, rtss-cli={AppPaths.HasRtssCli}");
+                         $"rtss-cli={AppPaths.HasRtssCli}");
 
             ViewModel = new MainViewModel();
             _window = new MainWindow(ViewModel);
             MainWindowInstance = _window;
             _tray = new TrayService(_window, ViewModel);
             ListenForSignals();
+            // same requests as consolemode:// links, plus a status reply (see ControlPipeService)
+            _control = new ControlPipeService(ViewModel, _window.DispatcherQueue,
+                requestStart: () => _startSignal?.Set(),
+                requestStop: () => _stopSignal?.Set(),
+                requestShow: () => _showSignal?.Set());
             WatchGuideButton();
 
             // A stop request with nothing running just opens the window.
@@ -114,6 +125,9 @@ public partial class App : Application
         _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, ShowSignalName);
         _startSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StartSignalName);
         _stopSignal = new EventWaitHandle(false, EventResetMode.AutoReset, StopSignalName);
+        _menuSignal = new EventWaitHandle(false, EventResetMode.AutoReset, MenuSignalName);
+        _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_menuSignal, (_, _) =>
+            _window?.DispatcherQueue.TryEnqueue(() => ViewModel?.ToggleSessionMenu()), null, Timeout.Infinite, executeOnlyOnce: false));
 
         _signalWaits.Add(ThreadPool.RegisterWaitForSingleObject(_showSignal, (_, _) =>
             _window?.DispatcherQueue.TryEnqueue(() => _tray?.ShowWindow()), null, Timeout.Infinite, executeOnlyOnce: false));
@@ -139,22 +153,28 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Idle: the Home button enters console mode (a hold, or a press once Game Bar's shortcut
-    /// is off). In a session Big Picture owns the Home button, so Start + Back held together
-    /// restores the desk instead.
+    /// The shortcuts the user picked (Settings, or the first-run setup); none is set until then.
+    /// Home, from the tray: enter console mode (a hold, or a press once Game Bar's shortcut is
+    /// off). Menu and Exit, in a session: the menu over the game, and back to the PC.
     /// </summary>
     private void WatchGuideButton()
     {
         if (_window is null || ViewModel is null) return;
-        _guide = new ControllerHoldWatcher(_window.DispatcherQueue, ControllerHoldWatcher.GuideButton, "botão Home");
+        _guide = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Home");
         _guide.Held += () =>
         {
             if (ViewModel is not null) ViewModel.LaunchedByController = true;
             _ = HandleStartRequestAsync();
         };
-        _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
+        _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Voltar ao PC");
         _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.StopConsoleAsync(); };
+        _menuChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Menu da sessão")
+        {
+            HoldDuration = TimeSpan.FromMilliseconds(250)
+        };
+        _menuChord.Held += () => ViewModel?.ToggleSessionMenu();
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
+        ViewModel.ShortcutOnboardingRequested += () => _ = ShowShortcutOnboardingAsync();
         RefreshGuideWatch();
 
         // Issue #29: a pad connecting while we're in the tray means "I'm on the couch".
@@ -172,7 +192,7 @@ public partial class App : Application
 
     private void OnViewModelChangedForGuide(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(MainViewModel.HomeButtonLaunch) or nameof(MainViewModel.HomeButtonShortPress)
+        if (e.PropertyName is MainViewModel.ShortcutsProperty or nameof(MainViewModel.HomeButtonShortPress)
             or nameof(MainViewModel.IsConsoleActive))
             RefreshGuideWatch();
         if (e.PropertyName == nameof(MainViewModel.IsConsoleActive) && ViewModel?.IsConsoleActive == false)
@@ -181,10 +201,45 @@ public partial class App : Application
 
     private void RefreshGuideWatch()
     {
-        if (_guide is null || _exitChord is null || ViewModel is null) return;
+        if (_guide is null || _exitChord is null || _menuChord is null || ViewModel is null) return;
+        _guide.Mask = ViewModel.GetShortcut(ShortcutSlot.Home);
+        _menuChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Menu);
+        _exitChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Exit);
         _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
-        if (!ViewModel.HomeButtonLaunch) { _guide.Stop(); _exitChord.Stop(); return; }
-        if (ViewModel.IsConsoleActive) { _guide.Stop(); _exitChord.Start(); }
-        else { _exitChord.Stop(); _guide.Start(); }
+
+        // Picking a shortcut presses buttons on purpose: nothing may fire meanwhile. A shortcut
+        // that isn't set never runs, and the three do not depend on each other.
+        var idle = !ViewModel.IsCapturingShortcut;
+        Apply(_guide, idle && _guide.Mask != 0 && !ViewModel.IsConsoleActive);
+        // The menu also opens outside a session in this alpha (a preview, to try it without console mode).
+        Apply(_menuChord, idle && _menuChord.Mask != 0);
+        Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
+    }
+
+    private bool _onboardingOpen;
+
+    /// <summary>The first-run shortcuts setup (nothing is set until the user chooses).</summary>
+    private async Task ShowShortcutOnboardingAsync()
+    {
+        if (_onboardingOpen || _window?.Content?.XamlRoot is not { } root || ViewModel is null) return;
+        _onboardingOpen = true;
+        try
+        {
+            await Controls.ShortcutPicker.ShowOnboardingAsync(root, ViewModel);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Atalhos: {ex.Message}");
+        }
+        finally
+        {
+            _onboardingOpen = false;
+        }
+    }
+
+    private static void Apply(ControllerHoldWatcher watcher, bool run)
+    {
+        if (run) watcher.Start();
+        else watcher.Stop();
     }
 }

@@ -30,14 +30,15 @@ public partial class MainViewModel
     public string HintConfirm => IsPlayStationHints ? "✕" : "A";
     public string HintBack => IsPlayStationHints ? "○" : "B";
     public string HintAlt => IsPlayStationHints ? "△" : "Y";
+    public string HintOption => IsPlayStationHints ? "□" : "X";
     public string HintMenu => IsPlayStationHints ? "OPTIONS" : "☰";
 
     partial void OnIsConsoleUiChanged(bool value)
     {
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
-        if (value) IsRolePanelOpen = false;
-        else { IsConsoleSettingsOpen = false; IsPickerOpen = false; }
+        if (value) { IsRolePanelOpen = false; IsControllerToastOpen = false; }
+        else { ConsoleTabIndex = HomeTabIndex; IsPickerOpen = false; }
     }
 
     partial void OnIsHomePageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopHome));
@@ -48,7 +49,11 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HintConfirm));
         OnPropertyChanged(nameof(HintBack));
         OnPropertyChanged(nameof(HintAlt));
+        OnPropertyChanged(nameof(HintOption));
         OnPropertyChanged(nameof(HintMenu));
+        OnPropertyChanged(nameof(HintLb));
+        OnPropertyChanged(nameof(HintRb));
+        NotifyShortcutTexts();
     }
 
     partial void OnSelectedUiModeChanged(ComboOption? value)
@@ -69,6 +74,23 @@ public partial class MainViewModel
     }
 
     [ObservableProperty] private bool _controllerDetected;
+    [ObservableProperty] private bool _isControllerToastOpen;
+    private int _controllerToastId;
+
+    // A toast instead of a permanent chip: shown for a few seconds when a pad connects.
+    partial void OnControllerDetectedChanged(bool value)
+    {
+        var id = ++_controllerToastId;
+        IsControllerToastOpen = value && !IsConsoleUi;
+        if (!IsControllerToastOpen) return;
+        _ = HideControllerToastAsync(id);
+    }
+
+    private async Task HideControllerToastAsync(int id)
+    {
+        await Task.Delay(4000);
+        if (id == _controllerToastId) IsControllerToastOpen = false;
+    }
 
     /// <summary>Called after the config is applied and whenever the choice changes.</summary>
     private void ResolveUi()
@@ -107,6 +129,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(RolePanelTitle));
         OnPropertyChanged(nameof(HdrText));
         OnPropertyChanged(nameof(VrrText));
+        OnPropertyChanged(nameof(BackgroundModeText));
     }
 
     /// <summary>"desktop" / "console": the on-screen switch, remembered as an explicit choice.</summary>
@@ -129,11 +152,11 @@ public partial class MainViewModel
     {
         if (IsConsoleActive) return;
         IsRolePanelOpen = false;
-        IsConsoleSettingsOpen = true;
+        ConsoleTabIndex = SystemTabIndex;
     }
 
     [RelayCommand]
-    private void CloseConsoleSettings() => IsConsoleSettingsOpen = false;
+    private void CloseConsoleSettings() => ConsoleTabIndex = HomeTabIndex;
 
     /// <summary>"launch:+1", "audio:-1", "fps:+1", "mode:+1": cycle a quick-setting card.</summary>
     [RelayCommand]
@@ -161,11 +184,17 @@ public partial class MainViewModel
             case "hide": SelectedHideStrategy = Next(HideStrategies, SelectedHideStrategy, step); break;
             case "language": SelectedLanguage = Next(LanguageOptions, SelectedLanguage, step); break;
             case "ui": SelectedUiMode = Next(UiModeOptions, SelectedUiMode, step); break;
-            case "home": HomeButtonLaunch = !HomeButtonLaunch; break;
+            case "home": ToggleSuggestedShortcut(ShortcutSlot.Home); break;
+            case "menushortcut": ToggleSuggestedShortcut(ShortcutSlot.Menu); break;
+            case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
+            case "sounds": InterfaceSounds = !InterfaceSounds; break;
+            case "background": CycleBackgroundMode(); break;
+            case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
+            case "betas": BetaUpdates = !BetaUpdates; break;
         }
     }
 

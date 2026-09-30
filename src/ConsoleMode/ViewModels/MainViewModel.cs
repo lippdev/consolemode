@@ -34,6 +34,7 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private CancellationTokenSource? _loopCts;
     private volatile bool _busy;
+    private bool _restoreRequestActive;
     private bool _applying;
 
     /// <summary>Last config read from disk; monitor fields survive a failed monitor listing.</summary>
@@ -96,6 +97,7 @@ public partial class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsIdle));
         NotifyStartState();
+        if (value) _ = ShowSessionHintAsync();
     }
     partial void OnFocusRowChanged(MonitorRowViewModel? value)
     {
@@ -129,8 +131,10 @@ public partial class MainViewModel : ObservableObject
         InitializeAppSettings();
         ResolveUi();
         _ = RecheckControllerAsync();
+        _ = RefreshBackgroundAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
+        else if (interactive) RequestShortcutOnboarding();
         _ = CheckForUpdatesOnStartupAsync();
     }
 
@@ -203,20 +207,13 @@ public partial class MainViewModel : ObservableObject
         AudioOptions.Clear();
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioNoChange"), Value = "" });
         AudioOptions.Add(new ComboOption { Text = LocalizationService.Get("AudioOnConnect"), Value = ConsoleEngine.AudioOnConnectId });
-        if (AppPaths.HasSvv)
-        {
-            foreach (var device in _availableAudioDevices)
-                AudioOptions.Add(new ComboOption
-                {
-                    Text = device.IsActive ? device.Name : $"{device.Name}{LocalizationService.Get("AudioDisabledSuffix")}",
-                    Value = device.FriendlyId
-                });
-            AudioHintText = LocalizationService.Get("AudioHint");
-        }
-        else
-        {
-            AudioHintText = LocalizationService.Get("SvvMissing");
-        }
+        foreach (var device in _availableAudioDevices)
+            AudioOptions.Add(new ComboOption
+            {
+                Text = device.IsActive ? device.Name : $"{device.Name}{LocalizationService.Get("AudioDisabledSuffix")}",
+                Value = device.FriendlyId
+            });
+        AudioHintText = LocalizationService.Get("AudioHint");
         SelectedAudio = AudioOptions.FirstOrDefault(x => x.Value == selectedValue) ?? AudioOptions[0];
     }
 
@@ -249,9 +246,7 @@ public partial class MainViewModel : ObservableObject
                 monitors.Add(new LoadedMonitor(monitor, engine.Monitors.GetDisplayModes(monitor.Name, monitor)));
             if (list.Count == 0)
             {
-                error = AppPaths.HasMmt
-                    ? LocalizationService.Get("NoDisplayTryRefresh")
-                    : LocalizationService.Get("MmtMissing", AppPaths.MmtPath);
+                error = LocalizationService.Get("NoDisplayTryRefresh");
             }
         }
         catch (Exception ex)
@@ -263,7 +258,7 @@ public partial class MainViewModel : ObservableObject
         List<AudioDevice> audio = [];
         try
         {
-            if (AppPaths.HasSvv) audio = [.. engine.Audio.GetDevices(true)];
+            audio = [.. engine.Audio.GetDevices(true)];
         }
         catch (Exception ex)
         {
@@ -309,9 +304,14 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
-            HomeButtonLaunch = config.HomeButtonLaunch;
+            BetaUpdates = config.BetaUpdates;
+            LoadShortcuts(config);
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
+            InterfaceSounds = config.InterfaceSounds;
+            ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
+            ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
+            CloseSteamOnRestore = config.CloseSteamOnRestore;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
 
@@ -631,6 +631,7 @@ public partial class MainViewModel : ObservableObject
         {
             var focus = FocusRow?.Monitor;
             await Task.Run(() => Engine.Start(config, focus, confirm));
+            Engine.State.SessionStartedAt = DateTime.Now;
             IsConsoleActive = true;
             ShowPage(settings: false);
             ActiveDescText = DescribeActive(config);
@@ -769,10 +770,13 @@ public partial class MainViewModel : ObservableObject
     private void EndTour()
     {
         TourStep = 0;
-        if (_loadedConfig.TourDone) return;
-        var config = BuildConfig();
-        config.TourDone = true;
-        TrySave(config);
+        if (!_loadedConfig.TourDone)
+        {
+            var config = BuildConfig();
+            config.TourDone = true;
+            TrySave(config);
+        }
+        RequestShortcutOnboarding();
     }
 
     /// <summary>
@@ -787,37 +791,57 @@ public partial class MainViewModel : ObservableObject
         var mode = Engine.State.FullscreenMode;
         var closed = await Task.Run(() => Engine.Launch.CloseFrontEnd(mode, Engine.State));
         AppLog.Write($"Stop-ConsoleMode: {mode} {(closed ? "fechado" : "ainda aberto")}");
-        for (var i = 0; i < 12 && IsConsoleActive; i++) await Task.Delay(500);
+        if (!await WaitForRestoreToFinishAsync()) return;
         if (IsConsoleActive) await RestoreNowAsync();
+    }
+
+    private async Task<bool> WaitForRestoreToFinishAsync()
+    {
+        var timer = Stopwatch.StartNew();
+        while (RestoreWaitPolicy.ShouldWait(Engine.State.RestoreInProgress, timer.Elapsed))
+            await Task.Delay(RestoreWaitPolicy.PollInterval);
+
+        if (!Engine.State.RestoreInProgress) return true;
+        AppLog.Write("Stop-ConsoleMode: restauração anterior ainda em andamento após 30 segundos; nova restauração adiada");
+        return false;
     }
 
     [RelayCommand]
     public async Task RestoreNowAsync()
     {
-        if (_busy && !Engine.State.IsActive) return;
-        StopLoop();
-        _busy = true;
-        IsRestoring = true;
+        if (_busy || _restoreRequestActive) return;
+        _restoreRequestActive = true;
         try
         {
-            await Task.Run(() => Engine.Stop());
-            IsConsoleActive = false;
-            SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
-        }
-        catch (Exception ex)
-        {
-            AppLog.Write($"Restore: {ex}");
-            SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
+            if (!await WaitForRestoreToFinishAsync()) return;
+            StopLoop();
+            _busy = true;
+            IsRestoring = true;
+            try
+            {
+                await Task.Run(() => Engine.Stop());
+                IsConsoleActive = false;
+                SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
+            }
+            catch (Exception ex)
+            {
+                AppLog.Write($"Restore: {ex}");
+                SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
+            }
+            finally
+            {
+                IsRestoring = false;
+                _busy = false;
+            }
+
+            // Screens were renumbered/re-enabled; refresh names and resolutions.
+            Engine.Monitors.ClearCache();
+            await ReloadAsync();
         }
         finally
         {
-            IsRestoring = false;
-            _busy = false;
+            _restoreRequestActive = false;
         }
-
-        // Screens were renumbered/re-enabled; refresh names and resolutions.
-        Engine.Monitors.ClearCache();
-        await ReloadAsync();
     }
 
     public bool TryCloseToTray() => IsConsoleActive;
@@ -910,9 +934,17 @@ public partial class MainViewModel : ObservableObject
             TourDone = _loadedConfig.TourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
-            HomeButtonLaunch = HomeButtonLaunch,
+            BetaUpdates = BetaUpdates,
+            HomeShortcut = _shortcuts[(int)ShortcutSlot.Home],
+            MenuShortcut = _shortcuts[(int)ShortcutSlot.Menu],
+            ExitShortcut = _shortcuts[(int)ShortcutSlot.Exit],
+            ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
+            InterfaceSounds = InterfaceSounds,
+            ConsoleBackground = ConsoleBackgroundMode,
+            ConsoleBackgroundImage = ConsoleBackgroundImage,
+            CloseSteamOnRestore = CloseSteamOnRestore,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };

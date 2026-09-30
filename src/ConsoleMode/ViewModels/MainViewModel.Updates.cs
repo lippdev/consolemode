@@ -16,9 +16,11 @@ public partial class MainViewModel
     private enum UpdateStatusKind { InstallKind, Searching, Latest, Available, Failed }
 
     [ObservableProperty] private bool _checkUpdates = true;
-    [ObservableProperty] private bool _homeButtonLaunch = true;
+    [ObservableProperty] private bool _betaUpdates;
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
+    [ObservableProperty] private bool _interfaceSounds = true;
+    [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _isUpdateOpen;
@@ -80,9 +82,22 @@ public partial class MainViewModel
 
     partial void OnCheckUpdatesChanged(bool value) => SaveQuietly();
 
-    partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
+    partial void OnBetaUpdatesChanged(bool value)
+    {
+        SaveQuietly();
+        if (_applying || IsLoading) return;
+        if (value) SetStatus(LocalizationService.Get("BetaUpdatesWarning"), InfoBarSeverity.Warning);
+    }
 
     partial void OnAutoStartOnControllerChanged(bool value) => SaveQuietly();
+
+    partial void OnInterfaceSoundsChanged(bool value)
+    {
+        UiSounds.Enabled = value;
+        SaveQuietly();
+        if (value && !_applying) UiSounds.Play(UiSound.Confirm);
+    }
+    partial void OnCloseSteamOnRestoreChanged(bool value) => SaveQuietly();
 
     partial void OnHomeButtonShortPressChanged(bool value)
     {
@@ -129,7 +144,7 @@ public partial class MainViewModel
         }
         try
         {
-            var update = await UpdateService.CheckAsync();
+            var update = await UpdateService.CheckAsync(BetaUpdates);
             if (update is null)
             {
                 _updateStatusKind = UpdateStatusKind.Latest;
@@ -215,6 +230,10 @@ public partial class MainViewModel
         TrySave(config);
         IsUpdateOpen = false;
     }
+
+    /// <summary>B/Esc on the console notice: close without marking the version as skipped (it reappears next check).</summary>
+    [RelayCommand]
+    private void DismissUpdate() => IsUpdateOpen = false;
 
     /// <summary>
     /// First item of the release notes in the interface language. Releases without notes in

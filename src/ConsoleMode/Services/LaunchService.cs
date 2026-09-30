@@ -107,6 +107,8 @@ public sealed class LaunchService
             .ToArray();
     }
 
+    public bool IsPlayniteRunning() => Process.GetProcessesByName("Playnite.FullscreenApp").Length > 0;
+
     public nint[] GetFullscreenHandles(string mode) =>
         mode == "playnite" ? GetPlayniteHandles() : GetBigPictureHandles();
 
@@ -129,6 +131,34 @@ public sealed class LaunchService
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Leaves Big Picture the clean way, through Steam's own URL (back to the desktop client), so it does not
+    /// stay open on the desk once the screens are back. Halfway through the wait, if it is still there, the
+    /// window is asked to close (WM_CLOSE: the X button, not a kill). Returns whether it is gone.
+    /// </summary>
+    public bool CloseBigPicture(ConsoleRuntimeState state, int timeoutMs = 6000)
+    {
+        if (!IsBigPictureActive(state)) return true;
+        var handles = GetBigPictureHandles();
+        try { ProcessRunner.StartDetached("steam://close/bigpicture"); }
+        catch (Exception ex) { AppLog.Write($"Fechar Big Picture: {ex.Message}"); }
+
+        var deadline = Environment.TickCount64 + timeoutMs;
+        var nudged = false;
+        while (Environment.TickCount64 < deadline)
+        {
+            Thread.Sleep(400);
+            if (!IsBigPictureActive(state)) return true;
+            if (!nudged && Environment.TickCount64 > deadline - timeoutMs / 2)
+            {
+                nudged = true;
+                foreach (var handle in handles.Concat(GetBigPictureHandles()).Distinct())
+                    NativeWindows.PostMessage(handle, NativeWindows.WmClose, 0, 0);
+            }
+        }
+        return !IsBigPictureActive(state);
     }
 
     public bool IsBigPictureActive(ConsoleRuntimeState state)
@@ -204,19 +234,13 @@ public sealed class LaunchService
     public bool CloseFrontEnd(string mode, ConsoleRuntimeState state, int timeoutMs = 8000)
     {
         if (mode == "xboxMode" || !IsFullscreenActive(mode, state)) return true;
+        if (mode == "bigPicture") return CloseBigPicture(state, timeoutMs);
+        if (mode != "playnite") return true;
+
         var handles = GetFullscreenHandles(mode);
-        if (mode == "playnite")
+        foreach (var p in Process.GetProcessesByName("Playnite.FullscreenApp"))
         {
-            foreach (var p in Process.GetProcessesByName("Playnite.FullscreenApp"))
-            {
-                try { p.CloseMainWindow(); } catch { /* best effort */ }
-            }
-        }
-        else
-        {
-            // Steam's own URL leaves Big Picture the clean way (back to the desktop client)
-            try { ProcessRunner.StartDetached("steam://close/bigpicture"); }
-            catch (Exception ex) { AppLog.Write($"Fechar Big Picture: {ex.Message}"); }
+            try { p.CloseMainWindow(); } catch { /* best effort */ }
         }
 
         var deadline = Environment.TickCount64 + timeoutMs;
@@ -230,7 +254,7 @@ public sealed class LaunchService
             {
                 nudged = true;
                 foreach (var h in handles.Concat(GetFullscreenHandles(mode)).Distinct())
-                    NativeWindows.PostMessage(h, NativeWindows.WM_CLOSE, 0, 0);
+                    NativeWindows.PostMessage(h, NativeWindows.WmClose, 0, 0);
             }
         }
         return !IsFullscreenActive(mode, state);

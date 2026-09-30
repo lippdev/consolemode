@@ -58,7 +58,26 @@ public sealed class ReleaseNotesTests
     {
         Assert.Equal("Interface em inglês (Estados Unidos).",
             ReleaseNotes.FirstLine(LegacyPortuguese, LocalizationService.PortugueseBrazil));
-        Assert.Null(ReleaseNotes.FirstLine(LegacyPortuguese, LocalizationService.EnglishUnitedStates));
+        // A body without language headings is the English-only format (beta.6+): everyone reads it.
+        Assert.Equal("Interface em inglês (Estados Unidos).",
+            ReleaseNotes.FirstLine(LegacyPortuguese, LocalizationService.EnglishUnitedStates));
+    }
+
+    [Fact]
+    public void FirstLine_EnglishOnlyBodyIsSharedByEveryLanguage()
+    {
+        const string englishOnly = """
+            ### What's new
+            - **Session menu** over the game. (#46)
+
+            ### Downloads
+            - Installer
+
+            ---
+            Notas em português: CHANGELOG.md
+            """;
+        Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.PortugueseBrazil));
+        Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.SpanishSpain));
     }
 
     [Fact]

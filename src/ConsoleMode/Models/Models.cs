@@ -38,15 +38,42 @@ public sealed class AppConfig
 
     /// <summary>Look for new GitHub releases on startup.</summary>
     public bool CheckUpdates { get; set; } = true;
+    /// <summary>Also offer alpha/beta releases (Settings → Receive test versions).</summary>
+    public bool BetaUpdates { get; set; }
 
-    /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
-    public bool HomeButtonLaunch { get; set; } = true;
+    /// <summary>
+    /// Controller shortcuts the user picked, as XInput button bits (see ControllerShortcuts);
+    /// 0 = not set, which is how every install starts: nothing fires until they choose.
+    /// Home: from the tray, enters console mode. Menu: in a session, opens the menu over the
+    /// game. Exit: in a session, goes back to the PC.
+    /// </summary>
+    public int HomeShortcut { get; set; }
+    public int MenuShortcut { get; set; }
+    public int ExitShortcut { get; set; }
+
+    /// <summary>The shortcuts setup (first run of the version that made them configurable) was finished or skipped.</summary>
+    public bool ShortcutsOnboardingDone { get; set; }
 
     /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
     public bool HomeButtonShortPress { get; set; }
 
+    /// <summary>
+    /// Going back to the PC also quits Steam (its own Exit, never a kill), unless a game is running.
+    /// Big Picture itself is always closed.
+    /// </summary>
+    public bool CloseSteamOnRestore { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
+
+    /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
+    public bool InterfaceSounds { get; set; } = true;
+
+    /// <summary>Console background: "auto" (covers of the installed Steam games), "gradient" or "image".</summary>
+    public string ConsoleBackground { get; set; } = "auto";
+
+    /// <summary>The picture used when the background is "image".</summary>
+    public string ConsoleBackgroundImage { get; set; } = "";
 
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
@@ -246,6 +273,7 @@ public sealed class ConsoleRuntimeState
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
     public string FullscreenMode { get; set; } = "bigPicture";
+    public bool CloseSteamOnRestore { get; set; } = true;
     public string? AudioDeviceId { get; set; }
     public bool AudioAutoSwitch { get; set; }
     public string? AudioDeviceHint { get; set; }
@@ -254,6 +282,7 @@ public sealed class ConsoleRuntimeState
     public string? LastAudioSwitchName { get; set; }
     public bool AudioPendingTarget { get; set; }
     public nint CachedBigPictureHandle { get; set; }
+    public DateTime? PlayniteWindowMissingSince { get; set; }
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }
@@ -263,6 +292,9 @@ public sealed class ConsoleRuntimeState
     public bool HdrApplied { get; set; }
     public string? HdrMonitor { get; set; }
     public bool VrrApplied { get; set; }
+    /// <summary>The session menu turned off an HDR that was on before the session; Stop() turns it back on.</summary>
+    public bool HdrTurnedOffByUser { get; set; }
+    public DateTime? SessionStartedAt { get; set; }
     public string? BackupAudioId { get; set; }
 }
 

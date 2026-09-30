@@ -6,11 +6,6 @@ dist/
 artifacts/
 release-notes.md
 
-# Ferramentas NirSoft (baixadas pelo build ou colocadas localmente em dev)
-MultiMonitorTool.exe
-MultiMonitorTool.chm
-SoundVolumeView.exe
-SoundVolumeView.chm
 rtss-cli.exe
 readme.txt
 

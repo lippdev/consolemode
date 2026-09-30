@@ -15,6 +15,40 @@ public static class NativeWindows
     public static extern nint GetForegroundWindow();
 
     [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(nint hWnd, nint processId);
+
+    [DllImport("user32.dll")]
+    private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetCurrentThreadId();
+
+    /// <summary>
+    /// Bring a window in front of a fullscreen game. Windows refuses SetForegroundWindow from a
+    /// background process, so attach to the foreground thread's input queue first.
+    /// </summary>
+    public static bool ForceForeground(nint hwnd)
+    {
+        var current = GetForegroundWindow();
+        if (current == hwnd) return true;
+        var ourThread = GetCurrentThreadId();
+        var theirThread = current == 0 ? 0 : GetWindowThreadProcessId(current, 0);
+        var attached = theirThread != 0 && theirThread != ourThread && AttachThreadInput(ourThread, theirThread, true);
+        try
+        {
+            SetWindowPos(hwnd, -1 /* HWND_TOPMOST */, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040 /* NOSIZE|NOMOVE|SHOWWINDOW */);
+            return SetForegroundWindow(hwnd);
+        }
+        finally
+        {
+            if (attached) AttachThreadInput(ourThread, theirThread, false);
+        }
+    }
+
+    [DllImport("user32.dll")]
     public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -39,9 +73,9 @@ public static class NativeWindows
     public static extern bool IsWindow(nint hWnd);
 
     [DllImport("user32.dll")]
-    public static extern bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
+    public static extern bool PostMessage(nint hWnd, uint msg, nint wParam, nint lParam);
 
-    public const uint WM_CLOSE = 0x0010;
+    public const uint WmClose = 0x0010;
 
     [DllImport("user32.dll")]
     public static extern nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
@@ -202,6 +236,21 @@ public static class NativeWindows
         return [.. list];
     }
 
+    /// <summary>A plain F11 to the window in front (ControlFS uses it for full screen).</summary>
+    public static void SendF11()
+    {
+        keybd_event(VK_F11, 0, 0, UIntPtr.Zero);
+        keybd_event(VK_F11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+    }
+
+    public static bool TryGetWindowRect(nint hWnd, out int left, out int top, out int width, out int height)
+    {
+        left = top = width = height = 0;
+        if (hWnd == 0 || !GetWindowRect(hWnd, out var r)) return false;
+        left = r.Left; top = r.Top; width = r.Right - r.Left; height = r.Bottom - r.Top;
+        return true;
+    }
+
     public static void SendWinF11()
     {
         keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);
@@ -318,5 +367,12 @@ public static class NativeWindows
         if (!EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm)) return null;
         return BuildDisplayModeInfo(dm.dmPelsWidth, dm.dmPelsHeight, dm.dmDisplayFrequency, dm.dmBitsPerPel,
             ConsoleMode.Services.LocalizationService.Get("CurrentModeSuffix"));
+    }
+
+    /// <summary>DEVMODE.dmDisplayOrientation of the current mode (0 landscape, 1 = 90°, 2 = 180°, 3 = 270°); 0 when unreadable.</summary>
+    public static int GetCurrentOrientation(string deviceName)
+    {
+        var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf<DEVMODE>() };
+        return EnumDisplaySettings(deviceName, ENUM_CURRENT_SETTINGS, ref dm) ? dm.dmDisplayOrientation : 0;
     }
 }

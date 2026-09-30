@@ -42,6 +42,7 @@ public sealed class ConsoleEngine
         State.HideMonitors = [.. config.HideMonitors];
         State.HideStrategy = config.HideStrategy;
         State.FullscreenMode = config.FullscreenMode;
+        State.CloseSteamOnRestore = config.CloseSteamOnRestore;
         State.AudioDeviceId = config.AudioAutoSwitch ? null : config.AudioDeviceId;
         State.AudioAutoSwitch = config.AudioAutoSwitch;
         State.AudioDeviceHint = config.AudioDeviceName;
@@ -55,6 +56,7 @@ public sealed class ConsoleEngine
         State.LaunchTime = null;
         State.AbsenceCount = 0;
         State.CachedBigPictureHandle = 0;
+        State.PlayniteWindowMissingSince = null;
         State.CachedXboxHandle = 0;
         State.AudioWatchComplete = false;
         State.BigPictureWatchActive = false;
@@ -81,12 +83,9 @@ public sealed class ConsoleEngine
 
         State.IsActive = true;
 
-        if (AppPaths.HasSvv)
-        {
-            State.BackupAudioId = Audio.GetDefaultId();
-            if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
-                File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
-        }
+        State.BackupAudioId = Audio.GetDefaultId();
+        if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
+            File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
 
         if (focusInfo is null || !focusInfo.IsActive)
         {
@@ -133,15 +132,15 @@ public sealed class ConsoleEngine
 
         Monitors.ClearCache();
         Audio.ClearCache();
-        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+        Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
 
-        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch && AppPaths.HasSvv)
+        if (!string.IsNullOrWhiteSpace(config.AudioDeviceId) && !config.AudioAutoSwitch)
         {
             var devices = Audio.GetDevices(true);
             var target = devices.FirstOrDefault(d => d.FriendlyId == config.AudioDeviceId);
             if (target is { IsActive: true })
             {
-                Audio.SetOutput(config.AudioDeviceId);
+                TrySetOutput(config.AudioDeviceId);
                 CompleteAudioWatch();
             }
             else
@@ -150,16 +149,13 @@ public sealed class ConsoleEngine
             }
         }
 
-        if (AppPaths.HasSvv)
-        {
-            InitializeAudioWatch();
-            if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
-                CompleteAudioWatch();
-        }
+        InitializeAudioWatch();
+        if (!config.AudioAutoSwitch && !State.AudioPendingTarget && string.IsNullOrWhiteSpace(config.AudioDeviceId))
+            CompleteAudioWatch();
 
         if (confirmScreen is not null)
         {
-            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowMmtFallback: true);
+            Monitors.UpdateFocusRect(config.FocusMonitor, State, allowListFallback: true);
             if (!confirmScreen(State.FocusMonitorRect))
             {
                 AppLog.Write("Start: tela de jogo não confirmada; restaurando");
@@ -286,6 +282,7 @@ public sealed class ConsoleEngine
         AppLog.Write("Stop-ConsoleMode: iniciando restauração");
         try
         {
+            CloseSteamForRestore();
             OnUi(BlackCurtain.Close);
             Video.RestoreHdr(State);
             Video.RestoreVrr(State);
@@ -342,6 +339,29 @@ public sealed class ConsoleEngine
         }
     }
 
+    /// <summary>
+    /// Going back to the PC: Big Picture is closed (it would otherwise be left on the desk monitor when the
+    /// screens come back), and Steam is asked to quit its own way, because after Big Picture it is often left
+    /// half-working. Never a kill, never when a game is running, and never a reason to fail the restore.
+    /// </summary>
+    private void CloseSteamForRestore()
+    {
+        if (State.FullscreenMode != "bigPicture") return;
+        try
+        {
+            var closed = Launch.CloseBigPicture(State);
+            AppLog.Write($"Steam: Big Picture {(closed ? "fechado" : "ainda aberto")}");
+            var appId = SteamSession.RunningAppId();
+            var decision = SteamShutdown.Decide(State.FullscreenMode, State.CloseSteamOnRestore, SteamSession.IsRunning(), appId);
+            AppLog.Write(SteamShutdown.Describe(decision, appId));
+            if (decision == SteamShutdown.Decision.Shutdown) SteamSession.RequestShutdown();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Steam: fechar ao voltar: {ex.Message}");
+        }
+    }
+
     public void RequestExit() => State.ShouldExit = true;
 
     private void ShowCurtains(IReadOnlyList<string> names)
@@ -377,10 +397,12 @@ public sealed class ConsoleEngine
         return new AppConfig
         {
             Version = config.Version,
+            AppLanguage = config.AppLanguage,
             FocusMonitor = focus,
             HideMonitors = hide,
             HideStrategy = config.HideStrategy,
             FullscreenMode = config.FullscreenMode,
+            PlaynitePath = config.PlaynitePath,
             AudioDeviceId = config.AudioDeviceId,
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
@@ -388,9 +410,21 @@ public sealed class ConsoleEngine
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
             VrrEnable = config.VrrEnable,
+            UiMode = config.UiMode,
             TourDone = config.TourDone,
             ConfirmedSetup = config.ConfirmedSetup,
             CheckUpdates = config.CheckUpdates,
+            BetaUpdates = config.BetaUpdates,
+            HomeShortcut = config.HomeShortcut,
+            MenuShortcut = config.MenuShortcut,
+            ExitShortcut = config.ExitShortcut,
+            ShortcutsOnboardingDone = config.ShortcutsOnboardingDone,
+            HomeButtonShortPress = config.HomeButtonShortPress,
+            CloseSteamOnRestore = config.CloseSteamOnRestore,
+            AutoStartOnController = config.AutoStartOnController,
+            InterfaceSounds = config.InterfaceSounds,
+            ConsoleBackground = config.ConsoleBackground,
+            ConsoleBackgroundImage = config.ConsoleBackgroundImage,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
@@ -398,7 +432,7 @@ public sealed class ConsoleEngine
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)
     {
         if (rect is not null)
-            Monitors.MoveWindowViaMmt(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
+            Monitors.MoveProcessWindows(monitorName, rect, State.FullscreenMode == "playnite" ? "Playnite.FullscreenApp" : "steamwebhelper");
 
         if (rect is null) return;
         foreach (var handle in handles)
@@ -410,9 +444,10 @@ public sealed class ConsoleEngine
 
     private bool IsExitSignaled()
     {
-        if (NativeWindows.ConsumeBigPictureExitRequest()) return true;
-        if (State.CachedBigPictureHandle != 0 && !NativeWindows.IsWindowStillVisible(State.CachedBigPictureHandle))
-            return true;
+        var watchedGone = NativeWindows.ConsumeBigPictureExitRequest() ||
+                          (State.CachedBigPictureHandle != 0 && !NativeWindows.IsWindowStillVisible(State.CachedBigPictureHandle));
+        if (State.FullscreenMode == "playnite" && State.HasAppeared) return IsPlayniteExitSignaled(watchedGone);
+        if (watchedGone) return true;
         if (!State.HasAppeared) return false;
         if (Launch.IsFullscreenActive(State.FullscreenMode, State))
         {
@@ -423,9 +458,31 @@ public sealed class ConsoleEngine
         return State.AbsenceCount >= 2;
     }
 
+    /// <summary>
+    /// Playnite may replace the window being watched (loading screen → main window). Follow the new
+    /// window while the process runs, and end the session only when it exits or stays windowless.
+    /// </summary>
+    private bool IsPlayniteExitSignaled(bool watchedGone)
+    {
+        if (watchedGone) State.CachedBigPictureHandle = 0;
+        var showing = Launch.IsPlayniteActive(State);
+        if (showing && watchedGone)
+        {
+            var handle = State.CachedBigPictureHandle;
+            AppLog.Write("Loop: Playnite trocou de janela; acompanhando a nova");
+            OnUi(() => State.BigPictureWatchActive = NativeWindows.StartBigPictureExitWatch(handle));
+        }
+
+        if (showing) State.PlayniteWindowMissingSince = null;
+        else State.PlayniteWindowMissingSince ??= DateTime.Now;
+        var exit = PlayniteExitPolicy.IsExit(Launch.IsPlayniteRunning(), showing, State.PlayniteWindowMissingSince, DateTime.Now);
+        if (exit) AppLog.Write("Loop: Playnite fechou");
+        return exit;
+    }
+
     private bool AudioWatchNeeded()
     {
-        if (!AppPaths.HasSvv || State.AudioWatchComplete) return false;
+        if (State.AudioWatchComplete) return false;
         return State.AudioAutoSwitch || State.AudioPendingTarget;
     }
 
@@ -470,9 +527,11 @@ public sealed class ConsoleEngine
 
         var pick = Audio.PickNewDevice(newly, State.AudioDeviceHint, focus);
         if (pick is null) return;
-        Audio.SetOutput(pick.FriendlyId);
-        State.AudioDeviceId = pick.FriendlyId;
-        State.LastAudioSwitchName = pick.Name;
+        if (TrySetOutput(pick.FriendlyId))
+        {
+            State.AudioDeviceId = pick.FriendlyId;
+            State.LastAudioSwitchName = pick.Name;
+        }
         CompleteAudioWatch();
     }
 
@@ -482,8 +541,25 @@ public sealed class ConsoleEngine
         var devices = Audio.GetDevices(true);
         var target = devices.FirstOrDefault(d => d.FriendlyId == State.AudioDeviceId);
         if (target is not { IsActive: true }) return;
-        Audio.SetOutput(target.FriendlyId);
-        State.LastAudioSwitchName = target.Name;
+        if (TrySetOutput(target.FriendlyId)) State.LastAudioSwitchName = target.Name;
         CompleteAudioWatch();
+    }
+
+    /// <summary>
+    /// Switching the output is best effort: a Core Audio error is logged and the session goes on,
+    /// instead of rolling back the whole start after the screens were already switched.
+    /// </summary>
+    private bool TrySetOutput(string friendlyId)
+    {
+        try
+        {
+            Audio.SetOutput(friendlyId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Áudio: não foi possível trocar para {friendlyId}: {ex.Message}");
+            return false;
+        }
     }
 }

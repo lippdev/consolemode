@@ -2,6 +2,137 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Correcoes
+- `consolemode://stop` e o atalho configuravel de voltar ao PC agora fecham o Playnite em tela cheia antes de restaurar; uma restauracao em andamento termina antes de uma nova tentativa. (#45)
+
+## [1.6.0-alpha.3]
+### Novidades
+- Menu da sessão: painel fixo no topo da lateral com o **Explorador de arquivos (ControlFS)**, o gerenciador de arquivos de código aberto da equipe, feito para o controle. Um toque abre o ControlFS por cima, sempre em tela cheia na tela da sessão (ou o traz para a frente se já estiver aberto); se não estiver instalado, abre a página de download. O Console Mode só o chama pelo `--start` dele, não o encerra nem envia F11 a outra janela se o Windows negar o foco. (#122)
+- Menu da sessão (o atalho do controle, Select + Y na sugestão) redesenhado como o overlay do Steam (Shift+Tab): cobre a tela inteira, o jogo escurece e desfoca por trás, um painel lateral reúne as opções (volume com medidor, resolução, áudio, FPS, HDR) e no meio ficam sempre visíveis as **janelas abertas**, um ALT+TAB interno: o direcional escolhe, A traz a janela para a frente, X a fecha e B volta ao jogo (trocar de janela não encerra a sessão). O vidro fosco só aparece se os efeitos de transparência do Windows estiverem ligados (senão o painel fica escuro e sólido, e muda ao vivo se você trocar a configuração), e em alto contraste usa as cores do sistema. Tem foco que cresce, sons e animações (o painel entra deslizando, as linhas vêm em cascata e ao fechar ele some suavemente). Nesta alpha ele abre também **fora da sessão**, como prévia com um selo no topo, para testar sem ligar o modo console (nela o limite de FPS não aparece e "Voltar ao PC" vira "Fechar menu"). (#120)
+- Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation) com uma animação de deslize, blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR), que abre cada escolha. (#117)
+- Plano de fundo do modo Console: por padrão, uma colagem com as capas dos seus jogos instalados na Steam sob um gradiente escuro (o app só lê as imagens que a Steam já baixou; nada é embutido). Dá para trocar por só o gradiente ou por uma imagem sua, em Sistema → Plano de fundo. (#117)
+- Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)
+- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar no mesmo controle). A captura não mistura botões de controles diferentes. Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
+- Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+
+### Correções
+- Menu da sessão: se o Windows não conseguir ativar a janela escolhida, o menu continua aberto para tentar de novo. (#120)
+- Steam: ao voltar ao PC (botão, menu, atalho, link `stop` ou saindo do Big Picture) o Big Picture é sempre fechado e a Steam é chamada para fechar do jeito normal, o "Sair" dela, sem encerrar o processo à força. Antes ela ficava aberta e costumava ficar bugada. Não fecha a Steam se houver um jogo rodando, e dá para desligar em Ajustes → "Fechar a Steam ao voltar ao PC". (#121)
+- Menu da sessão: o aviso que mostra o atalho no início da sessão não fica mais preso na tela; ele some sozinho depois de alguns segundos. (#114)
+- Controles: um controle que manda leituras impossíveis pelo driver HID genérico (muitos botões apertados ao mesmo tempo, direcional preso) agora é ignorado também quando o Windows o expõe por Windows.Gaming.Input. O log avisa, e reabrir o app tenta de novo. (#115)
+- Interface Console: navegar pelo controle não trava mais. "Para cima" (e "para baixo") funciona também quando o bloco de destino não está na mesma coluna, o foco não para mais em contêineres invisíveis e, ao trocar de aba, ele cai no primeiro item dela. (#117)
+- Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)
+- Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos. Se o Playnite troca a janela de carregamento pela principal, o Console Mode passa a acompanhar a nova e só restaura a mesa quando o Playnite fecha de verdade. (#83)
+- Áudio: se a troca da saída falhar, a sessão continua em vez de ser desfeita depois de as telas já terem sido trocadas. (#109)
+- Telas: a tela principal vem da flag do próprio Windows, então com telas clonadas não há mais ambiguidade. (#110)
+
+### Por trás dos panos
+- Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
+- O código não cita mais o MultiMonitorTool nem o SoundVolumeView, e a limpeza dos arquivos antigos deles na pasta `tools` saiu: quem atualiza direto da 1.5 mantém esses dois arquivos até apagá-los à mão. (#119)
+- O pacote embute só o rtss-cli; sobras de MultiMonitorTool/SoundVolumeView não entram mais no executável. (#110)
+
+## [1.6.0-alpha.2]
+### Mudanças
+- A 1.6 é só código do projeto: saiu também a opção de voltar ao MultiMonitorTool / SoundVolumeView, e os arquivos antigos deles na pasta `tools` são apagados ao abrir o app. (#91)
+- Telas e áudio são controlados pelas APIs do próprio Windows desde a 1.6.0-alpha.1; veja as notas dela abaixo. (#97, #98, #99)
+
+### Atenção: versão alpha
+- Ainda não validada em muitos setups de monitores e TV. Se algo falhar, volte para a 1.5.0 e conte pelo botão de feedback (anexe o `consolemode.log`). Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
+## [1.6.0-alpha.1]
+### Novidades
+- Telas e áudio agora são controlados pelas APIs do próprio Windows. O app não embute mais o MultiMonitorTool nem o SoundVolumeView, da NirSoft: o pacote fica só com código do projeto e o rtss-cli (MIT), o que abre caminho para assinar o executável e reduz alertas falsos de antivírus. (#91, #97, #98, #99)
+- As telas salvas, a saída de áudio escolhida e o backup da mesa continuam valendo: os identificadores são os mesmos de antes.
+
+### Atenção: versão alpha
+- Esta versão ainda não foi validada em muitos setups de monitores e TV. Se algo falhar ao ligar a TV, desligar as outras telas ou restaurar a mesa, volte para a 1.5.0 e conte o que aconteceu pelo botão de feedback (anexe o `consolemode.log`).
+- Quem usa a 1.5.0 estável não recebe esta versão automaticamente.
+
+## [1.5.1]
+### Novidades
+- Ajustes → "Receber versões de teste (alpha e beta)": entre nos testes da 1.6 pelo próprio app. A 1.6 controla telas e áudio com código próprio, sem as ferramentas da NirSoft. Desligado por padrão; ao ligar, o app avisa que versões de teste podem ter bugs.
+
+## [1.5.0]
+### Novidades
+- Interface Console: tela inicial e Ajustes em tela cheia, pensados para o controle (direcional/analógico, A/B) com controles Xbox e PlayStation. O modo Automático escolhe essa interface sempre que há um controle conectado. (#41, #42, #47)
+- Menu da sessão sobre o jogo: segure Select + Y (Create + △ no PlayStation) para volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode", em blocos na horizontal. Um aviso no canto lembra a combinação quando o jogo começa. (#46, #64)
+- Atalhos do sofá: com o app na bandeja, segure o botão Home para entrar no modo console; durante a sessão, Start + Select volta para o PC. Funcionam também com DualSense e DualShock 4 via HID, sem Steam Input. (#61)
+- Automação: links `consolemode://start`, `stop`, `show` e `menu`, `ConsoleMode.exe --stop` e uma API de controle local pelo named pipe `\.\pipe\ConsoleMode.Control`. Por @nextestudios. (#23, #24)
+- Ajustes → "Testar controle" mostra ao vivo o que o Windows lê de cada controle e copia um diagnóstico; "Entrar ao conectar um controle"; pasta do Playnite manual para instalações portáteis; "Outros apps do desenvolvedor" (WakeOn, Next Boost). (#63)
+- Botão de feedback que abre uma issue no GitHub já preenchida, notas da versão no idioma da interface e interface em espanhol. O instalador pergunta o idioma.
+
+### Correções
+- Atualização: o download não esgota mais o tempo em conexões lentas, e a interface Console consegue instalar a atualização, não só encontrar. (#49, #58)
+- A navegação pelo controle nos Ajustes da interface Console não pula mais linhas nem desenha o anel de foco no lugar errado, e os botões do aviso de atualização têm anel de foco visível (preto). (#60, #73)
+- Controles: um controle com falha não silencia mais os outros, e controles que o Windows lista com atraso (PlayStation, Bluetooth) passam a ser detectados.
+- Os itens do menu da bandeja voltaram a funcionar, o app espera a tela de jogo ligar antes de desligar as outras e a janela normal do Steam não é mais confundida com o Big Picture.
+
+### Atualizando da 1.4.0
+- O app mostra o aviso: clique em **Atualizar agora**. As configurações são mantidas.
+- Se a atualização a partir da 1.4.0 falhar com "HttpClient.Timeout of 15 seconds elapsing" (conexão lenta), baixe o instalador abaixo uma vez. Esse erro é do atualizador da 1.4.0 e está corrigido a partir da 1.5.0.
+
+## [1.5.0-beta.11]
+### Novidades
+- Menu da sessão (Select + Y) com layout horizontal: blocos lado a lado e "Voltar ao PC" / "Sair do Console Mode" embaixo. No volume, A entra no ajuste (◀ ▶ muda, □/X deixa mudo, A ou B sai). (#64)
+- Aviso no canto da tela do jogo alguns segundos depois de entrar: mostra qual combinação abre o menu (Select + Y, ou Create + △ no PlayStation). Não tira o foco do jogo. (#64)
+- Ajustes → "Outros apps do desenvolvedor": WakeOn (automação com Wake-on-LAN) e Next Boost (otimização do Windows). (#63)
+
+### Correções
+- Menu da sessão: com controle de PlayStation, o menu abria mas o controle não respondia dentro dele. Agora o menu lê o controle direto por HID, mesmo com o jogo em primeiro plano. (#64)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas. Quem está na beta.8 e vê o erro de tempo esgotado ao atualizar: baixe o instalador abaixo uma vez.
+
+## [1.5.0-beta.10]
+### Correções
+- Select + Y (menu sobre o jogo) e Start + Back (voltar pra mesa) agora funcionam com controles de PlayStation (DualSense e DualShock 4, USB ou Bluetooth) sem Steam Input: o app lê o controle direto por HID. No controle da Sony: Create/Share + Triângulo abre o menu; Options + Share volta pra mesa; o botão PS vale como Home. (#61)
+- Esses atalhos também paravam de funcionar quando "Abrir com o botão Home do controle" estava desligado. (#61)
+- Ajustes na interface Console: navegando com o controle, "Como desligar as outras telas" era pulada e o anel de foco aparecia no lugar errado. (#60)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas. Quem está na beta.8 e vê o erro de tempo esgotado ao atualizar: baixe o instalador abaixo uma vez.
+
+## [1.5.0-beta.9]
+### Correções
+- Atualização: o download não falha mais com "HttpClient.Timeout of 15 seconds elapsing" em conexões lentas. Agora só é cancelado se ficar 30 s sem receber dados. Quem está na beta.8 e recebe esse erro: baixe o instalador abaixo uma vez; as próximas atualizações pelo app funcionam. (#58)
+- Tela inicial Desktop: "Controle detectado" virou um aviso temporário (toast) que aparece por alguns segundos quando um controle conecta, em vez de ficar fixo no cabeçalho. (#58)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas.
+
+## [1.5.0-beta.8]
+### Correções
+- Tela inicial Desktop: o aviso "aperte A para o modo console" fica limitado em largura, com reticências, e mostra o texto completo ao passar o mouse; traduções longas não esticam mais o cabeçalho. (#56)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas.
+
+## [1.5.0-beta.7]
+### Novidades
+- Ajustes → "Testar controle": mostra ao vivo o que o Windows entrega de cada controle (origem, botões por índice, D-pad, analógicos) e copia um diagnóstico para a issue. O log de abertura lista os controles. Para quem o controle aparece mas não responde (DualSense com Steam aberto, por exemplo).
+- API de controle local: com o app aberto, o named pipe `\\.\pipe\ConsoleMode.Control` recebe uma linha JSON (`status`, `start`, `stop`, `show`) e responde com o estado (ativo, restaurando, modo, versão). Só o usuário logado e o LocalSystem conectam. Por @nextestudios. (#24)
+- `ConsoleMode.exe --stop` restaura a mesa pela linha de comando, como o `consolemode://stop`. Por @nextestudios. (#23)
+
+### Correções
+- Controle: um dispositivo que falha na leitura não silencia mais os outros; controles que o Windows expõe como Gamepad sem XInput responder passam a ser lidos (antes eram pulados); DualSense/DualShock via HID caem no mesmo caminho quando o XInput está vazio.
+- Interface Console: o aviso de atualização agora tem um jeito de instalar, não só de encontrar. Antes o botão "Atualizar agora" só existia na tela Desktop; na Console, "Procurar agora" achava a versão nova e não dava pra fazer nada com ela. (#49)
+
+### Versão beta
+- Esta beta é a versão principal para download. Quem usa a 1.4.0 ou uma beta anterior recebe o aviso dentro do aplicativo: basta clicar em **Atualizar agora**. As configurações são mantidas.
+
+## [1.5.0-beta.6]
+### Novidades
+- Interface Desktop navegável pelo controle: D-pad/analógico movem, A ativa (listas, interruptores, cards), B fecha a lista ou volta de Ajustes, Start abre/fecha Ajustes, Y vai para a interface Console; no tutorial, A avança e B pula. Baseado no PR #17 de @nextestudios.
+
+### Correções
+- O controle deixava de responder de vez se um controle desconectasse no meio de uma leitura; agora a leitura só pula a amostra. Também vindo do PR #17. (#47)
+- Navegação por controle: o primeiro toque só mostra o anel de foco; em listas roladas o foco cai na ordem de tabulação quando a busca espacial não acha nada; diagonais no D-pad contam como vertical; a leitura só vale com a janela em primeiro plano (verificação por janela, não por evento).
+- Menu da sessão: com o jogo aberto, segure Select + Y para abrir um menu sobre o jogo com volume, resolução, saída de áudio, limite de FPS, HDR, "Voltar ao PC" e "Sair do Console Mode". Também por `consolemode://menu`.
+
+### Versão beta
+- Pré-release: quem usa uma 1.5.0-beta recebe o aviso dentro do aplicativo. Quem está na 1.4.0 não recebe; para testar, baixe os arquivos abaixo.
+
 ## [1.5.0-beta.5]
 ### Novidades
 - Interface Console: os ajustes de lista (abrir em, áudio, resolução, FPS, como desligar, idioma, interface) abrem um seletor com todas as opções, com foco na atual; A escolhe, B volta. Antes era preciso ir apertando A para ciclar.

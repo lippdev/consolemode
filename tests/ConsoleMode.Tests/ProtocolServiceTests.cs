@@ -11,6 +11,7 @@ public class ProtocolServiceTests
     [InlineData("consolemode:show", "show")]
     [InlineData("consolemode://start?preset=sala", "start")]
     [InlineData("consolemode://start#x", "start")]
+    [InlineData("consolemode://menu", "menu")]
     public void ParseAction_ReadsTheActionFromTheUri(string argument, string expected) =>
         Assert.Equal(expected, ProtocolService.ParseAction(argument));
 

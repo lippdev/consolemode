@@ -44,7 +44,7 @@ public sealed class ControllerConnectWatcher : IDisposable
     {
         var now = DateTime.UtcNow;
         var can = CanTrigger?.Invoke() ?? false;
-        AppLog.Write($"Controle conectado: {controller.DisplayName}; auto-start {(ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can) ? "sim" : "não")}");
+        AppLog.Write($"Controle conectado: {controller.DisplayName}; auto-start {(ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can) ? "sim" : "não")}; " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
         _dispatcher.TryEnqueue(() => PresenceChanged?.Invoke());
         if (!ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can)) return;
         _dispatcher.TryEnqueue(() => Connected?.Invoke());
