@@ -29,13 +29,15 @@ Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [P
 2. Clique em **Jogar agora**, ou use o atalho de 1 clique na Área de Trabalho. Na primeira vez numa tela nova, a TV pergunta "Está vendo esta tela?" e desfaz tudo sozinha se ninguém responder.
 3. Saia do Big Picture ou do Playnite e tudo volta: telas, áudio, resolução.
 
-Prefere o sofá? Com o app na bandeja, segure o botão Home do controle e ele começa dali.
+Prefere o sofá? Com o app na bandeja, segure o seu atalho do controle e ele começa dali.
 
-| Atalho no controle | Faz |
-|---|---|
-| Segurar **Home** (Xbox / PS) | Entra no modo console a partir da bandeja |
-| Segurar **Select + Y** (Create + △) | Menu sobre o jogo: volume, resolução, áudio, FPS, HDR, sair |
-| Segurar **Start + Select** (Options + Create) | Volta para o PC |
+Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunta na primeira abertura (e dá para mudar em Ajustes). Nenhum botão pode servir para duas ações.
+
+| Atalho no controle | Faz | Sugestão |
+|---|---|---|
+| Segurar o seu atalho de **abrir** | Entra no modo console a partir da bandeja | **Home** (Xbox / PS) |
+| Segurar o seu atalho do **menu** | Menu sobre o jogo: volume, resolução, áudio, FPS, HDR, sair | **Select + Y** (Create + △) |
+| Segurar o seu atalho de **voltar ao PC** | Volta para o PC | **Start + Select** (Options + Create) |
 
 ## Recursos
 

@@ -4,11 +4,16 @@ Tudo aqui precisa de hardware ou de olho humano e **não é coberto pelos testes
 
 Como testar em build de desenvolvimento: `dotnet build src/ConsoleMode -c Debug -r win-x64` e rode `src/ConsoleMode/bin/Debug/net8.0-windows10.0.19041.0/win-x64/ConsoleMode.exe`. Os dados ficam em `ConsoleMode_Data` ao lado do exe (`config.json`, `consolemode.log`).
 
-## 1. Botão Home do controle (PR #27)
+## 0. Atalhos do controle configuráveis e primeira configuração
 
 Pré-condições: controle **Xbox** (XInput) conectado; app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
 
 - [ ] **Segurar o botão Xbox por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
+## 1. Atalho Home do controle (PR #27)
+
+Pré-condições: atalho de "Abrir o Console Mode" definido (o padrão sugerido é o botão Xbox, controle **Xbox** (XInput)); app na bandeja (minimizado ou aberto com `--tray`); sessão inativa.
+
+- [ ] **Segurar o atalho por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
 - [ ] **Toque curto** no botão Xbox não faz nada no app (só a Game Bar abre, se o atalho dela estiver ligado). Resultado: ______
 - [ ] Com a sessão **ativa** (Big Picture aberto), segurar o botão Xbox **não** reinicia nada. Resultado: ______
 - [ ] **Segurar Start + Select por 1 s** durante a sessão restaura a mesa (igual a "Restaurar agora"). Resultado: ______
@@ -35,7 +40,7 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
 - [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
 
-## 1c. Menu da sessão (Select + Y)
+## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
 Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; controle Xbox ou PlayStation.
 

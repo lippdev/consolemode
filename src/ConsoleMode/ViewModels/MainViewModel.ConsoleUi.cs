@@ -49,6 +49,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HintBack));
         OnPropertyChanged(nameof(HintAlt));
         OnPropertyChanged(nameof(HintMenu));
+        NotifyShortcutTexts();
     }
 
     partial void OnSelectedUiModeChanged(ComboOption? value)
@@ -178,7 +179,9 @@ public partial class MainViewModel
             case "hide": SelectedHideStrategy = Next(HideStrategies, SelectedHideStrategy, step); break;
             case "language": SelectedLanguage = Next(LanguageOptions, SelectedLanguage, step); break;
             case "ui": SelectedUiMode = Next(UiModeOptions, SelectedUiMode, step); break;
-            case "home": HomeButtonLaunch = !HomeButtonLaunch; break;
+            case "home": ToggleSuggestedShortcut(ShortcutSlot.Home); break;
+            case "menushortcut": ToggleSuggestedShortcut(ShortcutSlot.Menu); break;
+            case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "startup": StartWithWindows = !StartWithWindows; break;

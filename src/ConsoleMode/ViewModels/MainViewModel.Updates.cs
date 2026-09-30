@@ -17,7 +17,6 @@ public partial class MainViewModel
 
     [ObservableProperty] private bool _checkUpdates = true;
     [ObservableProperty] private bool _betaUpdates;
-    [ObservableProperty] private bool _homeButtonLaunch = true;
     [ObservableProperty] private bool _homeButtonShortPress;
     [ObservableProperty] private bool _autoStartOnController;
     [ObservableProperty] private string _homeButtonHint = "";
@@ -87,8 +86,6 @@ public partial class MainViewModel
         if (_applying || IsLoading) return;
         if (value) SetStatus(LocalizationService.Get("BetaUpdatesWarning"), InfoBarSeverity.Warning);
     }
-
-    partial void OnHomeButtonLaunchChanged(bool value) => SaveQuietly();
 
     partial void OnAutoStartOnControllerChanged(bool value) => SaveQuietly();
 

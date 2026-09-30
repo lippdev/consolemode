@@ -153,28 +153,28 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Idle: the Home button enters console mode (a hold, or a press once Game Bar's shortcut
-    /// is off). In a session Big Picture owns the Home button, so Start + Back held together
-    /// restores the desk instead.
+    /// The shortcuts the user picked (Settings, or the first-run setup); none is set until then.
+    /// Home, from the tray: enter console mode (a hold, or a press once Game Bar's shortcut is
+    /// off). Menu and Exit, in a session: the menu over the game, and back to the PC.
     /// </summary>
     private void WatchGuideButton()
     {
         if (_window is null || ViewModel is null) return;
-        _guide = new ControllerHoldWatcher(_window.DispatcherQueue, ControllerHoldWatcher.GuideButton, "botão Home");
+        _guide = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Home");
         _guide.Held += () =>
         {
             if (ViewModel is not null) ViewModel.LaunchedByController = true;
             _ = HandleStartRequestAsync();
         };
-        _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.StartButton | ControllerHoldWatcher.BackButton), "Start + Back");
+        _exitChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Voltar ao PC");
         _exitChord.Held += () => { if (ViewModel?.IsConsoleActive == true) _ = ViewModel.RestoreNowAsync(); };
-        // Select + Y: the in-session menu (volume, resolution, audio, FPS, HDR, leave).
-        _menuChord = new ControllerHoldWatcher(_window.DispatcherQueue, (ushort)(ControllerHoldWatcher.BackButton | ControllerHoldWatcher.YButton), "Select + Y")
+        _menuChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Menu da sessão")
         {
             HoldDuration = TimeSpan.FromMilliseconds(250)
         };
         _menuChord.Held += () => ViewModel?.ToggleSessionMenu();
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
+        ViewModel.ShortcutOnboardingRequested += () => _ = ShowShortcutOnboardingAsync();
         RefreshGuideWatch();
 
         // Issue #29: a pad connecting while we're in the tray means "I'm on the couch".
@@ -192,7 +192,7 @@ public partial class App : Application
 
     private void OnViewModelChangedForGuide(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(MainViewModel.HomeButtonLaunch) or nameof(MainViewModel.HomeButtonShortPress)
+        if (e.PropertyName is MainViewModel.ShortcutsProperty or nameof(MainViewModel.HomeButtonShortPress)
             or nameof(MainViewModel.IsConsoleActive))
             RefreshGuideWatch();
         if (e.PropertyName == nameof(MainViewModel.IsConsoleActive) && ViewModel?.IsConsoleActive == false)
@@ -202,12 +202,43 @@ public partial class App : Application
     private void RefreshGuideWatch()
     {
         if (_guide is null || _exitChord is null || _menuChord is null || ViewModel is null) return;
+        _guide.Mask = ViewModel.GetShortcut(ShortcutSlot.Home);
+        _menuChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Menu);
+        _exitChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Exit);
         _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
-        // The session chords (Select + Y, Start + Back) do not depend on the Home button option:
-        // turning that off used to leave them dead too.
-        if (ViewModel.IsConsoleActive) { _exitChord.Start(); _menuChord.Start(); }
-        else { _exitChord.Stop(); _menuChord.Stop(); }
-        if (ViewModel.HomeButtonLaunch && !ViewModel.IsConsoleActive) _guide.Start();
-        else _guide.Stop();
+
+        // Picking a shortcut presses buttons on purpose: nothing may fire meanwhile. A shortcut
+        // that isn't set never runs, and the three do not depend on each other.
+        var idle = !ViewModel.IsCapturingShortcut;
+        Apply(_guide, idle && _guide.Mask != 0 && !ViewModel.IsConsoleActive);
+        Apply(_menuChord, idle && _menuChord.Mask != 0 && ViewModel.IsConsoleActive);
+        Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
+    }
+
+    private bool _onboardingOpen;
+
+    /// <summary>The first-run shortcuts setup (nothing is set until the user chooses).</summary>
+    private async Task ShowShortcutOnboardingAsync()
+    {
+        if (_onboardingOpen || _window?.Content?.XamlRoot is not { } root || ViewModel is null) return;
+        _onboardingOpen = true;
+        try
+        {
+            await Controls.ShortcutPicker.ShowOnboardingAsync(root, ViewModel);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Atalhos: {ex.Message}");
+        }
+        finally
+        {
+            _onboardingOpen = false;
+        }
+    }
+
+    private static void Apply(ControllerHoldWatcher watcher, bool run)
+    {
+        if (run) watcher.Start();
+        else watcher.Stop();
     }
 }

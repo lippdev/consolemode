@@ -67,10 +67,10 @@ public partial class MainViewModel
         await Task.Delay(TimeSpan.FromSeconds(5));
         _dispatcher.TryEnqueue(() =>
         {
-            if (!IsConsoleActive || IsSessionMenuOpen) return;
+            if (!IsConsoleActive || IsSessionMenuOpen || !MenuShortcutSet) return;
             try
             {
-                var combo = IsPlayStationHints ? "Create + △" : "Select + Y";
+                var combo = MenuShortcutText;
                 _ = new SessionHintWindow(LocalizationService.Get("SessionHintTitle"),
                     LocalizationService.Get("SessionHintBody", combo),
                     Engine.State.FocusMonitorRect, TimeSpan.FromSeconds(7));

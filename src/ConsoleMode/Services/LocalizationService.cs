@@ -185,6 +185,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string BackToPc => LocalizationService.Get(nameof(BackToPc));
     public string ConsoleActiveHint => LocalizationService.Get(nameof(ConsoleActiveHint));
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
+    public string ExitShortcutCard => LocalizationService.Get(nameof(ExitShortcutCard));
+    public string ExitShortcutDescription => LocalizationService.Get(nameof(ExitShortcutDescription));
     public string HomeButtonDescription => LocalizationService.Get(nameof(HomeButtonDescription));
     public string HomeButtonShortPressCard => LocalizationService.Get(nameof(HomeButtonShortPressCard));
     public string AutoStartControllerCard => LocalizationService.Get(nameof(AutoStartControllerCard));
