@@ -58,8 +58,8 @@ public sealed class CecController : ITvController
         process.Start();
         try
         {
-            var stdout = process.StandardOutput.ReadToEndAsync(ct);
-            var stderr = process.StandardError.ReadToEndAsync(ct);
+            var stdout = CecOutputCapture.ReadBoundedAsync(process.StandardOutput, CecOutputCapture.MaxCharacters, ct);
+            var stderr = CecOutputCapture.ReadBoundedAsync(process.StandardError, CecOutputCapture.MaxCharacters, ct);
             await process.StandardInput.WriteLineAsync(command.AsMemory(), ct);
             process.StandardInput.Close();
 

@@ -66,4 +66,26 @@ public sealed class CecCommandsTests
         Assert.Equal(new[] { "-s", "-d", "1", "-t", "p", "-p" }, arguments[..6]);
         Assert.Contains(arguments[6], new[] { "1", "2", "3", "4" });
     }
+
+    [Fact]
+    public async Task Output_capture_keeps_a_bounded_prefix_and_drains_the_reader()
+    {
+        using var reader = new StringReader(new string('x', 100_000));
+
+        var output = await CecOutputCapture.ReadBoundedAsync(reader, 128, CancellationToken.None);
+
+        Assert.Equal(128, output.Length);
+        Assert.Equal(new string('x', 128), output);
+        Assert.Equal(-1, reader.Peek());
+    }
+
+    [Fact]
+    public async Task Output_capture_honors_cancellation()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            CecOutputCapture.ReadBoundedAsync(new StringReader("output"), 10, cts.Token));
+    }
 }
