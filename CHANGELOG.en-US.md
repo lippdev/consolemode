@@ -9,6 +9,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Fixes
 - LG webOS: the secure connection is tried first and the TV certificate is remembered; legacy unencrypted access requires an explicit choice. (#94)
+- `consolemode://stop` and the configurable Back to PC shortcut now close Playnite fullscreen before restoring; an in-progress restore finishes before another attempt starts. (#45)
 
 ## [1.6.0-alpha.3]
 ### What's new

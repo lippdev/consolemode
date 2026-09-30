@@ -269,6 +269,16 @@ Pré-condições: TV LG webOS na mesma rede, com "Ligar via Wi-Fi" (ou "LG Conne
 - [ ] Atualização de uma versão antiga: a chave `webos-<ip>.key` não é reutilizada; a TV pede autorização novamente. Resultado: ______
 - [ ] "Colocar a TV em espera ao restaurar": a TV desliga depois que a mesa volta. Resultado: ______
 
+## 3e. Voltar ao PC com Playnite (issue #45)
+
+Pré-condições para Playnite: iniciador = Playnite tela cheia; sessão ativa na TV; atalho configurável **Voltar ao PC** definido.
+
+- [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
+- [ ] Atalho configurável **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
+- [ ] Fechar o Playnite por conta própria continua restaurando automaticamente. Resultado: ______
+- [ ] Menu da sessão: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na prévia sem sessão, **Voltar ao PC** apenas fecha o menu. Resultado: ______
+- [ ] Bandeja > **Restaurar setup** continua sendo restauração manual; **Modo Xbox** não fecha um front-end. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______
