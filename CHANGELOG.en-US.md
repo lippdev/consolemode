@@ -15,6 +15,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Behind the scenes
 - Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+- The code no longer mentions MultiMonitorTool or SoundVolumeView, and the cleanup of their old files in the `tools` folder is gone: anyone updating straight from 1.5 keeps those two files until they delete them by hand. (#119)
 - The package embeds only rtss-cli; leftover MultiMonitorTool/SoundVolumeView files no longer end up in the executable. (#110)
 
 ## [1.6.0-alpha.2]
