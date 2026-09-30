@@ -16,7 +16,7 @@ public sealed class WebOsController : ITvController
         var connection = await ConnectAsync(config, wakeOnLan: true, ct);
         using var socket = connection.Socket;
         await RegisterAsync(connection, config, approvalTimeout, ct);
-        await RequestAsync(socket, WebOsProtocol.SwitchInput("input_0", config.HdmiInput), "input_0", ct);
+        await RequestAsync(socket, WebOsProtocol.SwitchInput("input_0", config.HdmiInput), "input_0", config.Host, ct);
     }
 
     public async Task TurnOffAsync(TvControlConfig config, CancellationToken ct)
@@ -24,7 +24,7 @@ public sealed class WebOsController : ITvController
         var connection = await ConnectAsync(config, wakeOnLan: false, ct);
         using var socket = connection.Socket;
         await RegisterAsync(connection, config, TimeSpan.FromSeconds(5), ct);
-        await RequestAsync(socket, WebOsProtocol.Request("off_0", WebOsProtocol.TurnOffUri), "off_0", ct);
+        await RequestAsync(socket, WebOsProtocol.Request("off_0", WebOsProtocol.TurnOffUri), "off_0", config.Host, ct);
     }
 
     private sealed record Connection(ClientWebSocket Socket, string? Fingerprint, bool Secure, bool HasPin);
@@ -53,7 +53,7 @@ public sealed class WebOsController : ITvController
         {
             return await OpenAsync(new Uri($"wss://{host}:{WebOsProtocol.SecurePort}"), pin, ct);
         }
-        catch (IOException) when (config.WebOsAllowInsecure)
+        catch (IOException) when (WebOsSecurity.MayFallbackToInsecure(config.WebOsAllowInsecure, pin is not null))
         {
             AppLog.Write("TV: webOS usando ws:// sem criptografia por opção do usuário");
             return await OpenAsync(new Uri($"ws://{host}:{WebOsProtocol.Port}"), null, ct);
@@ -107,15 +107,15 @@ public sealed class WebOsController : ITvController
         var host = config.Host.Trim();
         var key = WebOsSecurity.MaySendSavedKey(connection.Secure, connection.HasPin, config.WebOsAllowInsecure)
             ? WebOsKeyStore.LoadKey(host) : null;
-        await SendAsync(connection.Socket, WebOsProtocol.Register(key), ct);
-
         using var wait = CancellationTokenSource.CreateLinkedTokenSource(ct);
         wait.CancelAfter(approvalTimeout);
         try
         {
+            await SendAsync(connection.Socket, WebOsProtocol.Register(key), wait.Token);
             while (true)
             {
                 var reply = WebOsProtocol.Parse(await ReceiveAsync(connection.Socket, wait.Token));
+                if (reply.Id is not null && reply.Id != "register_0") continue;
                 switch (reply.Kind)
                 {
                     case WebOsProtocol.ReplyKind.Prompt:
@@ -127,13 +127,13 @@ public sealed class WebOsController : ITvController
                             if (key is null) throw new TvControlException(LocalizationService.Get("TvWebOsNotAllowed"));
                             return;
                         }
+                        if (connection.Secure && connection.Fingerprint is null)
+                            throw new TvControlException(LocalizationService.Get("TvWebOsCertificateChanged"));
+                        WebOsKeyStore.SaveKey(host, reply.ClientKey);
                         if (connection.Secure)
                         {
-                            if (connection.Fingerprint is null)
-                                throw new TvControlException(LocalizationService.Get("TvWebOsCertificateChanged"));
-                            WebOsKeyStore.SavePin(host, connection.Fingerprint);
+                            WebOsKeyStore.SavePin(host, connection.Fingerprint!);
                         }
-                        WebOsKeyStore.SaveKey(host, reply.ClientKey);
                         return;
                     case WebOsProtocol.ReplyKind.Error when reply.Id == "register_0":
                         AppLog.Write($"TV: webOS recusou o registro: {reply.Error}");
@@ -147,16 +147,25 @@ public sealed class WebOsController : ITvController
         }
     }
 
-    private static async Task RequestAsync(ClientWebSocket socket, string message, string id, CancellationToken ct)
+    private static async Task RequestAsync(ClientWebSocket socket, string message, string id, string host, CancellationToken ct)
     {
-        await SendAsync(socket, message, ct);
-        while (true)
+        using var wait = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        wait.CancelAfter(TimeSpan.FromSeconds(10));
+        try
         {
-            var reply = WebOsProtocol.Parse(await ReceiveAsync(socket, ct));
-            if (reply.Id != id) continue;
-            if (reply.Kind == WebOsProtocol.ReplyKind.Error)
-                throw new TvControlException(LocalizationService.Get("TvWebOsRequestFailed", reply.Error ?? ""));
-            if (reply.Kind == WebOsProtocol.ReplyKind.Response) return;
+            await SendAsync(socket, message, wait.Token);
+            while (true)
+            {
+                var reply = WebOsProtocol.Parse(await ReceiveAsync(socket, wait.Token));
+                if (reply.Id != id) continue;
+                if (reply.Kind == WebOsProtocol.ReplyKind.Error)
+                    throw new TvControlException(LocalizationService.Get("TvWebOsRequestFailed", reply.Error ?? ""));
+                if (reply.Kind == WebOsProtocol.ReplyKind.Response) return;
+            }
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            throw new TvControlException(LocalizationService.Get("TvWebOsRequestTimedOut", host));
         }
     }
 

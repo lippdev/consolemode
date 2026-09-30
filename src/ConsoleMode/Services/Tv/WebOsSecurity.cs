@@ -22,6 +22,9 @@ public static class WebOsSecurity
     public static bool MaySendSavedKey(bool secure, bool hasPinnedCertificate, bool allowInsecure) =>
         secure ? hasPinnedCertificate : allowInsecure;
 
+    public static bool MayFallbackToInsecure(bool allowInsecure, bool hasPinnedCertificate) =>
+        allowInsecure && !hasPinnedCertificate;
+
     public static bool WithinMessageLimit(long currentLength, int nextCount) =>
         nextCount >= 0 && currentLength >= 0 && currentLength <= MaxMessageBytes - nextCount;
 }

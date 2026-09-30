@@ -30,6 +30,14 @@ public sealed class WebOsSecurityTests
     }
 
     [Fact]
+    public void Pinned_secure_pairing_cannot_downgrade_to_legacy_port()
+    {
+        Assert.False(WebOsSecurity.MayFallbackToInsecure(allowInsecure: false, hasPinnedCertificate: false));
+        Assert.True(WebOsSecurity.MayFallbackToInsecure(allowInsecure: true, hasPinnedCertificate: false));
+        Assert.False(WebOsSecurity.MayFallbackToInsecure(allowInsecure: true, hasPinnedCertificate: true));
+    }
+
+    [Fact]
     public void Fragmented_reply_cannot_exceed_the_total_message_limit()
     {
         Assert.True(WebOsSecurity.WithinMessageLimit(WebOsSecurity.MaxMessageBytes - 1, 1));

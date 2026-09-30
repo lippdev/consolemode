@@ -9,6 +9,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Correções
 - LG webOS: a conexão segura é tentada primeiro e o certificado da TV é lembrado; a porta antiga sem criptografia exige escolha explícita. (#94)
+- O teste da TV termina com um aviso se o comando webOS ficar sem resposta, sem deixar o botão preso. (#94)
 - `consolemode://stop` e o atalho configurável de voltar ao PC agora fecham o Playnite em tela cheia antes de restaurar; uma restauração em andamento termina antes de uma nova tentativa. (#45)
 
 ## [1.6.0-alpha.3]

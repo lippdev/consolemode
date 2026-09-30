@@ -261,11 +261,14 @@ Pré-condições: TV LG webOS na mesma rede, com "Ligar via Wi-Fi" (ou "LG Conne
 
 - [ ] **Testar agora** com TV que aceita `wss://:3001`: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Arquivos `webos-<hash>.key` (com `dpapi:`) e `webos-<hash>.pin` aparecem na pasta de dados. Resultado: ______
 - [ ] **Testar agora** de novo: não pede mais autorização. Resultado: ______
+- [ ] Com a TV pareada, bloquear a resposta ao comando de troca de entrada: **Testar agora** termina em cerca de 10 s com aviso de falta de resposta, sem ficar preso. Resultado: ______
+- [ ] Se a TV parar de responder em qualquer etapa do teste, o teste termina em até 90 s e o botão volta a ficar disponível. Resultado: ______
 - [ ] Com a TV em espera: o log mostra `enviando Wake-on-LAN`, a TV liga e troca a entrada. Resultado: ______
 - [ ] Recusar o pedido na TV: o status explica que a TV não autorizou. Resultado: ______
 - [ ] Firmware que aceita `wss://:3001`: a porta segura é usada primeiro, mesmo se `ws://:3000` também responder. Resultado: ______
 - [ ] TV antiga que só aceita `ws://:3000`: sem a opção **Permitir conexão webOS antiga sem criptografia**, o teste explica que a porta segura não respondeu; com a opção ativada, pede autorização e funciona. Resultado: ______
 - [ ] Com certificado da TV alterado, o teste recusa a conexão antes de enviar a chave salva, inclusive com a opção de conexão antiga ativada. Após conferir o IP e usar **Esquecer pareamento**, pede autorização de novo. Resultado: ______
+- [ ] Com certificado já lembrado, deixar a porta segura indisponível e a porta antiga disponível: o teste falha mesmo com a opção de conexão antiga ativada, sem enviar a chave salva pela porta antiga. Resultado: ______
 - [ ] Atualização de uma versão antiga: a chave `webos-<ip>.key` não é reutilizada; a TV pede autorização novamente. Resultado: ______
 - [ ] "Colocar a TV em espera ao restaurar": a TV desliga depois que a mesa volta. Resultado: ______
 
