@@ -4,6 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
+- Controller shortcuts of your choice: the button that opens Console Mode, the session menu's and the one that goes back to the PC are now set in Settings (hold the buttons you want and let go on the same controller). Capture never combines buttons from different controllers. None is on by default: the first time you open this version the app shows the setup, with a suggestion for each action (Home, Select + Y and Start + Select). One button can't serve two actions. If you used the Home button or Start + Select before, choose them again. (#116)
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes

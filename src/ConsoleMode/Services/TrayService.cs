@@ -82,6 +82,7 @@ public sealed class TrayService : IDisposable
             _window.Activate();
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
             Native.NativeWindows.ShowWindow(hwnd, 9);
+            _vm.RequestShortcutOnboarding();
         });
     }
 

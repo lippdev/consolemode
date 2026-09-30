@@ -29,13 +29,15 @@ Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [
 2. Press **Play now**, or use the one-click desktop shortcut. The first time on a new screen, the TV asks "Can you see this screen?" and reverts on its own if nobody answers.
 3. Quit Big Picture or Playnite and everything goes back: screens, audio, resolution.
 
-Prefer the couch? With the app in the tray, hold the controller's Home button and it starts from there.
+Prefer the couch? With the app in the tray, hold your controller shortcut and it starts from there.
 
-| Controller shortcut | Does |
-|---|---|
-| Hold **Home** (Xbox / PS) | Enter console mode from the tray |
-| Hold **Select + Y** (Create + △) | Menu over the game: volume, resolution, audio, FPS, HDR, exit |
-| Hold **Start + Select** (Options + Create) | Back to the PC |
+You pick the controller shortcuts yourself: none is on at first, the app asks the first time you open it (and you can change them in Settings). No button can serve two actions.
+
+| Controller shortcut | Does | Suggested |
+|---|---|---|
+| Hold your **open** shortcut | Enter console mode from the tray | **Home** (Xbox / PS) |
+| Hold your **menu** shortcut | Menu over the game: volume, resolution, audio, FPS, HDR, exit | **Select + Y** (Create + △) |
+| Hold your **back to the PC** shortcut | Back to the PC | **Start + Select** (Options + Create) |
 
 ## Features
 

@@ -351,7 +351,19 @@
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="home">
                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}"/>
-                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.HomeButtonLaunch), Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.HomeShortcutText, Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="menushortcut">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.MenuShortcutText, Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="exitshortcut">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.ExitShortcutText, Mode=OneWay}"/>
                         </Grid>
                     </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="autostart">
@@ -360,7 +372,7 @@
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.AutoStartOnController), Mode=OneWay}"/>
                         </Grid>
                     </Button>
-                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="shortpress" IsEnabled="{x:Bind ViewModel.HomeButtonLaunch, Mode=OneWay}">
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="shortpress" IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}"/>
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.HomeButtonShortPress), Mode=OneWay}"/>
@@ -521,7 +533,7 @@
                 </StackPanel>
             </Button>
             <ProgressBar IsIndeterminate="True" Width="220" Visibility="{x:Bind ViewModel.IsRestoring, Mode=OneWay}"/>
-            <TextBlock Text="{x:Bind ViewModel.Texts.ConsoleActiveHint, Mode=OneWay}" FontSize="17" TextAlignment="Center"
+            <TextBlock Text="{x:Bind ViewModel.ConsoleActiveHintText, Mode=OneWay}" FontSize="17" TextAlignment="Center"
                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
         </StackPanel>
     </Grid>

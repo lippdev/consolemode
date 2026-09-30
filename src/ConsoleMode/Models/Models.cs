@@ -41,8 +41,18 @@ public sealed class AppConfig
     /// <summary>Also offer alpha/beta releases (Settings → Receive test versions).</summary>
     public bool BetaUpdates { get; set; }
 
-    /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
-    public bool HomeButtonLaunch { get; set; } = true;
+    /// <summary>
+    /// Controller shortcuts the user picked, as XInput button bits (see ControllerShortcuts);
+    /// 0 = not set, which is how every install starts: nothing fires until they choose.
+    /// Home: from the tray, enters console mode. Menu: in a session, opens the menu over the
+    /// game. Exit: in a session, goes back to the PC.
+    /// </summary>
+    public int HomeShortcut { get; set; }
+    public int MenuShortcut { get; set; }
+    public int ExitShortcut { get; set; }
+
+    /// <summary>The shortcuts setup (first run of the version that made them configurable) was finished or skipped.</summary>
+    public bool ShortcutsOnboardingDone { get; set; }
 
     /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
     public bool HomeButtonShortPress { get; set; }
