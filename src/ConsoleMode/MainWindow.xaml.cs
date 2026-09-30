@@ -75,6 +75,8 @@ public sealed partial class MainWindow : Window
         {
             Intercept = action =>
             {
+                // Picking a shortcut presses buttons on purpose: they must not also navigate.
+                if (ViewModel.IsCapturingShortcut) return true;
                 if (ViewModel.TourStep <= 0) return false;
                 if (action == ControllerAction.Confirm) ViewModel.TourNextCommand.Execute(null);
                 else if (action == ControllerAction.Back) ViewModel.EndTourCommand.Execute(null);

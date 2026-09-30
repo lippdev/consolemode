@@ -19,12 +19,42 @@ public sealed class TvControlTests
         Assert.Equal(AdbProtocol.Checksum(banner), BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(16)));
         Assert.Equal(AdbProtocol.Connect ^ 0xFFFFFFFF, BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(20)));
 
-        var (command, arg0, arg1, length) = AdbProtocol.DecodeHeader(bytes);
+        var (command, arg0, arg1, length, checksum) = AdbProtocol.DecodeHeader(bytes);
         Assert.Equal(AdbProtocol.Connect, command);
         Assert.Equal(AdbProtocol.Version, arg0);
         Assert.Equal(AdbProtocol.MaxPayload, arg1);
         Assert.Equal(banner.Length, length);
+        Assert.Equal(AdbProtocol.Checksum(banner), checksum);
         Assert.Equal("host::\0", Encoding.ASCII.GetString(bytes, AdbProtocol.HeaderSize, length));
+    }
+
+    [Fact]
+    public void Adb_payload_with_wrong_checksum_is_rejected()
+    {
+        var payload = Encoding.ASCII.GetBytes("response");
+
+        Assert.Throws<InvalidDataException>(() => AdbProtocol.ValidatePayload(0, payload));
+    }
+
+    [Fact]
+    public void Adb_shell_output_is_bounded_across_multiple_packets()
+    {
+        var output = new AdbShellOutput();
+        var packet = new byte[AdbProtocol.MaxPayload];
+
+        for (var i = 0; i < AdbProtocol.MaxShellOutput / packet.Length; i++)
+            output.Append(packet);
+
+        Assert.Throws<InvalidDataException>(() => output.Append([1]));
+    }
+
+    [Fact]
+    public void Adb_shell_output_preserves_text_within_the_limit()
+    {
+        var output = new AdbShellOutput();
+        output.Append(Encoding.UTF8.GetBytes("TV ready"));
+
+        Assert.Equal("TV ready", output.ToString());
     }
 
     [Fact]

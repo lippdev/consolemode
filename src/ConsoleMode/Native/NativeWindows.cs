@@ -73,6 +73,11 @@ public static class NativeWindows
     public static extern bool IsWindow(nint hWnd);
 
     [DllImport("user32.dll")]
+    public static extern bool PostMessage(nint hWnd, uint msg, nint wParam, nint lParam);
+
+    public const uint WmClose = 0x0010;
+
+    [DllImport("user32.dll")]
     public static extern nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
     [DllImport("user32.dll")]
@@ -229,6 +234,21 @@ public static class NativeWindows
             return true;
         }, 0);
         return [.. list];
+    }
+
+    /// <summary>A plain F11 to the window in front (ControlFS uses it for full screen).</summary>
+    public static void SendF11()
+    {
+        keybd_event(VK_F11, 0, 0, UIntPtr.Zero);
+        keybd_event(VK_F11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+    }
+
+    public static bool TryGetWindowRect(nint hWnd, out int left, out int top, out int width, out int height)
+    {
+        left = top = width = height = 0;
+        if (hWnd == 0 || !GetWindowRect(hWnd, out var r)) return false;
+        left = r.Left; top = r.Top; width = r.Right - r.Left; height = r.Bottom - r.Top;
+        return true;
     }
 
     public static void SendWinF11()

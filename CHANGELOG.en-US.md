@@ -3,17 +3,36 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- `consolemode://stop` and the configurable Back to PC shortcut now close Playnite fullscreen before restoring; an in-progress restore finishes before another attempt starts. (#45)
+
+## [1.6.0-alpha.3]
 ### What's new
+- Session menu: a pinned panel at the top of the side column with the **File explorer (ControlFS)**, the team's open-source, controller-first file manager. One press opens ControlFS on top, always full screen on the session screen (or brings it to the front if already open); if it isn't installed, its download page opens. Console Mode only calls it through its own `--start` flag, never closes it, and never sends F11 to another window if Windows denies focus. (#122)
+- Session menu (the controller shortcut, Select + Y in the suggestion) redesigned like Steam's overlay (Shift + Tab): it covers the whole screen, the game dims and blurs behind it, a side panel gathers the options (volume with a gauge, resolution, audio, FPS, HDR) and the **open windows** are always visible in the middle, an in-menu Alt + Tab: the D-pad picks, A brings the window to the front, X closes it and B goes back to the game (switching windows does not end the session). The frosted glass only shows when Windows' transparency effects are on (otherwise the panel is dark and solid, and it changes live if you flip the setting), and in high contrast it uses the system colours. It has a focus that grows, sounds and animations (the panel slides in, the rows follow one after another and closing fades it out). In this alpha it also opens **outside a session**, as a preview with a badge on top, so it can be tried without turning on console mode (in it the FPS limit is hidden and "Back to the PC" becomes "Close menu"). (#120)
+- Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation) with a slide animation, screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR), each opening its choices. (#117)
+- Console background: by default, a collage of the covers of your installed Steam games under a dark gradient (the app only reads images Steam already downloaded; nothing is bundled). You can switch to just the gradient or to a picture of your own, in System → Background. (#117)
+- Sounds in the Console interface when you move the focus, pick and go back (made by the app itself, at a low volume). Turn them off in Settings → Interface sounds. (#117)
+- Controller shortcuts of your choice: the button that opens Console Mode, the session menu's and the one that goes back to the PC are now set in Settings (hold the buttons you want and let go on the same controller). Capture never combines buttons from different controllers. None is on by default: the first time you open this version the app shows the setup, with a suggestion for each action (Home, Select + Y and Start + Select). One button can't serve two actions. If you used the Home button or Start + Select before, choose them again. (#116)
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 - Settings → TV: console mode turns the TV on and switches it to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
 - TV control through a Pulse-Eight USB-CEC adapter (libCEC): powers on, switches input and puts any HDMI-CEC TV in standby. (#96)
 
 ### Fixes
+- Session menu: if Windows cannot activate the selected window, the menu stays open so you can try again. (#120)
+- Steam: when you go back to the PC (button, menu, shortcut, `stop` link or leaving Big Picture) Big Picture is always closed and Steam is asked to quit the normal way, its own Exit, without killing the process. Before, it stayed open and was often left glitchy. It does not close Steam if a game is running, and you can turn it off in Settings → "Close Steam when going back to the PC". (#121)
+- Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
+- Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored even when Windows also exposes it through Windows.Gaming.Input. The log says so, and reopening the app tries again. (#115)
+- Console interface: controller navigation no longer gets stuck. Up (and down) also works when the target card is not in the same column, the focus no longer lands on invisible containers and, when you switch tabs, it lands on the first item of the new one. (#117)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
-- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
+- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#83)
+- Audio: if switching the output fails, the session goes on instead of being rolled back after the screens were already switched. (#109)
+- Displays: the primary screen comes from Windows' own flag, so cloned screens are no longer ambiguous. (#110)
 
 ### Behind the scenes
 - Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+- The code no longer mentions MultiMonitorTool or SoundVolumeView, and the cleanup of their old files in the `tools` folder is gone: anyone updating straight from 1.5 keeps those two files until they delete them by hand. (#119)
+- The package embeds only rtss-cli; leftover MultiMonitorTool/SoundVolumeView files no longer end up in the executable. (#110)
 
 ## [1.6.0-alpha.2]
 ### Changes

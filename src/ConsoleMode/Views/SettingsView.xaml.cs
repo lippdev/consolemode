@@ -1,3 +1,5 @@
+using ConsoleMode.Controls;
+using ConsoleMode.Services;
 using ConsoleMode.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
@@ -10,5 +12,8 @@ public sealed partial class SettingsView : UserControl
     public SettingsView()
     {
         InitializeComponent();
+        HomeShortcutCard.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Home);
+        MenuShortcutCard.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Menu);
+        ExitShortcutCard.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Exit);
     }
 }

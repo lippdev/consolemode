@@ -133,6 +133,34 @@ public sealed class LaunchService
         return false;
     }
 
+    /// <summary>
+    /// Leaves Big Picture the clean way, through Steam's own URL (back to the desktop client), so it does not
+    /// stay open on the desk once the screens are back. Halfway through the wait, if it is still there, the
+    /// window is asked to close (WM_CLOSE: the X button, not a kill). Returns whether it is gone.
+    /// </summary>
+    public bool CloseBigPicture(ConsoleRuntimeState state, int timeoutMs = 6000)
+    {
+        if (!IsBigPictureActive(state)) return true;
+        var handles = GetBigPictureHandles();
+        try { ProcessRunner.StartDetached("steam://close/bigpicture"); }
+        catch (Exception ex) { AppLog.Write($"Fechar Big Picture: {ex.Message}"); }
+
+        var deadline = Environment.TickCount64 + timeoutMs;
+        var nudged = false;
+        while (Environment.TickCount64 < deadline)
+        {
+            Thread.Sleep(400);
+            if (!IsBigPictureActive(state)) return true;
+            if (!nudged && Environment.TickCount64 > deadline - timeoutMs / 2)
+            {
+                nudged = true;
+                foreach (var handle in handles.Concat(GetBigPictureHandles()).Distinct())
+                    NativeWindows.PostMessage(handle, NativeWindows.WmClose, 0, 0);
+            }
+        }
+        return !IsBigPictureActive(state);
+    }
+
     public bool IsBigPictureActive(ConsoleRuntimeState state)
     {
         if (state.CachedBigPictureHandle != 0)
@@ -196,6 +224,40 @@ public sealed class LaunchService
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Asks the fullscreen front-end to quit, so leaving console mode from outside doesn't leave
+    /// Big Picture / Playnite sitting on the desk monitor. Xbox mode has no window of its own.
+    /// Returns once it is gone, or after <paramref name="timeoutMs"/>.
+    /// </summary>
+    public bool CloseFrontEnd(string mode, ConsoleRuntimeState state, int timeoutMs = 8000)
+    {
+        if (mode == "xboxMode" || !IsFullscreenActive(mode, state)) return true;
+        if (mode == "bigPicture") return CloseBigPicture(state, timeoutMs);
+        if (mode != "playnite") return true;
+
+        var handles = GetFullscreenHandles(mode);
+        foreach (var p in Process.GetProcessesByName("Playnite.FullscreenApp"))
+        {
+            try { p.CloseMainWindow(); } catch { /* best effort */ }
+        }
+
+        var deadline = Environment.TickCount64 + timeoutMs;
+        var nudged = false;
+        while (Environment.TickCount64 < deadline)
+        {
+            Thread.Sleep(500);
+            if (!IsFullscreenActive(mode, state)) return true;
+            // halfway through and still there: close the window itself
+            if (!nudged && Environment.TickCount64 > deadline - timeoutMs / 2)
+            {
+                nudged = true;
+                foreach (var h in handles.Concat(GetFullscreenHandles(mode)).Distinct())
+                    NativeWindows.PostMessage(h, NativeWindows.WmClose, 0, 0);
+            }
+        }
+        return !IsFullscreenActive(mode, state);
     }
 
     public bool IsFullscreenActive(string mode, ConsoleRuntimeState state) => mode switch
