@@ -6,6 +6,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Settings → TV: console mode turns the TV on and switches to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
 - TV control through Home Assistant: runs a script, scene, automation or media_player on start and on restore, with the token stored encrypted. (#95)
+### Fixes
+- `consolemode://stop` and the configurable Back to PC shortcut now close Playnite fullscreen before restoring; an in-progress restore finishes before another attempt starts. (#45)
 
 ## [1.6.0-alpha.3]
 ### What's new

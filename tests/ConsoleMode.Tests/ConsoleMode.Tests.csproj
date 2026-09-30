@@ -39,6 +39,7 @@
     <Compile Include="../../src/ConsoleMode/Services/AltTabRules.cs" Link="AltTabRules.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControlFsLocator.cs" Link="ControlFsLocator.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SteamShutdown.cs" Link="SteamShutdown.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/RestoreWaitPolicy.cs" Link="RestoreWaitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbProtocol.cs" Link="Tv/AdbProtocol.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbShellOutput.cs" Link="Tv/AdbShellOutput.cs" />

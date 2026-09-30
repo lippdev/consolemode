@@ -268,6 +268,13 @@ Pré-condições: Home Assistant acessível pelo PC; um script que liga a TV e t
 - [ ] **Jogar agora**: o script roda antes das telas mudarem; o log tem `TV: Home Assistant script.turn_on ... → 200`. Resultado: ______
 - [ ] "Colocar a TV em espera ao restaurar" com entidade de restauração: ela roda depois que a mesa volta. Sem entidade de restauração e entidade inicial `media_player`: roda `media_player.turn_off`. Com script como entidade inicial e sem a de restauração: nada acontece (log explica). Resultado: ______
 
+Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
+
+- [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
+- [ ] Atalho configuravel **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
+- [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
+- [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
+- [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______
