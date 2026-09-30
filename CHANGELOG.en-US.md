@@ -9,7 +9,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Fixes
 - Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
-- Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored instead of moving around and pressing buttons in the app by itself. The log says so, and reopening the app tries again. (#115)
+- Controllers: a controller that sends impossible readings through the generic HID driver (many buttons down at once, a stuck D-pad) is now ignored even when Windows also exposes it through Windows.Gaming.Input. The log says so, and reopening the app tries again. (#115)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
 - Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#83)
 - Audio: if switching the output fails, the session goes on instead of being rolled back after the screens were already switched. (#109)
@@ -17,6 +17,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Behind the scenes
 - Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+- The code no longer mentions MultiMonitorTool or SoundVolumeView, and the cleanup of their old files in the `tools` folder is gone: anyone updating straight from 1.5 keeps those two files until they delete them by hand. (#119)
 - The package embeds only rtss-cli; leftover MultiMonitorTool/SoundVolumeView files no longer end up in the executable. (#110)
 
 ## [1.6.0-alpha.2]

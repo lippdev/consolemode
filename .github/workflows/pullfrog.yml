@@ -22,13 +22,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
       # Console Mode: .NET 8 so the agent can run the unit tests (tests/ConsoleMode.Tests
       # targets plain net8.0). The WinUI app itself only builds on Windows: the CI workflow does that.
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "8.0.x"
       - name: Run agent
