@@ -3,6 +3,9 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
+- Controle da TV pelo Home Assistant: roda um script, cena, automação ou media_player ao entrar e ao restaurar, com o token guardado criptografado. (#95)
 ### Correcoes
 - `consolemode://stop` e o atalho configuravel de voltar ao PC agora fecham o Playnite em tela cheia antes de restaurar; uma restauracao em andamento termina antes de uma nova tentativa. (#45)
 

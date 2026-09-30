@@ -237,6 +237,15 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string TvTurnOffDescription => LocalizationService.Get(nameof(TvTurnOffDescription));
     public string TvTestCard => LocalizationService.Get(nameof(TvTestCard));
     public string TvTestDescription => LocalizationService.Get(nameof(TvTestDescription));
+    public string TvHaUrlCard => LocalizationService.Get(nameof(TvHaUrlCard));
+    public string TvHaTokenCard => LocalizationService.Get(nameof(TvHaTokenCard));
+    public string TvHaTokenDescription => LocalizationService.Get(nameof(TvHaTokenDescription));
+    public string TvHaSelfSignedCard => LocalizationService.Get(nameof(TvHaSelfSignedCard));
+    public string TvHaSelfSignedDescription => LocalizationService.Get(nameof(TvHaSelfSignedDescription));
+    public string TvHaOnEntityCard => LocalizationService.Get(nameof(TvHaOnEntityCard));
+    public string TvHaOnEntityDescription => LocalizationService.Get(nameof(TvHaOnEntityDescription));
+    public string TvHaOffEntityCard => LocalizationService.Get(nameof(TvHaOffEntityCard));
+    public string TvHaOffEntityDescription => LocalizationService.Get(nameof(TvHaOffEntityDescription));
     public string TutorialCard => LocalizationService.Get(nameof(TutorialCard));
     public string TutorialDescription => LocalizationService.Get(nameof(TutorialDescription));
     public string SeeAgain => LocalizationService.Get(nameof(SeeAgain));

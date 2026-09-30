@@ -137,6 +137,27 @@
                                       Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}">
                         <TextBox MinWidth="220" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}"/>
                     </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaUrlCard, Mode=OneWay}" Description="{x:Bind ViewModel.HaUrlDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <TextBox MinWidth="260" PlaceholderText="https://homeassistant.local:8123" Text="{x:Bind ViewModel.HaUrl, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaSelfSignedCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHaSelfSignedDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.HaAllowSelfSigned, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaTokenCard, Mode=OneWay}" Description="{x:Bind ViewModel.HaTokenDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <PasswordBox MinWidth="260" Password="{x:Bind ViewModel.HaToken, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaOnEntityCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHaOnEntityDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <TextBox MinWidth="260" PlaceholderText="script.tv_to_pc" Text="{x:Bind ViewModel.HaOnEntity, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHaOffEntityCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHaOffEntityDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvHomeAssistant, Mode=OneWay}">
+                        <TextBox MinWidth="260" PlaceholderText="script.tv_off" Text="{x:Bind ViewModel.HaOffEntity, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
                     <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvTurnOffDescription, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
                         <ToggleSwitch IsOn="{x:Bind ViewModel.TvTurnOffOnRestore, Mode=TwoWay}"

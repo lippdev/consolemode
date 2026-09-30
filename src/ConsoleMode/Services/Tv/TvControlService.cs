@@ -32,6 +32,7 @@ public sealed class TvControlService
     public static ITvController? Create(string provider) => provider switch
     {
         TvControlConfig.AndroidTv => new AndroidTvController(),
+        TvControlConfig.HomeAssistant => new HomeAssistantController(),
         _ => null
     };
 
