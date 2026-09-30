@@ -32,6 +32,7 @@ public sealed class TvControlService
     public static ITvController? Create(string provider) => provider switch
     {
         TvControlConfig.AndroidTv => new AndroidTvController(),
+        TvControlConfig.WebOs => new WebOsController(),
         _ => null
     };
 
@@ -40,7 +41,16 @@ public sealed class TvControlService
     {
         var controller = Create(config.Provider) ?? throw new TvControlException(LocalizationService.Get("TvNotConfigured"));
         AppLog.Write($"TV: teste ({config.Provider})");
-        await controller.TurnOnAsync(config, PairingTimeout, ct);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(PairingTimeout + TimeSpan.FromSeconds(30));
+        try
+        {
+            await controller.TurnOnAsync(config, PairingTimeout, timeout.Token);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            throw new TvControlException(LocalizationService.Get("TvTestTimedOut"));
+        }
     }
 
     /// <summary>Called by the engine on its worker thread; never throws.</summary>

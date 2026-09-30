@@ -255,13 +255,33 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
 - [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
 
-Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
+## 3d. Controle da TV: LG webOS (issue #75)
+
+Pré-condições: TV LG webOS na mesma rede, com "Ligar via Wi-Fi" (ou "LG Connect Apps") ativo; Ajustes → TV → *LG webOS* com IP, MAC e a entrada HDMI do PC.
+
+- [ ] **Testar agora** com TV que aceita `wss://:3001`: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Arquivos `webos-<hash>.key` (com `dpapi:`) e `webos-<hash>.pin` aparecem na pasta de dados. Resultado: ______
+- [ ] **Testar agora** de novo: não pede mais autorização. Resultado: ______
+- [ ] Com a TV pareada, bloquear a resposta ao comando de troca de entrada: **Testar agora** termina em cerca de 10 s com aviso de falta de resposta, sem ficar preso. Resultado: ______
+- [ ] Se a TV parar de responder em qualquer etapa do teste, o teste termina em até 90 s e o botão volta a ficar disponível. Resultado: ______
+- [ ] Com a TV em espera: o log mostra `enviando Wake-on-LAN`, a TV liga e troca a entrada. Resultado: ______
+- [ ] Recusar o pedido na TV: o status explica que a TV não autorizou. Resultado: ______
+- [ ] Firmware que aceita `wss://:3001`: a porta segura é usada primeiro, mesmo se `ws://:3000` também responder. Resultado: ______
+- [ ] TV antiga que só aceita `ws://:3000`: sem a opção **Permitir conexão webOS antiga sem criptografia**, o teste explica que a porta segura não respondeu; com a opção ativada, pede autorização e funciona. Resultado: ______
+- [ ] Com certificado da TV alterado, o teste recusa a conexão antes de enviar a chave salva, inclusive com a opção de conexão antiga ativada. Após conferir o IP e usar **Esquecer pareamento**, pede autorização de novo. Resultado: ______
+- [ ] Com certificado já lembrado, deixar a porta segura indisponível e a porta antiga disponível: o teste falha mesmo com a opção de conexão antiga ativada, sem enviar a chave salva pela porta antiga. Resultado: ______
+- [ ] Atualização de uma versão antiga: a chave `webos-<ip>.key` não é reutilizada; a TV pede autorização novamente. Resultado: ______
+- [ ] "Colocar a TV em espera ao restaurar": a TV desliga depois que a mesa volta. Resultado: ______
+
+## 3e. Voltar ao PC com Playnite (issue #45)
+
+Pré-condições para Playnite: iniciador = Playnite tela cheia; sessão ativa na TV; atalho configurável **Voltar ao PC** definido.
 
 - [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
-- [ ] Atalho configuravel **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
-- [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
-- [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
-- [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
+- [ ] Atalho configurável **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
+- [ ] Fechar o Playnite por conta própria continua restaurando automaticamente. Resultado: ______
+- [ ] Menu da sessão: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na prévia sem sessão, **Voltar ao PC** apenas fecha o menu. Resultado: ______
+- [ ] Bandeja > **Restaurar setup** continua sendo restauração manual; **Modo Xbox** não fecha um front-end. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

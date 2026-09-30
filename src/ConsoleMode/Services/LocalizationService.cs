@@ -233,6 +233,11 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string TvHdmiDescription => LocalizationService.Get(nameof(TvHdmiDescription));
     public string TvInputCommandCard => LocalizationService.Get(nameof(TvInputCommandCard));
     public string TvInputCommandDescription => LocalizationService.Get(nameof(TvInputCommandDescription));
+    public string TvWebOsInsecureCard => LocalizationService.Get(nameof(TvWebOsInsecureCard));
+    public string TvWebOsInsecureDescription => LocalizationService.Get(nameof(TvWebOsInsecureDescription));
+    public string TvWebOsForgetCard => LocalizationService.Get(nameof(TvWebOsForgetCard));
+    public string TvWebOsForgetDescription => LocalizationService.Get(nameof(TvWebOsForgetDescription));
+    public string TvWebOsForgetButton => LocalizationService.Get(nameof(TvWebOsForgetButton));
     public string TvTurnOffCard => LocalizationService.Get(nameof(TvTurnOffCard));
     public string TvTurnOffDescription => LocalizationService.Get(nameof(TvTurnOffDescription));
     public string TvTestCard => LocalizationService.Get(nameof(TvTestCard));

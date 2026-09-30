@@ -48,6 +48,16 @@ Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 
 
 A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
+### LG webOS
+
+TVs LG de 2014 em diante, pela rede local (a mesma API do app LG ThinQ). Nada para instalar no PC.
+
+1. Na TV, ative **Ligar via Wi-Fi** (em modelos antigos: **LG Connect Apps** / **Mobile TV On**) para ela poder ser acordada da espera.
+2. No Console Mode, escolha *LG webOS*, informe o IP da TV, o **endereço MAC** (Configurações → Rede → Wi-Fi/Cabeada → Avançado na TV) e a entrada HDMI do PC.
+3. Aperte **Testar agora** e aceite o pedido na TV. A chave que a TV devolve fica guardada (criptografada para o seu usuário do Windows com DPAPI), então ela só pergunta uma vez; se a pasta de dados for copiada para outro usuário do Windows ou outro PC, a chave não pode ser lida lá e a TV pergunta de novo.
+
+A TV liga por Wake-on-LAN e troca de entrada com `ssap://tv/switchInput` (`HDMI_1` a `HDMI_4`); a espera usa `ssap://system/turnOff`. O app tenta primeiro `wss://` com criptografia na porta 3001. Depois da primeira autorização, ele guarda o certificado da TV e recusa um certificado diferente antes de enviar a chave salva. Confira o endereço da TV antes da primeira autorização: o certificado autoassinado passa a ser confiável nesse primeiro pareamento. TVs antigas que só aceitam `ws://` sem criptografia na porta 3000 exigem ativar **Permitir conexão webOS antiga sem criptografia** em Ajustes. Nessa porta, a chave de pareamento passa em texto puro pela rede; use apenas em uma rede confiável. Se o certificado ou a TV mudar, confirme o endereço, use **Esquecer pareamento** e autorize novamente na TV. Chaves de versões anteriores do Console Mode não são reutilizadas automaticamente; autorize o pareamento novamente.
+
 ## Extras opcionais
 
 ### HDR

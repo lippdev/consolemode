@@ -137,6 +137,15 @@
                                       Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}">
                         <TextBox MinWidth="220" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}"/>
                     </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvWebOsInsecureCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvWebOsInsecureDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvWebOs, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.WebOsAllowInsecure, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvWebOsForgetCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvWebOsForgetDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvWebOs, Mode=OneWay}">
+                        <Button Content="{x:Bind ViewModel.Texts.TvWebOsForgetButton, Mode=OneWay}" Command="{x:Bind ViewModel.ForgetWebOsPairingCommand}"/>
+                    </ctk:SettingsCard>
                     <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvTurnOffDescription, Mode=OneWay}"
                                       Visibility="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
                         <ToggleSwitch IsOn="{x:Bind ViewModel.TvTurnOffOnRestore, Mode=TwoWay}"
