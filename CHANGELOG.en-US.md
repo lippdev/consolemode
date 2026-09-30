@@ -9,6 +9,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - TV control for LG webOS too: powers on with Wake-on-LAN and switches input over the network, pairing the first time. (#94)
 
 ### Fixes
+- LG webOS: the secure connection is tried first and the TV certificate is remembered; legacy unencrypted access requires an explicit choice. (#94)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
 - Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
 

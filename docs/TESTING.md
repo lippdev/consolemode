@@ -126,11 +126,14 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 
 Pré-condições: TV LG webOS na mesma rede, com "Ligar via Wi-Fi" (ou "LG Connect Apps") ativo; Ajustes → TV → *LG webOS* com IP, MAC e a entrada HDMI do PC.
 
-- [ ] **Testar agora** com a TV ligada: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Um arquivo `webos-<ip>.key` aparece na pasta de dados e começa com `dpapi:` (não em texto puro). Resultado: ______
+- [ ] **Testar agora** com TV que aceita `wss://:3001`: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Arquivos `webos-<hash>.key` (com `dpapi:`) e `webos-<hash>.pin` aparecem na pasta de dados. Resultado: ______
 - [ ] **Testar agora** de novo: não pede mais autorização. Resultado: ______
 - [ ] Com a TV em espera: o log mostra `enviando Wake-on-LAN`, a TV liga e troca a entrada. Resultado: ______
 - [ ] Recusar o pedido na TV: o status explica que a TV não autorizou. Resultado: ______
-- [ ] Firmware novo (só `wss://3001`): a conexão cai para a porta segura e funciona. Resultado: ______
+- [ ] Firmware que aceita `wss://:3001`: a porta segura é usada primeiro, mesmo se `ws://:3000` também responder. Resultado: ______
+- [ ] TV antiga que só aceita `ws://:3000`: sem a opção **Permitir conexão webOS antiga sem criptografia**, o teste explica que a porta segura não respondeu; com a opção ativada, pede autorização e funciona. Resultado: ______
+- [ ] Com certificado da TV alterado, o teste recusa a conexão antes de enviar a chave salva, inclusive com a opção de conexão antiga ativada. Após conferir o IP e usar **Esquecer pareamento**, pede autorização de novo. Resultado: ______
+- [ ] Atualização de uma versão antiga: a chave `webos-<ip>.key` não é reutilizada; a TV pede autorização novamente. Resultado: ______
 - [ ] "Colocar a TV em espera ao restaurar": a TV desliga depois que a mesa volta. Resultado: ______
 
 ## 4. Regressões

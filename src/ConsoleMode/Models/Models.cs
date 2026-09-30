@@ -82,6 +82,9 @@ public sealed class TvControlConfig
     /// <summary>Android TV: shell command that switches to the PC's input, for TVs that ignore the HDMI key codes.</summary>
     public string InputCommand { get; set; } = "";
 
+    /// <summary>Allow legacy webOS port 3000 if secure port 3001 is unavailable. Sends the pairing key in clear.</summary>
+    public bool WebOsAllowInsecure { get; set; }
+
     /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
     public bool TurnOffOnRestore { get; set; }
 

@@ -19,6 +19,7 @@ public partial class MainViewModel
     [ObservableProperty] private string _tvHost = "";
     [ObservableProperty] private string _tvMacAddress = "";
     [ObservableProperty] private string _tvInputCommand = "";
+    [ObservableProperty] private bool _webOsAllowInsecure;
     [ObservableProperty] private bool _tvTurnOffOnRestore;
     [ObservableProperty] private bool _isTestingTv;
 
@@ -52,6 +53,7 @@ public partial class MainViewModel
     partial void OnTvHostChanged(string value) => SaveQuietly();
     partial void OnTvMacAddressChanged(string value) => SaveQuietly();
     partial void OnTvInputCommandChanged(string value) => SaveQuietly();
+    partial void OnWebOsAllowInsecureChanged(bool value) => SaveQuietly();
     partial void OnTvTurnOffOnRestoreChanged(bool value) => SaveQuietly();
 
     /// <summary>Part of <see cref="BuildLocalizedOptions"/>: the names follow the interface language.</summary>
@@ -80,6 +82,7 @@ public partial class MainViewModel
         TvHost = tv.Host ?? "";
         TvMacAddress = tv.MacAddress ?? "";
         TvInputCommand = tv.InputCommand ?? "";
+        WebOsAllowInsecure = tv.WebOsAllowInsecure;
         TvTurnOffOnRestore = tv.TurnOffOnRestore;
     }
 
@@ -90,8 +93,25 @@ public partial class MainViewModel
         MacAddress = TvMacAddress.Trim(),
         HdmiInput = int.TryParse(SelectedTvHdmiInput?.Value, out var hdmi) ? hdmi : 1,
         InputCommand = TvInputCommand.Trim(),
+        WebOsAllowInsecure = WebOsAllowInsecure,
         TurnOffOnRestore = TvTurnOffOnRestore
     };
+
+    [RelayCommand]
+    private void ForgetWebOsPairing()
+    {
+        if (string.IsNullOrWhiteSpace(TvHost)) return;
+        try
+        {
+            WebOsKeyStore.Forget(TvHost.Trim());
+            SetStatus(LocalizationService.Get("TvWebOsForgotten"), InfoBarSeverity.Informational);
+        }
+        catch (IOException ex)
+        {
+            AppLog.Write($"TV: falha ao esquecer pareamento webOS: {ex.Message}");
+            SetStatus(LocalizationService.Get("TvTestFailure", ex.Message), InfoBarSeverity.Error);
+        }
+    }
 
     /// <summary>Turns the TV on and switches the input now; the first time, pairs with the TV.</summary>
     [RelayCommand]
