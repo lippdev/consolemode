@@ -486,19 +486,10 @@ public sealed partial class SessionMenuWindow : Window
     private void CancelCloseConfirmation()
     {
         var item = _pendingCloseItem;
+        var index = _pendingCloseIndex;
         _pendingCloseItem = null;
         CloseConfirmOverlay.Visibility = Visibility.Collapsed;
-        if (item is not null && ViewModel.SwitcherWindows.Contains(item))
-        {
-            var index = ViewModel.SwitcherWindows.IndexOf(item);
-            if (SwitcherList.ContainerFromIndex(index) is { } container
-                && FocusManager.FindFirstFocusableElement(container) is Control card)
-            {
-                card.Focus(FocusState.Programmatic);
-                return;
-            }
-        }
-        FirstRow.Focus(FocusState.Programmatic);
+        FocusSwitcherCard(item, index, FocusState.Programmatic);
     }
 
     private async void ConfirmCloseClick(object sender, RoutedEventArgs e)
@@ -507,6 +498,7 @@ public sealed partial class SessionMenuWindow : Window
         var index = _pendingCloseIndex;
         _pendingCloseItem = null;
         CloseConfirmOverlay.Visibility = Visibility.Collapsed;
+        FocusSwitcherCard(item, index, FocusState.Programmatic);
         if (item is not null) await CloseAndRefocusAsync(item, index);
     }
 
@@ -518,18 +510,37 @@ public sealed partial class SessionMenuWindow : Window
             ShowCloseConfirmation(item, ViewModel.SwitcherWindows.IndexOf(item));
     }
 
-    /// <summary>The card goes away once its window closes: the focus moves to the next one (or the previous, or the first row).</summary>
+    /// <summary>Keep focus on the target while the close request is pending, then move to a neighbor if it closes.</summary>
     private async Task CloseAndRefocusAsync(SwitchWindowItem item, int index)
     {
         await ViewModel.CloseSwitcherWindowAsync(item);
-        if (ViewModel.SwitcherWindows.Contains(item)) return;   // it asked to save: the card stays, so does the focus
-        var count = ViewModel.SwitcherWindows.Count;
-        if (count == 0) { FirstRow.Focus(FocusState.Keyboard); return; }
-        var next = Math.Clamp(index, 0, count - 1);
+        FocusSwitcherCard(item, index, FocusState.Keyboard);
+    }
+
+    /// <summary>Focus the requested card if it remains; otherwise the card now occupying its old position.</summary>
+    private void FocusSwitcherCard(SwitchWindowItem? item, int oldIndex, FocusState focusState)
+    {
+        var target = item is not null && ViewModel.SwitcherWindows.Contains(item)
+            ? item
+            : ViewModel.SwitcherWindows.Count == 0 ? null
+            : ViewModel.SwitcherWindows[Math.Clamp(oldIndex, 0, ViewModel.SwitcherWindows.Count - 1)];
+        if (target is null)
+        {
+            FirstRow.Focus(focusState);
+            return;
+        }
+
+        var next = ViewModel.SwitcherWindows.IndexOf(target);
         SwitcherList.UpdateLayout();
         if (SwitcherList.ContainerFromIndex(next) is { } container
-            && FocusManager.FindFirstFocusableElement(container) is Control card)
-            card.Focus(FocusState.Keyboard);
+            && FocusManager.FindFirstFocusableElement(container) is Control card
+            && ReferenceEquals(card.DataContext, target))
+        {
+            card.Focus(focusState);
+            return;
+        }
+
+        FirstRow.Focus(focusState);
     }
 
     /// <summary>Windows won't hand a background process the foreground; this forces it (PlayStation pads need it).</summary>
