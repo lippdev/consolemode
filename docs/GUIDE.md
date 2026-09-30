@@ -12,8 +12,6 @@ Details that don't fit in the [README](../README.md). 🇧🇷 [Guia em portugu�
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-`consolemode://stop`, `ConsoleMode.exe --stop` and the configured **Back to PC** controller shortcut close Playnite fullscreen before restoring. The session menu's **Back to the PC** and **Exit Console Mode** actions, and the tray's **Restore setup**, keep their restore behavior; in the menu preview, **Back to the PC** only closes the preview.
-
 ## Local control API
 
 `consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.

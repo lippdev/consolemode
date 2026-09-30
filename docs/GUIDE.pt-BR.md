@@ -12,8 +12,6 @@ Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in Engl
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
-`consolemode://stop`, `ConsoleMode.exe --stop` e o atalho configuravel **Voltar ao PC** fecham o Playnite em tela cheia antes de restaurar. As acoes **Voltar ao PC** e **Sair do Console Mode** do menu da sessao, e **Restaurar setup** da bandeja, mantem o comportamento de restauracao; na previa do menu, **Voltar ao PC** apenas fecha a previa.
-
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.

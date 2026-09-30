@@ -255,13 +255,6 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
 - [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
 
-Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
-
-- [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
-- [ ] Atalho configuravel **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
-- [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
-- [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
-- [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

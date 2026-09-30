@@ -34,7 +34,6 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private CancellationTokenSource? _loopCts;
     private volatile bool _busy;
-    private bool _restoreRequestActive;
     private bool _applying;
 
     /// <summary>Last config read from disk; monitor fields survive a failed monitor listing.</summary>
@@ -781,69 +780,33 @@ public partial class MainViewModel : ObservableObject
         RequestShortcutOnboarding();
     }
 
-    /// <summary>
-    /// Leave console mode on request from outside the session (consolemode://stop, the
-    /// controller exit chord): quit Big Picture / Playnite first — the loop then restores the
-    /// desk on its own, as when the user exits it — and restore explicitly if still active.
-    /// The tray's Restore keeps restoring only.
-    /// </summary>
-    public async Task StopConsoleAsync()
-    {
-        if (!IsConsoleActive) return;
-        var mode = Engine.State.FullscreenMode;
-        var closed = await Task.Run(() => Engine.Launch.CloseFrontEnd(mode, Engine.State));
-        AppLog.Write($"Stop-ConsoleMode: {mode} {(closed ? "fechado" : "ainda aberto")}");
-        if (!await WaitForRestoreToFinishAsync()) return;
-        if (IsConsoleActive) await RestoreNowAsync();
-    }
-
-    private async Task<bool> WaitForRestoreToFinishAsync()
-    {
-        var timer = Stopwatch.StartNew();
-        while (RestoreWaitPolicy.ShouldWait(Engine.State.RestoreInProgress, timer.Elapsed))
-            await Task.Delay(RestoreWaitPolicy.PollInterval);
-
-        if (!Engine.State.RestoreInProgress) return true;
-        AppLog.Write("Stop-ConsoleMode: restauração anterior ainda em andamento após 30 segundos; nova restauração adiada");
-        return false;
-    }
-
     [RelayCommand]
     public async Task RestoreNowAsync()
     {
-        if (_busy || _restoreRequestActive) return;
-        _restoreRequestActive = true;
+        if (_busy && !Engine.State.IsActive) return;
+        StopLoop();
+        _busy = true;
+        IsRestoring = true;
         try
         {
-            if (!await WaitForRestoreToFinishAsync()) return;
-            StopLoop();
-            _busy = true;
-            IsRestoring = true;
-            try
-            {
-                await Task.Run(() => Engine.Stop());
-                IsConsoleActive = false;
-                SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Write($"Restore: {ex}");
-                SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
-            }
-            finally
-            {
-                IsRestoring = false;
-                _busy = false;
-            }
-
-            // Screens were renumbered/re-enabled; refresh names and resolutions.
-            Engine.Monitors.ClearCache();
-            await ReloadAsync();
+            await Task.Run(() => Engine.Stop());
+            IsConsoleActive = false;
+            SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Restore: {ex}");
+            SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
         }
         finally
         {
-            _restoreRequestActive = false;
+            IsRestoring = false;
+            _busy = false;
         }
+
+        // Screens were renumbered/re-enabled; refresh names and resolutions.
+        Engine.Monitors.ClearCache();
+        await ReloadAsync();
     }
 
     public bool TryCloseToTray() => IsConsoleActive;
