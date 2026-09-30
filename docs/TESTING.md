@@ -137,6 +137,7 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] O mapa de telas mostra os mesmos monitores que na 1.5, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
 - [ ] A tela de jogo e as telas a esconder que já estavam salvas continuam marcadas (o ID estável é o mesmo). Resultado: ______
 - [ ] A lista de resoluções de cada tela continua igual. Resultado: ______
+- [ ] Com telas **clonadas** (duas no mesmo ponto 0,0), só a principal do Windows aparece como principal. Resultado: ______
 
 ### Sessão com "Desconectar"
 
@@ -155,5 +156,6 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 ### Janelas e recuperação
 
 - [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______
+- [ ] Playnite lento para abrir (troca a janela de carregamento pela principal): o app não volta ao PC sozinho e só restaura a mesa quando o Playnite fecha. Resultado: ______
 - [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
 - [ ] Um backup da mesa feito pela 1.5 (sessão iniciada na 1.5, app atualizado antes de restaurar) é restaurado pela 1.6. Resultado: ______
