@@ -2,6 +2,10 @@
 
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
+## [Unreleased]
+### Novidades
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
+
 ## [1.6.0-alpha.3]
 ### Novidades
 - Menu da sessão: painel fixo no topo da lateral com o **Explorador de arquivos (ControlFS)**, o gerenciador de arquivos de código aberto da equipe, feito para o controle. Um toque abre o ControlFS por cima, sempre em tela cheia na tela da sessão (ou o traz para a frente se já estiver aberto); se não estiver instalado, abre a página de download. O Console Mode só o chama pelo `--start` dele, não o encerra nem envia F11 a outra janela se o Windows negar o foco. (#122)
@@ -11,6 +15,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)
 - Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar no mesmo controle). A captura não mistura botões de controles diferentes. Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
 
 ### Correções
 - Menu da sessão: se o Windows não conseguir ativar a janela escolhida, o menu continua aberto para tentar de novo. (#120)
