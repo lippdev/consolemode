@@ -55,37 +55,42 @@ public sealed class CecController : ITvController
         foreach (var arg in CecCommands.Arguments(hdmiInput)) psi.ArgumentList.Add(arg);
 
         using var process = new Process { StartInfo = psi };
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(CommandTimeout);
         process.Start();
+        Task<string>? stdout = null;
+        Task<string>? stderr = null;
         try
         {
-            var stdout = CecOutputCapture.ReadBoundedAsync(process.StandardOutput, CecOutputCapture.MaxCharacters, ct);
-            var stderr = CecOutputCapture.ReadBoundedAsync(process.StandardError, CecOutputCapture.MaxCharacters, ct);
-            await process.StandardInput.WriteLineAsync(command.AsMemory(), ct);
+            stdout = CecOutputCapture.ReadBoundedAsync(process.StandardOutput, CecOutputCapture.MaxCharacters, timeout.Token);
+            stderr = CecOutputCapture.ReadBoundedAsync(process.StandardError, CecOutputCapture.MaxCharacters, timeout.Token);
+            await process.StandardInput.WriteLineAsync(command.AsMemory(), timeout.Token);
             process.StandardInput.Close();
 
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            timeout.CancelAfter(CommandTimeout);
-            try
-            {
-                await process.WaitForExitAsync(timeout.Token);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-            {
-                AppLog.Write($"TV: cec-client \"{command}\" sem resposta em {CommandTimeout.TotalSeconds:0}s; encerrando");
-                throw new TvControlException(LocalizationService.Get("TvCecNoAnswer"));
-            }
-
-            var output = await stdout + await stderr;
+            await process.WaitForExitAsync(timeout.Token);
+            var capturedOutput = await Task.WhenAll(stdout, stderr);
+            var output = string.Concat(capturedOutput);
             AppLog.Write($"TV: cec-client \"{command}\" → {process.ExitCode}");
             if (CecCommands.NoAdapter(output))
                 throw new TvControlException(LocalizationService.Get("TvCecNoAdapter"));
             if (process.ExitCode != 0)
                 throw new TvControlException(LocalizationService.Get("TvCecFailed", process.ExitCode));
         }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            AppLog.Write($"TV: cec-client \"{command}\" sem resposta em {CommandTimeout.TotalSeconds:0}s; encerrando");
+            throw new TvControlException(LocalizationService.Get("TvCecNoAnswer"));
+        }
         finally
         {
+            timeout.Cancel();
             // Every way out (timeout, cancel, error): never leave a cec-client running, it holds the adapter.
             KillIfRunning(process);
+            if (stdout is not null && stderr is not null)
+            {
+                try { await Task.WhenAll(stdout, stderr); }
+                catch (Exception) { /* Preserve the original process error; both drains have now been observed. */ }
+            }
         }
     }
 
