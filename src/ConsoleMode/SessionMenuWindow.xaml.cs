@@ -38,6 +38,8 @@ public sealed partial class SessionMenuWindow : Window
     private Control? _lastSidebarFocus;
     private FocusNavigationDirection _lastDirection;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _closeTimer;
+    private SwitchWindowItem? _pendingCloseItem;
+    private int _pendingCloseIndex;
 
     public MainViewModel ViewModel { get; }
 
@@ -76,12 +78,14 @@ public sealed partial class SessionMenuWindow : Window
             ReadingOrderFallback = false,
             // Focus may only land inside the picker while it is open (it covers everything else); up and
             // down stay inside the panel or the grid they start in, so the end of a list is an end.
-            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard
+            SearchRoot = () => CloseConfirmOverlay.Visibility == Visibility.Visible ? CloseConfirmCard
+                : ViewModel.IsSessionPickerOpen ? PickerCard
                 : _lastDirection is FocusNavigationDirection.Up or FocusNavigationDirection.Down ? RegionOfFocus() : Root,
             // Adjust mode on the volume row: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
                 _lastDirection = direction;
+                if (CloseConfirmOverlay.Visibility == Visibility.Visible) return false;
                 // Left from the first column of windows goes back to the row of the panel you came from.
                 if (!_editingVolume && direction == FocusNavigationDirection.Left && !ViewModel.IsSessionPickerOpen && IsOnLeftmostCard())
                 {
@@ -98,11 +102,13 @@ public sealed partial class SessionMenuWindow : Window
         // X / Square: close the highlighted window, or mute on the volume row.
         _navigator.OptionRequested += () =>
         {
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible) return;
             if (!CloseFocusedWindow() && IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null);
         };
         _navigator.BackRequested += () =>
         {
-            if (_editingVolume) SetEditingVolume(false);
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible) CancelCloseConfirmation();
+            else if (_editingVolume) SetEditingVolume(false);
             else ViewModel.SessionMenuBack();
         };
         _navigator.Start();
@@ -111,6 +117,38 @@ public sealed partial class SessionMenuWindow : Window
         // before they ever bubble up to Root.
         Root.PreviewKeyDown += (_, e) =>
         {
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible)
+            {
+                var confirmDirection = e.Key switch
+                {
+                    Windows.System.VirtualKey.Up => FocusNavigationDirection.Up,
+                    Windows.System.VirtualKey.Down => FocusNavigationDirection.Down,
+                    Windows.System.VirtualKey.Left => FocusNavigationDirection.Left,
+                    Windows.System.VirtualKey.Right => FocusNavigationDirection.Right,
+                    _ => FocusNavigationDirection.None
+                };
+                if (confirmDirection != FocusNavigationDirection.None)
+                {
+                    e.Handled = true;
+                    _navigator.Navigate(confirmDirection);
+                    return;
+                }
+                if (e.Key == Windows.System.VirtualKey.Tab)
+                {
+                    e.Handled = true;
+                    var focused = Root.XamlRoot is { } confirmRoot ? FocusManager.GetFocusedElement(confirmRoot) : null;
+                    if (ReferenceEquals(focused, CancelCloseButton)) ConfirmCloseButton.Focus(FocusState.Keyboard);
+                    else CancelCloseButton.Focus(FocusState.Keyboard);
+                    return;
+                }
+                if (e.Key is Windows.System.VirtualKey.Escape or Windows.System.VirtualKey.Back)
+                {
+                    e.Handled = true;
+                    CancelCloseConfirmation();
+                }
+                else if (e.Key == Windows.System.VirtualKey.Delete) e.Handled = true;
+                return;
+            }
             // Arrows go through the same navigator as the D-pad (aligned, then the nearest).
             var direction = e.Key switch
             {
@@ -431,8 +469,53 @@ public sealed partial class SessionMenuWindow : Window
         if (Root.XamlRoot is not { } root) return false;
         if (FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem item }) return false;
         var index = ViewModel.SwitcherWindows.IndexOf(item);
-        _ = CloseAndRefocusAsync(item, index);
+        ShowCloseConfirmation(item, index);
         return true;
+    }
+
+    private void ShowCloseConfirmation(SwitchWindowItem item, int index)
+    {
+        if (CloseConfirmOverlay.Visibility == Visibility.Visible) return;
+        _pendingCloseItem = item;
+        _pendingCloseIndex = index;
+        CloseConfirmBodyText.Text = LocalizationService.Get("SwitcherCloseConfirmBody", item.Title);
+        CloseConfirmOverlay.Visibility = Visibility.Visible;
+        CancelCloseButton.Focus(FocusState.Programmatic);
+    }
+
+    private void CancelCloseConfirmation()
+    {
+        var item = _pendingCloseItem;
+        _pendingCloseItem = null;
+        CloseConfirmOverlay.Visibility = Visibility.Collapsed;
+        if (item is not null && ViewModel.SwitcherWindows.Contains(item))
+        {
+            var index = ViewModel.SwitcherWindows.IndexOf(item);
+            if (SwitcherList.ContainerFromIndex(index) is { } container
+                && FocusManager.FindFirstFocusableElement(container) is Control card)
+            {
+                card.Focus(FocusState.Programmatic);
+                return;
+            }
+        }
+        FirstRow.Focus(FocusState.Programmatic);
+    }
+
+    private async void ConfirmCloseClick(object sender, RoutedEventArgs e)
+    {
+        var item = _pendingCloseItem;
+        var index = _pendingCloseIndex;
+        _pendingCloseItem = null;
+        CloseConfirmOverlay.Visibility = Visibility.Collapsed;
+        if (item is not null) await CloseAndRefocusAsync(item, index);
+    }
+
+    private void CancelCloseClick(object sender, RoutedEventArgs e) => CancelCloseConfirmation();
+
+    private void CloseCardClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: SwitchWindowItem item })
+            ShowCloseConfirmation(item, ViewModel.SwitcherWindows.IndexOf(item));
     }
 
     /// <summary>The card goes away once its window closes: the focus moves to the next one (or the previous, or the first row).</summary>
