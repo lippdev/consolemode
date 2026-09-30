@@ -122,9 +122,18 @@ public sealed class WebOsController : ITvController
                         AppLog.Write("TV: webOS pediu autorização; aguardando \"Permitir\" na TV");
                         break;
                     case WebOsProtocol.ReplyKind.Registered:
-                        if (connection.Secure && connection.Fingerprint is not null)
+                        if (string.IsNullOrWhiteSpace(reply.ClientKey))
+                        {
+                            if (key is null) throw new TvControlException(LocalizationService.Get("TvWebOsNotAllowed"));
+                            return;
+                        }
+                        if (connection.Secure)
+                        {
+                            if (connection.Fingerprint is null)
+                                throw new TvControlException(LocalizationService.Get("TvWebOsCertificateChanged"));
                             WebOsKeyStore.SavePin(host, connection.Fingerprint);
-                        if (!string.IsNullOrWhiteSpace(reply.ClientKey)) WebOsKeyStore.SaveKey(host, reply.ClientKey);
+                        }
+                        WebOsKeyStore.SaveKey(host, reply.ClientKey);
                         return;
                     case WebOsProtocol.ReplyKind.Error when reply.Id == "register_0":
                         AppLog.Write($"TV: webOS recusou o registro: {reply.Error}");
