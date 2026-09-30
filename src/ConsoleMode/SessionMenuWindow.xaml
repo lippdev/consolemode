@@ -277,8 +277,9 @@
                         <ItemsControl.ItemsPanel><ItemsPanelTemplate><controls:WrapPanel Spacing="16"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:SwitchWindowItem">
-                                <Button Tag="card" Style="{StaticResource WindowCard}" Width="250" Height="178" Padding="18,16"
-                                        Command="{Binding ViewModel.SwitchToWindowCommand, ElementName=Page}" CommandParameter="{x:Bind}">
+                                <Grid Width="250" Height="178">
+                                  <Button Tag="card" Style="{StaticResource WindowCard}" Padding="18,16"
+                                          Command="{Binding ViewModel.SwitchToWindowCommand, ElementName=Page}" CommandParameter="{x:Bind}">
                                     <Grid>
                                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                                         <Grid Width="52" Height="52" HorizontalAlignment="Left">
@@ -291,7 +292,13 @@
                                             <TextBlock Text="{x:Bind Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </Grid>
-                                </Button>
+                                  </Button>
+                                  <Button IsTabStop="False" Width="40" Height="40" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Margin="0,7,7,0" Background="{ThemeResource MenuVeil}" Foreground="White" Click="CloseCardClick"
+                                          DataContext="{Binding}">
+                                      <FontIcon Glyph="&#xE711;" FontSize="16"/>
+                                  </Button>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -341,6 +348,25 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- Confirm closing a window; the cancel action is focused by default. -->
+        <Grid x:Name="CloseConfirmOverlay" Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="Collapsed"
+              Background="{ThemeResource MenuPickerVeil}" IsTabStop="False">
+            <Grid x:Name="CloseConfirmCard" MaxWidth="640" VerticalAlignment="Center" RowSpacing="18" Padding="40,32"
+                  Background="{ThemeResource MenuVeil}" XYFocusKeyboardNavigation="Enabled">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseConfirmTitle, Mode=OneWay}" FontSize="28" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock x:Name="CloseConfirmBodyText" Grid.Row="1" FontSize="19"
+                           Foreground="{ThemeResource MenuTextSecondary}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
+                    <Button x:Name="CancelCloseButton" MinWidth="180" Height="56" Content="{x:Bind ViewModel.Texts.ShortcutCancel, Mode=OneWay}"
+                            Click="CancelCloseClick"/>
+                    <Button x:Name="ConfirmCloseButton" MinWidth="180" Height="56" Content="{x:Bind ViewModel.Texts.SwitcherCloseConfirmAction, Mode=OneWay}"
+                            Click="ConfirmCloseClick"/>
+                </StackPanel>
             </Grid>
         </Grid>
 

@@ -7,6 +7,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Settings → TV: console mode turns a Google TV / Android TV on over the network and switches to the PC's HDMI input; it can also put the TV in standby on restore. (#126)
 
 ### Fixes
+- Session menu: closing a window through the internal Alt+Tab now asks for confirmation; Cancel keeps the window open and restores focus to its card. (#127)
 - Reverted PR #45: restored the previous behavior when stopping a session. (#125)
 
 ## [1.6.0-alpha.3]
