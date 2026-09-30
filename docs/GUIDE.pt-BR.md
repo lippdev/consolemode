@@ -52,7 +52,7 @@ TVs LG de 2014 em diante, pela rede local (a mesma API do app LG ThinQ). Nada pa
 
 1. Na TV, ative **Ligar via Wi-Fi** (em modelos antigos: **LG Connect Apps** / **Mobile TV On**) para ela poder ser acordada da espera.
 2. No Console Mode, escolha *LG webOS*, informe o IP da TV, o **endereço MAC** (Configurações → Rede → Wi-Fi/Cabeada → Avançado na TV) e a entrada HDMI do PC.
-3. Aperte **Testar agora** e aceite o pedido na TV. A chave que a TV devolve fica guardada, então ela só pergunta uma vez.
+3. Aperte **Testar agora** e aceite o pedido na TV. A chave que a TV devolve fica guardada (criptografada para o seu usuário do Windows com DPAPI), então ela só pergunta uma vez; se a pasta de dados for copiada para outro usuário do Windows ou outro PC, a chave não pode ser lida lá e a TV pergunta de novo.
 
 A TV liga por Wake-on-LAN e troca de entrada com `ssap://tv/switchInput` (`HDMI_1` a `HDMI_4`); a espera usa `ssap://system/turnOff`. O app tenta `ws://` na porta 3000 e, se não der, `wss://` na 3001 (firmwares novos, certificado autoassinado).
 

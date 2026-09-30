@@ -130,7 +130,11 @@ public sealed class WebOsController : ITvController
     }
 }
 
-/// <summary>The key each LG TV hands out after "Allow", kept per TV address in the data folder.</summary>
+/// <summary>
+/// The client key each LG TV hands out after "Allow", kept per TV address in the data folder,
+/// encrypted with DPAPI (see <see cref="SecretProtector"/>): the portable data folder travels
+/// with the exe, and the key lets whoever has it control the paired TV.
+/// </summary>
 internal static class WebOsKeyStore
 {
     private static string PathFor(string host)
@@ -139,14 +143,18 @@ internal static class WebOsKeyStore
         return Path.Combine(AppPaths.DataDir, $"webos-{safe}.key");
     }
 
+    /// <summary>Null = no usable key: the TV asks to allow Console Mode again (and hands out a new one).</summary>
     public static string? Load(string host)
     {
         try
         {
             var path = PathFor(host);
-            return File.Exists(path) ? File.ReadAllText(path).Trim() : null;
+            if (!File.Exists(path)) return null;
+            if (SecretProtector.TryUnprotect(File.ReadAllText(path).Trim(), out var key)) return key.Length > 0 ? key : null;
+            AppLog.Write("TV: chave webOS de outro usuário/PC; a TV pedirá autorização de novo");
+            return null;
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
             AppLog.Write($"TV: chave webOS ilegível: {ex.Message}");
             return null;
@@ -155,7 +163,7 @@ internal static class WebOsKeyStore
 
     public static void Save(string host, string key)
     {
-        File.WriteAllText(PathFor(host), key);
+        File.WriteAllText(PathFor(host), SecretProtector.Protect(key));
         AppLog.Write("TV: webOS pareada");
     }
 }

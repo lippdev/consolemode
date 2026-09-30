@@ -52,7 +52,7 @@ LG TVs from 2014 on, over the local network (the same API the LG ThinQ app uses)
 
 1. On the TV, turn on **Turn on via Wi-Fi** (older models: **LG Connect Apps** / **Mobile TV On**) so it can be woken from standby.
 2. In Console Mode, pick *LG webOS*, enter the TV's IP, its **MAC address** (Settings → Network → Wi-Fi/Wired → Advanced on the TV) and the HDMI input the PC uses.
-3. Press **Test now** and accept the request on the TV. The key the TV returns is kept, so it only asks once.
+3. Press **Test now** and accept the request on the TV. The key the TV returns is kept (encrypted for your Windows user with DPAPI), so it only asks once; if the data folder is copied to another Windows user or PC, the key can't be read there and the TV asks again.
 
 The TV is powered on with Wake-on-LAN, then switched with `ssap://tv/switchInput` (`HDMI_1`-`HDMI_4`); standby uses `ssap://system/turnOff`. The app tries `ws://` on port 3000 and falls back to `wss://` on 3001 (newer firmware, self-signed certificate).
 

@@ -126,7 +126,7 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 
 Pré-condições: TV LG webOS na mesma rede, com "Ligar via Wi-Fi" (ou "LG Connect Apps") ativo; Ajustes → TV → *LG webOS* com IP, MAC e a entrada HDMI do PC.
 
-- [ ] **Testar agora** com a TV ligada: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Um arquivo `webos-<ip>.key` aparece na pasta de dados. Resultado: ______
+- [ ] **Testar agora** com a TV ligada: aparece o pedido de autorização; ao aceitar, a TV troca para a entrada do PC. Um arquivo `webos-<ip>.key` aparece na pasta de dados e começa com `dpapi:` (não em texto puro). Resultado: ______
 - [ ] **Testar agora** de novo: não pede mais autorização. Resultado: ______
 - [ ] Com a TV em espera: o log mostra `enviando Wake-on-LAN`, a TV liga e troca a entrada. Resultado: ______
 - [ ] Recusar o pedido na TV: o status explica que a TV não autorizou. Resultado: ______
