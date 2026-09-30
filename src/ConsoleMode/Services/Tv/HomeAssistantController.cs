@@ -74,7 +74,7 @@ public sealed class HomeAssistantController : ITvController
         HttpResponseMessage response;
         try
         {
-            response = await (selfSigned ? InsecureHttp : Http).SendAsync(request, ct);
+            response = await (selfSigned ? InsecureHttp : Http).SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         }
         catch (HttpRequestException ex)
         {
