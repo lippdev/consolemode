@@ -4,9 +4,9 @@ namespace ConsoleMode.Native;
 
 /// <summary>
 /// Windows Core Audio (MMDevice API) for the output devices: list, switch the default, enable a
-/// disabled one, volume and mute. Replaces SoundVolumeView (issue #91).
+/// disabled one, volume and mute (issue #91).
 /// Switching the default output uses IPolicyConfig, which Windows doesn't document but has kept
-/// stable since Windows 7; the Control Panel, SoundVolumeView, EarTrumpet and AudioSwitcher use it.
+/// stable since Windows 7; the Control Panel, EarTrumpet and AudioSwitcher use it.
 /// </summary>
 internal static class CoreAudio
 {
@@ -24,7 +24,7 @@ internal static class CoreAudio
     // PKEY_DeviceInterface_FriendlyName: the adapter ("Realtek(R) Audio", "NVIDIA High Definition Audio").
     private static readonly PropertyKey InterfaceFriendlyNameKey = new(new Guid("026e516e-b814-414b-83cd-856d6fef4822"), 2);
 
-    /// <summary>Active, disabled and unplugged outputs (the same set SoundVolumeView listed).</summary>
+    /// <summary>Active, disabled and unplugged outputs.</summary>
     public static List<Endpoint> ListRenderEndpoints()
     {
         var result = new List<Endpoint>();

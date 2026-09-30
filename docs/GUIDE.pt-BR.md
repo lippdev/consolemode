@@ -106,6 +106,6 @@ Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workl
 
 Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (o instalador precisa do [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Abra `ConsoleMode.sln` para depurar.
 
-Para lançar uma versão, faça push de uma tag como `v1.4.0` (ou `v1.4.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
+Para lançar uma versão, faça o merge do PR de release na `main` e rode Actions → **Release** → Run workflow na `main` com a versão (como `1.4.0`, ou `1.4.0-beta.2` para pré-release) e **publish** marcado: o workflow cria a tag e a release no GitHub, gera os dois arquivos e os publica, e o app oferece a atualização. Sem "publish" ele só gera e guarda os arquivos como artefato. Fazer push de uma tag `v*` continua funcionando e faz o mesmo.
 
 A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) e não é usada pelo app WinUI.
