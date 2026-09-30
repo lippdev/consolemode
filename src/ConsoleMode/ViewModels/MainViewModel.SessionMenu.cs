@@ -326,8 +326,13 @@ public partial class MainViewModel
     private void OpenControlFs()
     {
         var installed = ControlFsService.FindExe() is not null;
+        var screen = IsConsoleActive ? Engine.State.FocusMonitorRect : Engine.Monitors.GetMonitorRect(SessionMonitorName, Engine.State);
         CloseSessionMenu();
-        if (installed && ControlFsService.Open()) return;
+        if (installed && ControlFsService.Open())
+        {
+            _ = Task.Run(() => ControlFsService.EnsureFullScreen(screen));
+            return;
+        }
         AppLog.Write("ControlFS: não instalado, abrindo a página de download");
         ControlFsService.OpenDownloadPage();
     }

@@ -22,6 +22,16 @@ public class ControlFsLocatorTests
     }
 
     [Fact]
+    public void Full_screen_is_the_exact_screen_not_a_maximized_window()
+    {
+        Assert.True(ControlFsLocator.IsFullScreen(0, 0, 1920, 1080, 0, 0, 1920, 1080));
+        Assert.True(ControlFsLocator.IsFullScreen(1920, 0, 3840, 2160, 1920, 0, 3840, 2160));      // a second screen
+        Assert.False(ControlFsLocator.IsFullScreen(-8, -8, 1936, 1048, 0, 0, 1920, 1080));          // maximized: the frame overhangs
+        Assert.False(ControlFsLocator.IsFullScreen(0, 0, 1920, 1080, 0, 0, 3840, 2160));            // on the wrong screen
+        Assert.False(ControlFsLocator.IsFullScreen(0, 0, 100, 100, 0, 0, 0, 0));                    // no screen known
+    }
+
+    [Fact]
     public void Resolve_returns_the_first_folder_that_has_the_exe_and_null_when_none_does()
     {
         string[] folders = [@"C:\a", @"C:\b", @"C:\c"];

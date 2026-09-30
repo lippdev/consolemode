@@ -231,6 +231,21 @@ public static class NativeWindows
         return [.. list];
     }
 
+    /// <summary>A plain F11 to the window in front (ControlFS uses it for full screen).</summary>
+    public static void SendF11()
+    {
+        keybd_event(VK_F11, 0, 0, UIntPtr.Zero);
+        keybd_event(VK_F11, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+    }
+
+    public static bool TryGetWindowRect(nint hWnd, out int left, out int top, out int width, out int height)
+    {
+        left = top = width = height = 0;
+        if (hWnd == 0 || !GetWindowRect(hWnd, out var r)) return false;
+        left = r.Left; top = r.Top; width = r.Right - r.Left; height = r.Bottom - r.Top;
+        return true;
+    }
+
     public static void SendWinF11()
     {
         keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);

@@ -25,6 +25,15 @@ public static class ControlFsLocator
         return folders;
     }
 
+    /// <summary>
+    /// Full screen means the window is exactly the screen. A maximized window is about 16 px bigger (its frame hangs
+    /// over the edges), so it is not counted; a pixel of tolerance covers rounding.
+    /// </summary>
+    public static bool IsFullScreen(int left, int top, int width, int height, int screenX, int screenY, int screenWidth, int screenHeight) =>
+        screenWidth > 0 && screenHeight > 0
+        && Math.Abs(left - screenX) <= 1 && Math.Abs(top - screenY) <= 1
+        && Math.Abs(width - screenWidth) <= 1 && Math.Abs(height - screenHeight) <= 1;
+
     /// <summary>The first folder that really has ControlFS.exe, or null (not installed).</summary>
     public static string? Resolve(IEnumerable<string> folders, Func<string, bool> fileExists)
     {
