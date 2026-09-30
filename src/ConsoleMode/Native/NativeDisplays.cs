@@ -7,8 +7,8 @@ using static ConsoleMode.Native.CcdHelper;
 namespace ConsoleMode.Native;
 
 /// <summary>
-/// Displays through Windows' own APIs (CCD, ChangeDisplaySettingsEx, DDC/CI via dxva2), replacing
-/// MultiMonitorTool (issue #91). Monitors are named by their GDI source (\\.\DISPLAYn) like before.
+/// Displays through Windows' own APIs (CCD, ChangeDisplaySettingsEx, DDC/CI via dxva2) (issue #91).
+/// Monitors are named by their GDI source (\\.\DISPLAYn), the same names 1.5 saved.
 /// </summary>
 internal static class NativeDisplays
 {

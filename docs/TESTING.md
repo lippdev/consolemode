@@ -225,21 +225,20 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao 
 
 ## Áudio com código próprio (issue #91)
 
-Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida). A 1.6 não usa mais o SoundVolumeView; o arquivo antigo em `tools` é apagado ao abrir o app.
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida).
 
 - [ ] Ajustes → Saída de áudio lista as mesmas saídas que na 1.5, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
-- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada depois de atualizar da 1.5 (o ID salvo é o mesmo). Resultado: ______
+- [ ] A saída que já estava escolhida na 1.5 continua selecionada depois de atualizar (o ID salvo é o mesmo). Resultado: ______
 - [ ] Entrar no modo console com uma saída fixa (ex.: HDMI da TV): o som passa para ela, inclusive em apps de chamada (papel "comunicações"). O log mostra `Áudio: saída padrão = …`. Resultado: ______
 - [ ] Se a troca de saída falhar (ex.: o dispositivo some no meio), a sessão continua e o log mostra `Áudio: não foi possível trocar para …`; a mesa não é desfeita. Resultado: ______
 - [ ] "A que aparecer ao conectar (TV)" com a TV começando **desligada**: quando a TV liga, o som vai para o HDMI dela. Resultado: ______
 - [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
-- [ ] A pasta `tools` não tem mais `SoundVolumeView.exe` nem `MultiMonitorTool.exe` depois de abrir o app. Resultado: ______
 
 ## Telas com código próprio (issue #91)
 
-Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar. A 1.6 não usa mais o MultiMonitorTool; o arquivo antigo em `tools` é apagado ao abrir o app.
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.
 
 ### Lista e identidade
 

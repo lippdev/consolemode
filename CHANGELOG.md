@@ -24,6 +24,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Por trás dos panos
 - Publicar uma versão estável agora também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). Versões de teste ficam de fora. (#106)
 - O pacote embute só o rtss-cli; sobras de MultiMonitorTool/SoundVolumeView não entram mais no executável. (#110)
+- O código não cita mais o MultiMonitorTool nem o SoundVolumeView, e a limpeza dos arquivos antigos deles na pasta `tools` saiu: quem atualiza direto da 1.5 mantém esses dois arquivos até apagá-los à mão. (#119)
 
 ## [1.6.0-alpha.2]
 ### Mudanças
