@@ -41,6 +41,7 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 
 - [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______
 - [ ] Select + Y de novo (ou B, ou Esc) fecha o menu e o jogo continua onde estava. Resultado: ______
+- [ ] O aviso "Menu do Console Mode" do início da sessão some sozinho em cerca de 7 s, em várias sessões seguidas, e nunca fica preso na tela. Resultado: ______
 - [ ] Cabeçalho mostra o relógio, "Jogando há X min" e o controle detectado. Resultado: ______
 - [ ] **Volume:** ◀/▶ na linha muda de 5 em 5 e o Windows reflete; A alterna mudo. O valor inicial é o atual do Windows. Resultado: ______
 - [ ] **Resolução:** abre a lista com a atual marcada; escolher outra aplica na TV, o Big Picture continua aberto e a sessão não se encerra sozinha. Ao restaurar no fim, a resolução original volta. Resultado: ______

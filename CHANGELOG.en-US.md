@@ -7,6 +7,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
 
 ### Fixes
+- Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
 - Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#83)
 - Audio: if switching the output fails, the session goes on instead of being rolled back after the screens were already switched. (#109)
