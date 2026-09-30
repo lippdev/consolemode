@@ -47,6 +47,12 @@ public sealed class AppConfig
     /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
     public bool HomeButtonShortPress { get; set; }
 
+    /// <summary>
+    /// Going back to the PC also quits Steam (its own Exit, never a kill), unless a game is running.
+    /// Big Picture itself is always closed.
+    /// </summary>
+    public bool CloseSteamOnRestore { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 
@@ -248,6 +254,7 @@ public sealed class ConsoleRuntimeState
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
     public string FullscreenMode { get; set; } = "bigPicture";
+    public bool CloseSteamOnRestore { get; set; } = true;
     public string? AudioDeviceId { get; set; }
     public bool AudioAutoSwitch { get; set; }
     public string? AudioDeviceHint { get; set; }

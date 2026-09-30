@@ -77,6 +77,8 @@
   "ChooseRoleFor": "¿Qué hace la pantalla {0}?",
   "HomeButtonCard": "Abrir con el botón Home del mando",
   "HomeButtonDescription": "Con la aplicación en la bandeja, mantén el botón Xbox 1 segundo para entrar en modo consola. Durante la sesión, mantén Start + Select 1 segundo para volver al PC. Solo mandos Xbox (XInput).",
+  "CloseSteamCard": "Cerrar Steam al volver al PC",
+  "CloseSteamDescription": "Al salir de Big Picture o volver al PC, se le pide a Steam que se cierre de la forma normal (su propio «Salir», nunca a la fuerza). Big Picture siempre se cierra. Steam sigue abierta si hay un juego en ejecución.",
   "AutoStartControllerCard": "Entrar al conectar un mando",
   "AutoStartControllerDescription": "Con la aplicación en la bandeja, encender o conectar un mando entra en modo consola. Ignora los primeros 15 s tras abrir y 30 s tras restaurar.",
   "HomeButtonShortPressCard": "Pulsación corta del botón Xbox",

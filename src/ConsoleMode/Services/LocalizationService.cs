@@ -187,6 +187,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string HomeButtonDescription => LocalizationService.Get(nameof(HomeButtonDescription));
     public string HomeButtonShortPressCard => LocalizationService.Get(nameof(HomeButtonShortPressCard));
+    public string CloseSteamCard => LocalizationService.Get(nameof(CloseSteamCard));
+    public string CloseSteamDescription => LocalizationService.Get(nameof(CloseSteamDescription));
     public string AutoStartControllerCard => LocalizationService.Get(nameof(AutoStartControllerCard));
     public string AutoStartControllerDescription => LocalizationService.Get(nameof(AutoStartControllerDescription));
     public string NotifyUpdatesCard => LocalizationService.Get(nameof(NotifyUpdatesCard));
