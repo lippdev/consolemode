@@ -8,11 +8,16 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Fixes
 - Steam: when you go back to the PC (button, menu, shortcut, `stop` link or leaving Big Picture) Big Picture is always closed and Steam is asked to quit the normal way, its own Exit, without killing the process. Before, it stayed open and was often left glitchy. It does not close Steam if a game is running, and you can turn it off in Settings → "Close Steam when going back to the PC". (#121)
+- Session menu: the notice that shows the shortcut when a session starts no longer gets stuck on screen; it goes away by itself after a few seconds. (#114)
 - Displays: a monitor turned to portrait (rotated) keeps its rotation in the layout backup, so restoring the desk puts it back in portrait. Before, the rotation was never saved or restored. (#108)
-- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#81)
+- Playnite: a slow start no longer sends you back to the PC after a few seconds. When Playnite swaps its loading window for the main one, Console Mode now follows the new window and only restores the desk once Playnite actually closes. (#83)
+- Audio: if switching the output fails, the session goes on instead of being rolled back after the screens were already switched. (#109)
+- Displays: the primary screen comes from Windows' own flag, so cloned screens are no longer ambiguous. (#110)
 
 ### Behind the scenes
 - Publishing a stable release now also opens the update PR on winget (`winget install lippdev.ConsoleMode`). Test versions are skipped. (#106)
+- The code no longer mentions MultiMonitorTool or SoundVolumeView, and the cleanup of their old files in the `tools` folder is gone: anyone updating straight from 1.5 keeps those two files until they delete them by hand. (#119)
+- The package embeds only rtss-cli; leftover MultiMonitorTool/SoundVolumeView files no longer end up in the executable. (#110)
 
 ## [1.6.0-alpha.2]
 ### Changes

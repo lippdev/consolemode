@@ -41,6 +41,7 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 
 - [ ] Segurar **Select + Y** por ~0,3 s abre o menu centralizado na tela de jogo, por cima do Big Picture, com foco em "Voltar ao jogo". Resultado: ______
 - [ ] Select + Y de novo (ou B, ou Esc) fecha o menu e o jogo continua onde estava. Resultado: ______
+- [ ] O aviso "Menu do Console Mode" do início da sessão some sozinho em cerca de 7 s, em várias sessões seguidas, e nunca fica preso na tela. Resultado: ______
 - [ ] Cabeçalho mostra o relógio, "Jogando há X min" e o controle detectado. Resultado: ______
 - [ ] **Volume:** ◀/▶ na linha muda de 5 em 5 e o Windows reflete; A alterna mudo. O valor inicial é o atual do Windows. Resultado: ______
 - [ ] **Resolução:** abre a lista com a atual marcada; escolher outra aplica na TV, o Big Picture continua aberto e a sessão não se encerra sozinha. Ao restaurar no fim, a resolução original volta. Resultado: ______
@@ -114,6 +115,8 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao 
 - [ ] A Steam **não é encerrada à força**: no Gerenciador de Tarefas ela some sem o aviso "o programa não está respondendo", e o log mostra `Steam: pedindo para fechar (sair normal)`. Resultado: ______
 - [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
 - [ ] Com o ajuste **desligado**: o Big Picture fecha, a Steam fica aberta (`Steam: mantida aberta (desligado nos ajustes)`). Resultado: ______
+- [ ] Desligar o ajuste, fechar e reabrir o Console Mode e iniciar uma sessão Big Picture: a preferência continua desligada e a Steam fica aberta. Resultado: ______
+- [ ] Com o Steam aberto e o estado do jogo indisponível no Registro (valor `RunningAppID` ausente ou ilegível): a Steam fica aberta e o log informa que não foi possível verificar se há jogo em execução. Resultado: ______
 - [ ] Steam **já fechada** antes de voltar: nada é aberto nem pedido (`Steam: não estava aberta`); a Steam não é iniciada de novo por engano. Resultado: ______
 - [ ] Lançador Playnite ou Modo Xbox: a Steam não é tocada. Resultado: ______
 - [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
@@ -129,27 +132,27 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao 
 
 ## Áudio com código próprio (issue #91)
 
-Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida). A 1.6 não usa mais o SoundVolumeView; o arquivo antigo em `tools` é apagado ao abrir o app.
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (saída de áudio escolhida).
 
 - [ ] Ajustes → Saída de áudio lista as mesmas saídas que na 1.5, com os mesmos nomes, e as desativadas aparecem com o sufixo "[Desabilitado]". Resultado: ______
-- [ ] A saída que já estava escolhida com o SoundVolumeView continua selecionada depois de atualizar da 1.5 (o ID salvo é o mesmo). Resultado: ______
+- [ ] A saída que já estava escolhida na 1.5 continua selecionada depois de atualizar (o ID salvo é o mesmo). Resultado: ______
 - [ ] Entrar no modo console com uma saída fixa (ex.: HDMI da TV): o som passa para ela, inclusive em apps de chamada (papel "comunicações"). O log mostra `Áudio: saída padrão = …`. Resultado: ______
 - [ ] Se a troca de saída falhar (ex.: o dispositivo some no meio), a sessão continua e o log mostra `Áudio: não foi possível trocar para …`; a mesa não é desfeita. Resultado: ______
 - [ ] "A que aparecer ao conectar (TV)" com a TV começando **desligada**: quando a TV liga, o som vai para o HDMI dela. Resultado: ______
 - [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
-- [ ] A pasta `tools` não tem mais `SoundVolumeView.exe` nem `MultiMonitorTool.exe` depois de abrir o app. Resultado: ______
 
 ## Telas com código próprio (issue #91)
 
-Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar. A 1.6 não usa mais o MultiMonitorTool; o arquivo antigo em `tools` é apagado ao abrir o app.
+Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.
 
 ### Lista e identidade
 
 - [ ] O mapa de telas mostra os mesmos monitores que na 1.5, com os mesmos nomes, resoluções e posições, inclusive a TV **desligada/desconectada**. Resultado: ______
 - [ ] A tela de jogo e as telas a esconder que já estavam salvas continuam marcadas (o ID estável é o mesmo). Resultado: ______
 - [ ] A lista de resoluções de cada tela continua igual. Resultado: ______
+- [ ] Com telas **clonadas** (duas no mesmo ponto 0,0), só a principal do Windows aparece como principal. Resultado: ______
 
 ### Sessão com "Desconectar"
 
@@ -168,5 +171,6 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 ### Janelas e recuperação
 
 - [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______
+- [ ] Playnite lento para abrir (troca a janela de carregamento pela principal): o app não volta ao PC sozinho e só restaura a mesa quando o Playnite fecha. Resultado: ______
 - [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
 - [ ] Um backup da mesa feito pela 1.5 (sessão iniciada na 1.5, app atualizado antes de restaurar) é restaurado pela 1.6. Resultado: ______

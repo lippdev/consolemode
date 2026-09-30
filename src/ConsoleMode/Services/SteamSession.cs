@@ -19,8 +19,8 @@ public static class SteamSession
         finally { foreach (var p in processes) p.Dispose(); }
     }
 
-    /// <summary>The id of the game Steam is running, or 0.</summary>
-    public static int RunningAppId()
+    /// <summary>The id of the game Steam is running, 0 if none, or null if the state is unknown.</summary>
+    public static int? RunningAppId()
     {
         try
         {
@@ -30,7 +30,7 @@ public static class SteamSession
         catch (Exception ex)
         {
             AppLog.Write($"Steam: RunningAppID: {ex.Message}");
-            return 0;
+            return null;
         }
     }
 
