@@ -46,6 +46,12 @@ public sealed class GamepadNavigator : IDisposable
     /// </summary>
     public bool NearestOnSides { get; set; }
 
+    /// <summary>
+    /// Up/down fall back to reading order (top to bottom, then left to right) when nothing else is found: right
+    /// for a scrolled list, wrong for a grid, where the next item in reading order is the one beside it.
+    /// </summary>
+    public bool ReadingOrderFallback { get; set; } = true;
+
     /// <summary>Play the interface sounds for moves, confirms and backs (the console interface).</summary>
     public bool Sounds { get; set; }
 
@@ -201,7 +207,7 @@ public sealed class GamepadNavigator : IDisposable
                      // take the nearest one in that direction instead of doing nothing.
                      ?? FindNearest(direction)
                      // Scrolled lists: controls outside the viewport aren't in a spatial search at all.
-                     ?? FindInReadingOrder(control, direction);
+                     ?? (ReadingOrderFallback ? FindInReadingOrder(control, direction) : null);
         if (target is null) return;
         target.Focus(FocusState.Keyboard);
         Play(UiSound.Move);

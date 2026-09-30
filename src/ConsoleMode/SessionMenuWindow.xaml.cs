@@ -34,6 +34,9 @@ public sealed partial class SessionMenuWindow : Window
     private readonly GamepadNavigator _navigator;
     private bool _editingVolume;
     private bool _closing;
+    private Control? _pickerOpener;
+    private Control? _lastSidebarFocus;
+    private FocusNavigationDirection _lastDirection;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _closeTimer;
 
     public MainViewModel ViewModel { get; }
@@ -53,8 +56,11 @@ public sealed partial class SessionMenuWindow : Window
             presenter.IsMinimizable = false;
             presenter.SetBorderAndTitleBar(false, false);
         }
+        // Before sizing: the classic frame is what shows as a light border and eats 6 px of the client area.
+        WindowChrome.Strip(_hwnd);
         WindowPlacement.FillScreen(appWindow, target);
-        TryGlass();
+        TryRemoveRoundingAndOutline();
+        ApplyMaterial();
 
         // Hidden until its entrance animation runs, or the rows would flash in place first.
         if (Animate) HideForEntrance();
@@ -66,11 +72,23 @@ public sealed partial class SessionMenuWindow : Window
             Sounds = true,
             // The side panel and the windows grid sit next to each other, never on the same row.
             NearestOnSides = true,
-            // Focus may only land inside the picker while it is open (it covers everything else).
-            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard : Root,
+            // The end of a column is an end: the next item in reading order would be the one beside it in the grid.
+            ReadingOrderFallback = false,
+            // Focus may only land inside the picker while it is open (it covers everything else); up and
+            // down stay inside the panel or the grid they start in, so the end of a list is an end.
+            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard
+                : _lastDirection is FocusNavigationDirection.Up or FocusNavigationDirection.Down ? RegionOfFocus() : Root,
             // Adjust mode on the volume row: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
+                _lastDirection = direction;
+                // Left from the first column of windows goes back to the row of the panel you came from.
+                if (!_editingVolume && direction == FocusNavigationDirection.Left && !ViewModel.IsSessionPickerOpen && IsOnLeftmostCard())
+                {
+                    (_lastSidebarFocus ?? FirstRow).Focus(FocusState.Keyboard);
+                    UiSounds.Play(UiSound.Move);
+                    return true;
+                }
                 if (!_editingVolume) return false;
                 if (direction == FocusNavigationDirection.Left) { ViewModel.ChangeVolume(-1); UiSounds.Play(UiSound.Move); }
                 else if (direction == FocusNavigationDirection.Right) { ViewModel.ChangeVolume(1); UiSounds.Play(UiSound.Move); }
@@ -117,12 +135,17 @@ public sealed partial class SessionMenuWindow : Window
             ViewModel.SessionMenuBack();
         };
         // The focused row / card outlines in white and grows a little, like the console interface.
-        Root.GotFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: true);
+        Root.GotFocus += (_, e) =>
+        {
+            ScaleFocused(e.OriginalSource, grow: true);
+            if (e.OriginalSource is Control focused && IsInside(SidebarPanel, focused)) _lastSidebarFocus = focused;
+        };
         Root.LostFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: false);
         // Mouse clicks sound like a confirm (the pad has its own sounds in the navigator).
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
 
         ViewModel.PropertyChanged += OnViewModelChanged;
+        Ui.ColorValuesChanged += OnColorValuesChanged;
         VolumeRow.LostFocus += (_, _) => SetEditingVolume(false);
         // BringToFront runs before the tree exists; the real first focus happens here.
         Root.Loaded += (_, _) =>
@@ -140,27 +163,51 @@ public sealed partial class SessionMenuWindow : Window
         Closed += (_, _) =>
         {
             ViewModel.PropertyChanged -= OnViewModelChanged;
+            Ui.ColorValuesChanged -= OnColorValuesChanged;
             _navigator.Dispose();
         };
     }
 
     private static bool Animate => Ui.AnimationsEnabled;
 
-    // ── Look: dim glass over the game ────────────────────────────────────────────────────────
+    // ── Look: dim glass over the game, if the user has Windows' transparency effects on ───────
 
-    private void TryGlass()
+    /// <summary>
+    /// Glass when Settings → Personalization → Colors → "Transparency effects" is on (the game dims and
+    /// blurs behind the menu); when it is off, or the battery saver turns it off, a solid dark veil with
+    /// the same contrast. Re-applied live when the user flips the setting.
+    /// </summary>
+    private void ApplyMaterial()
     {
+        var glass = Ui.AdvancedEffectsEnabled;
         try
         {
-            SystemBackdrop = new DesktopAcrylicBackdrop();
-            // A full-screen overlay has no rounded corners.
-            var square = 1; // DWMWCP_DONOTROUND
-            DwmSetWindowAttribute(_hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, ref square, sizeof(int));
+            SystemBackdrop = glass ? new DesktopAcrylicBackdrop() : null;
         }
         catch (Exception ex)
         {
-            // A plain dark veil: still a working menu.
+            glass = false;
             AppLog.Write($"Menu da sessão: vidro: {ex.Message}");
+        }
+        Root.Background = new SolidColorBrush(glass ? Windows.UI.Color.FromArgb(0x99, 0x07, 0x0A, 0x0E) : Windows.UI.Color.FromArgb(0xF7, 0x07, 0x0A, 0x0E));
+        SidebarPanel.Background = new SolidColorBrush(glass ? Windows.UI.Color.FromArgb(0xB3, 0x11, 0x18, 0x20) : Windows.UI.Color.FromArgb(0xFF, 0x13, 0x1A, 0x22));
+    }
+
+    private void OnColorValuesChanged(UISettings sender, object args) => DispatcherQueue.TryEnqueue(ApplyMaterial);
+
+    private void TryRemoveRoundingAndOutline()
+    {
+        try
+        {
+            // A full-screen overlay has no rounded corners and no 1 px Windows outline.
+            var square = 1; // DWMWCP_DONOTROUND
+            DwmSetWindowAttribute(_hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, ref square, sizeof(int));
+            var none = unchecked((int)0xFFFFFFFE); // DWMWA_COLOR_NONE
+            DwmSetWindowAttribute(_hwnd, 34 /* DWMWA_BORDER_COLOR */, ref none, sizeof(int));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Menu da sessão: cantos: {ex.Message}");
         }
     }
 
@@ -295,14 +342,14 @@ public sealed partial class SessionMenuWindow : Window
     }
 
     /// <summary>
-    /// Window cards grow 6% and side rows 2.5% when focused (Tag "card" / "row") and shrink back when it
-    /// leaves. Done on the composition visual: once a visual is used for the entrance animation, WinUI
+    /// Window cards grow 4% when focused (Tag "card") and shrink back when it leaves; the side rows stay
+    /// still and show the selection with the ring alone. Done on the composition visual: once a visual is used for the entrance animation, WinUI
     /// refuses UIElement.Scale and CenterPoint on it.
     /// </summary>
     private static void ScaleFocused(object source, bool grow)
     {
         if (source is not Button button) return;
-        var factor = button.Tag switch { "card" => 1.06f, "row" => 1.025f, _ => 0f };
+        var factor = button.Tag switch { "card" => 1.04f, _ => 0f };
         if (factor == 0f) return;
         try
         {
@@ -348,13 +395,58 @@ public sealed partial class SessionMenuWindow : Window
         VolumeLeft.Visibility = VolumeRight.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private static bool IsInside(DependencyObject ancestor, DependencyObject? node)
+    {
+        for (; node is not null; node = VisualTreeHelper.GetParent(node))
+            if (ReferenceEquals(node, ancestor)) return true;
+        return false;
+    }
+
+    private DependencyObject RegionOfFocus()
+    {
+        var focused = Root.XamlRoot is { } root ? FocusManager.GetFocusedElement(root) as DependencyObject : null;
+        if (IsInside(WindowsPanel, focused)) return WindowsPanel;
+        if (IsInside(SidebarPanel, focused)) return SidebarPanel;
+        return Root;
+    }
+
+    /// <summary>True when the focus is on a window card with no card to its left (the first column of the grid).</summary>
+    private bool IsOnLeftmostCard()
+    {
+        if (Root.XamlRoot is not { } root || FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem } card) return false;
+        double X(FrameworkElement e) => e.TransformToVisual(SwitcherList).TransformPoint(new Windows.Foundation.Point(0, 0)).X;
+        var cardX = X(card);
+        for (var i = 0; i < ViewModel.SwitcherWindows.Count; i++)
+        {
+            if (SwitcherList.ContainerFromIndex(i) is { } container
+                && FocusManager.FindFirstFocusableElement(container) is FrameworkElement other && X(other) < cardX - 1)
+                return false;
+        }
+        return true;
+    }
+
     /// <summary>X / Delete on a window card: ask that window to close. False when the focus is not on a window card.</summary>
     private bool CloseFocusedWindow()
     {
         if (Root.XamlRoot is not { } root) return false;
         if (FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem item }) return false;
-        _ = ViewModel.CloseSwitcherWindowAsync(item);
+        var index = ViewModel.SwitcherWindows.IndexOf(item);
+        _ = CloseAndRefocusAsync(item, index);
         return true;
+    }
+
+    /// <summary>The card goes away once its window closes: the focus moves to the next one (or the previous, or the first row).</summary>
+    private async Task CloseAndRefocusAsync(SwitchWindowItem item, int index)
+    {
+        await ViewModel.CloseSwitcherWindowAsync(item);
+        if (ViewModel.SwitcherWindows.Contains(item)) return;   // it asked to save: the card stays, so does the focus
+        var count = ViewModel.SwitcherWindows.Count;
+        if (count == 0) { FirstRow.Focus(FocusState.Keyboard); return; }
+        var next = Math.Clamp(index, 0, count - 1);
+        SwitcherList.UpdateLayout();
+        if (SwitcherList.ContainerFromIndex(next) is { } container
+            && FocusManager.FindFirstFocusableElement(container) is Control card)
+            card.Focus(FocusState.Keyboard);
     }
 
     /// <summary>Windows won't hand a background process the foreground; this forces it (PlayStation pads need it).</summary>
@@ -373,10 +465,13 @@ public sealed partial class SessionMenuWindow : Window
                 Close();
                 break;
             case nameof(MainViewModel.IsSessionPickerOpen):
+                // Read the focus now: by the time the queued work runs, the picker already took it.
+                if (ViewModel.IsSessionPickerOpen && Root.XamlRoot is { } xamlRoot)
+                    _pickerOpener = FocusManager.GetFocusedElement(xamlRoot) as Control;
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsSessionPickerOpen) { PlayPickerEntrance(); FocusPickerSelection(); }
-                    else FirstRow.Focus(FocusState.Keyboard);
+                    else (_pickerOpener ?? FirstRow).Focus(FocusState.Keyboard);   // back on the row that opened it
                 });
                 break;
         }

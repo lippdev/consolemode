@@ -70,7 +70,17 @@ public partial class MainViewModel
         var screen = IsConsoleActive
             ? Engine.State.FocusMonitorRect
             : Engine.Monitors.GetMonitorRect(SessionMonitorName, Engine.State);
-        _sessionMenu = new SessionMenuWindow(this, screen);
+        try
+        {
+            _sessionMenu = new SessionMenuWindow(this, screen);
+        }
+        catch (Exception ex)
+        {
+            // A menu that fails to build must never take the app (and the session) down with it.
+            AppLog.Write($"Menu da sessão: não abriu: {ex}");
+            _sessionMenu = null;
+            return;
+        }
         _sessionMenu.Closed += (_, _) => { _sessionMenu = null; IsSessionMenuOpen = false; StopSessionClock(); };
         IsSessionMenuOpen = true;
         IsSessionPickerOpen = false;

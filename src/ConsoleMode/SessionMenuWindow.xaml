@@ -10,9 +10,30 @@
 
     <!-- Like Steam's Shift + Tab: the whole screen, the game dimmed behind, a side panel with the
          options and the open windows in the middle. Controller-first. -->
-    <Grid x:Name="Root" Background="#99070A0E" Padding="56,36,56,30" RowSpacing="22" RequestedTheme="Dark"
+    <!-- Background is set in code (ApplyMaterial): glass or solid depending on Windows' transparency setting -->
+    <Grid x:Name="Root" Background="Transparent" Padding="56,36,56,30" RowSpacing="22" RequestedTheme="Dark"
           XYFocusKeyboardNavigation="Enabled">
         <Grid.Resources>
+          <ResourceDictionary>
+            <!-- Colour tokens of the menu. In Windows' high-contrast mode they become the system colours. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="MenuIconFill" Color="#26FFFFFF"/>
+                    <SolidColorBrush x:Key="MenuTextSecondary" Color="#B3FFFFFF"/>
+                    <SolidColorBrush x:Key="MenuTextTertiary" Color="#80FFFFFF"/>
+                    <SolidColorBrush x:Key="MenuRule" Color="#26FFFFFF"/>
+                    <SolidColorBrush x:Key="MenuVeil" Color="#99070A0E"/>
+                    <SolidColorBrush x:Key="MenuPickerVeil" Color="#F2070A0E"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="MenuIconFill" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                    <SolidColorBrush x:Key="MenuTextSecondary" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                    <SolidColorBrush x:Key="MenuTextTertiary" Color="{ThemeResource SystemColorGrayTextColor}"/>
+                    <SolidColorBrush x:Key="MenuRule" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                    <SolidColorBrush x:Key="MenuVeil" Color="{ThemeResource SystemColorWindowColor}"/>
+                    <SolidColorBrush x:Key="MenuPickerVeil" Color="{ThemeResource SystemColorWindowColor}"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
             <Style x:Key="RowLabel" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="20"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -35,17 +56,27 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="Padding" Value="16,0"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <!-- No hairline (the panel is the container) and the selection ring sits on the edge of the row,
+                     not five pixels out with a gap of background between them. -->
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FocusVisualMargin" Value="0"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="2"/>
+            </Style>
+            <Style x:Key="WindowCard" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FocusVisualMargin" Value="0"/>
+                <Setter Property="FocusVisualPrimaryThickness" Value="2"/>
             </Style>
             <Style x:Key="RowIcon" TargetType="Border">
                 <Setter Property="Width" Value="44"/>
                 <Setter Property="Height" Value="44"/>
                 <Setter Property="CornerRadius" Value="22"/>
-                <Setter Property="Background" Value="#26FFFFFF"/>
+                <Setter Property="Background" Value="{ThemeResource MenuIconFill}"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
             <Style x:Key="TileLabel" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Foreground" Value="#B3FFFFFF"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="Foreground" Value="{ThemeResource MenuTextSecondary}"/>
                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                 <Setter Property="MaxLines" Value="1"/>
             </Style>
@@ -55,6 +86,7 @@
                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                 <Setter Property="MaxLines" Value="1"/>
             </Style>
+                  </ResourceDictionary>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -77,10 +109,10 @@
                             <TextBlock Text="{x:Bind ViewModel.Texts.SessionPreviewBadge, Mode=OneWay}" FontSize="13" FontWeight="SemiBold"
                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                         </Border>
-                        <TextBlock Text="{x:Bind ViewModel.SessionElapsed, Mode=OneWay}" FontSize="16" Foreground="#B3FFFFFF"
+                        <TextBlock Text="{x:Bind ViewModel.SessionElapsed, Mode=OneWay}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}"
                                    Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}"/>
-                        <TextBlock Text="·" FontSize="16" Foreground="#80FFFFFF" Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}"/>
-                        <TextBlock Text="{x:Bind ViewModel.SessionControllerText, Mode=OneWay}" FontSize="16" Foreground="#B3FFFFFF"/>
+                        <TextBlock Text="·" FontSize="16" Foreground="{ThemeResource MenuTextTertiary}" Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}"/>
+                        <TextBlock Text="{x:Bind ViewModel.SessionControllerText, Mode=OneWay}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -94,7 +126,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border x:Name="SidebarPanel" CornerRadius="24" Padding="14" BorderThickness="1" BorderBrush="#1FFFFFFF" Background="#B3111820">
+            <Border x:Name="SidebarPanel" CornerRadius="24" Padding="14" Background="#B3111820">
                 <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">
                         <Button x:Name="FirstRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
@@ -186,7 +218,7 @@
                             </Grid>
                         </Button>
 
-                        <Border Height="1" Margin="8,6" Background="#26FFFFFF"/>
+                        <Border Height="1" Margin="8,6" Background="{ThemeResource MenuRule}"/>
 
                         <!-- The two ways out: the main one filled -->
                         <Button Tag="row" Style="{StaticResource SideRow}" Height="64" Command="{x:Bind ViewModel.RestoreFromMenuCommand}"
@@ -212,26 +244,26 @@
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal" Spacing="14" Margin="6,0,0,0">
                     <TextBlock Text="{x:Bind ViewModel.Texts.SessionWindowsCard, Mode=OneWay}" FontSize="26" FontWeight="SemiBold"/>
-                    <TextBlock Text="{x:Bind ViewModel.SessionWindowsText, Mode=OneWay}" FontSize="17" Foreground="#B3FFFFFF" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
+                    <TextBlock Text="{x:Bind ViewModel.SessionWindowsText, Mode=OneWay}" FontSize="18" Foreground="{ThemeResource MenuTextSecondary}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                 </StackPanel>
                 <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.Texts.SwitcherEmpty, Mode=OneWay}" FontSize="19"
-                           Foreground="#B3FFFFFF" Margin="6,8,0,0" Visibility="{x:Bind ViewModel.SwitcherIsEmpty, Mode=OneWay}"/>
+                           Foreground="{ThemeResource MenuTextSecondary}" Margin="6,8,0,0" Visibility="{x:Bind ViewModel.SwitcherIsEmpty, Mode=OneWay}"/>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <ItemsControl x:Name="SwitcherList" IsTabStop="False" Margin="0,4,0,18" ItemsSource="{x:Bind ViewModel.SwitcherWindows, Mode=OneWay}">
                         <ItemsControl.ItemsPanel><ItemsPanelTemplate><controls:WrapPanel Spacing="16"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:SwitchWindowItem">
-                                <Button Tag="card" Style="{StaticResource ConsoleCard}" Width="250" Height="178" Padding="18,16"
+                                <Button Tag="card" Style="{StaticResource WindowCard}" Width="250" Height="178" Padding="18,16"
                                         Command="{Binding ViewModel.SwitchToWindowCommand, ElementName=Page}" CommandParameter="{x:Bind}">
                                     <Grid>
                                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                                         <Grid Width="52" Height="52" HorizontalAlignment="Left">
-                                            <Border CornerRadius="26" Background="#26FFFFFF"/>
+                                            <Border CornerRadius="26" Background="{ThemeResource MenuIconFill}"/>
                                             <FontIcon Glyph="&#xE737;" FontSize="22"/>
                                             <Image Source="{x:Bind Icon, Mode=OneWay}" Width="34" Height="34" Stretch="Uniform"/>
                                         </Grid>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ProcessName}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ProcessName}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}" TextTrimming="CharacterEllipsis" MaxLines="1"/>
                                             <TextBlock Text="{x:Bind Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </Grid>
@@ -247,24 +279,24 @@
         <StackPanel x:Name="HintsPanel" Grid.Row="2" Orientation="Horizontal" Spacing="26" HorizontalAlignment="Center">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintConfirm, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
-                <TextBlock Text="{x:Bind ViewModel.Texts.HintSelect, Mode=OneWay}" VerticalAlignment="Center" FontSize="15"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.HintSelect, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintBack, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
-                <TextBlock Text="{x:Bind ViewModel.Texts.BackToGame, Mode=OneWay}" VerticalAlignment="Center" FontSize="15"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.BackToGame, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintOption, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
-                <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseWindow, Mode=OneWay}" VerticalAlignment="Center" FontSize="15"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseWindow, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Border Style="{StaticResource HintBadge}"><TextBlock Text="◀ ▶" FontWeight="Bold" VerticalAlignment="Center"/></Border>
-                <TextBlock Text="{x:Bind ViewModel.Texts.HintVolume, Mode=OneWay}" VerticalAlignment="Center" FontSize="15"/>
+                <TextBlock Text="{x:Bind ViewModel.Texts.HintVolume, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
             </StackPanel>
         </StackPanel>
 
         <!-- Sub-picker (resolution / audio / FPS) -->
-        <Grid x:Name="PickerOverlay" Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionPickerOpen, Mode=OneWay}" Background="#F2070A0E">
+        <Grid x:Name="PickerOverlay" Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionPickerOpen, Mode=OneWay}" Background="{ThemeResource MenuPickerVeil}">
             <Grid x:Name="PickerCard" MaxWidth="640" VerticalAlignment="Center" RowSpacing="16" Padding="40,0">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                 <TextBlock Text="{x:Bind ViewModel.SessionPickerTitle, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center"/>
@@ -289,7 +321,7 @@
         </Grid>
 
         <!-- Busy veil while a blocking change runs -->
-        <Grid Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionMenuBusy, Mode=OneWay}" Background="#99070A0E">
+        <Grid Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionMenuBusy, Mode=OneWay}" Background="{ThemeResource MenuVeil}">
             <ProgressRing IsActive="True" Width="56" Height="56"/>
         </Grid>
     </Grid>
