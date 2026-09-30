@@ -80,8 +80,15 @@ public static class ControlFsService
             Thread.Sleep(300);
             if (NativeWindows.GetForegroundWindow() != hwnd) NativeWindows.ForceForeground(hwnd);
             Thread.Sleep(200);
-            NativeWindows.SendF11();
-            Thread.Sleep(700);
+            if (NativeWindows.GetForegroundWindow() == hwnd)
+            {
+                NativeWindows.SendF11();
+                Thread.Sleep(700);
+            }
+            else
+            {
+                AppLog.Write("ControlFS: F11 n\u00e3o enviado porque outra janela est\u00e1 em primeiro plano");
+            }
             if (IsCovering(hwnd, screen)) { AppLog.Write("ControlFS: em tela cheia"); return; }
 
             NativeWindows.ShowWindow(hwnd, 3 /* SW_MAXIMIZE */);

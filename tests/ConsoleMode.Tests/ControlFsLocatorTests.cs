@@ -7,9 +7,12 @@ public class ControlFsLocatorTests
     [Fact]
     public void The_registry_folder_comes_first_then_the_usual_ones_without_repeats()
     {
-        var folders = ControlFsLocator.Folders(@"C:\Users\ana\AppData\Local\Programs\ControlFS\", @"C:\Users\ana\AppData\Local", @"C:\Program Files");
+        var localAppData = Path.Combine(Path.GetTempPath(), "ana", "AppData", "Local");
+        var registryLocation = Path.Combine(localAppData, "Programs", "ControlFS");
+        var programFiles = Path.Combine(Path.GetTempPath(), "Program Files");
+        var folders = ControlFsLocator.Folders(registryLocation + Path.DirectorySeparatorChar, localAppData, programFiles);
         Assert.Equal(
-            [@"C:\Users\ana\AppData\Local\Programs\ControlFS", Path.Combine(@"C:\Program Files", "ControlFS")],
+            [registryLocation, Path.Combine(programFiles, "ControlFS")],
             folders);
     }
 
@@ -18,7 +21,9 @@ public class ControlFsLocatorTests
     {
         var folders = ControlFsLocator.Folders("  ", null, null);
         Assert.Empty(folders);
-        Assert.Equal([@"D:\Apps\ControlFS"], ControlFsLocator.Folders("\"D:\\Apps\\ControlFS\\\"", null, null));
+        var quotedPath = Path.Combine(Path.GetTempPath(), "Apps", "ControlFS");
+        var quoted = $"\"{quotedPath}{Path.DirectorySeparatorChar}\"";
+        Assert.Equal([quotedPath], ControlFsLocator.Folders(quoted, null, null));
     }
 
     [Fact]
@@ -34,9 +39,11 @@ public class ControlFsLocatorTests
     [Fact]
     public void Resolve_returns_the_first_folder_that_has_the_exe_and_null_when_none_does()
     {
-        string[] folders = [@"C:\a", @"C:\b", @"C:\c"];
-        var hit = ControlFsLocator.Resolve(folders, p => p == Path.Combine(@"C:\b", "ControlFS.exe") || p == Path.Combine(@"C:\c", "ControlFS.exe"));
-        Assert.Equal(Path.Combine(@"C:\b", "ControlFS.exe"), hit);
+        string[] folders = [Path.Combine(Path.GetTempPath(), "a"), Path.Combine(Path.GetTempPath(), "b"), Path.Combine(Path.GetTempPath(), "c")];
+        var secondExe = Path.Combine(folders[1], "ControlFS.exe");
+        var thirdExe = Path.Combine(folders[2], "ControlFS.exe");
+        var hit = ControlFsLocator.Resolve(folders, p => p == secondExe || p == thirdExe);
+        Assert.Equal(secondExe, hit);
         Assert.Null(ControlFsLocator.Resolve(folders, _ => false));
     }
 }

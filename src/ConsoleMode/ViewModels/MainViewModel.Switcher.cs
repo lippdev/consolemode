@@ -66,7 +66,7 @@ public partial class MainViewModel
         if (item is null) return;
         var ok = WindowSwitcher.Activate(item.Window.Handle);
         AppLog.Write($"Janelas: trocar para \"{item.Title}\" ({item.ProcessName}) => {(ok ? "ok" : "não conseguiu")}");
-        CloseSessionMenu();
+        if (ok) CloseSessionMenu();
     }
 
     /// <summary>X on a card: ask the window to close, then drop its card once it is gone.</summary>

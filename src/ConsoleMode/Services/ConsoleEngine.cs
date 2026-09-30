@@ -422,6 +422,9 @@ public sealed class ConsoleEngine
             HomeButtonShortPress = config.HomeButtonShortPress,
             CloseSteamOnRestore = config.CloseSteamOnRestore,
             AutoStartOnController = config.AutoStartOnController,
+            InterfaceSounds = config.InterfaceSounds,
+            ConsoleBackground = config.ConsoleBackground,
+            ConsoleBackgroundImage = config.ConsoleBackgroundImage,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
