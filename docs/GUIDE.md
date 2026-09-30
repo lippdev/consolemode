@@ -50,11 +50,11 @@ Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignor
 
 Works with **any TV with HDMI-CEC** (Samsung Anynet+, Sony Bravia Sync, LG SimpLink…), with no network setup, through a [Pulse-Eight USB-CEC adapter](https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter) placed on the HDMI cable between the PC and the TV.
 
-1. Install **libCEC** from Pulse-Eight; it brings `cec-client.exe` (found automatically in `Program Files (x86)\Pulse-Eight\USB-CEC Adapter`, or on the PATH).
+1. Install **libCEC** from Pulse-Eight; it brings `cec-client.exe`. This route is **optional** and Console Mode does **not** ship `cec-client`: the app looks for it, in this order, at the path set in Settings (a folder or the `.exe`), next to `ConsoleMode.exe`, in `Program Files (x86)\Pulse-Eight\USB-CEC Adapter` / `Program Files`, then on the PATH. Settings → TV shows which one it found, or says "cec-client.exe not found" and where to install libCEC; starting console mode with no `cec-client` only logs the error and carries on.
 2. Turn CEC on in the TV's settings.
 3. In Console Mode, pick *USB-CEC adapter* and the TV's HDMI input the PC is on. Press **Test now**.
 
-On start, the app runs `cec-client -s -t p -p <input>` with `on 0` (power on) and then `as` (Active Source, so the TV switches to that input); on restore, `standby 0`. Each command takes a few seconds while the adapter opens.
+On start, the app runs `cec-client -s -t p -p <input>` with `on 0` (power on) and then `as` (Active Source, so the TV switches to that input); on restore, `standby 0`. Each command takes a few seconds while the adapter opens and is capped at 15 seconds: a `cec-client` that hangs is killed, so no stray process is left holding the adapter. No text from your settings is put on its command line (only fixed flags and the HDMI port, 1-4).
 
 ## Optional extras
 

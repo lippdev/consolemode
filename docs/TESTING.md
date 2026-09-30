@@ -126,7 +126,8 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 
 Pré-condições: adaptador Pulse-Eight USB-CEC entre o PC e a TV, libCEC instalado, CEC ativo na TV; Ajustes → TV → *Adaptador USB-CEC* com a entrada HDMI do PC.
 
-- [ ] O card "cec-client" mostra o caminho encontrado; sem libCEC, mostra que não encontrou. Resultado: ______
+- [ ] O card "cec-client" mostra o caminho encontrado (campo vazio: ao lado do exe, `Program Files (x86)\Pulse-Eight\USB-CEC Adapter` ou PATH); sem libCEC, mostra que não encontrou e **Jogar agora** segue normal (só o log registra). Resultado: ______
+- [ ] Nenhum `cec-client.exe` fica aberto depois de um teste que falha ou expira: o Gerenciador de Tarefas não mostra `cec-client.exe` (nem com o adaptador solto do USB durante a execução). Resultado: ______
 - [ ] **Testar agora** com a TV em espera: ela liga e troca para a entrada do PC. Resultado: ______
 - [ ] Adaptador desconectado do USB: o status diz que o adaptador não foi encontrado. Resultado: ______
 - [ ] **Jogar agora**: a TV liga antes das telas mudarem; o log tem `TV: cec-client "on 0" → 0` e `"as" → 0`. Resultado: ______
