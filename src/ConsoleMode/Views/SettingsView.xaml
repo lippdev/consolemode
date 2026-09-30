@@ -97,6 +97,53 @@
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
 
+            <!-- TV: power on and switch input (issue #75) -->
+            <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.TvControlCard, Mode=OneWay}" Description="{x:Bind ViewModel.TvProviderDescription, Mode=OneWay}"
+                                  IsExpanded="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
+                <ctk:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE7F4;"/>
+                </ctk:SettingsExpander.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.TvProviders, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedTvProvider, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+                <ctk:SettingsExpander.Items>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHostCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHostDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}">
+                        <TextBox MinWidth="220" PlaceholderText="192.168.0.50" Text="{x:Bind ViewModel.TvHost, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvMacCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvMacDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}">
+                        <TextBox MinWidth="220" PlaceholderText="AA:BB:CC:DD:EE:FF" Text="{x:Bind ViewModel.TvMacAddress, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvHdmiCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvHdmiDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.UsesTvHdmiInput, Mode=OneWay}">
+                        <ComboBox MinWidth="220"
+                                  ItemsSource="{x:Bind ViewModel.TvHdmiInputs, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedTvHdmiInput, Mode=TwoWay}"
+                                  DisplayMemberPath="Text"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvInputCommandCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvInputCommandDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}">
+                        <TextBox MinWidth="220" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvTurnOffDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.TvTurnOffOnRestore, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvTestCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.TvTestDescription, Mode=OneWay}"
+                                      Visibility="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <ProgressRing Width="18" Height="18" IsActive="{x:Bind ViewModel.IsTestingTv, Mode=OneWay}"
+                                          Visibility="{x:Bind ViewModel.IsTestingTv, Mode=OneWay}"/>
+                            <Button Content="{x:Bind ViewModel.Texts.TestNow, Mode=OneWay}" Command="{x:Bind ViewModel.TestTvCommand}"/>
+                        </StackPanel>
+                    </ctk:SettingsCard>
+                </ctk:SettingsExpander.Items>
+            </ctk:SettingsExpander>
+
             <!-- Optional extras -->
             <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HdrDescription, Mode=OneWay}">

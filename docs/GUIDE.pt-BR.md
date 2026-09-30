@@ -23,6 +23,25 @@ Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma �
 
 `start`, `stop` e `show` fazem o mesmo que o link `consolemode://` correspondente e respondem quando o app terminou (`ok:false` com `error` se o modo console não entrou ou a restauração não terminou). `status` só consulta. Só o usuário logado e o LocalSystem conseguem conectar; nada fica exposto na rede.
 
+## Controle da TV
+
+Ajustes → **TV** pode ligar a TV e trocar para a entrada HDMI do PC quando o modo console começa e, se você quiser, colocá-la em espera depois que a mesa volta. Uma TV que não responde nunca trava o modo console: o app registra no log e espera a tela de jogo como sempre.
+
+A maioria das placas de vídeo de PC não envia HDMI-CEC, então o app fala com a TV pela rede:
+
+### Google TV / Android TV
+
+TVs TCL, Sony, Hisense, Philips e outras com Google TV ou Android TV, via ADB (o protocolo de depuração do Android). Nada para instalar no PC.
+
+1. Na TV: **Configurações → Sistema → Sobre**, aperte **Build do Android TV OS** 7 vezes para liberar as Opções do desenvolvedor.
+2. **Configurações → Sistema → Opções do desenvolvedor**: ative **Depuração USB** (em algumas TVs, **Depuração pela rede** / **ADB pela rede**).
+3. No Console Mode, escolha *Google TV / Android TV*, informe o IP da TV (Configurações → Rede na TV; reserve esse IP no roteador) e a entrada HDMI do PC.
+4. Aperte **Testar agora**. A TV pergunta "Permitir depuração deste computador?": marque **Sempre permitir** e aperte **Permitir**.
+
+Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 1-4**. Se a sua TV ignorar essa tecla, preencha **Comando da entrada** com qualquer comando de shell do Android que abra a entrada do PC. Se a TV sai da rede em espera, informe o **endereço MAC** para o app mandar Wake-on-LAN antes (a opção "Ligar pela rede" / "Wake on Wi-Fi" da TV precisa estar ativa).
+
+A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
+
 ## Extras opcionais
 
 ### HDR

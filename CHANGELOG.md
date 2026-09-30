@@ -5,6 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 ### Novidades
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
 
 ### Correções
 - Telas: um monitor girado (em retrato) mantém a rotação no backup do layout, então restaurar a mesa devolve o monitor em retrato. Antes a rotação nunca era salva nem restaurada. (#108)

@@ -105,6 +105,21 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] "Copiar diagnóstico" cola dispositivos + amostra; o `consolemode.log` tem a linha `Controles: …` de abertura com o DualSense listado. Resultado: ______
 - [ ] Desconectar e reconectar durante o teste: a lista atualiza e a leitura continua. Resultado: ______
 
+## 3c. Controle da TV: Google TV / Android TV (issue #75)
+
+Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuração USB** (ou "Depuração pela rede") ativada nas Opções do desenvolvedor; Ajustes → TV → *Google TV / Android TV* com o IP e a entrada HDMI do PC.
+
+- [ ] **Testar agora** na primeira vez: a TV pede "Permitir depuração"; com "Sempre permitir" + "Permitir", a TV acorda e vai para a entrada do PC. O status mostra sucesso. Resultado: ______
+- [ ] **Testar agora** de novo: não pede mais permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
+- [ ] Recusar o pedido na TV (ou esperar 60 s): o status explica que a TV não autorizou este PC. Resultado: ______
+- [ ] IP errado / TV fora da rede: o status diz que a TV não respondeu, em poucos segundos. Resultado: ______
+- [ ] **Jogar agora** com a TV em espera: ela liga, troca para o PC e o modo console segue normal. O log tem `TV: ligar (androidTv) ok`. Resultado: ______
+- [ ] Com a TV desligada da tomada: o modo console não trava; o log tem `TV: ligar ... falhou` e o fluxo segue (a TV não aparece, o app avisa como antes). Resultado: ______
+- [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
+- [ ] **Colocar a TV em espera ao restaurar** ligado: ao sair do Big Picture, a mesa volta e depois a TV entra em espera. Desligado (padrão): a TV continua ligada. Resultado: ______
+- [ ] TV que ignora a tecla HDMI: preencher **Comando da entrada** faz a troca funcionar. Resultado: ______
+- [ ] Escolher "Não controlar": os campos somem e nada é enviado à TV. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

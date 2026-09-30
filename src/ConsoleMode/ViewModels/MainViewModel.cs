@@ -191,6 +191,7 @@ public partial class MainViewModel : ObservableObject
 
             BuildAudioOptions(audioValue);
             BuildUiModeOptions();
+            BuildTvOptions();
             FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
         finally
@@ -298,6 +299,7 @@ public partial class MainViewModel : ObservableObject
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
+            ApplyTv(config.Tv);
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
@@ -893,7 +895,8 @@ public partial class MainViewModel : ObservableObject
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
-            SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
+            SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,
+            Tv = BuildTvConfig()
         };
 
         if (Monitors.Count == 0) return config;
