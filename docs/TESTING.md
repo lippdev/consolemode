@@ -246,6 +246,7 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] **Testar agora** de novo: não pede mais permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
 - [ ] Recusar o pedido na TV (ou esperar 60 s): o status explica que a TV não autorizou este PC. Resultado: ______
 - [ ] IP errado / TV fora da rede: o status diz que a TV não respondeu, em poucos segundos. Resultado: ______
+- [ ] TV acessível pela rede, mas sem responder ao teste ADB: o status informa o limite de 90 s e o botão **Testar agora** volta a ficar disponível. Resultado: ______
 - [ ] **Jogar agora** com a TV em espera: ela liga, troca para o PC e o modo console segue normal. O log tem `TV: ligar (androidTv) ok`. Resultado: ______
 - [ ] Com a TV desligada da tomada: o modo console não trava; o log tem `TV: ligar ... falhou` e o fluxo segue (a TV não aparece, o app avisa como antes). Resultado: ______
 - [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
