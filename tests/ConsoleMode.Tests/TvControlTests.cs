@@ -120,4 +120,12 @@ public sealed class TvControlTests
         for (var i = 0; i < 16; i++)
             Assert.Equal(mac, packet[(6 + i * 6)..(12 + i * 6)]);
     }
+
+    [Fact]
+    public void Tv_control_is_off_by_default_so_nothing_runs_at_start()
+    {
+        var config = new ConsoleMode.Models.AppConfig();
+        Assert.False(config.Tv.IsEnabled);
+        Assert.Equal(ConsoleMode.Models.TvControlConfig.None, config.Tv.Provider);
+    }
 }

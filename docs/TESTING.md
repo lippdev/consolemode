@@ -118,7 +118,9 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
 - [ ] **Colocar a TV em espera ao restaurar** ligado: ao sair do Big Picture, a mesa volta e depois a TV entra em espera. Desligado (padrão): a TV continua ligada. Resultado: ______
 - [ ] TV que ignora a tecla HDMI: preencher **Comando da entrada** faz a troca funcionar. Resultado: ______
-- [ ] Escolher "Não controlar": os campos somem e nada é enviado à TV. Resultado: ______
+- [ ] Escolher "Não controlar": os campos somem e nada é enviado à TV, e **Jogar agora** não demora mais do que antes (nenhuma linha `TV:` no log). Resultado: ______
+- [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
+- [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
 
 ## 4. Regressões
 

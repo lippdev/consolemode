@@ -151,7 +151,11 @@ public sealed class AdbClient : IAsyncDisposable
     }
 }
 
-/// <summary>This PC's ADB key (RSA-2048), kept next to the config so the TV only asks once.</summary>
+/// <summary>
+/// This PC's ADB key (RSA-2048), kept next to the config so the TV only asks once.
+/// The private key is encrypted with DPAPI (see <see cref="SecretProtector"/>): the portable
+/// data folder travels with the exe, and the key lets whoever has it control the paired TV.
+/// </summary>
 internal static class AdbKeyStore
 {
     private static readonly object Gate = new();
@@ -166,10 +170,25 @@ internal static class AdbKeyStore
                 var saved = RSA.Create();
                 try
                 {
-                    saved.ImportFromPem(File.ReadAllText(path));
-                    if (saved.KeySize == 2048) return saved;
+                    var stored = File.ReadAllText(path).Trim();
+                    if (SecretProtector.TryUnprotect(stored, out var pem) && pem.Length > 0)
+                    {
+                        saved.ImportFromPem(pem);
+                        if (saved.KeySize == 2048)
+                        {
+                            // A key written before encryption existed: protect it in place.
+                            if (!SecretProtector.IsProtected(stored)) File.WriteAllText(path, SecretProtector.Protect(pem));
+                            return saved;
+                        }
+                    }
+                    else
+                    {
+                        // Copied from another Windows user / PC: DPAPI can't open it. A new key just
+                        // means the TV asks "Allow debugging?" once more.
+                        AppLog.Write("TV: chave ADB de outro usuário/PC; criando outra (a TV pedirá permissão de novo)");
+                    }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is CryptographicException or ArgumentException or IOException)
                 {
                     AppLog.Write($"TV: chave ADB ilegível, criando outra: {ex.Message}");
                 }
@@ -177,7 +196,7 @@ internal static class AdbKeyStore
             }
 
             var created = RSA.Create(2048);
-            File.WriteAllText(path, created.ExportPkcs8PrivateKeyPem());
+            File.WriteAllText(path, SecretProtector.Protect(created.ExportPkcs8PrivateKeyPem()));
             AppLog.Write("TV: chave ADB criada");
             return created;
         }
