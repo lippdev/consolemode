@@ -15,6 +15,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Sounds in the Console interface when you move the focus, pick and go back (made by the app itself, at a low volume). Turn them off in Settings → Interface sounds. (#117)
 - Controller shortcuts of your choice: the button that opens Console Mode, the session menu's and the one that goes back to the PC are now set in Settings (hold the buttons you want and let go on the same controller). Capture never combines buttons from different controllers. None is on by default: the first time you open this version the app shows the setup, with a suggestion for each action (Home, Select + Y and Start + Select). One button can't serve two actions. If you used the Home button or Start + Select before, choose them again. (#116)
 - Settings → "Receive test versions (alpha and beta)": anyone can join the tests of upcoming versions from the app. Off by default; turning it on shows a warning that test versions can have bugs.
+- Settings → TV: console mode turns the TV on and switches it to the PC's HDMI input, and can put it in standby on restore. First route: Google TV / Android TV over the network (ADB), nothing to install on the PC. (#93)
+- TV control through a Pulse-Eight USB-CEC adapter (libCEC): powers on, switches input and puts any HDMI-CEC TV in standby. (#96)
 
 ### Fixes
 - Session menu: if Windows cannot activate the selected window, the menu stays open so you can try again. (#120)

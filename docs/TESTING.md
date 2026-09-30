@@ -255,6 +255,17 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
 - [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
 
+## 3f. Controle da TV: adaptador USB-CEC (issue #75)
+
+Pré-condições: adaptador Pulse-Eight USB-CEC entre o PC e a TV, libCEC instalado, CEC ativo na TV; Ajustes → TV → *Adaptador USB-CEC* com a entrada HDMI do PC.
+
+- [ ] O card "cec-client" mostra o caminho encontrado (campo vazio: ao lado do exe, `Program Files (x86)\Pulse-Eight\USB-CEC Adapter` ou PATH); sem libCEC, mostra que não encontrou e **Jogar agora** segue normal (só o log registra). Resultado: ______
+- [ ] Nenhum `cec-client.exe` fica aberto depois de um teste que falha ou expira: o Gerenciador de Tarefas não mostra `cec-client.exe` (nem com o adaptador solto do USB durante a execução). Resultado: ______
+- [ ] **Testar agora** com a TV em espera: ela liga e troca para a entrada do PC. Resultado: ______
+- [ ] Adaptador desconectado do USB: o status diz que o adaptador não foi encontrado. Resultado: ______
+- [ ] **Jogar agora**: a TV liga antes das telas mudarem; o log tem `TV: cec-client "on 0" → 0` e `"as" → 0`. Resultado: ______
+- [ ] "Colocar a TV em espera ao restaurar": `standby 0` depois que a mesa volta. Resultado: ______
+
 Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
 
 - [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
@@ -262,6 +273,7 @@ Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV
 - [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
 - [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
 - [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______

@@ -90,8 +90,9 @@ public sealed class TvControlConfig
 {
     public const string None = "none";
     public const string AndroidTv = "androidTv";
+    public const string Cec = "cec";
 
-    /// <summary>"none" | "androidTv".</summary>
+    /// <summary>"none" | "androidTv" | "cec".</summary>
     public string Provider { get; set; } = None;
 
     /// <summary>The TV's IP address or host name, optionally with ":port".</summary>
@@ -105,6 +106,9 @@ public sealed class TvControlConfig
 
     /// <summary>Android TV: shell command that switches to the PC's input, for TVs that ignore the HDMI key codes.</summary>
     public string InputCommand { get; set; } = "";
+
+    /// <summary>USB-CEC: cec-client.exe (or its folder); empty = libCEC's install folder, then PATH.</summary>
+    public string CecClientPath { get; set; } = "";
 
     /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
     public bool TurnOffOnRestore { get; set; }

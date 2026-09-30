@@ -15,6 +15,8 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Sons na interface Console ao mover o foco, escolher e voltar (sons criados pelo próprio app, em volume baixo). Dá para desligar em Ajustes → Sons da interface. (#117)
 - Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC agora são configuráveis em Ajustes (basta segurar os botões que você quer e soltar no mesmo controle). A captura não mistura botões de controles diferentes. Nenhum vem ligado: na primeira abertura desta versão o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. Quem usava o botão Home ou Start + Select precisa escolher de novo. (#116)
 - Ajustes → "Receber versões de teste (alpha e beta)": qualquer pessoa pode entrar nos testes das próximas versões pelo próprio app. Desligado por padrão; ao ligar, o app avisa que a versão pode ter bugs.
+- Ajustes → TV: o modo console liga a TV e troca para a entrada HDMI do PC, e pode colocá-la em espera ao restaurar. Primeiro caminho: Google TV / Android TV pela rede (ADB), sem instalar nada no PC. (#93)
+- Controle da TV por adaptador USB-CEC da Pulse-Eight (libCEC): liga, troca a entrada e coloca em espera qualquer TV com HDMI-CEC. (#96)
 
 ### Correções
 - Menu da sessão: se o Windows não conseguir ativar a janela escolhida, o menu continua aberto para tentar de novo. (#120)

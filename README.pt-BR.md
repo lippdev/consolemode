@@ -44,7 +44,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - Esconde as outras telas **desconectando**, com **cortinas pretas** ou por **DDC/CI**
 - **Resolução e Hz** por tela, **HDR**, **VRR** e **limite de FPS** (RTSS) enquanto você joga
 - O áudio vai para a TV (ou qualquer saída) e volta depois
-- [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
+- [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede, ou qualquer TV por um adaptador USB-CEC), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation)
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)

@@ -20,18 +20,25 @@ public partial class MainViewModel
     [ObservableProperty] private string _tvMacAddress = "";
     [ObservableProperty] private string _tvInputCommand = "";
     [ObservableProperty] private bool _tvTurnOffOnRestore;
+    [ObservableProperty] private string _cecClientPath = "";
     [ObservableProperty] private bool _isTestingTv;
 
     private string TvProvider => SelectedTvProvider?.Value ?? TvControlConfig.None;
 
     public bool IsTvEnabled => TvProvider != TvControlConfig.None;
     public bool IsTvAndroid => TvProvider == TvControlConfig.AndroidTv;
+    public bool IsTvCec => TvProvider == TvControlConfig.Cec;
     public bool UsesTvHost => IsTvAndroid;
-    public bool UsesTvHdmiInput => IsTvAndroid;
+    public bool UsesTvHdmiInput => IsTvAndroid || IsTvCec;
+
+    public string CecClientStatus => CecController.Locate(CecClientPath) is { } found
+        ? LocalizationService.Get("TvCecClientFound", found)
+        : LocalizationService.Get("TvCecClientMissing");
 
     public string TvProviderDescription => LocalizationService.Get(TvProvider switch
     {
         TvControlConfig.AndroidTv => "TvAndroidDescription",
+        TvControlConfig.Cec => "TvCecDescription",
         _ => "TvNoneDescription"
     });
 
@@ -39,6 +46,8 @@ public partial class MainViewModel
     {
         OnPropertyChanged(nameof(IsTvEnabled));
         OnPropertyChanged(nameof(IsTvAndroid));
+        OnPropertyChanged(nameof(IsTvCec));
+        OnPropertyChanged(nameof(CecClientStatus));
         OnPropertyChanged(nameof(UsesTvHost));
         OnPropertyChanged(nameof(UsesTvHdmiInput));
         OnPropertyChanged(nameof(TvProviderDescription));
@@ -51,6 +60,12 @@ public partial class MainViewModel
     partial void OnTvInputCommandChanged(string value) => SaveQuietly();
     partial void OnTvTurnOffOnRestoreChanged(bool value) => SaveQuietly();
 
+    partial void OnCecClientPathChanged(string value)
+    {
+        OnPropertyChanged(nameof(CecClientStatus));
+        SaveQuietly();
+    }
+
     /// <summary>Part of <see cref="BuildLocalizedOptions"/>: the names follow the interface language.</summary>
     private void BuildTvOptions()
     {
@@ -60,6 +75,7 @@ public partial class MainViewModel
         TvProviders.Clear();
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderNone"), Value = TvControlConfig.None });
         TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderAndroid"), Value = TvControlConfig.AndroidTv });
+        TvProviders.Add(new ComboOption { Text = LocalizationService.Get("TvProviderCec"), Value = TvControlConfig.Cec });
         SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == provider) ?? TvProviders[0];
 
         TvHdmiInputs.Clear();
@@ -77,6 +93,7 @@ public partial class MainViewModel
         TvMacAddress = tv.MacAddress ?? "";
         TvInputCommand = tv.InputCommand ?? "";
         TvTurnOffOnRestore = tv.TurnOffOnRestore;
+        CecClientPath = tv.CecClientPath ?? "";
     }
 
     private TvControlConfig BuildTvConfig() => new()
@@ -86,7 +103,8 @@ public partial class MainViewModel
         MacAddress = TvMacAddress.Trim(),
         HdmiInput = int.TryParse(SelectedTvHdmiInput?.Value, out var hdmi) ? hdmi : 1,
         InputCommand = TvInputCommand.Trim(),
-        TurnOffOnRestore = TvTurnOffOnRestore
+        TurnOffOnRestore = TvTurnOffOnRestore,
+        CecClientPath = CecClientPath.Trim()
     };
 
     /// <summary>Turns the TV on and switches the input now; the first time, pairs with the TV.</summary>
