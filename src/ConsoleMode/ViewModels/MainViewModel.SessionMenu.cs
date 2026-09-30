@@ -84,6 +84,7 @@ public partial class MainViewModel
         _sessionMenu.Closed += (_, _) => { _sessionMenu = null; IsSessionMenuOpen = false; StopSessionClock(); };
         IsSessionMenuOpen = true;
         IsSessionPickerOpen = false;
+        ControlFsInstalled = ControlFsService.FindExe() is not null;
         RefreshSessionHeader();
         StartSessionClock();
         _sessionMenu.Activate();
@@ -308,6 +309,27 @@ public partial class MainViewModel
         try { await Task.Run(action); }
         catch (Exception ex) { AppLog.Write($"Menu da sessão: {ex.Message}"); }
         finally { _busy = false; IsSessionMenuBusy = false; }
+    }
+
+    /// <summary>Whether ControlFS is installed; decides what the pinned row says. Read each time the menu opens.</summary>
+    [ObservableProperty] private bool _controlFsInstalled;
+
+    public string ControlFsRowText => ControlFsInstalled ? Texts.ControlFsOpen : Texts.ControlFsMissing;
+    partial void OnControlFsInstalledChanged(bool value) => OnPropertyChanged(nameof(ControlFsRowText));
+
+    /// <summary>
+    /// The pinned "File explorer (ControlFS)" row: the menu closes and ControlFS (a separate app, controller-first)
+    /// opens or comes to the front. Without it installed, its download page opens instead. Outside a session it
+    /// works the same, so it can be tried in the preview.
+    /// </summary>
+    [RelayCommand]
+    private void OpenControlFs()
+    {
+        var installed = ControlFsService.FindExe() is not null;
+        CloseSessionMenu();
+        if (installed && ControlFsService.Open()) return;
+        AppLog.Write("ControlFS: não instalado, abrindo a página de download");
+        ControlFsService.OpenDownloadPage();
     }
 
     [RelayCommand]

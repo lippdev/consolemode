@@ -37,6 +37,7 @@
     <Compile Include="../../src/ConsoleMode/Services/UiSoundSynth.cs" Link="UiSoundSynth.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SteamArt.cs" Link="SteamArt.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AltTabRules.cs" Link="AltTabRules.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControlFsLocator.cs" Link="ControlFsLocator.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />

@@ -189,6 +189,9 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string SoundsCard => LocalizationService.Get(nameof(SoundsCard));
     public string SessionPreviewBadge => LocalizationService.Get(nameof(SessionPreviewBadge));
     public string CloseMenu => LocalizationService.Get(nameof(CloseMenu));
+    public string ControlFsCard => LocalizationService.Get(nameof(ControlFsCard));
+    public string ControlFsOpen => LocalizationService.Get(nameof(ControlFsOpen));
+    public string ControlFsMissing => LocalizationService.Get(nameof(ControlFsMissing));
     public string SessionWindowsCard => LocalizationService.Get(nameof(SessionWindowsCard));
     public string SwitcherEmpty => LocalizationService.Get(nameof(SwitcherEmpty));
     public string SwitcherOpen => LocalizationService.Get(nameof(SwitcherOpen));

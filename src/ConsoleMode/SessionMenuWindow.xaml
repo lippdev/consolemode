@@ -127,7 +127,30 @@
             </Grid.ColumnDefinitions>
 
             <Border x:Name="SidebarPanel" CornerRadius="24" Padding="14" Background="#B3111820">
-                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+              <Grid RowSpacing="10">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+                <!-- Pinned, not part of the scrolling list: ControlFS, the controller-first file explorer (a separate,
+                     open-source app from the same team). -->
+                <Button x:Name="ControlFsRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenControlFsCommand}"
+                        AutomationProperties.Name="{x:Bind ViewModel.Texts.ControlFsCard, Mode=OneWay}">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF2B5C8F" Offset="0"/>
+                            <GradientStop Color="#FF16263A" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE8B7;" FontSize="19"/></Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Style="{StaticResource TileValue}" FontSize="18" Text="{x:Bind ViewModel.Texts.ControlFsCard, Mode=OneWay}"/>
+                            <TextBlock Style="{StaticResource TileLabel}" FontSize="14" Text="{x:Bind ViewModel.ControlFsRowText, Mode=OneWay}"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">
                         <Button x:Name="FirstRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
                             <Button.Background>
@@ -237,6 +260,7 @@
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
+              </Grid>
             </Border>
 
             <!-- The open windows, front to back: an Alt + Tab that is always on screen -->
