@@ -107,6 +107,8 @@
   "ShortcutsOnboardingBody": "No shortcut is on until you choose it. Pick a button or combination for each action, or leave it without one. Press Set, hold the buttons and let go. The same combination can't be used for two actions. You can change all of this later in Settings.",
   "ShortcutsUseSuggested": "Use the suggested shortcuts",
   "ShortcutsOnboardingDone": "Done",
+  "CloseSteamCard": "Close Steam when going back to the PC",
+  "CloseSteamDescription": "When you leave Big Picture or go back to the PC, Steam is asked to quit the normal way (its own Exit, never forced). Big Picture is always closed. Steam stays open if a game is running.",
   "AutoStartControllerCard": "Enter when a controller connects",
   "AutoStartControllerDescription": "With the app in the tray, turning on or plugging in a controller enters console mode. Ignores the first 15 s after opening and 30 s after restoring.",
   "HomeButtonShortPressCard": "Short press of the Xbox button",

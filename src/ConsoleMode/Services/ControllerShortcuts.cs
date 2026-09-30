@@ -47,6 +47,10 @@ public static class ControllerShortcuts
 
     public static int ButtonCount(ushort mask) => System.Numerics.BitOperations.PopCount(mask);
 
+    /// <summary>Whether any one device holds the full combo.</summary>
+    public static bool IsHeldOnAnyDevice(ushort mask, IEnumerable<ushort> deviceStates) =>
+        mask != 0 && deviceStates.Any(buttons => (buttons & mask) == mask);
+
     /// <summary>
     /// A combo of two or more buttons, or the Guide button alone. A single face button would
     /// fire in the middle of any game.
@@ -93,32 +97,58 @@ public static class ControllerShortcuts
 }
 
 /// <summary>
-/// Turns polled button states into one combo: every button pressed until the pad is let go
-/// counts, and the combo is reported on release. Starts only after a poll with nothing held,
-/// so the press that opened the capture (a click, the A of the gamepad navigation) is not it.
+/// Captures one device's buttons until that device is released, then reports the combo.
+/// Each device arms independently after a neutral poll, so an unrelated held pad cannot delay
+/// capture and inputs from different devices are never combined.
 /// </summary>
 public sealed class ShortcutCapture
 {
-    private bool _armed;
+    private readonly HashSet<string> _releasedSinceStart = new(StringComparer.OrdinalIgnoreCase);
+    private string? _capturingDevice;
     private ushort _seen;
 
-    /// <summary>Feed the buttons held right now; returns the combo once it is complete.</summary>
-    public ushort? Feed(ushort held)
+    /// <summary>The current allowed buttons on the device being captured.</summary>
+    public ushort CurrentHeld { get; private set; }
+
+    /// <summary>Feed one poll of device IDs and states; returns the combo on release/disconnect.</summary>
+    public ushort? Feed(IReadOnlyDictionary<string, ushort> devices)
     {
-        held &= ControllerShortcuts.Allowed;
-        if (!_armed)
+        CurrentHeld = 0;
+        foreach (var id in _releasedSinceStart.Where(id => !devices.ContainsKey(id)).ToArray())
+            _releasedSinceStart.Remove(id);
+
+        if (_capturingDevice is not null)
         {
-            if (held == 0) _armed = true;
-            return null;
-        }
-        if (held != 0)
-        {
+            if (!devices.TryGetValue(_capturingDevice, out var held) ||
+                (held &= ControllerShortcuts.Allowed) == 0)
+            {
+                var device = _capturingDevice;
+                _capturingDevice = null;
+                if (devices.ContainsKey(device)) _releasedSinceStart.Add(device);
+                else _releasedSinceStart.Remove(device);
+                var result = _seen;
+                _seen = 0;
+                return result == 0 ? null : result;
+            }
+            CurrentHeld = held;
             _seen |= held;
             return null;
         }
-        if (_seen == 0) return null;
-        var result = _seen;
-        _seen = 0;
-        return result;
+
+        foreach (var (id, buttons) in devices.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            var held = (ushort)(buttons & ControllerShortcuts.Allowed);
+            if (held == 0)
+            {
+                _releasedSinceStart.Add(id);
+                continue;
+            }
+            if (!_releasedSinceStart.Contains(id)) continue;
+            _capturingDevice = id;
+            CurrentHeld = held;
+            _seen = held;
+            break;
+        }
+        return null;
     }
 }
