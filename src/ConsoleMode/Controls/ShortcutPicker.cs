@@ -103,10 +103,11 @@ public sealed class ShortcutPicker : StackPanel
     private void Poll()
     {
         if (_capture is null) return;
-        var held = ControllerHoldWatcher.ReadHeld();
-        var live = ControllerShortcuts.Format((ushort)(held & ControllerShortcuts.Allowed), _vm.IsPlayStationHints);
+        var held = ControllerHoldWatcher.ReadHeldByDevice();
+        var captured = _capture.Feed(held);
+        var live = ControllerShortcuts.Format(_capture.CurrentHeld, _vm.IsPlayStationHints);
         _value.Text = live.Length > 0 ? live : LocalizationService.Get("ShortcutPressButtons");
-        if (_capture.Feed(held) is not { } mask) return;
+        if (captured is not { } mask) return;
 
         StopCapture();
         var error = _vm.TrySetShortcut(_slot, mask);

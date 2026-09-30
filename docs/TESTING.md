@@ -78,6 +78,10 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 - [ ] Há um som ao mover o foco, outro ao confirmar (A ou clique) e outro ao voltar (B); trocar de aba toca o de mover. Resultado: ______
 - [ ] Sistema/Ajustes → "Sons da interface" desligado: silêncio total. Resultado: ______
 - [ ] Segurar o direcional não acumula sons (um novo interrompe o anterior). Resultado: ______
+- [ ] **Segurar o botão Xbox por 1 s** entra no modo console (mesmo caminho do atalho "1 Click"). Resultado: ______
+- [ ] Ao configurar um atalho, deixe um controle segurando um botão e use outro para montar o atalho; a captura aceita o segundo sem esperar o primeiro soltar. Resultado: ______
+- [ ] Com dois controles conectados, pressione partes diferentes do atalho em cada um, inclusive soltando um antes de pressionar o outro; a captura não combina os controles e só aceita a combinação feita em um único controle. Resultado: ______
+- [ ] Durante a captura, desconecte o controle depois de pressionar parte da combinação e continue no segundo controle; o primeiro encerra sua captura e os botões do segundo não são acrescentados a ela. Resultado: ______
 
 ## 1. Atalho Home do controle (PR #27)
 

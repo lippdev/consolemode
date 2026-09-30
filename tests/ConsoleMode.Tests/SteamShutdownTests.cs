@@ -40,6 +40,21 @@ public class SteamShutdownTests
         Assert.Equal(Decision.GameRunning, Decide("bigPicture", true, true, appId));
 
     [Fact]
+    public void Unknown_game_state_keeps_steam_open() =>
+        Assert.Equal(Decision.GameStateUnknown, Decide("bigPicture", true, true, runningAppId: null));
+
+    [Fact]
+    public void Missing_running_app_id_remains_unknown_through_the_shutdown_decision_and_log()
+    {
+        var appId = ParseRunningAppId(null);
+        var decision = Decide("bigPicture", closeSteamSetting: true, steamRunning: true, appId);
+
+        Assert.Equal(Decision.GameStateUnknown, decision);
+        Assert.Contains("mantida aberta", Describe(decision, appId));
+        Assert.Contains("não foi possível verificar", Describe(decision, appId));
+    }
+
+    [Fact]
     public void The_setting_wins_over_everything_else()
     {
         Assert.Equal(Decision.SettingOff, Decide("bigPicture", false, false, 570));
@@ -48,14 +63,14 @@ public class SteamShutdownTests
     [Theory]
     [InlineData(1245620, 1245620)]
     [InlineData(0, 0)]
-    [InlineData(-5, 0)]
+    [InlineData(-5, null)]
     [InlineData(570u, 570)]
-    [InlineData(4000000000u, 0)]      // does not fit an int: not an app id
+    [InlineData(4000000000u, null)]  // does not fit an int: state unknown
     [InlineData("730", 730)]
-    [InlineData("abc", 0)]
-    [InlineData("", 0)]
-    [InlineData(null, 0)]
-    public void The_running_game_id_is_read_from_whatever_the_registry_holds(object? value, int expected) =>
+    [InlineData("abc", null)]
+    [InlineData("", null)]
+    [InlineData(null, null)]
+    public void The_running_game_id_is_read_from_whatever_the_registry_holds(object? value, int? expected) =>
         Assert.Equal(expected, ParseRunningAppId(value));
 
     [Fact]

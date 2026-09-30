@@ -397,10 +397,12 @@ public sealed class ConsoleEngine
         return new AppConfig
         {
             Version = config.Version,
+            AppLanguage = config.AppLanguage,
             FocusMonitor = focus,
             HideMonitors = hide,
             HideStrategy = config.HideStrategy,
             FullscreenMode = config.FullscreenMode,
+            PlaynitePath = config.PlaynitePath,
             AudioDeviceId = config.AudioDeviceId,
             AudioDeviceName = config.AudioDeviceName,
             AudioAutoSwitch = config.AudioAutoSwitch,
@@ -408,10 +410,18 @@ public sealed class ConsoleEngine
             MonitorModes = modes,
             HdrEnable = config.HdrEnable,
             VrrEnable = config.VrrEnable,
+            UiMode = config.UiMode,
             TourDone = config.TourDone,
             ConfirmedSetup = config.ConfirmedSetup,
             CheckUpdates = config.CheckUpdates,
             BetaUpdates = config.BetaUpdates,
+            HomeShortcut = config.HomeShortcut,
+            MenuShortcut = config.MenuShortcut,
+            ExitShortcut = config.ExitShortcut,
+            ShortcutsOnboardingDone = config.ShortcutsOnboardingDone,
+            HomeButtonShortPress = config.HomeButtonShortPress,
+            CloseSteamOnRestore = config.CloseSteamOnRestore,
+            AutoStartOnController = config.AutoStartOnController,
             SkippedUpdateVersion = config.SkippedUpdateVersion
         };
     }
