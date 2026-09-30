@@ -154,6 +154,22 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 - [ ] Jogo em **tela cheia exclusiva**: o menu não aparece por cima (limitação documentada); Select + Y não quebra nada. Resultado: ______
 - [ ] `start consolemode://menu` no cmd abre o menu; fora da sessão, não faz nada. Resultado: ______
 
+## 1d. Explorador de arquivos (ControlFS) no menu da sessão
+
+Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS).
+
+- [ ] Select + Y: no topo da lateral esquerda, fora da lista que rola, há o painel "Explorador de arquivos (ControlFS)"; o restante das opções rola por baixo dele. Resultado: ______
+- [ ] Direcional para cima a partir de "Voltar ao jogo" chega nele; A abre o ControlFS em tela cheia na TV, por cima do jogo/Big Picture, e o menu fecha. Resultado: ______
+- [ ] O ControlFS abre **sempre em tela cheia** na tela da sessão (a TV), cobrindo-a por inteiro, mesmo que ele estivesse em janela ou maximizado; se já estava em tela cheia, nada muda. Resultado: ______
+- [ ] Se outra aplicação permanecer em primeiro plano porque o Windows negou o foco ao ControlFS, o F11 não é enviado a ela; a janela de outra aplicação não muda de estado. Resultado: ______
+- [ ] Abrir de novo com o ControlFS já aberto só o traz para a frente (continua um processo só no Gerenciador de Tarefas). Resultado: ______
+- [ ] O ControlFS responde ao controle logo de cara (o foco do controle fica com ele, sem o Console Mode reagir aos botões). Resultado: ______
+- [ ] Com o ControlFS já aberto: A só o traz para a frente (não abre uma segunda instância). Resultado: ______
+- [ ] A sessão **não** termina nem restaura a mesa enquanto o ControlFS está na frente; ao sair dele (Menu do ControlFS → Sair) volta-se ao jogo. Resultado: ______
+- [ ] Select + Y com o ControlFS na frente abre o menu por cima dele (saída de emergência). Resultado: ______
+- [ ] Sem o ControlFS instalado: a linha diz "Não instalado · aperte para baixar" e A abre a página de releases no navegador. Resultado: ______
+- [ ] Fora da sessão (prévia do menu) o painel funciona igual. Resultado: ______
+
 ## 2. Links `consolemode://`
 
 - [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______
