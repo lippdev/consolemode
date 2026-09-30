@@ -12,6 +12,8 @@ Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in Engl
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
+`consolemode://stop`, `ConsoleMode.exe --stop` e o atalho configuravel **Voltar ao PC** fecham o Playnite em tela cheia antes de restaurar. As acoes **Voltar ao PC** e **Sair do Console Mode** do menu da sessao, e **Restaurar setup** da bandeja, mantem o comportamento de restauracao; na previa do menu, **Voltar ao PC** apenas fecha a previa.
+
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
@@ -22,6 +24,29 @@ Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma �
 ```
 
 `start`, `stop` e `show` fazem o mesmo que o link `consolemode://` correspondente e respondem quando o app terminou (`ok:false` com `error` se o modo console não entrou ou a restauração não terminou). `status` só consulta. Só o usuário logado e o LocalSystem conseguem conectar; nada fica exposto na rede.
+
+## Controle da TV
+
+Ajustes → **TV** pode ligar a TV e trocar para a entrada HDMI do PC quando o modo console começa e, se você quiser, colocá-la em espera depois que a mesa volta. Uma TV que não responde nunca trava o modo console: o app registra no log e espera a tela de jogo como sempre.
+
+Com o padrão, **Não controlar**, nada é enviado e nada é acrescentado ao iniciar nem ao restaurar. Com um caminho escolhido, a etapa da TV roda primeiro quando o modo console começa e tem limite de **30 segundos** (o pior caso, quando a TV não responde e o Wake-on-LAN é tentado); a espera opcional ao restaurar tem limite de **15 segundos**. Uma TV que já está ligada costuma responder em um ou dois segundos.
+
+A maioria das placas de vídeo de PC não envia HDMI-CEC, então o app fala com a TV pela rede:
+
+### Google TV / Android TV
+
+TVs TCL, Sony, Hisense, Philips e outras com Google TV ou Android TV, via ADB (o protocolo de depuração do Android). Nada para instalar no PC.
+
+1. Na TV: **Configurações → Sistema → Sobre**, aperte **Build do Android TV OS** 7 vezes para liberar as Opções do desenvolvedor.
+2. **Configurações → Sistema → Opções do desenvolvedor**: ative **Depuração USB** (em algumas TVs, **Depuração pela rede** / **ADB pela rede**).
+3. No Console Mode, escolha *Google TV / Android TV*, informe o IP da TV (Configurações → Rede na TV; reserve esse IP no roteador) e a entrada HDMI do PC.
+4. Aperte **Testar agora**. A TV pergunta "Permitir depuração deste computador?": marque **Sempre permitir** e aperte **Permitir**.
+
+A chave ADB deste PC fica guardada criptografada para o seu usuário do Windows (DPAPI), então a TV só pergunta uma vez. Se a pasta de dados for copiada para outro usuário do Windows ou outro PC, a chave não pode ser lida lá: o app cria outra e a TV pergunta "Permitir depuração?" de novo.
+
+Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 1-4**. Se a sua TV ignorar essa tecla, preencha **Comando da entrada** com qualquer comando de shell do Android que abra a entrada do PC. Se a TV sai da rede em espera, informe o **endereço MAC** para o app mandar Wake-on-LAN antes (a opção "Ligar pela rede" / "Wake on Wi-Fi" da TV precisa estar ativa).
+
+A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
 ## Extras opcionais
 
@@ -41,7 +66,6 @@ Limita a taxa de quadros global durante o modo console (útil em TV 60 Hz). Exig
 
 - Layouts multi-monitor variam; em alguns setups a restauração pode precisar de uma nova tentativa pela bandeja
 - O Modo Xbox não detecta o fim do fullscreen — restaure manualmente
-- Monitores e áudio dependem das ferramentas [NirSoft](https://www.nirsoft.net/) incluídas no pacote
 - O limite de FPS é global (limitação do RTSS), não por tela
 - O build WinUI 3 precisa ser compilado no Windows (`net8.0-windows`)
 
@@ -68,12 +92,12 @@ Confirme se o monitor de foco é compatível com o recurso e se o HDR está ativ
 Precisa do [Visual Studio 2022](https://visualstudio.microsoft.com/) com a workload **Desenvolvimento de aplicativos da Windows**, ou do SDK do .NET 8 + Windows App SDK.
 
 ```powershell
-# Baixa MultiMonitorTool / SoundVolumeView / rtss-cli e compila os dois pacotes
+# Baixa o rtss-cli e compila os dois pacotes
 .\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 
 Saída: `dist\ConsoleMode-Portable-x64.exe` e `dist\ConsoleMode-Setup-x64.exe` (o instalador precisa do [Inno Setup 6](https://jrsoftware.org/isinfo.php): `winget install JRSoftware.InnoSetup`). Abra `ConsoleMode.sln` para depurar.
 
-Para lançar uma versão, faça push de uma tag como `v1.4.0` (ou `v1.4.0-beta.2` para pré-release): o workflow `Release` gera e publica os dois arquivos, e o app oferece a atualização.
+Para lançar uma versão, faça o merge do PR de release na `main` e rode Actions → **Release** → Run workflow na `main` com a versão (como `1.4.0`, ou `1.4.0-beta.2` para pré-release) e **publish** marcado: o workflow cria a tag e a release no GitHub, gera os dois arquivos e os publica, e o app oferece a atualização. Sem "publish" ele só gera e guarda os arquivos como artefato. Fazer push de uma tag `v*` continua funcionando e faz o mesmo.
 
 A implementação antiga em PowerShell + WPF (1.2 e anteriores) fica na branch [`legacy`](https://github.com/lippdev/consolemode/tree/legacy) e não é usada pelo app WinUI.

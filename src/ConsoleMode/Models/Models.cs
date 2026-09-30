@@ -19,10 +19,6 @@ public sealed class AppConfig
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
-    /// <summary>Use Core Audio instead of SoundVolumeView (issue #91); off until verified on hardware.</summary>
-    public bool NativeAudio { get; set; }
-    /// <summary>Use Windows' display APIs instead of MultiMonitorTool (issue #91); off until verified on hardware.</summary>
-    public bool NativeDisplays { get; set; }
     public int FpsLimit { get; set; }
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }
@@ -42,22 +38,79 @@ public sealed class AppConfig
 
     /// <summary>Look for new GitHub releases on startup.</summary>
     public bool CheckUpdates { get; set; } = true;
+    /// <summary>Also offer alpha/beta releases (Settings → Receive test versions).</summary>
+    public bool BetaUpdates { get; set; }
 
-    /// <summary>Holding the Xbox Guide (Home) button while in the tray enters console mode.</summary>
-    public bool HomeButtonLaunch { get; set; } = true;
+    /// <summary>
+    /// Controller shortcuts the user picked, as XInput button bits (see ControllerShortcuts);
+    /// 0 = not set, which is how every install starts: nothing fires until they choose.
+    /// Home: from the tray, enters console mode. Menu: in a session, opens the menu over the
+    /// game. Exit: in a session, goes back to the PC.
+    /// </summary>
+    public int HomeShortcut { get; set; }
+    public int MenuShortcut { get; set; }
+    public int ExitShortcut { get; set; }
+
+    /// <summary>The shortcuts setup (first run of the version that made them configurable) was finished or skipped.</summary>
+    public bool ShortcutsOnboardingDone { get; set; }
 
     /// <summary>A short press of the Guide button is enough (Game Bar's own shortcut is turned off).</summary>
     public bool HomeButtonShortPress { get; set; }
 
+    /// <summary>
+    /// Going back to the PC also quits Steam (its own Exit, never a kill), unless a game is running.
+    /// Big Picture itself is always closed.
+    /// </summary>
+    public bool CloseSteamOnRestore { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
+
+    /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
+    public bool InterfaceSounds { get; set; } = true;
+
+    /// <summary>Console background: "auto" (covers of the installed Steam games), "gradient" or "image".</summary>
+    public string ConsoleBackground { get; set; } = "auto";
+
+    /// <summary>The picture used when the background is "image".</summary>
+    public string ConsoleBackgroundImage { get; set; } = "";
 
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 
+    /// <summary>Turning the TV on / to the PC's input when console mode starts (issue #75).</summary>
+    public TvControlConfig Tv { get; set; } = new();
+
     [JsonIgnore]
     public string SetupKey =>
         $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";
+}
+
+public sealed class TvControlConfig
+{
+    public const string None = "none";
+    public const string AndroidTv = "androidTv";
+
+    /// <summary>"none" | "androidTv".</summary>
+    public string Provider { get; set; } = None;
+
+    /// <summary>The TV's IP address or host name, optionally with ":port".</summary>
+    public string Host { get; set; } = "";
+
+    /// <summary>For Wake-on-LAN when the TV is in deep standby; empty = don't send it.</summary>
+    public string MacAddress { get; set; } = "";
+
+    /// <summary>HDMI input the PC is plugged into (1-4).</summary>
+    public int HdmiInput { get; set; } = 1;
+
+    /// <summary>Android TV: shell command that switches to the PC's input, for TVs that ignore the HDMI key codes.</summary>
+    public string InputCommand { get; set; } = "";
+
+    /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
+    public bool TurnOffOnRestore { get; set; }
+
+    [JsonIgnore]
+    public bool IsEnabled => !string.IsNullOrWhiteSpace(Provider) && Provider != None;
 }
 
 public sealed class SavedDisplayMode
@@ -235,6 +288,8 @@ public sealed class ScreenRect
 public sealed class ConsoleRuntimeState
 {
     public bool IsActive { get; set; }
+    /// <summary>TV control used for this session, for the optional standby on restore.</summary>
+    public TvControlConfig? Tv { get; set; }
     public bool ShouldExit { get; set; }
     public bool RestoreInProgress { get; set; }
     public bool SteamMoved { get; set; }
@@ -250,6 +305,7 @@ public sealed class ConsoleRuntimeState
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
     public string FullscreenMode { get; set; } = "bigPicture";
+    public bool CloseSteamOnRestore { get; set; } = true;
     public string? AudioDeviceId { get; set; }
     public bool AudioAutoSwitch { get; set; }
     public string? AudioDeviceHint { get; set; }
@@ -258,6 +314,7 @@ public sealed class ConsoleRuntimeState
     public string? LastAudioSwitchName { get; set; }
     public bool AudioPendingTarget { get; set; }
     public nint CachedBigPictureHandle { get; set; }
+    public DateTime? PlayniteWindowMissingSince { get; set; }
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }

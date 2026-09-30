@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using ConsoleMode.Models;
 using ConsoleMode.Native;
+using ConsoleMode.Services;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -20,6 +21,12 @@ public sealed class SessionHintWindow : Window
     private const double WidthDip = 470;
     private const double HeightDip = 96;
     private const double MarginDip = 28;
+
+    // Nobody holds the window after "new": without this the GC can collect it and its timer
+    // before they fire, and the toast then stays on screen and never closes.
+    private static readonly HashSet<SessionHintWindow> Live = [];
+
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _timer;
 
     public SessionHintWindow(string title, string body, ScreenRect? target, TimeSpan duration)
     {
@@ -55,14 +62,27 @@ public sealed class SessionHintWindow : Window
             presenter.IsMinimizable = false;
             presenter.SetBorderAndTitleBar(false, false);
         }
+        WindowChrome.Strip(hwnd);
         WindowPlacement.TopRightOn(appWindow, target, WidthDip, HeightDip, MarginDip);
         appWindow.Show(activateWindow: false);
 
-        var timer = DispatcherQueue.CreateTimer();
-        timer.Interval = duration;
-        timer.IsRepeating = false;
-        timer.Tick += (_, _) => Close();
-        timer.Start();
+        Live.Add(this);
+        Closed += (_, _) =>
+        {
+            _timer?.Stop();
+            Live.Remove(this);
+        };
+
+        _timer = DispatcherQueue.CreateTimer();
+        _timer.Interval = duration;
+        _timer.IsRepeating = false;
+        _timer.Tick += (_, _) =>
+        {
+            _timer.Stop();
+            try { Close(); }
+            catch (Exception ex) { AppLog.Write($"Menu da sessão: aviso não fechou: {ex.Message}"); }
+        };
+        _timer.Start();
     }
 
     private const int GwlExStyle = -20;

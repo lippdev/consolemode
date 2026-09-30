@@ -8,14 +8,16 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Os monitores da mesa desligam para a TV no HDMI; ao sair do Big Picture, a mesa volta sozinha." width="800">
+<img src="assets/features.gif" alt="Tour do Console Mode 1.5: resolução e HDR ajustados para a TV, Big Picture, Playnite ou Xbox como lançador, as telas da mesa e o áudio voltando ao sair do jogo, segurar Home para começar e Start + Select para voltar ao PC." width="800">
 
 ## Download
 
-Baixe a **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, a versão estável mais recente:
+Baixe a **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
+
+Quer ajudar a testar o que vem aí? A **[1.6.0-alpha.3](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.3)** é uma alpha da 1.6 que não embute mais nenhuma ferramenta de terceiros para telas e áudio. Ela ainda não foi validada em muitos setups: fique na 1.5.1 se precisa que funcione sem surpresas, ou ligue Ajustes → "Receber versões de teste" na 1.5.1 para recebê-la pelo app.
 
 Está na 1.4.0? O app oferece a atualização. Se ela falhar por tempo esgotado, baixe o instalador uma vez; as configurações são mantidas.
 
@@ -27,13 +29,15 @@ Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [P
 2. Clique em **Jogar agora**, ou use o atalho de 1 clique na Área de Trabalho. Na primeira vez numa tela nova, a TV pergunta "Está vendo esta tela?" e desfaz tudo sozinha se ninguém responder.
 3. Saia do Big Picture ou do Playnite e tudo volta: telas, áudio, resolução.
 
-Prefere o sofá? Com o app na bandeja, segure o botão Home do controle e ele começa dali.
+Prefere o sofá? Com o app na bandeja, segure o seu atalho do controle e ele começa dali.
 
-| Atalho no controle | Faz |
-|---|---|
-| Segurar **Home** (Xbox / PS) | Entra no modo console a partir da bandeja |
-| Segurar **Select + Y** (Create + △) | Menu sobre o jogo: volume, resolução, áudio, FPS, HDR, sair |
-| Segurar **Start + Select** (Options + Create) | Volta para o PC |
+Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunta na primeira abertura (e dá para mudar em Ajustes). Nenhum botão pode servir para duas ações.
+
+| Atalho no controle | Faz | Sugestão |
+|---|---|---|
+| Segurar o seu atalho de **abrir** | Entra no modo console a partir da bandeja | **Home** (Xbox / PS) |
+| Segurar o seu atalho do **menu** | Menu sobre o jogo: volume, resolução, áudio, FPS, HDR, sair | **Select + Y** (Create + △) |
+| Segurar o seu atalho de **voltar ao PC** | Volta para o PC | **Start + Select** (Options + Create) |
 
 ## Recursos
 
@@ -42,6 +46,7 @@ Prefere o sofá? Com o app na bandeja, segure o botão Home do controle e ele co
 - Esconde as outras telas **desconectando**, com **cortinas pretas** ou por **DDC/CI**
 - **Resolução e Hz** por tela, **HDR**, **VRR** e **limite de FPS** (RTSS) enquanto você joga
 - O áudio vai para a TV (ou qualquer saída) e volta depois
+- [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation)
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)

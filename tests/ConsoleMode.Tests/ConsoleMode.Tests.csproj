@@ -10,15 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="coverlet.collector" Version="10.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
     <Compile Include="../../src/ConsoleMode/Services/UpdateIntegrity.cs" Link="UpdateIntegrity.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/UpdateChannel.cs" Link="UpdateChannel.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ReleaseNotes.cs" Link="ReleaseNotes.cs" />
     <Compile Include="../../src/ConsoleMode/Services/LocalizationService.cs" Link="LocalizationService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/FeedbackService.cs" Link="FeedbackService.cs" />
@@ -27,11 +28,22 @@
     <Compile Include="../../src/ConsoleMode/Services/UiModeResolver.cs" Link="UiModeResolver.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlaynitePaths.cs" Link="PlaynitePaths.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControllerShortcuts.cs" Link="ControllerShortcuts.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/UiSoundSynth.cs" Link="UiSoundSynth.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/SteamArt.cs" Link="SteamArt.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/AltTabRules.cs" Link="AltTabRules.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControlFsLocator.cs" Link="ControlFsLocator.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/SteamShutdown.cs" Link="SteamShutdown.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/RestoreWaitPolicy.cs" Link="RestoreWaitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/Tv/AdbProtocol.cs" Link="Tv/AdbProtocol.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/Tv/AdbShellOutput.cs" Link="Tv/AdbShellOutput.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/Tv/WakeOnLan.cs" Link="Tv/WakeOnLan.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.es-ES.json" Link="Strings.es-ES.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.es-ES.json" />

@@ -3,16 +3,19 @@ using System.Text.RegularExpressions;
 
 namespace ConsoleMode.Services;
 
-/// <summary>One monitor in the layout backup (MultiMonitorTool's .cfg format, kept for compatibility).</summary>
+/// <summary>
+/// One monitor in the layout backup (the .cfg format 1.5 wrote, kept so its backups can be restored).
+/// <c>Orientation</c> is DEVMODE.dmDisplayOrientation: 0 landscape, 1 = 90°, 2 = 180°, 3 = 270°.
+/// </summary>
 public sealed record LayoutEntry(string Name, string MonitorId, string Serial, int BitsPerPixel,
-    int Width, int Height, int Frequency, int PositionX, int PositionY);
+    int Width, int Height, int Frequency, int PositionX, int PositionY, int Orientation = 0);
 
 /// <summary>What the monitor's EDID says about itself.</summary>
 public sealed record EdidInfo(string Name, string Serial, int PreferredWidth, int PreferredHeight);
 
 /// <summary>
 /// Monitor identity and layout-file helpers for the native display backend (issue #91). They
-/// produce the same values MultiMonitorTool did, so saved settings and backups keep working.
+/// produce the same values 1.5 saved, so saved settings and backups keep working.
 /// Pure, so it's tested.
 /// </summary>
 public static class DisplayIdentity
@@ -34,7 +37,7 @@ public static class DisplayIdentity
     }
 
     /// <summary>
-    /// MultiMonitorTool's "Monitor ID" (the device ID Windows gives the monitor), e.g.
+    /// The monitor ID saved since 1.5 (the device ID Windows gives the monitor), e.g.
     /// <c>MONITOR\GSM5B7F\{4d36e96e-e325-11ce-bfc1-08002be10318}\0004</c>; the last part is the
     /// monitor's driver key. It's what <c>MonitorInfo.StableId</c> saves in config.json.
     /// </summary>
@@ -123,7 +126,7 @@ public static class DisplayIdentity
             sb.Append($"Height={e.Height}\r\n");
             sb.Append("DisplayFlags=0\r\n");
             sb.Append($"DisplayFrequency={e.Frequency}\r\n");
-            sb.Append("DisplayOrientation=0\r\n");
+            sb.Append($"DisplayOrientation={e.Orientation}\r\n");
             sb.Append($"PositionX={e.PositionX}\r\n");
             sb.Append($"PositionY={e.PositionY}\r\n");
         }

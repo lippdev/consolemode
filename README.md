@@ -8,14 +8,16 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode.gif" alt="Desk monitors turn off for a previously off HDMI TV; closing Big Picture restores the desk automatically." width="800">
+<img src="assets/features.gif" alt="Tour of Console Mode 1.5: resolution and HDR tuned for the TV, Big Picture, Playnite or Xbox as the launcher, the desk screens and audio coming back when you quit the game, hold Home to start and Start + Select to go back to the PC." width="800">
 
 ## Download
 
-Get **[1.5.0](https://github.com/lippdev/consolemode/releases/tag/v1.5.0)**, the latest stable version:
+Get **[1.5.1](https://github.com/lippdev/consolemode/releases/tag/v1.5.1)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
+
+Want to help test what comes next? **[1.6.0-alpha.3](https://github.com/lippdev/consolemode/releases/tag/v1.6.0-alpha.3)** is an early alpha of 1.6 that no longer bundles any third-party tool for displays and audio. It is not verified on many setups yet: keep 1.5.1 if you need it to just work, or turn on Settings → "Receive test versions" in 1.5.1 to get it from the app.
 
 On 1.4.0? The app offers the update. If it fails with a timeout, download the installer once; your settings are kept.
 
@@ -27,13 +29,15 @@ Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [
 2. Press **Play now**, or use the one-click desktop shortcut. The first time on a new screen, the TV asks "Can you see this screen?" and reverts on its own if nobody answers.
 3. Quit Big Picture or Playnite and everything goes back: screens, audio, resolution.
 
-Prefer the couch? With the app in the tray, hold the controller's Home button and it starts from there.
+Prefer the couch? With the app in the tray, hold your controller shortcut and it starts from there.
 
-| Controller shortcut | Does |
-|---|---|
-| Hold **Home** (Xbox / PS) | Enter console mode from the tray |
-| Hold **Select + Y** (Create + △) | Menu over the game: volume, resolution, audio, FPS, HDR, exit |
-| Hold **Start + Select** (Options + Create) | Back to the PC |
+You pick the controller shortcuts yourself: none is on at first, the app asks the first time you open it (and you can change them in Settings). No button can serve two actions.
+
+| Controller shortcut | Does | Suggested |
+|---|---|---|
+| Hold your **open** shortcut | Enter console mode from the tray | **Home** (Xbox / PS) |
+| Hold your **menu** shortcut | Menu over the game: volume, resolution, audio, FPS, HDR, exit | **Select + Y** (Create + △) |
+| Hold your **back to the PC** shortcut | Back to the PC | **Start + Select** (Options + Create) |
 
 ## Features
 
@@ -42,6 +46,7 @@ Prefer the couch? With the app in the tray, hold the controller's Home button an
 - Hide the other screens by **disconnecting** them, **black overlays** or **DDC/CI**
 - Per-screen **resolution and refresh rate**, **HDR**, **VRR** and an **FPS limit** (RTSS) while you play
 - Audio goes to the TV (or any output) and comes back afterwards
+- [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can put it in standby afterwards
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode
 - Two interfaces: **Desktop** (mouse) and **Console** (full screen, Xbox and PlayStation pads)
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)

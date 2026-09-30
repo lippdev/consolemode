@@ -7,8 +7,7 @@ namespace ConsoleMode.Services;
 
 public sealed class MonitorService
 {
-    private static bool? _useNative;
-    private readonly IDisplayBackend _backend = UseNative ? new NativeDisplayBackend() : new MmtDisplayBackend();
+    private readonly DisplayBackend _backend = new();
     private readonly object _gate = new();
     private List<MonitorInfo>? _cache;
     private readonly Dictionary<string, List<DisplayModeOption>> _modesCache = new(StringComparer.OrdinalIgnoreCase);
@@ -17,21 +16,6 @@ public sealed class MonitorService
     {
         lock (_gate) _cache = null;
         lock (_modesCache) _modesCache.Clear();
-    }
-
-    /// <summary>
-    /// Windows' own display APIs instead of MultiMonitorTool (issue #91). Off by default while it's
-    /// verified on real hardware: set <c>"NativeDisplays": true</c> in config.json and restart the app.
-    /// </summary>
-    public static bool UseNative => _useNative ??= LoadNativeFlag();
-
-    /// <summary>Display control works: the native backend is on, or MultiMonitorTool is present.</summary>
-    public static bool IsAvailable => UseNative || AppPaths.HasMmt;
-
-    private static bool LoadNativeFlag()
-    {
-        try { return ConfigService.Load().NativeDisplays; }
-        catch { return false; }
     }
 
     public IReadOnlyList<MonitorInfo> GetMonitors(bool forceRefresh = false)
@@ -51,11 +35,6 @@ public sealed class MonitorService
     private IReadOnlyList<MonitorInfo> ReadMonitors(bool forceRefresh)
     {
         if (!forceRefresh && _cache is not null) return _cache;
-        if (!_backend.IsAvailable)
-        {
-            _cache = [];
-            return _cache;
-        }
 
         var monitors = _backend.ListMonitors();
         // Windows' "Display n": active monitors first, in the order they were listed.
@@ -321,7 +300,7 @@ public sealed class MonitorService
         return RectFromInfo(info);
     }
 
-    public bool UpdateFocusRect(string monitorName, ConsoleRuntimeState state, bool allowMmtFallback)
+    public bool UpdateFocusRect(string monitorName, ConsoleRuntimeState state, bool allowListFallback)
     {
         var screen = DisplayScreens.GetBounds(monitorName);
         if (screen is not null)
@@ -330,7 +309,7 @@ public sealed class MonitorService
             return true;
         }
 
-        if (!allowMmtFallback) return false;
+        if (!allowListFallback) return false;
         var rect = RectFromInfo(GetMonitors().FirstOrDefault(m => m.Name == monitorName));
         if (rect is null) return false;
         state.FocusMonitorRect = rect;
