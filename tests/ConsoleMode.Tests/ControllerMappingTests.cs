@@ -131,4 +131,36 @@ public class ControllerMappingTests
     [InlineData(new byte[] { 0x31, 0, 0 })]         // too short
     public void Unknown_or_short_sony_reports_give_nothing(byte[] report) =>
         Assert.Equal(0, ControllerMapping.SonyButtons(report, dualSense: true));
+
+    // A DualSense over Bluetooth in its basic mode (ID 0x01, 10 meaningful bytes). Windows may hand every
+    // report back padded to the declared Bluetooth size (78), which must not be read as the 64-byte USB layout.
+    [Theory]
+    [InlineData(10)]   // exactly the report
+    [InlineData(78)]   // padded to the declared size
+    public void DualSense_basic_bluetooth_report_is_read_whatever_its_padding(int length)
+    {
+        var report = new byte[length];
+        report[0] = 0x01;
+        report[1] = report[2] = 128;                 // left stick centred
+        report[5] = (byte)(0x08 | 0x20);             // hat released + Cross
+        report[6] = 0x20;                            // Options
+        Assert.Equal(0x1000 | 0x0010, ControllerMapping.SonyButtons(report, dualSense: true, inputReportLength: 78));
+    }
+
+    [Fact]
+    public void DualSense_usb_report_keeps_its_own_layout_when_the_declared_size_is_64()
+    {
+        var report = NeutralReport(0x01, 64, 8, 1);
+        report[8] |= 0x20;   // Cross
+        Assert.Equal(0x1000, ControllerMapping.SonyButtons(report, dualSense: true, inputReportLength: 64));
+    }
+
+    [Theory]
+    [InlineData(0x01, true)]
+    [InlineData(0x11, true)]
+    [InlineData(0x31, true)]
+    [InlineData(0x05, false)]
+    [InlineData(0x00, false)]
+    public void Only_the_documented_sony_report_ids_are_known(byte id, bool known) =>
+        Assert.Equal(known, ControllerMapping.IsKnownSonyReport(id));
 }

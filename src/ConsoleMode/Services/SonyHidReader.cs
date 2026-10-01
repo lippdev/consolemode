@@ -96,11 +96,24 @@ public static class SonyHidReader
         {
             await using var stream = new FileStream(pad.Handle, FileAccess.Read, 0, isAsync: true);
             var buffer = new byte[Math.Max(pad.ReportLength, 64)];
+            var loggedFirst = false;
+            var loggedUnknown = false;
             while (!ct.IsCancellationRequested)
             {
                 var read = await stream.ReadAsync(buffer.AsMemory(0, pad.ReportLength), ct);
                 if (read <= 0) break;
-                var bits = ControllerMapping.SonyButtons(buffer.AsSpan(0, read), pad.DualSense);
+                // Once per pad, so a pad that reads wrong can be diagnosed from the log alone.
+                if (!loggedFirst)
+                {
+                    loggedFirst = true;
+                    AppLog.Write($"Controle: HID {(pad.DualSense ? "DualSense" : "DualShock 4")}: relatório 0x{buffer[0]:X2} com {read} bytes (descritor declara {pad.ReportLength})");
+                }
+                if (!loggedUnknown && !ControllerMapping.IsKnownSonyReport(buffer[0]))
+                {
+                    loggedUnknown = true;
+                    AppLog.Write($"Controle: HID: relatório 0x{buffer[0]:X2} não reconhecido; os botões desse formato não são lidos");
+                }
+                var bits = ControllerMapping.SonyButtons(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength);
                 lock (Gate) { Buttons[path] = bits; }
             }
         }
