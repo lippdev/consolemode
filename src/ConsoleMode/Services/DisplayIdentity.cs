@@ -167,6 +167,29 @@ public static class DisplayIdentity
     }
 
     /// <summary>
+    /// Monitors that were on in the backup (they have a size) whose current state is wrong: not active, or not
+    /// at the saved position. Used to check a restore and to retry it. Specs without a saved position are skipped.
+    /// </summary>
+    public static List<string> LayoutMismatches(
+        IReadOnlyDictionary<string, Dictionary<string, string>> specs,
+        IEnumerable<(string Name, bool IsActive, int X, int Y)> current)
+    {
+        var now = current.GroupBy(m => m.Name, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+        var wrong = new List<string>();
+        foreach (var (name, spec) in specs)
+        {
+            int.TryParse(spec.GetValueOrDefault("Width"), out var width);
+            int.TryParse(spec.GetValueOrDefault("Height"), out var height);
+            if (width <= 0 || height <= 0) continue; // was off
+            if (!int.TryParse(spec.GetValueOrDefault("PositionX"), out var x) ||
+                !int.TryParse(spec.GetValueOrDefault("PositionY"), out var y)) continue;
+            if (!now.TryGetValue(name, out var monitor) || !monitor.IsActive || monitor.X != x || monitor.Y != y)
+                wrong.Add(name);
+        }
+        return wrong;
+    }
+
+    /// <summary>
     /// Re-keys layout sections by the name each monitor has now, matched by <c>MonitorID</c>: a
     /// monitor that was disabled can come back as another \.\DISPLAYn. Sections whose monitor isn't
     /// found keep their saved name.

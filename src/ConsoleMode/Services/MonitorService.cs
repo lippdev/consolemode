@@ -113,51 +113,11 @@ public sealed class MonitorService
             Thread.Sleep(300);
         }
 
-        var allDeviceNames = backupSpecs.Values
-            .Select(s => s.GetValueOrDefault("Name") ?? "")
-            .Where(n => n.Length > 0)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        // Screens that were on before the session come back; the ones that were off (the TV, usually) stay off.
         var monitorsToVerify = backupSpecs
             .Where(kv => IsBackupSpecActive(kv.Value))
             .Select(kv => kv.Key)
             .ToList();
-
-        if (allDeviceNames.Count > 0)
-        {
-            _backend.Enable(allDeviceNames);
-
-            if (monitorsToVerify.Count > 0 && !WaitMonitorsActive(monitorsToVerify))
-            {
-                foreach (var name in monitorsToVerify)
-                    _backend.Enable([name]);
-                if (!WaitMonitorsActive(monitorsToVerify, 3000))
-                {
-                    AppLog.Write($"Restore: /enable não confirmou todos ({string.Join('+', monitorsToVerify)}); usando ExtendAll");
-                    CcdHelper.ExtendAll();
-                    if (!WaitMonitorsActive(monitorsToVerify))
-                        result.Issues.Add($"Nem todos os monitores foram reativados: {string.Join(", ", monitorsToVerify)}");
-                }
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
-        {
-            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
-            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
-                result.Issues.Add($"Não foi possível restaurar o primário para {ctx.OriginalPrimary}");
-        }
-
-        _backend.LoadLayout(AppPaths.BackupMonitorConfig);
-        Thread.Sleep(800);
-
-        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
-        {
-            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
-            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
-                result.Issues.Add($"Primário não confirmado em {ctx.OriginalPrimary} após LoadConfig");
-        }
-
         var monitorsToDisable = backupSpecs
             .Where(kv => !IsBackupSpecActive(kv.Value))
             .Select(kv => kv.Key)
@@ -168,17 +128,88 @@ public sealed class MonitorService
             monitorsToDisable.Add(ctx.FocusMonitor);
         }
 
-        foreach (var name in monitorsToDisable)
+        // 1. Re-attach only the screens that were on. Enabling the ones that were off too (as 1.5's tool did)
+        //    made Windows lay them out and then re-flow everything when they were detached again.
+        var restored = true;
+        if (monitorsToVerify.Count > 0)
         {
-            if (string.Equals(name, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase)) continue;
-            if (!DisableWithRetry(name))
-                result.Issues.Add($"Não foi possível desconectar {name}");
+            _backend.Enable(monitorsToVerify);
+
+            if (!WaitMonitorsActive(monitorsToVerify))
+            {
+                foreach (var name in monitorsToVerify)
+                    _backend.Enable([name]);
+                if (!WaitMonitorsActive(monitorsToVerify, 3000))
+                {
+                    AppLog.Write($"Restore: /enable não confirmou todos ({string.Join('+', monitorsToVerify)}); usando ExtendAll");
+                    CcdHelper.ExtendAll();
+                    if (!WaitMonitorsActive(monitorsToVerify))
+                    {
+                        restored = false;
+                        result.Issues.Add($"Nem todos os monitores foram reativados: {string.Join(", ", monitorsToVerify)}");
+                    }
+                }
+            }
+        }
+
+        // 2. Detach the screens that were off BEFORE placing the others: while the TV is still part of the
+        //    desktop, Windows keeps the positions around it and moves the other screens when it goes. If the
+        //    originals didn't come back, the TV is the only picture left: leave it on.
+        if (restored)
+        {
+            foreach (var name in monitorsToDisable)
+            {
+                if (string.Equals(name, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!DisableWithRetry(name))
+                    result.Issues.Add($"Não foi possível desconectar {name}");
+            }
+        }
+        else
+        {
+            AppLog.Write("Restore: telas originais não voltaram; a tela de jogo fica ligada para não ficar sem imagem");
+        }
+
+        // 3. Primary, then every position and mode of the backup in one go, and check that it stuck.
+        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
+        {
+            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
+            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
+                result.Issues.Add($"Não foi possível restaurar o primário para {ctx.OriginalPrimary}");
+        }
+
+        const int layoutAttempts = 3;
+        for (var attempt = 1; attempt <= layoutAttempts; attempt++)
+        {
+            _backend.LoadLayout(AppPaths.BackupMonitorConfig);
+            Thread.Sleep(800);
+            var wrong = LayoutMismatches(backupSpecs);
+            if (wrong.Count == 0) break;
+            AppLog.Write($"Restore: posições fora do backup em {string.Join('+', wrong)} (tentativa {attempt}/{layoutAttempts})");
+            if (attempt == layoutAttempts) result.Issues.Add($"Posição das telas diferente do backup: {string.Join(", ", wrong)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
+        {
+            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
+            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
+                result.Issues.Add($"Primário não confirmado em {ctx.OriginalPrimary} após restaurar o layout");
         }
 
         ClearCache();
         result.Success = result.Issues.Count == 0;
         AppLog.Write(result.Success ? "Restore: concluído com sucesso" : $"Restore: problemas: {string.Join(" | ", result.Issues)}");
         return result;
+    }
+
+    /// <summary>Screens that were on in the backup whose position (or state) is not the saved one right now.</summary>
+    private List<string> LayoutMismatches(Dictionary<string, Dictionary<string, string>> backupSpecs)
+    {
+        var now = GetMonitors(true).Select(m =>
+        {
+            ParseLeftTop(m.LeftTop, out var x, out var y);
+            return (m.Name, m.IsActive, x ?? 0, y ?? 0);
+        });
+        return DisplayIdentity.LayoutMismatches(backupSpecs, now);
     }
 
     public void SetPrimary(string monitorName)

@@ -143,4 +143,50 @@ public sealed class DisplayIdentityTests
         var bytes = Encoding.ASCII.GetBytes(text + "\n");
         for (var i = 0; i < 13; i++) edid[offset + 5 + i] = i < bytes.Length ? bytes[i] : (byte)0x20;
     }
+
+    // The desk before the session: DISPLAY1 at the origin, DISPLAY2 right below it, the TV off.
+    private static Dictionary<string, Dictionary<string, string>> DeskBackup() => DisplayIdentity.ParseLayout(DisplayIdentity.FormatLayout(
+    [
+        new LayoutEntry(@"\\.\DISPLAY1", "A", "", 32, 2560, 1080, 144, 0, 0),
+        new LayoutEntry(@"\\.\DISPLAY2", "B", "", 32, 2560, 1440, 144, 0, 1080),
+        new LayoutEntry(@"\\.\DISPLAY3", "TV", "", 0, 0, 0, 0, 0, 0)
+    ]).Split("\r\n"));
+
+    [Fact]
+    public void Layout_check_passes_when_every_screen_that_was_on_is_where_it_was()
+    {
+        var wrong = DisplayIdentity.LayoutMismatches(DeskBackup(),
+        [
+            (@"\\.\DISPLAY1", true, 0, 0),
+            (@"\\.\DISPLAY2", true, 0, 1080),
+            (@"\\.\DISPLAY3", false, 0, 0)   // the TV was off: its state is not part of the check
+        ]);
+        Assert.Empty(wrong);
+    }
+
+    [Fact]
+    public void Layout_check_flags_a_screen_that_slid_aside()
+    {
+        var wrong = DisplayIdentity.LayoutMismatches(DeskBackup(),
+        [
+            (@"\\.\DISPLAY1", true, 0, 0),
+            (@"\\.\DISPLAY2", true, -2560, 1080),
+            (@"\\.\DISPLAY3", false, 0, 0)
+        ]);
+        Assert.Equal(new[] { @"\\.\DISPLAY2" }, wrong);
+    }
+
+    [Fact]
+    public void Layout_check_flags_a_screen_that_is_off_or_missing()
+    {
+        var wrong = DisplayIdentity.LayoutMismatches(DeskBackup(), [(@"\\.\DISPLAY1", false, 0, 0)]);
+        Assert.Equal(new[] { @"\\.\DISPLAY1", @"\\.\DISPLAY2" }, wrong.Order());
+    }
+
+    [Fact]
+    public void Layout_check_ignores_backups_without_a_position()
+    {
+        var specs = DisplayIdentity.ParseLayout(["[Monitor0]", @"Name=\\.\DISPLAY1", "Width=1920", "Height=1080"]);
+        Assert.Empty(DisplayIdentity.LayoutMismatches(specs, [(@"\\.\DISPLAY1", true, 500, 500)]));
+    }
 }
