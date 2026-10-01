@@ -290,6 +290,16 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (sa
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
 
+## Restaurar a mesa: posições das telas
+
+Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas telas empilhadas ou lado a lado, p. ex. uma ultrawide com outra logo abaixo, alinhadas à esquerda); anote o mapa em Configurações → Sistema → Tela antes de começar.
+
+- [ ] Estratégia "Desconectar": **Jogar agora** e depois **Voltar ao PC** (botão, menu da sessão e tray): o mapa em Configurações → Sistema → Tela volta **idêntico** ao anotado (cada tela no mesmo lugar, mesma tela principal, a TV desligada como antes). Resultado: ______
+- [ ] O `consolemode.log` mostra a ordem `Telas: desativar <TV>` **antes** de `Telas: layout restaurado => 0` e não tem `posições fora do backup`. Se tiver, o texto diz quais telas e em qual tentativa a restauração acertou. Resultado: ______
+- [ ] Repetir 3 vezes seguidas: o layout não deriva a cada ciclo. Resultado: ______
+- [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
+- [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
+
 ## Telas com código próprio (issue #91)
 
 Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.
