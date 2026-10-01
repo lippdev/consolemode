@@ -12,6 +12,12 @@ Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in Engl
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
+## Configurações no modo Console
+
+A aba **Sistema** oferece os mesmos ajustes do modo PC, incluindo os atalhos do controle, Playnite, Android TV, FPS personalizado e pasta de dados. Os valores são compartilhados entre as duas interfaces e permanecem salvos ao reabrir o app.
+
+Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar**, segure a combinação desejada em um único controle e solte os botões. **Remover** desativa aquele atalho. Durante a captura, os botões não navegam pela interface; use **Cancelar** ou **Esc** para interrompê-la. Fora da captura, **B** volta do editor. Campos de endereço e FPS personalizado aceitam digitação por teclado.
+
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
