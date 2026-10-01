@@ -4,6 +4,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+### Correções
+- Telas: ao voltar para o PC o layout volta idêntico ao de antes (a tela 2 não desliza mais para o lado) e a TV continua desligada. Só voltam as telas que estavam ligadas, a TV é desconectada antes das posições, o resultado é conferido com o backup e refeito se preciso. (#134)
+
 ## [1.6.0-alpha.5]
 
 ### Correções

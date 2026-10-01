@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixes
+- Displays: going back to the PC restores the exact layout from before (the second monitor no longer slides aside) and keeps the TV off. Only the screens that were on come back, the TV is detached before the positions, and the result is checked against the backup and redone if needed. (#134)
+
 ## [1.6.0-alpha.5]
 
 ### Fixes
