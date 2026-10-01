@@ -349,9 +349,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Going back to the PC: Big Picture is closed (it would otherwise be left on the desk monitor when the
-    /// screens come back), and Steam is asked to quit its own way, because after Big Picture it is often left
-    /// half-working. Never a kill, never when a game is running, and never a reason to fail the restore.
+    /// Going back to the PC closes Big Picture and Steam's client window to the tray; the process remains running.
     /// </summary>
     private void CloseSteamForRestore()
     {
@@ -363,7 +361,7 @@ public sealed class ConsoleEngine
             var appId = SteamSession.RunningAppId();
             var decision = SteamShutdown.Decide(State.FullscreenMode, State.CloseSteamOnRestore, SteamSession.IsRunning(), appId);
             AppLog.Write(SteamShutdown.Describe(decision, appId));
-            if (decision == SteamShutdown.Decision.Shutdown) SteamSession.RequestShutdown();
+            if (decision == SteamShutdown.Decision.CloseToTray) SteamSession.CloseWindowToTray();
         }
         catch (Exception ex)
         {

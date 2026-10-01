@@ -435,6 +435,8 @@
                             <Setter Property="FontSize" Value="20"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="MaxLines" Value="2"/>
                         </Style>
                         <Style x:Key="RowValue" TargetType="TextBlock">
                             <Setter Property="FontSize" Value="20"/>
@@ -443,20 +445,22 @@
                             <Setter Property="HorizontalAlignment" Value="Right"/>
                             <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="MaxLines" Value="2"/>
                             <Setter Property="MaxWidth" Value="420"/>
                         </Style>
                     </Grid.Resources>
                     <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                        <StackPanel Spacing="10" MaxWidth="1100" HorizontalAlignment="Left">
+                        <StackPanel Spacing="10" MaxWidth="1100" HorizontalAlignment="Stretch">
                             <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}"/>
                             <Button x:Name="FirstSettingsRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="mode" IsEnabled="{x:Bind ViewModel.HasFocusRow, Mode=OneWay}">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.FocusRow.SelectedMode.Text, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="hide">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HideOtherScreensCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedHideStrategy.Text, Mode=OneWay}"/>
                                 </Grid>
@@ -464,19 +468,19 @@
 
                             <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="launch">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.LaunchCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedLaunch.Text, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="audio">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedAudio.Text, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.PickPlaynitePathCommand}">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.PlaynitePathCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.PlaynitePathText, Mode=OneWay}"/>
                                 </Grid>
@@ -484,27 +488,48 @@
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.ClearPlaynitePathCommand}" IsEnabled="{x:Bind ViewModel.HasPlaynitePath, Mode=OneWay}">
                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.PlaynitePathClear, Mode=OneWay}"/>
                             </Button>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
+                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="controllerlayout">
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ControllerLayoutCard, Mode=OneWay}"/>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedControllerLayout.Text, Mode=OneWay}"/>
+                                </Grid>
+                            </Button>
+                            <TextBlock Text="{x:Bind ViewModel.ControllerLayoutPreview, Mode=OneWay}" FontSize="22" Opacity="0.9" Margin="12,0,0,2"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.ControllerLayoutDescription, Mode=OneWay}" FontSize="18" TextWrapping="Wrap" Opacity="0.72" Margin="12,0,0,8"/>
                             <Button x:Name="HomeShortcutRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenShortcutEditorCommand}" CommandParameter="home">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.HomeShortcutText, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button x:Name="MenuShortcutRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenShortcutEditorCommand}" CommandParameter="menu">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.MenuShortcutText, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button x:Name="ExitShortcutRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenShortcutEditorCommand}" CommandParameter="exit">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.ExitShortcutText, Mode=OneWay}"/>
                                 </Grid>
                     </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="autostart">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AutoStartControllerCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.AutoStartOnController), Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="shortpress" IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.HomeButtonShortPress), Mode=OneWay}"/>
+                        </Grid>
+                    </Button>
                     <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="tvprovider">
-                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvControlCard, Mode=OneWay}"/>
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedTvProvider.Text, Mode=OneWay}"/>
                         </Grid>
@@ -512,14 +537,14 @@
                     <TextBox Header="{x:Bind ViewModel.Texts.TvHostCard, Mode=OneWay}" PlaceholderText="192.168.0.50" Text="{x:Bind ViewModel.TvHost, Mode=TwoWay}" Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}"/>
                     <TextBox Header="{x:Bind ViewModel.Texts.TvMacCard, Mode=OneWay}" PlaceholderText="AA:BB:CC:DD:EE:FF" Text="{x:Bind ViewModel.TvMacAddress, Mode=TwoWay}" Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}"/>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="tvhdmi" Visibility="{x:Bind ViewModel.UsesTvHdmiInput, Mode=OneWay}">
-                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvHdmiCard, Mode=OneWay}"/>
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedTvHdmiInput.Text, Mode=OneWay}"/>
                         </Grid>
                     </Button>
                     <TextBox Header="{x:Bind ViewModel.Texts.TvInputCommandCard, Mode=OneWay}" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}" Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}"/>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="tvpower" IsEnabled="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}">
-                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}"/>
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.TvTurnOffOnRestore), Mode=OneWay}"/>
                         </Grid>
@@ -528,37 +553,25 @@
                         <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvTestCard, Mode=OneWay}"/>
                     </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="background">
-                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BackgroundCard, Mode=OneWay}"/>
                             <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.BackgroundModeText, Mode=OneWay}"/>
                         </Grid>
                     </Button>
                     <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="backgroundimage"
                             Visibility="{x:Bind ViewModel.IsBackgroundImageMode, Mode=OneWay}">
-                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BackgroundImageCard, Mode=OneWay}"/>
                         </Grid>
                     </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="sounds">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.SoundsCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.InterfaceSounds), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="autostart">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AutoStartControllerCard, Mode=OneWay}"/>
-                                    <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.AutoStartOnController), Mode=OneWay}"/>
-                                </Grid>
-                            </Button>
-                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="shortpress" IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}"/>
-                                    <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.HomeButtonShortPress), Mode=OneWay}"/>
-                                </Grid>
-                            </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="closest">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.CloseSteamCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.CloseSteamOnRestore), Mode=OneWay}"/>
                                 </Grid>
@@ -566,19 +579,19 @@
 
                             <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="hdr">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.HdrText, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="vrr">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.VrrCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.VrrText, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="fps" IsEnabled="{x:Bind ViewModel.IsFpsAvailable, Mode=OneWay}">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFps.Text, Mode=OneWay}"/>
                                 </Grid>
@@ -588,37 +601,37 @@
 
                             <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="ui">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.UiModeCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedUiMode.Text, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="language">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.LanguageCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedLanguage.Text, Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="startup">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.StartupCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.StartWithWindows), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="updates">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.NotifyUpdatesCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.CheckUpdates), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="betas">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BetaUpdatesCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.BetaUpdates), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CheckNowCommand}">
-                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.CheckNow, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal" FontSize="16"/>
                                 </Grid>
@@ -646,14 +659,14 @@
 
                             <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" Style="{StaticResource ConsoleHeading}" Margin="4,16,0,12"/>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://wake.nextestudios.com">
-                                <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <Image Source="{x:Bind ViewModel.WakeOnLogo}" Width="36" Height="36"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="WakeOn"/>
                                     <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.Texts.WakeOnDescription, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://nextboost.pro">
-                                <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <Image Source="{x:Bind ViewModel.NextBoostLogo}" Width="36" Height="36"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowLabel}" Text="Next Boost"/>
                                     <TextBlock Grid.Column="2" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.Texts.NextBoostDescription, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal"/>
@@ -777,14 +790,23 @@
         </Grid>
 
         <Grid x:Name="ShortcutEditorPanel" Visibility="{x:Bind ViewModel.IsShortcutEditorOpen, Mode=OneWay}" Background="#E60F1418" TabFocusNavigation="Cycle">
-            <Grid MaxWidth="900" VerticalAlignment="Center" RowSpacing="18">
+            <Grid MaxWidth="1000" VerticalAlignment="Center" RowSpacing="18">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                 <TextBlock Text="{x:Bind ViewModel.ShortcutEditorTitle, Mode=OneWay}" FontSize="32" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                <StackPanel Grid.Row="1" Spacing="20">
-                    <StackPanel Spacing="4"><TextBlock Text="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" FontSize="19"/><ContentControl x:Name="HomeShortcutPickerHost"/></StackPanel>
-                    <StackPanel Spacing="4"><TextBlock Text="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}" FontSize="19"/><ContentControl x:Name="MenuShortcutPickerHost"/></StackPanel>
-                    <StackPanel Spacing="4"><TextBlock Text="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}" FontSize="19"/><ContentControl x:Name="ExitShortcutPickerHost"/></StackPanel>
-                </StackPanel>
+                <ScrollViewer Grid.Row="1" IsTabStop="False" MaxHeight="560" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid ColumnSpacing="16" Margin="4">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Border Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
+                            <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="HomeShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
+                            <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.SessionMenuCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="MenuShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
+                            <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="ExitShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
                 <Button Grid.Row="2" Style="{StaticResource ConsoleSmallButton}" HorizontalAlignment="Center" Command="{x:Bind ViewModel.CloseShortcutEditorCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10"><Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintBack, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border><TextBlock Text="{x:Bind ViewModel.Texts.Back, Mode=OneWay}"/></StackPanel>
                 </Button>

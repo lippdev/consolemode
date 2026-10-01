@@ -27,6 +27,9 @@ public sealed class AppConfig
     /// <summary>"auto" | "desktop" | "console": which interface to show (UiModeResolver).</summary>
     public string UiMode { get; set; } = "auto";
 
+    /// <summary>"auto" | "xbox" | "playstation": which controller symbols to show in the console UI.</summary>
+    public string ControllerLayout { get; set; } = "auto";
+
     /// <summary>The first-run tour was finished or skipped.</summary>
     public bool TourDone { get; set; }
 
@@ -58,7 +61,7 @@ public sealed class AppConfig
     public bool HomeButtonShortPress { get; set; }
 
     /// <summary>
-    /// Going back to the PC also quits Steam (its own Exit, never a kill), unless a game is running.
+    /// Going back to the PC closes Steam's client window to the tray, unless a game is running.
     /// Big Picture itself is always closed.
     /// </summary>
     public bool CloseSteamOnRestore { get; set; } = true;

@@ -5,10 +5,22 @@ namespace ConsoleMode.Tests;
 
 public class SteamShutdownTests
 {
+    [Theory]
+    [InlineData("steam", "Steam", "Chrome_WidgetWin_1", true, false, true)]
+    [InlineData("steamwebhelper", "Steam", "vguiPopupWindow", true, false, true)]
+    [InlineData("steam", "Steam", "SDL_app", true, false, true)]
+    [InlineData("game", "Steam", "Chrome_WidgetWin_1", true, false, false)]
+    [InlineData("steam", "Game", "Chrome_WidgetWin_1", true, false, false)]
+    [InlineData("steam", "Big Picture", "SDL_app", true, false, false)]
+    [InlineData("steam", "Steam", "Chrome_WidgetWin_1", false, false, false)]
+    [InlineData("steam", "Steam", "Chrome_WidgetWin_1", true, true, false)]
+    public void Only_unowned_visible_steam_client_windows_are_close_candidates(string process, string title, string className, bool visible, bool owned, bool expected) =>
+        Assert.Equal(expected, SteamShutdown.IsClientWindowCandidate(process, title, className, visible, owned));
+
     [Fact]
-    public void Steam_is_asked_to_quit_when_big_picture_was_the_launcher_nothing_blocks_it()
+    public void Steam_window_is_closed_to_tray_when_big_picture_was_the_launcher_and_no_game_is_running()
     {
-        Assert.Equal(Decision.Shutdown, Decide("bigPicture", closeSteamSetting: true, steamRunning: true, runningAppId: 0));
+        Assert.Equal(Decision.CloseToTray, Decide("bigPicture", closeSteamSetting: true, steamRunning: true, runningAppId: 0));
     }
 
     [Theory]
@@ -44,7 +56,7 @@ public class SteamShutdownTests
         Assert.Equal(Decision.GameStateUnknown, Decide("bigPicture", true, true, runningAppId: null));
 
     [Fact]
-    public void Missing_running_app_id_remains_unknown_through_the_shutdown_decision_and_log()
+    public void Missing_running_app_id_remains_unknown_and_leaves_steam_untouched()
     {
         var appId = ParseRunningAppId(null);
         var decision = Decide("bigPicture", closeSteamSetting: true, steamRunning: true, appId);

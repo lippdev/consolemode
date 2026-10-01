@@ -21,6 +21,12 @@ public static class NativeWindows
     private static extern uint GetWindowThreadProcessId(nint hWnd, nint processId);
 
     [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(nint hWnd, out uint processId);
+
+    [DllImport("user32.dll")]
+    public static extern nint GetWindow(nint hWnd, uint uCmd);
+
+    [DllImport("user32.dll")]
     private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 
     [DllImport("kernel32.dll")]

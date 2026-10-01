@@ -26,9 +26,9 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         ViewModel = App.ViewModel!;
         InitializeComponent();
-        HomeShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Home);
-        MenuShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Menu);
-        ExitShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Exit);
+        HomeShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Home, consoleStyle: true);
+        MenuShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Menu, consoleStyle: true);
+        ExitShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Exit, consoleStyle: true);
         Loaded += OnLoaded;
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
@@ -297,6 +297,8 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void FocusShortcutEditorTarget()
     {
+        // Visibility changed before the dispatch callback; measure the cards before focusing their buttons.
+        ShortcutEditorPanel.UpdateLayout();
         var picker = ViewModel.ShortcutEditorSlot switch
         {
             "home" => HomeShortcutPickerHost.Content as ShortcutPicker,
