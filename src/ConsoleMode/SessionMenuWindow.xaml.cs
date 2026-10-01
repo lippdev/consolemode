@@ -93,6 +93,13 @@ public sealed partial class SessionMenuWindow : Window
                     UiSounds.Play(UiSound.Move);
                     return true;
                 }
+                // Along a row of window cards: pick the neighbour by position, not by the spatial search.
+                if (!_editingVolume && direction is (FocusNavigationDirection.Left or FocusNavigationDirection.Right)
+                    && !ViewModel.IsSessionPickerOpen && MoveAcrossWindowCards(direction))
+                {
+                    UiSounds.Play(UiSound.Move);
+                    return true;
+                }
                 // Cross into the grid explicitly; spatial focus may prefer another sidebar row.
                 if (!_editingVolume && direction == FocusNavigationDirection.Right && !ViewModel.IsSessionPickerOpen
                     && Root.XamlRoot is { } root
@@ -474,6 +481,48 @@ public sealed partial class SessionMenuWindow : Window
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Left/right between window cards by position: the card on the same row with the next X to that side.
+    /// The XY focus search can miss the neighbour (cards scaled while focused, clipped or scrolled in the
+    /// panel), which left the grid impossible to cross sideways. The end of a row is an end: Right on the last
+    /// card is consumed so the search can't jump somewhere else; Left on the first column is the caller's
+    /// (back to the side panel). False when the focus is not on a window card.
+    /// </summary>
+    private bool MoveAcrossWindowCards(FocusNavigationDirection direction)
+    {
+        if (Root.XamlRoot is not { } root
+            || FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem } current)
+            return false;
+
+        Windows.Foundation.Point Origin(FrameworkElement e) => e.TransformToVisual(SwitcherList).TransformPoint(new Windows.Foundation.Point(0, 0));
+        var from = Origin(current);
+        var rowTolerance = Math.Max(current.ActualHeight / 2, 1);
+
+        Control? best = null;
+        var bestX = 0d;
+        for (var i = 0; i < ViewModel.SwitcherWindows.Count; i++)
+        {
+            if (SwitcherList.ContainerFromIndex(i) is not { } container
+                || FocusManager.FindFirstFocusableElement(container) is not Control card
+                || ReferenceEquals(card, current))
+                continue;
+            var at = Origin(card);
+            if (Math.Abs(at.Y - from.Y) > rowTolerance) continue;
+            var dx = at.X - from.X;
+            if (direction == FocusNavigationDirection.Right ? dx <= 1 : dx >= -1) continue;
+            if (best is null || (direction == FocusNavigationDirection.Right ? at.X < bestX : at.X > bestX))
+            {
+                best = card;
+                bestX = at.X;
+            }
+        }
+
+        if (best is null) return direction == FocusNavigationDirection.Right;
+        best.Focus(FocusState.Keyboard);
+        best.StartBringIntoView();
+        return true;
     }
 
     /// <summary>True when the focus is on a window card with no card to its left (the first column of the grid).</summary>
