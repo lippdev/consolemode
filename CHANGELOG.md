@@ -4,6 +4,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.6.0-beta.1]
+### Atenção: versão beta, não é a estável
+- Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
+
 ### Correções
 - Telas: ao voltar para o PC o layout volta idêntico ao de antes (a tela 2 não desliza mais para o lado) e a TV continua desligada. Só voltam as telas que estavam ligadas, a TV é desconectada antes das posições, o resultado é conferido com o backup e refeito se preciso. (#134)
 

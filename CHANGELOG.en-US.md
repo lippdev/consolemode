@@ -4,6 +4,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.6.0-beta.1]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
 ### Fixes
 - Displays: going back to the PC restores the exact layout from before (the second monitor no longer slides aside) and keeps the TV off. Only the screens that were on come back, the TV is detached before the positions, and the result is checked against the backup and redone if needed. (#134)
 
