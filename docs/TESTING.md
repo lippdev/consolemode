@@ -261,7 +261,7 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 
 - [ ] Em Sistema, as configurações do modo PC também estão disponíveis: caminho do Playnite, fechar a Steam, Android TV, FPS personalizado, atalhos, diagnóstico do controle, tutorial e pasta de dados. Resultado: ______
 - [ ] Configurar, alterar e remover os atalhos de abrir o app, menu da sessão e voltar ao PC; uma combinação em conflito mostra o mesmo erro do modo PC. Durante a captura, os botões não navegam nem iniciam uma sessão. Resultado: ______
-- [ ] Cancelar a captura e sair do editor devolve o foco à configuração; teclado, mouse e controle conseguem abrir e fechar o editor sem acionar opções atrás dele. Resultado: ______
+- [ ] Na captura, apertar e soltar B/○ sozinho cancela sem alterar o atalho; B/○ de novo fecha o editor e devolve o foco à configuração. B/○ junto com outro botão ainda pode ser salvo como combinação, mas B/○ sozinho não é um atalho válido. Teclado e mouse também conseguem abrir e fechar o editor sem acionar opções atrás dele. Resultado: ______
 - [ ] Alterar uma configuração no modo Console, trocar para PC e reabrir o app: o valor permanece igual nas duas interfaces. Resultado: ______
 - [ ] Selecionar e limpar o caminho do Playnite; cancelar o seletor mantém o valor anterior. Resultado: ______
 - [ ] Configurar a Android TV no modo Console: endereço, MAC opcional, entrada HDMI, comando da entrada e espera ao restaurar; Testar agora mostra o resultado e libera o botão após erro ou timeout. Resultado: ______

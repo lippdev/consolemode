@@ -115,6 +115,7 @@
   "ShortcutClear": "Remover",
   "ShortcutCancel": "Cancelar",
   "ShortcutPressButtons": "Segure os botões e depois solte…",
+  "ShortcutCaptureHint": "Solte para salvar. Pressione {0} sozinho para cancelar.",
   "ShortcutNotAllowed": "Use dois ou mais botões juntos (como Select + Y), ou só o botão Home. Um botão sozinho dispararia no meio do jogo.",
   "ShortcutInUse": "{0} já é o atalho de \"{1}\". Escolha outra combinação.",
   "ShortcutsOnboardingTitle": "Configure os atalhos do controle",

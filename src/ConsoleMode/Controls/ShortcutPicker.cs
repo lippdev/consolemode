@@ -26,6 +26,13 @@ public sealed class ShortcutPicker : StackPanel
         Foreground = new SolidColorBrush(Color.FromArgb(255, 232, 88, 88)),
         Visibility = Visibility.Collapsed
     };
+    private readonly TextBlock _captureHint = new()
+    {
+        TextWrapping = TextWrapping.Wrap,
+        MaxWidth = 460,
+        Opacity = 0.7,
+        Visibility = Visibility.Collapsed
+    };
     private readonly Button _set = new();
     private readonly Button _clear = new();
     private readonly DispatcherQueueTimer _timer;
@@ -45,6 +52,7 @@ public sealed class ShortcutPicker : StackPanel
         row.Children.Add(_set);
         row.Children.Add(_clear);
         Children.Add(row);
+        Children.Add(_captureHint);
         Children.Add(_error);
 
         _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
@@ -77,6 +85,8 @@ public sealed class ShortcutPicker : StackPanel
         _clear.Content = LocalizationService.Get("ShortcutClear");
         _clear.Visibility = isSet && _capture is null ? Visibility.Visible : Visibility.Collapsed;
         _value.Opacity = isSet || _capture is not null ? 1 : 0.6;
+        _captureHint.Text = LocalizationService.Get("ShortcutCaptureHint", _vm.HintBack);
+        _captureHint.Visibility = _capture is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void StartCapture()
@@ -116,6 +126,9 @@ public sealed class ShortcutPicker : StackPanel
         if (captured is not { } mask) return;
 
         StopCapture();
+        // A lone B/Circle is never a valid shortcut, so use its release to cancel capture.
+        // Combinations containing B still reach TrySetShortcut unchanged.
+        if (mask == ControllerShortcuts.B) return;
         var error = _vm.TrySetShortcut(_slot, mask);
         _error.Text = error ?? "";
         _error.Visibility = error is null ? Visibility.Collapsed : Visibility.Visible;
