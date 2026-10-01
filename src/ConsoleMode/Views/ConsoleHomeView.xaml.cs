@@ -64,7 +64,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _navigator ??= new GamepadNavigator(DispatcherQueue, this,
-            App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0);
+            App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0,
+            readSonyHid: true);
         _navigator.SearchRoot = () =>
             ViewModel.IsControllerTestOpen ? ControllerTestPanel
             : ViewModel.IsConsoleTutorialOpen ? ConsoleTutorialPanel

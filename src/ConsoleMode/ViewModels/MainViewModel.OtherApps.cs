@@ -13,9 +13,11 @@ public partial class MainViewModel
 {
     private ImageSource? _wakeOnLogo;
     private ImageSource? _nextBoostLogo;
+    private ImageSource? _controlFsLogo;
 
     public ImageSource? WakeOnLogo => _wakeOnLogo ??= LoadLogo("wakeon.png");
     public ImageSource? NextBoostLogo => _nextBoostLogo ??= LoadLogo("nextboost.png");
+    public ImageSource? ControlFsLogo => _controlFsLogo ??= LoadLogo("controlfs.png");
 
     /// <summary>Embedded, so the installed and portable builds need no loose files.</summary>
     private static BitmapImage? LoadLogo(string file)

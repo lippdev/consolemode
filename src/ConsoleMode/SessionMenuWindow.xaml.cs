@@ -93,6 +93,15 @@ public sealed partial class SessionMenuWindow : Window
                     UiSounds.Play(UiSound.Move);
                     return true;
                 }
+                // Cross into the grid explicitly; spatial focus may prefer another sidebar row.
+                if (!_editingVolume && direction == FocusNavigationDirection.Right && !ViewModel.IsSessionPickerOpen
+                    && Root.XamlRoot is { } root
+                    && FocusManager.GetFocusedElement(root) is DependencyObject focused
+                    && IsInside(SidebarPanel, focused) && FocusFirstWindowCard())
+                {
+                    UiSounds.Play(UiSound.Move);
+                    return true;
+                }
                 if (!_editingVolume) return false;
                 if (direction == FocusNavigationDirection.Left) { ViewModel.ChangeVolume(-1); UiSounds.Play(UiSound.Move); }
                 else if (direction == FocusNavigationDirection.Right) { ViewModel.ChangeVolume(1); UiSounds.Play(UiSound.Move); }
@@ -177,6 +186,8 @@ public sealed partial class SessionMenuWindow : Window
         {
             ScaleFocused(e.OriginalSource, grow: true);
             if (e.OriginalSource is Control focused && IsInside(SidebarPanel, focused)) _lastSidebarFocus = focused;
+            if (e.OriginalSource is FrameworkElement { DataContext: SwitchWindowItem } card)
+                card.StartBringIntoView();
         };
         Root.LostFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: false);
         // Mouse clicks sound like a confirm (the pad has its own sounds in the navigator).
@@ -448,6 +459,23 @@ public sealed partial class SessionMenuWindow : Window
         return Root;
     }
 
+    /// <summary>Enter the windows grid even when spatial focus cannot reach it from the sidebar.</summary>
+    private bool FocusFirstWindowCard()
+    {
+        SwitcherList.UpdateLayout();
+        for (var i = 0; i < ViewModel.SwitcherWindows.Count; i++)
+        {
+            if (SwitcherList.ContainerFromIndex(i) is { } container
+                && FocusManager.FindFirstFocusableElement(container) is Control card
+                && card.Focus(FocusState.Keyboard))
+            {
+                card.StartBringIntoView();
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// <summary>True when the focus is on a window card with no card to its left (the first column of the grid).</summary>
     private bool IsOnLeftmostCard()
     {
@@ -503,12 +531,6 @@ public sealed partial class SessionMenuWindow : Window
     }
 
     private void CancelCloseClick(object sender, RoutedEventArgs e) => CancelCloseConfirmation();
-
-    private void CloseCardClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { DataContext: SwitchWindowItem item })
-            ShowCloseConfirmation(item, ViewModel.SwitcherWindows.IndexOf(item));
-    }
 
     /// <summary>Keep focus on the target while the close request is pending, then move to a neighbor if it closes.</summary>
     private async Task CloseAndRefocusAsync(SwitchWindowItem item, int index)

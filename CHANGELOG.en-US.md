@@ -4,6 +4,12 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.6.0-alpha.5]
+
+### Fixes
+- Console screen: read DualShock input directly over HID; overlay: navigate from the sidebar to windows, remove the cards' X button and display the ControlFS logo. (PR pending)
+
+
 ## [1.6.0-alpha.4]
 ### What's new
 - Settings → TV: console mode turns a Google TV / Android TV on over the network and switches to the PC's HDMI input; it can also put the TV in standby on restore. (#126)
