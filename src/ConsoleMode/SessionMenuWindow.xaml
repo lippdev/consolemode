@@ -142,7 +142,9 @@
                     </Button.Background>
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE8B7;" FontSize="19"/></Border>
+                        <Border Width="72" Height="48" CornerRadius="8">
+                            <Image Source="{x:Bind ViewModel.ControlFsLogo}" Stretch="Uniform"/>
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                             <TextBlock Style="{StaticResource TileValue}" FontSize="18" Text="{x:Bind ViewModel.Texts.ControlFsCard, Mode=OneWay}"/>
                             <TextBlock Style="{StaticResource TileLabel}" FontSize="14" Text="{x:Bind ViewModel.ControlFsRowText, Mode=OneWay}"/>
@@ -292,11 +294,6 @@
                                             <TextBlock Text="{x:Bind Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </Grid>
-                                  </Button>
-                                  <Button IsTabStop="False" Width="40" Height="40" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Margin="0,7,7,0" Background="{ThemeResource MenuVeil}" Foreground="White" Click="CloseCardClick"
-                                          DataContext="{Binding}">
-                                      <FontIcon Glyph="&#xE711;" FontSize="16"/>
                                   </Button>
                                 </Grid>
                             </DataTemplate>

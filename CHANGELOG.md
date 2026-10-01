@@ -4,6 +4,12 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.6.0-alpha.5]
+
+### Correções
+- Tela Console: leitura direta do DualShock por HID; overlay: navegação da lateral para as janelas, remoção do X dos cartões e logo do ControlFS. (#130)
+
+
 ## [1.6.0-alpha.4]
 ### Novidades
 - Ajustes → TV: o modo console liga a Google TV / Android TV pela rede e troca para a entrada HDMI do PC; também pode colocá-la em espera ao restaurar. (#126)
