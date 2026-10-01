@@ -13,12 +13,21 @@ public static class ControllerMapping
     /// <summary>DualSense and DualSense Edge; any other Sony pad is read with the DS4 layout.</summary>
     public static bool IsDualSense(ushort productId) => productId is 0x0CE6 or 0x0DF2;
 
+    /// <summary>Input report size the DualSense declares over USB; over Bluetooth it declares 78 (report 0x31).</summary>
+    public const int DualSenseUsbReportLength = 64;
+
     /// <summary>
     /// XInput-style button bits from a raw DS4/DualSense input report (first byte = report ID):
     /// Cross = A, Circle = B, Square = X, Triangle = Y, L1/R1 = LB/RB, Options = Start, Create/Share = Back,
     /// PS = Guide; the hat and the left stick set the D-pad bits. Unknown reports give 0.
     /// </summary>
-    public static ushort SonyButtons(ReadOnlySpan<byte> report, bool dualSense)
+    /// <param name="inputReportLength">
+    /// The report size the HID descriptor declares (HIDP_CAPS.InputReportByteLength), 0 when unknown.
+    /// ReadFile may hand back every report padded to that size, so a DualSense's basic Bluetooth report
+    /// (ID 0x01, 10 meaningful bytes) can arrive 78 bytes long: its size alone can't tell it from the
+    /// 64-byte USB report that has the same ID but a different layout; the declared size can.
+    /// </param>
+    public static ushort SonyButtons(ReadOnlySpan<byte> report, bool dualSense, int inputReportLength = 0)
     {
         if (report.Length == 0) return 0;
         // Offset of the buttons byte (hat + face) and of the left stick X, per report layout.
@@ -26,7 +35,7 @@ public static class ControllerMapping
         {
             0x31 => (9, 2),                                     // DualSense, Bluetooth
             0x11 => (7, 3),                                     // DS4, Bluetooth
-            0x01 when dualSense && report.Length >= 64 => (8, 1), // DualSense, USB
+            0x01 when IsDualSenseUsbReport(report.Length, dualSense, inputReportLength) => (8, 1), // DualSense, USB
             0x01 => (5, 1),                                     // DS4 USB, or either pad's basic Bluetooth report
             _ => (-1, -1)
         };
@@ -56,6 +65,17 @@ public static class ControllerMapping
         if (x < 64) bits |= 0x0004;
         if (x > 192) bits |= 0x0008;
         return bits;
+    }
+
+    /// <summary>Report IDs <see cref="SonyButtons"/> reads: basic/USB (0x01), DS4 Bluetooth (0x11), DualSense Bluetooth (0x31).</summary>
+    public static bool IsKnownSonyReport(byte reportId) => reportId is 0x01 or 0x11 or 0x31;
+
+    /// <summary>ID 0x01 on a DualSense is the USB report only when the pad's reports are USB-sized (64 bytes).</summary>
+    private static bool IsDualSenseUsbReport(int reportLength, bool dualSense, int inputReportLength)
+    {
+        if (!dualSense || reportLength < DualSenseUsbReportLength) return false;
+        // Padded to the Bluetooth size (78): this is the basic Bluetooth report.
+        return inputReportLength is 0 or DualSenseUsbReportLength;
     }
 
     /// <summary>HID button indexes (confirm, back, option, alt, menu) for a vendor's layout.</summary>

@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixes
+- Controllers: a DualSense (PS5) over Bluetooth is read again by the shortcuts and the session menu; the log records the first report format of each Sony pad. (#132)
+
 ## [1.6.0-beta.1]
 ### Heads-up: beta version, not the stable one
 - This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).

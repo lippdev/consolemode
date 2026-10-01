@@ -338,6 +338,8 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Repetir por Bluetooth e com Steam Input/DS4Windows ligado: cada toque produz uma única ação, sem movimento em repouso. Resultado: ______
 - [ ] Com um Xbox também conectado, repetir a navegação com o DualShock. Resultado: ______
 - [ ] Reconectar o DualShock com a tela Console aberta: a navegação volta a responder. Resultado: ______
+- [ ] **DualSense (PS5) por Bluetooth**, sem Steam Input/DS4Windows e com o jogo/Big Picture em foco: Select + Y (Create + △) abre o overlay e, nele, D-pad, ✕, ○ e □ respondem. Repetir por USB. Resultado: ______
+- [ ] O `consolemode.log` tem, por controle Sony, uma linha `Controle: HID DualSense: relatório 0x.. com N bytes (descritor declara M)`. Se o menu não responder, essa linha (e `relatório 0x.. não reconhecido`, se houver) diz o motivo. Resultado: ______
 - [ ] Durante o jogo, Share + △ (Select + Y) abre o overlay; → em uma opção lateral leva ao primeiro cartão de janela e ✕ ativa a janela escolhida. Resultado: ______
 - [ ] No primeiro cartão de uma coluna, ← retorna à opção lateral de origem; ↑/↓ e ←/→ navegam pelos demais cartões, inclusive com rolagem. Resultado: ______
 - [ ] Com seletor de sessão ou confirmação de fechamento aberto, as direções ficam dentro do diálogo. Sem janelas abertas, → não perde o foco. Resultado: ______
