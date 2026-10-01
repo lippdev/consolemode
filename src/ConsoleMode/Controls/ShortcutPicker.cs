@@ -100,6 +100,12 @@ public sealed class ShortcutPicker : StackPanel
         Refresh();
     }
 
+    /// <summary>Stops the active capture when its containing console overlay is dismissed.</summary>
+    public void CancelCapture() => StopCapture();
+
+    /// <summary>Moves controller focus to this shortcut's Set/Change/Cancel action.</summary>
+    public bool FocusCaptureButton() => _set.Focus(FocusState.Keyboard);
+
     private void Poll()
     {
         if (_capture is null) return;
