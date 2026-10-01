@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixes
+- Session menu: ← and → move across the open-window cards by position without failing; nothing moves past the last card of a row. (#133)
+
 ## [1.6.0-alpha.5]
 
 ### Fixes

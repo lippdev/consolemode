@@ -4,6 +4,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+### Correções
+- Menu da sessão: ← e → percorrem os cartões das janelas abertas pela posição, sem falhar; no último cartão da linha nada se move. (#133)
+
 ## [1.6.0-alpha.5]
 
 ### Correções
