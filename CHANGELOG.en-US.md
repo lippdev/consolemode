@@ -5,8 +5,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### Fixes
-- Returning from Big Picture now closes only Steam's client window to the tray, keeping Steam running; games and other windows are preserved. (PR pending)
-- Console interface settings: grouped controller options, a saved Automatic/Xbox/PlayStation button layout with a preview, and shortcut editing with cards and larger buttons. (PR pending)
+- Returning from Big Picture now closes only Steam's client window to the tray, keeping Steam running; games and other windows are preserved. (#131)
+- Console interface settings: grouped controller options, a saved Automatic/Xbox/PlayStation button layout with a preview, and shortcut editing with cards and larger buttons. (#131)
 
 ## [1.6.0-alpha.5]
 

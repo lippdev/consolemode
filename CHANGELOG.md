@@ -5,8 +5,8 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Correções
-- Voltar do Big Picture agora fecha apenas a janela da Steam para a bandeja, mantendo o cliente em execução; jogos e outras janelas são preservados. (PR pendente)
-- Ajustes da interface Console: opções de controle agrupadas, escolha persistente do layout Automático/Xbox/PlayStation com prévia e editor de atalhos com cartões e botões maiores. (PR pendente)
+- Voltar do Big Picture agora fecha apenas a janela da Steam para a bandeja, mantendo o cliente em execução; jogos e outras janelas são preservados. (#131)
+- Ajustes da interface Console: opções de controle agrupadas, escolha persistente do layout Automático/Xbox/PlayStation com prévia e editor de atalhos com cartões e botões maiores. (#131)
 
 ## [1.6.0-alpha.5]
 
