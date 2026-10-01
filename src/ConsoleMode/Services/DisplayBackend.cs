@@ -114,6 +114,7 @@ internal sealed class DisplayBackend
     public void Enable(IReadOnlyList<string> names) => NativeDisplays.Enable(names);
     public void Disable(IReadOnlyList<string> names) => NativeDisplays.Disable(names);
     public void SetPrimary(string name) => CcdHelper.SetPrimary(name);
+    public int SetPositions(IReadOnlyDictionary<string, (int X, int Y)> positions) => CcdHelper.SetPositions(positions);
     public void PowerOn(string name) => NativeDisplays.SetPower(name, on: true);
     public void PowerOff(string name) => NativeDisplays.SetPower(name, on: false);
 

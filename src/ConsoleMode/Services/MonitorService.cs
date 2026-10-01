@@ -157,6 +157,7 @@ public sealed class MonitorService
         //    originals didn't come back, the TV is the only picture left: leave it on.
         if (restored)
         {
+            AppLog.Write($"Restore: telas que voltam a ficar desligadas: {(monitorsToDisable.Count == 0 ? "nenhuma" : string.Join('+', monitorsToDisable))}");
             foreach (var name in monitorsToDisable)
             {
                 if (string.Equals(name, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase)) continue;
@@ -185,7 +186,36 @@ public sealed class MonitorService
             var wrong = LayoutMismatches(backupSpecs);
             if (wrong.Count == 0) break;
             AppLog.Write($"Restore: posições fora do backup em {string.Join('+', wrong)} (tentativa {attempt}/{layoutAttempts})");
-            if (attempt == layoutAttempts) result.Issues.Add($"Posição das telas diferente do backup: {string.Join(", ", wrong)}");
+        }
+
+        // LoadLayout applies the registry's display settings, and a screen that was just detached (the TV) can
+        // come back with them: detach it again. Doing that can move the others, so the positions are put back
+        // by CCD, which only touches the screens that are on and never brings a detached one back.
+        if (restored)
+        {
+            for (var round = 1; round <= 2; round++)
+            {
+                var back = monitorsToDisable
+                    .Where(n => !string.Equals(n, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase) && IsActiveNow(n))
+                    .ToList();
+                if (back.Count == 0) break;
+                AppLog.Write($"Restore: {string.Join('+', back)} voltou a ligar ao aplicar o layout; desconectando de novo ({round}/2)");
+                foreach (var name in back)
+                {
+                    if (!DisableWithRetry(name) && round == 2)
+                        result.Issues.Add($"Não foi possível desconectar {name}");
+                }
+            }
+        }
+
+        var misplaced = LayoutMismatches(backupSpecs);
+        if (misplaced.Count > 0)
+        {
+            var code = _backend.SetPositions(SavedPositions(backupSpecs));
+            AppLog.Write($"Restore: posições acertadas por CCD => {code}");
+            Thread.Sleep(600);
+            misplaced = LayoutMismatches(backupSpecs);
+            if (misplaced.Count > 0) result.Issues.Add($"Posição das telas diferente do backup: {string.Join(", ", misplaced)}");
         }
 
         if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
@@ -199,6 +229,22 @@ public sealed class MonitorService
         result.Success = result.Issues.Count == 0;
         AppLog.Write(result.Success ? "Restore: concluído com sucesso" : $"Restore: problemas: {string.Join(" | ", result.Issues)}");
         return result;
+    }
+
+    private bool IsActiveNow(string name) =>
+        GetMonitors(true).Any(m => m.IsActive && string.Equals(m.Name, name, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Saved desktop position of every screen that was on.</summary>
+    private static Dictionary<string, (int X, int Y)> SavedPositions(Dictionary<string, Dictionary<string, string>> backupSpecs)
+    {
+        var positions = new Dictionary<string, (int X, int Y)>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, spec) in backupSpecs)
+        {
+            if (!IsBackupSpecActive(spec)) continue;
+            if (int.TryParse(spec.GetValueOrDefault("PositionX"), out var x) && int.TryParse(spec.GetValueOrDefault("PositionY"), out var y))
+                positions[name] = (x, y);
+        }
+        return positions;
     }
 
     /// <summary>Screens that were on in the backup whose position (or state) is not the saved one right now.</summary>
