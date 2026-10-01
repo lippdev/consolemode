@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixes
+- Controllers: a DualSense (PS5) over Bluetooth is read again by the shortcuts and the session menu; the log records the first report format of each Sony pad. (#132)
+
 ## [1.6.0-alpha.5]
 
 ### Fixes
