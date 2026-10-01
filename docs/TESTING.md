@@ -343,6 +343,7 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Durante o jogo, Share + △ (Select + Y) abre o overlay; → em uma opção lateral leva ao primeiro cartão de janela e ✕ ativa a janela escolhida. Resultado: ______
 - [ ] No primeiro cartão de uma coluna, ← retorna à opção lateral de origem; ↑/↓ e ←/→ navegam pelos demais cartões, inclusive com rolagem. Resultado: ______
 - [ ] Com seletor de sessão ou confirmação de fechamento aberto, as direções ficam dentro do diálogo. Sem janelas abertas, → não perde o foco. Resultado: ______
+- [ ] Com **3 ou mais janelas** abertas (uma linha de cartões): → e ← percorrem a linha cartão a cartão; → no último cartão não faz nada (não pula para outro lugar); ← no primeiro volta à opção lateral de origem. Com várias linhas: → e ← ficam na linha do cartão. Resultado: ______
 - [ ] Os cartões não exibem o botão X no canto. Quadrado/Delete continuam pedindo confirmação para fechar a janela selecionada. Resultado: ______
 - [ ] A logo fornecida do ControlFS aparece no painel fixo do overlay, tanto instalado quanto ausente, inclusive no aplicativo publicado. Resultado: ______
 - [ ] Com overlay aberto ou outro aplicativo em primeiro plano, a tela Console ao fundo não reage ao DualShock. Resultado: ______

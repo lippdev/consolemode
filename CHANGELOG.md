@@ -5,6 +5,8 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Correções
+- Menu da sessão: ← e → percorrem os cartões das janelas abertas pela posição, sem falhar; no último cartão da linha nada se move. (#133)
+
 - Controles: o DualSense (PS5) por Bluetooth voltou a ser lido pelas teclas de atalho e pelo menu da sessão; o log registra o formato do primeiro relatório de cada controle Sony. (#132)
 
 ## [1.6.0-beta.1]

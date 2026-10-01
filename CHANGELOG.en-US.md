@@ -5,6 +5,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### Fixes
+- Session menu: ← and → move across the open-window cards by position without failing; nothing moves past the last card of a row. (#133)
+
 - Controllers: a DualSense (PS5) over Bluetooth is read again by the shortcuts and the session menu; the log records the first report format of each Sony pad. (#132)
 
 ## [1.6.0-beta.1]
