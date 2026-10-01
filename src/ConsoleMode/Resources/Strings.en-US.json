@@ -115,6 +115,7 @@
   "ShortcutClear": "Remove",
   "ShortcutCancel": "Cancel",
   "ShortcutPressButtons": "Hold the buttons, then let go…",
+  "ShortcutCaptureHint": "Release to save. Press {0} alone to cancel.",
   "ShortcutNotAllowed": "Use two or more buttons together (like Select + Y), or the Home button alone. A single button would fire in the middle of a game.",
   "ShortcutInUse": "{0} is already the shortcut for \"{1}\". Pick a different combination.",
   "ShortcutsOnboardingTitle": "Set up your controller shortcuts",

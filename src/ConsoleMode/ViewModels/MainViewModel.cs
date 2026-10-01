@@ -735,9 +735,9 @@ public partial class MainViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsTourMap), nameof(IsTourRole), nameof(IsTourPlay))]
     private int _tourStep;
 
-    public bool IsTourMap => TourStep == 1;
-    public bool IsTourRole => TourStep == 2;
-    public bool IsTourPlay => TourStep == 3;
+    public bool IsTourMap => !IsConsoleUi && TourStep == 1;
+    public bool IsTourRole => !IsConsoleUi && TourStep == 2;
+    public bool IsTourPlay => !IsConsoleUi && TourStep == 3;
 
     public string TourMapText => FocusRow is null
         ? LocalizationService.Get("TourMapGeneric")
@@ -747,6 +747,16 @@ public partial class MainViewModel : ObservableObject
     private void StartTour()
     {
         if (!HasMonitors || IsConsoleActive) return;
+        if (IsConsoleUi)
+        {
+            ConsoleTabIndex = HomeTabIndex;
+            IsConsoleTutorialOpen = true;
+            IsStatusOpen = false;
+            SelectedMonitor = FocusRow ?? SelectedMonitor;
+            OnPropertyChanged(nameof(TourMapText));
+            TourStep = 1;
+            return;
+        }
         ShowPage(settings: false);
         IsStatusOpen = false;
         SelectedMonitor = FocusRow ?? SelectedMonitor;
@@ -771,6 +781,7 @@ public partial class MainViewModel : ObservableObject
     private void EndTour()
     {
         TourStep = 0;
+        IsConsoleTutorialOpen = false;
         if (!_loadedConfig.TourDone)
         {
             var config = BuildConfig();

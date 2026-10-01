@@ -115,6 +115,7 @@
   "ShortcutClear": "Quitar",
   "ShortcutCancel": "Cancelar",
   "ShortcutPressButtons": "Mantén los botones y luego suéltalos…",
+  "ShortcutCaptureHint": "Suelta para guardar. Pulsa {0} solo para cancelar.",
   "ShortcutNotAllowed": "Usa dos o más botones a la vez (como Select + Y), o solo el botón Home. Un botón suelto se activaría en mitad del juego.",
   "ShortcutInUse": "{0} ya es el atajo de \"{1}\". Elige otra combinación.",
   "ShortcutsOnboardingTitle": "Configura los atajos del mando",
