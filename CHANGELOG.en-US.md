@@ -3,13 +3,14 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+
+## [1.6.0-alpha.4]
 ### What's new
 - Settings → TV: console mode turns a Google TV / Android TV on over the network and switches to the PC's HDMI input; it can also put the TV in standby on restore. (#126)
 
 ### Fixes
 - Console interface: the System tab now supports custom controller shortcuts and desktop settings, including Playnite, Android TV, custom FPS, closing Steam, the tutorial and the data folder. (#128)
 - Session menu: closing a window through the internal Alt+Tab now asks for confirmation; Cancel keeps the window open and restores focus to its card. (#127)
-- Reverted PR #45: restored the previous behavior when stopping a session. (#125)
 
 ## [1.6.0-alpha.3]
 ### What's new

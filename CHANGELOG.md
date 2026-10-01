@@ -3,13 +3,14 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+
+## [1.6.0-alpha.4]
 ### Novidades
 - Ajustes → TV: o modo console liga a Google TV / Android TV pela rede e troca para a entrada HDMI do PC; também pode colocá-la em espera ao restaurar. (#126)
 
 ### Correções
 - Interface Console: a aba Sistema agora permite configurar atalhos personalizados e acessar os ajustes do modo PC, incluindo Playnite, Android TV, FPS personalizado, fechar a Steam, tutorial e pasta de dados. (#128)
 - Menu da sessão: fechar uma janela pelo Alt+Tab interno agora pede confirmação; Cancelar mantém a janela aberta e devolve o foco ao cartão. (#127)
-- Revertida a PR #45: restaurado o comportamento anterior ao encerrar uma sessão. (#125)
 
 ## [1.6.0-alpha.3]
 ### Novidades
