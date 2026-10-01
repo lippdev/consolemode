@@ -7,7 +7,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [1.6.0-alpha.5]
 
 ### Correções
-- Tela Console: leitura direta do DualShock por HID; overlay: navegação da lateral para as janelas, remoção do X dos cartões e logo do ControlFS. (PR pendente)
+- Tela Console: leitura direta do DualShock por HID; overlay: navegação da lateral para as janelas, remoção do X dos cartões e logo do ControlFS. (#130)
 
 
 ## [1.6.0-alpha.4]

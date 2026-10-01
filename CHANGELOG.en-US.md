@@ -7,7 +7,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [1.6.0-alpha.5]
 
 ### Fixes
-- Console screen: read DualShock input directly over HID; overlay: navigate from the sidebar to windows, remove the cards' X button and display the ControlFS logo. (PR pending)
+- Console screen: read DualShock input directly over HID; overlay: navigate from the sidebar to windows, remove the cards' X button and display the ControlFS logo. (#130)
 
 
 ## [1.6.0-alpha.4]
