@@ -64,11 +64,11 @@ Grava `out/alpha3-x.mp4` (H.264 yuv420p + AAC, faststart).
 
 ## Console Mode 1.6 (`Release16`)
 
-Vídeo de ~54 s em inglês com tudo da 1.6: um clique leva o jogo para a TV, o novo menu da sessão sobre o jogo, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, o código próprio de telas e áudio (sem as ferramentas da NirSoft) e as correções. Reaproveita a abertura do `Launch` e as cenas do `Alpha3`.
+Vídeo de ~54 s em inglês com tudo da 1.6: um clique leva o jogo para a TV, o novo menu da sessão sobre o jogo, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, as correções e o JoyChromium (navegador para o controle, em breve; a tela é ilustrativa). Reaproveita a abertura do `Launch` e as cenas do `Alpha3`.
 
 O jogo na TV é um encaixe (`src/GamePlay.tsx`): por padrão a corrida de `RacingGame.tsx`. Para usar um vídeo de jogo e o print do ControlFS, coloque em `public/local/` (ignorada pelo git; não versione vídeo de terceiros nem prints com caminhos pessoais):
 
-- `public/local/gameplay.mp4`: 1080p, 30 fps, com áudio; o filme começa 1 s depois do início do arquivo (`CLIP` em `src/Release16.tsx`).
+- `public/local/gameplay.mp4`: 1080p, 30 fps (o áudio do arquivo não entra no filme); o filme começa 1 s depois do início do arquivo (`CLIP` em `src/Release16.tsx`).
 - `public/local/controlfs.png`: 1920×1080.
 
 Sem esses arquivos o filme usa a corrida e a animação da pasta.
