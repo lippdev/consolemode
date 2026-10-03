@@ -5,7 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Novidades
-- Menu da sessão: sem o ControlFS instalado, apertar A em "Explorador de arquivos (ControlFS)" agora baixa e instala o ControlFS ali mesmo, sem sair do controle: a linha mostra o progresso, o instalador é conferido (SHA-256) antes de rodar e, ao terminar, o ControlFS abre em tela cheia. Se não der (sem internet, por exemplo), a linha avisa e o próximo A abre a página de download.
+- Menu da sessão: sem o ControlFS instalado, apertar A em "Explorador de arquivos (ControlFS)" agora baixa e instala o ControlFS ali mesmo, sem sair do controle: a linha mostra o progresso, o instalador é conferido (SHA-256) antes de rodar e, ao terminar, o ControlFS abre em tela cheia. Se não der (sem internet, por exemplo), a linha avisa e o próximo A abre a página de download. (#136)
 
 ## [1.6.0-beta.4]
 ### Atenção: versão beta, não é a estável

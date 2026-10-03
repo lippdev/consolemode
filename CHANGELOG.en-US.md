@@ -5,7 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### What's new
-- Session menu: without ControlFS installed, pressing A on "File explorer (ControlFS)" now downloads and installs ControlFS right there, without leaving the controller: the row shows the progress, the installer is checked (SHA-256) before it runs and, when done, ControlFS opens full screen. If it can't (no internet, for example), the row says so and the next A opens the download page.
+- Session menu: without ControlFS installed, pressing A on "File explorer (ControlFS)" now downloads and installs ControlFS right there, without leaving the controller: the row shows the progress, the installer is checked (SHA-256) before it runs and, when done, ControlFS opens full screen. If it can't (no internet, for example), the row says so and the next A opens the download page. (#136)
 
 ## [1.6.0-beta.4]
 ### Heads-up: beta version, not the stable one
