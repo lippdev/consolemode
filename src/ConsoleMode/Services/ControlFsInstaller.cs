@@ -40,7 +40,15 @@ public static class ControlFsInstaller
             }) ?? throw new InvalidOperationException("o instalador não iniciou");
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
             timeout.CancelAfter(SetupTimeout);
-            await process.WaitForExitAsync(timeout.Token);
+            try { await process.WaitForExitAsync(timeout.Token); }
+            catch (OperationCanceledException)
+            {
+                // Given up on: stop it (Inno runs a second, child process), or it could finish later and a new
+                // attempt from the menu would start a second installer next to it.
+                try { process.Kill(entireProcessTree: true); } catch { /* already gone */ }
+                await process.WaitForExitAsync(CancellationToken.None);
+                throw new TimeoutException($"o instalador não terminou em {SetupTimeout.TotalMinutes:0} min e foi encerrado");
+            }
             if (process.ExitCode != 0) throw new InvalidOperationException($"o instalador saiu com o código {process.ExitCode}");
         }
         finally
