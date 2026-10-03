@@ -39,21 +39,59 @@ public sealed class ShortcutPicker : StackPanel
     private ShortcutCapture? _capture;
 
     /// <param name="stacked">In the setup dialog: left-aligned under the text instead of a right-hand column.</param>
-    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool stacked = false)
+    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool stacked = false, bool consoleStyle = false)
     {
         _vm = vm;
         _slot = slot;
         Spacing = 4;
-        var side = stacked ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        HorizontalAlignment = side;
+        var side = stacked || consoleStyle ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        HorizontalAlignment = consoleStyle ? HorizontalAlignment.Stretch : side;
 
-        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = side };
-        row.Children.Add(_value);
-        row.Children.Add(_set);
-        row.Children.Add(_clear);
-        Children.Add(row);
+        if (consoleStyle)
+        {
+            _value.FontSize = 23;
+            _value.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+            _value.TextAlignment = TextAlignment.Center;
+            _value.TextWrapping = TextWrapping.Wrap;
+            _value.MinWidth = 0;
+            var badge = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(42, 255, 255, 255)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(70, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(12, 10, 12, 10),
+                Child = _value
+            };
+            Children.Add(badge);
+            _set.Style = Application.Current.Resources["ConsoleSmallButton"] as Style;
+            _clear.Style = Application.Current.Resources["ConsoleSmallButton"] as Style;
+            _set.Height = 52;
+            _clear.Height = 52;
+            _set.FontSize = 18;
+            _clear.FontSize = 18;
+            _set.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _clear.HorizontalAlignment = HorizontalAlignment.Stretch;
+            Children.Add(_set);
+            Children.Add(_clear);
+        }
+        else
+        {
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = side };
+            row.Children.Add(_value);
+            row.Children.Add(_set);
+            row.Children.Add(_clear);
+            Children.Add(row);
+        }
         Children.Add(_captureHint);
         Children.Add(_error);
+        _captureHint.MaxWidth = consoleStyle ? 280 : 460;
+        _error.MaxWidth = consoleStyle ? 280 : 460;
+        if (consoleStyle)
+        {
+            _captureHint.FontSize = 18;
+            _error.FontSize = 18;
+        }
 
         _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(40);

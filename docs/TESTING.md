@@ -224,19 +224,20 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Um controle HID que manda leitura impossível (ex.: Switch Pro pelo driver genérico, com 6 ou mais botões "apertados" sozinhos) é ignorado mesmo quando também aparece em Windows.Gaming.Input: o app não navega nem inicia a sessão sozinho, e o log mostra `Controles: … ignorado: leitura inválida`. Reabrir o app tenta de novo. Resultado: ______
 - [ ] Com um controle HID defeituoso e outro controle normal conectados, o defeituoso não gera ações pelo HID nem pela projeção Windows.Gaming.Input, e o controle normal continua navegando. Resultado: ______
 
-## 3c. Fechar a Steam ao voltar ao PC
+## 3c. Mandar a Steam para a bandeja ao voltar ao PC
 
-Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
+Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam para a bandeja ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
 
-- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha** e some da mesa, e a **Steam fecha sozinha** em alguns segundos (o ícone sai da bandeja, sem janela de erro). Resultado: ______
-- [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam também fecha. Resultado: ______
-- [ ] A Steam **não é encerrada à força**: no Gerenciador de Tarefas ela some sem o aviso "o programa não está respondendo", e o log mostra `Steam: pedindo para fechar (sair normal)`. Resultado: ______
+- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha**, a janela principal some e a **Steam continua em execução na bandeja**. Resultado: ______
+- [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam permanece na bandeja. Resultado: ______
+- [ ] O processo da Steam continua no Gerenciador de Tarefas; clicar no ícone da bandeja reabre o cliente sem login nem reinício. Resultado: ______
 - [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
 - [ ] Com o ajuste **desligado**: o Big Picture fecha, a Steam fica aberta (`Steam: mantida aberta (desligado nos ajustes)`). Resultado: ______
 - [ ] Desligar o ajuste, fechar e reabrir o Console Mode e iniciar uma sessão Big Picture: a preferência continua desligada e a Steam fica aberta. Resultado: ______
 - [ ] Com o Steam aberto e o estado do jogo indisponível no Registro (valor `RunningAppID` ausente ou ilegível): a Steam fica aberta e o log informa que não foi possível verificar se há jogo em execução. Resultado: ______
 - [ ] Steam **já fechada** antes de voltar: nada é aberto nem pedido (`Steam: não estava aberta`); a Steam não é iniciada de novo por engano. Resultado: ______
 - [ ] Lançador Playnite ou Modo Xbox: a Steam não é tocada. Resultado: ______
+- [ ] Janelas de jogo, chat/popups da Steam e outros aplicativos não recebem o pedido de fechamento da janela principal. Resultado: ______
 - [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
 
 ## 3c. Controle da TV: Google TV / Android TV (issue #75)
@@ -347,3 +348,25 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Os cartões não exibem o botão X no canto. Quadrado/Delete continuam pedindo confirmação para fechar a janela selecionada. Resultado: ______
 - [ ] A logo fornecida do ControlFS aparece no painel fixo do overlay, tanto instalado quanto ausente, inclusive no aplicativo publicado. Resultado: ______
 - [ ] Com overlay aberto ou outro aplicativo em primeiro plano, a tela Console ao fundo não reage ao DualShock. Resultado: ______
+
+## Ajustes da interface Console: controle e atalhos
+
+### Layout dos botões
+
+- [ ] Abra **Sistema > Controle > Layout dos botões** com um controle conectado.
+- [ ] Em **Automático**, confirme que os símbolos acompanham o controle Xbox ou PlayStation conectado.
+- [ ] Selecione **Xbox** e confirme que a prévia e as dicas usam A, B, X, Y, LB e RB.
+- [ ] Selecione **PlayStation** e confirme que a prévia e as dicas usam ✕, ○, □, △, L1 e R1.
+- [ ] Feche e abra o app; confirme que a escolha manual continua salva.
+- [ ] Com dois tipos de controle disponíveis, troque o controle conectado em **Automático** e confirme que os símbolos acompanham o novo controle.
+- [ ] Abra o menu da sessão e confirme que as dicas também respeitam o layout escolhido.
+
+### Atalhos
+
+- [ ] Abra cada um dos três atalhos com A e confirme que os cartões ficam legíveis em 1920×1080 e em uma janela de 960×760.
+- [ ] Navegue entre **Definir/Alterar**, **Remover** e **Voltar** usando apenas o controle; confirme que o foco visível acompanha cada ação.
+- [ ] Grave uma combinação, solte os botões e confirme que o valor aparece no cartão e na linha de Ajustes.
+- [ ] Durante a gravação, pressione B/○ sozinho e confirme que a captura é cancelada sem alterar o atalho.
+- [ ] Tente usar uma combinação já atribuída e confirme que a mensagem de conflito aparece inteira e não corta os botões.
+- [ ] Reduza a altura da janela e confirme que o editor rola até **Voltar**, sem esconder os cartões.
+- [ ] Feche o editor durante uma captura e confirme que ela para; reabra-o e confirme que nenhum botão fica preso em captura.

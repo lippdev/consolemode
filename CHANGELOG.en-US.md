@@ -4,6 +4,14 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.6.0-beta.3]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
+### Fixes
+- Returning from Big Picture now closes only Steam's client window to the tray, keeping Steam running; games and other windows are preserved. (#131)
+- Console interface settings: grouped controller options, a saved Automatic/Xbox/PlayStation button layout with a preview, and shortcut editing with cards and larger buttons. (#131)
+
 ## [1.6.0-beta.2]
 ### Heads-up: beta version, not the stable one
 - This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
