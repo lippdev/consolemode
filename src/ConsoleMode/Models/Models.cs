@@ -20,8 +20,9 @@ public sealed class AppConfig
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
     public int FpsLimit { get; set; }
-    /// <summary>RtssOverlay style: "off" | "compact" | "detailed". Shown over the game during a session.</summary>
-    public string FpsOverlay { get; set; } = RtssOverlay.Off;
+    /// <summary>RtssOverlay style: "external" | "off" | "compact" | "detailed" | "custom". Applied over the game during a session.</summary>
+    public string FpsOverlay { get; set; } = RtssOverlay.External;
+    public FpsOverlayLayout FpsOverlayLayout { get; set; } = new();
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }

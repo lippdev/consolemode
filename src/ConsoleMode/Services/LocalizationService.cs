@@ -151,6 +151,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string VrrDescription => LocalizationService.Get(nameof(VrrDescription));
     public string FpsCard => LocalizationService.Get(nameof(FpsCard));
     public string FpsOverlayCard => LocalizationService.Get(nameof(FpsOverlayCard));
+    public string FpsOverlayItems => LocalizationService.Get(nameof(FpsOverlayItems));
+    public string FpsOverlayShowApi => LocalizationService.Get(nameof(FpsOverlayShowApi));
+    public string FpsOverlayShowFps => LocalizationService.Get(nameof(FpsOverlayShowFps));
+    public string FpsOverlayShowFrameTime => LocalizationService.Get(nameof(FpsOverlayShowFrameTime));
+    public string FpsOverlaySingleLine => LocalizationService.Get(nameof(FpsOverlaySingleLine));
+    public string FpsOverlayColor => LocalizationService.Get(nameof(FpsOverlayColor));
     public string FpsPlaceholder => LocalizationService.Get(nameof(FpsPlaceholder));
     public string AppSection => LocalizationService.Get(nameof(AppSection));
     public string StartupCard => LocalizationService.Get(nameof(StartupCard));

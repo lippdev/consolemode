@@ -146,14 +146,17 @@ public sealed class RtssService
 
     /// <summary>
     /// Shows our FPS counter (RtssOverlay.Text) in our own OSD slot, or clears that slot when
-    /// the text is empty. While it is on, MSI Afterburner's OSD is kept hidden (see HideAfterburnerLoop).
+    /// the text is empty. With <paramref name="hideOthers"/>, MSI Afterburner's OSD is kept hidden
+    /// meanwhile (see HideAfterburnerLoop): an empty text then means nothing on screen at all.
     /// </summary>
-    public bool SetOverlay(string text)
+    public bool SetOverlay(string text, bool hideOthers)
     {
         if (string.IsNullOrEmpty(text))
         {
-            _hideAfterburner = false;
             WriteOverlaySlot(null);
+            // Off doesn't start RTSS just to hide something that isn't there.
+            if (hideOthers && IsRunning()) HideAfterburner();
+            else _hideAfterburner = false;
             return true;
         }
         if (!EnsureRunning()) return false;
@@ -162,13 +165,18 @@ public sealed class RtssService
         {
             if (WriteOverlaySlot(text))
             {
-                HideAfterburner();
+                if (hideOthers) HideAfterburner();
+                else _hideAfterburner = false;
                 return true;
             }
             Thread.Sleep(300);
         }
         return false;
     }
+
+    /// <summary>Applies a style from <see cref="RtssOverlay"/>.</summary>
+    public bool ApplyOverlay(string? style, FpsOverlayLayout? layout) =>
+        SetOverlay(RtssOverlay.Text(style, layout), RtssOverlay.HidesOthers(style));
 
     private volatile bool _hideAfterburner;
     private Thread? _afterburnerHider;

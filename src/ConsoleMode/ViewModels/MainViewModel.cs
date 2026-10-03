@@ -191,6 +191,7 @@ public partial class MainViewModel : ObservableObject
                     LanguageOptions.Add(new ComboOption { Text = language.NativeName, Value = language.Code });
             }
 
+            BuildFpsOverlayOptions();
             BuildAudioOptions(audioValue);
             BuildUiModeOptions();
             BuildTvOptions();
@@ -316,6 +317,8 @@ public partial class MainViewModel : ObservableObject
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
             SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
+
+            LoadFpsOverlay(config);
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -906,7 +909,8 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
             FpsLimit = ReadFpsLimit(),
-            FpsOverlay = _loadedConfig.FpsOverlay,
+            FpsOverlay = FpsOverlayStyle,
+            FpsOverlayLayout = ReadFpsOverlayLayout(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             TourDone = _loadedConfig.TourDone,

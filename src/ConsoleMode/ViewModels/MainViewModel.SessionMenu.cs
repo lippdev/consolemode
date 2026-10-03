@@ -193,7 +193,7 @@ public partial class MainViewModel
         SessionAudioText = audioName;
         VolumePercent = volume ?? -1;
         SessionFpsText = state.FpsLimit > 0 ? $"{state.FpsLimit} FPS" : LocalizationService.Get("FpsNoLimit");
-        SessionOverlayText = FpsOverlayStyleText(_loadedConfig.FpsOverlay);
+        SessionOverlayText = SelectedFpsOverlay?.Text ?? "";
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
         OnPropertyChanged(nameof(IsFpsOverlayAvailable));
     }
@@ -294,31 +294,6 @@ public partial class MainViewModel
             }
         });
         await LoadSessionValuesAsync();
-    }
-
-    private static string FpsOverlayStyleText(string? style) => RtssOverlay.Normalize(style) switch
-    {
-        RtssOverlay.Compact => LocalizationService.Get("FpsOverlayCompact"),
-        RtssOverlay.Detailed => LocalizationService.Get("FpsOverlayDetailed"),
-        _ => LocalizationService.Get("FpsOverlayOff")
-    };
-
-    /// <summary>A on the FPS counter row: off → compact → detailed. Kept for the next sessions.</summary>
-    [RelayCommand]
-    private async Task CycleFpsOverlayAsync()
-    {
-        var next = RtssOverlay.Next(_loadedConfig.FpsOverlay);
-        var shown = false;
-        await RunSessionActionAsync(() =>
-        {
-            if (!Engine.Rtss.SetOverlay(RtssOverlay.Text(next)))
-                throw new InvalidOperationException("RTSS: o contador de FPS não pôde ser exibido");
-            shown = true;
-        });
-        if (!shown) return;
-        _loadedConfig.FpsOverlay = next;
-        SaveQuietly();
-        SessionOverlayText = FpsOverlayStyleText(next);
     }
 
     [RelayCommand]
