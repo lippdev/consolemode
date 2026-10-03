@@ -77,14 +77,13 @@ Sem esses arquivos o filme usa a corrida e a animação da pasta.
 npm run release16
 ```
 
-Grava `out/release16-x.mp4` (H.264 yuv420p + AAC, faststart). Em GIF (800 px, 12 fps), depois do vídeo:
+Grava `out/release16-x.mp4` (H.264 yuv420p + AAC, faststart). Para o GIF, depois do vídeo:
 
 ```console
 npm run release16:gif
-npx gifsicle -O3 --lossy=60 -o out/release16-small.gif out/release16.gif
 ```
 
-O primeiro grava `out/release16.gif` (~25 MB, por causa do vídeo de jogo); o `gifsicle` leva para ~11 MB sem perda visível. Com vídeo de terceiros, o GIF também não vai para o repositório.
+Grava `out/release16.gif`: um corte de ~26 s (o melhor momento de cada cena, sem acelerar), 960 px, ~8,5 MB. Os trechos e o motivo de cada configuração estão em `scripts/release16-gif.sh`. Com vídeo de terceiros, o GIF também não vai para o repositório.
 
 As trilhas dos filmes são sintetizadas por `scripts/soundtrack.py` (sem áudio de terceiros) no mesmo andamento das cenas (120 BPM: 1 tempo = 15 frames). Os momentos de cada filme ficam em `TIMELINES` no script. Se mudar os tempos em `src/Keynote.tsx`, `src/Launch.tsx`, `src/Alpha3.tsx` ou `src/Release16.tsx`, ajuste o script e regenere os MP3 em `public/keynote/`:
 
