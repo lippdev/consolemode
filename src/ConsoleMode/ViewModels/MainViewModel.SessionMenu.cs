@@ -87,6 +87,7 @@ public partial class MainViewModel
         ControlFsInstalled = ControlFsService.FindExe() is not null;
         // A failed install is offered again each time the menu opens (the connection may be back).
         if (!ControlFsInstalling) ControlFsInstallFailed = false;
+        ControlFsJustInstalled = false;
         RefreshSessionHeader();
         StartSessionClock();
         _sessionMenu.Activate();
@@ -323,10 +324,13 @@ public partial class MainViewModel
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ControlFsRowText))] private bool _controlFsSetupRunning;
     /// <summary>The install failed: the row says so and the next press opens the download page instead.</summary>
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ControlFsRowText))] private bool _controlFsInstallFailed;
+    /// <summary>Installed from the row while this menu was open: the row says it is ready to open.</summary>
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ControlFsRowText))] private bool _controlFsJustInstalled;
 
     public string ControlFsRowText =>
         ControlFsSetupRunning ? Texts.ControlFsInstalling
         : ControlFsInstalling ? LocalizationService.Get("ControlFsDownloading", (int)ControlFsProgress)
+        : ControlFsJustInstalled ? Texts.ControlFsInstalled
         : ControlFsInstalled ? Texts.ControlFsOpen
         : ControlFsInstallFailed ? Texts.ControlFsInstallFailed
         : Texts.ControlFsMissing;
@@ -335,7 +339,7 @@ public partial class MainViewModel
     /// <summary>
     /// The pinned "File explorer (ControlFS)" row: the menu closes and ControlFS (a separate app, controller-first)
     /// opens or comes to the front. Without it installed, the same press downloads and installs it (the row shows
-    /// the progress) and then opens it; if that fails, the next press opens its download page. Outside a session it
+    /// the progress) and the next press opens it; if that fails, the next press opens its download page. Outside a session it
     /// works the same, so it can be tried in the preview.
     /// </summary>
     [RelayCommand]
@@ -376,6 +380,7 @@ public partial class MainViewModel
             await Task.Run(() => ControlFsInstaller.InstallAsync(progress));
             AppLog.Write("ControlFS: instalado");
             ControlFsInstalled = true;
+            ControlFsJustInstalled = true;
         }
         catch (Exception ex)
         {
@@ -387,8 +392,8 @@ public partial class MainViewModel
             ControlFsSetupRunning = false;
             ControlFsInstalling = false;
         }
-        // Open it only if the menu that asked is still there: never pop it over a game the user went back to.
-        if (ControlFsInstalled && IsSessionMenuOpen) OpenControlFs();
+        // Not opened from here: by now the menu may have lost the foreground (or be gone), and ControlFS would come up
+        // behind the game. The row says it is installed; the next A opens it like any other time.
     }
 
     [RelayCommand]

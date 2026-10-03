@@ -93,6 +93,7 @@
   "ControlFsDownloading": "Baixando… {0}%",
   "ControlFsInstalling": "Instalando…",
   "ControlFsInstallFailed": "Não deu para instalar · aperte para abrir a página de download",
+  "ControlFsInstalled": "Instalado · aperte para abrir",
   "ControlFsMissingNote": "O ControlFS não está instalado. Abrindo a página de download no navegador.",
   "SessionWindowsCard": "Janelas",
   "SessionWindowsCount": "{0} abertas",
