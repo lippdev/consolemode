@@ -35,8 +35,11 @@ public partial class MainViewModel
     [ObservableProperty] private string _sessionModeText = "";
     [ObservableProperty] private string _sessionAudioText = "";
     [ObservableProperty] private string _sessionFpsText = "";
+    [ObservableProperty] private string _sessionOverlayText = "";
 
     public bool IsFpsMenuAvailable => Engine.Rtss.IsReady && !IsSessionMenuPreview;
+    /// <summary>The FPS counter only needs RTSS itself (no rtss-cli); like the limit, it is a session thing.</summary>
+    public bool IsFpsOverlayAvailable => Engine.Rtss.IsInstalled && !IsSessionMenuPreview;
     public bool IsSessionMenuLive => !IsSessionMenuPreview;
 
     /// <summary>"Back to the PC" in a session; "Close menu" in the preview, where there is no desk to restore.</summary>
@@ -52,6 +55,7 @@ public partial class MainViewModel
     partial void OnIsSessionMenuPreviewChanged(bool value)
     {
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
+        OnPropertyChanged(nameof(IsFpsOverlayAvailable));
         OnPropertyChanged(nameof(IsSessionMenuLive));
         OnPropertyChanged(nameof(BackToPcText));
     }
@@ -189,7 +193,9 @@ public partial class MainViewModel
         SessionAudioText = audioName;
         VolumePercent = volume ?? -1;
         SessionFpsText = state.FpsLimit > 0 ? $"{state.FpsLimit} FPS" : LocalizationService.Get("FpsNoLimit");
+        SessionOverlayText = SelectedFpsOverlay?.Text ?? "";
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
+        OnPropertyChanged(nameof(IsFpsOverlayAvailable));
     }
 
     /// <summary>Left/Right on the volume row.</summary>

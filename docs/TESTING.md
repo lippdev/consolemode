@@ -376,3 +376,20 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Tente usar uma combinação já atribuída e confirme que a mensagem de conflito aparece inteira e não corta os botões.
 - [ ] Reduza a altura da janela e confirme que o editor rola até **Voltar**, sem esconder os cartões.
 - [ ] Feche o editor durante uma captura e confirme que ela para; reabra-o e confirme que nenhum botão fica preso em captura.
+
+## Contador de FPS (RTSS)
+
+Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Display" ligado; MSI Afterburner aberto com o OSD dele ligado.
+
+- [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão e o cartão em Ajustes fica desabilitado.
+- [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
+- [ ] Config nova: o estilo é "Afterburner (não mexer)" e o OSD do Afterburner aparece normal na sessão.
+- [ ] Em sessão, A na linha alterna Afterburner → Desligado → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora.
+- [ ] Desligado: nada na tela, nem o nosso nem o do Afterburner (no máximo um piscar rápido do Afterburner de vez em quando).
+- [ ] Compacto / Detalhado / Personalizado: só o nosso aparece; o do Afterburner fica escondido.
+- [ ] Afterburner: o nosso some e o do Afterburner volta em até 1 s.
+- [ ] Ajustes → Contador de FPS → Personalizado: marcar/desmarcar API, FPS e tempo de quadro, "Tudo em uma linha" e a cor muda o contador no jogo na hora (com a sessão ativa).
+- [ ] Personalizado sem nenhum item marcado ainda mostra o FPS.
+- [ ] Com o RTSS fechado, ligar Compacto abre o RTSS e o contador aparece.
+- [ ] Voltar ao PC: o nosso some e o do Afterburner volta.
+- [ ] A escolha e o layout ficam salvos para a próxima sessão.

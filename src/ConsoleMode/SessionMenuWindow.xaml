@@ -237,6 +237,18 @@
                             </Grid>
                         </Button>
 
+                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
+                                Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE9D9;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionOverlayText, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
                         <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>

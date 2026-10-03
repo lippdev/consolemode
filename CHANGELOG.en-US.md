@@ -4,6 +4,13 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.6.0-beta.7]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
+### What's new
+- FPS counter over the game, through RivaTuner (RTSS), in Console Mode's style: pick it in Settings or cycle it with A on the new "FPS counter" row of the session menu. Styles: Afterburner (default; changes nothing), Off (nothing on screen), Compact (FPS only), Detailed (API, FPS and frame time) and Custom, where you pick the items, whether they share one line and the number color. Except on "Afterburner", MSI Afterburner's OSD is hidden during the session and comes back by itself when you go back to the PC; Afterburner's settings are not changed. (#138)
+
 ## [1.6.0-beta.6]
 ### Heads-up: beta version, not the stable one
 - This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).

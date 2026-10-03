@@ -185,6 +185,35 @@
                               DisplayMemberPath="Text"/>
                 </StackPanel>
             </ctk:SettingsCard>
+            <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}" Description="{x:Bind ViewModel.FpsOverlayStatusText, Mode=OneWay}"
+                                  IsEnabled="{x:Bind ViewModel.IsRtssInstalled, Mode=OneWay}" IsExpanded="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                <ctk:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE9D9;"/>
+                </ctk:SettingsExpander.HeaderIcon>
+                <ComboBox MinWidth="220"
+                          ItemsSource="{x:Bind ViewModel.FpsOverlayOptions, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedFpsOverlay, Mode=TwoWay}"
+                          DisplayMemberPath="Text"/>
+                <ctk:SettingsExpander.Items>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayItems, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowApi, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowApi, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFps, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFps, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFrameTime, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFrameTime, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlaySingleLine, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.OverlaySingleLine, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayColor, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                        <ComboBox MinWidth="160"
+                                  ItemsSource="{x:Bind ViewModel.FpsOverlayColorOptions, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedFpsOverlayColor, Mode=TwoWay}"
+                                  DisplayMemberPath="Text"/>
+                    </ctk:SettingsCard>
+                </ctk:SettingsExpander.Items>
+            </ctk:SettingsExpander>
 
             <!-- App -->
             <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>

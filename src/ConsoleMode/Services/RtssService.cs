@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.MemoryMappedFiles;
 using System.Text.Json;
 using ConsoleMode.Models;
 
@@ -142,6 +143,196 @@ public sealed class RtssService
             }
         }
     }
+
+    /// <summary>
+    /// Shows our FPS counter (RtssOverlay.Text) in our own OSD slot, or clears that slot when
+    /// the text is empty. With <paramref name="hideOthers"/>, MSI Afterburner's OSD is kept hidden
+    /// meanwhile (see HideAfterburnerLoop): an empty text then means nothing on screen at all.
+    /// </summary>
+    public bool SetOverlay(string text, bool hideOthers)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            WriteOverlaySlot(null);
+            // Off doesn't start RTSS just to hide something that isn't there.
+            if (hideOthers && IsRunning()) HideAfterburner();
+            else _hideAfterburner = false;
+            return true;
+        }
+        if (!EnsureRunning()) return false;
+        // Right after RTSS starts its shared memory may not be there yet.
+        for (var attempt = 0; attempt < 10; attempt++)
+        {
+            if (WriteOverlaySlot(text))
+            {
+                if (hideOthers) HideAfterburner();
+                else _hideAfterburner = false;
+                return true;
+            }
+            Thread.Sleep(300);
+        }
+        return false;
+    }
+
+    /// <summary>Applies a style from <see cref="RtssOverlay"/>.</summary>
+    public bool ApplyOverlay(string? style, FpsOverlayLayout? layout) =>
+        SetOverlay(RtssOverlay.Text(style, layout), RtssOverlay.HidesOthers(style));
+
+    private volatile bool _hideAfterburner;
+    private Thread? _afterburnerHider;
+
+    private void HideAfterburner()
+    {
+        _hideAfterburner = true;
+        if (_afterburnerHider is { IsAlive: true }) return;
+        _afterburnerHider = new Thread(HideAfterburnerLoop) { IsBackground = true, Name = "RTSS Afterburner", Priority = ThreadPriority.AboveNormal };
+        _afterburnerHider.Start();
+    }
+
+    /// <summary>
+    /// RTSS draws every slot and has no way to hide one, and Afterburner's own OSD hotkey turns off
+    /// the whole OSD (ours too). So, while our counter is on, empty Afterburner's slot text right
+    /// after each rewrite (it does one per polling period, ~1 s): at worst it shows for a frame.
+    /// Once we stop, its next rewrite brings it back by itself.
+    /// </summary>
+    private unsafe void HideAfterburnerLoop()
+    {
+        try
+        {
+            using var map = MemoryMappedFile.OpenExisting("RTSSSharedMemoryV2", MemoryMappedFileRights.ReadWrite);
+            using var view = map.CreateViewAccessor(0, 0, MemoryMappedFileAccess.ReadWrite);
+            byte* mem = null;
+            view.SafeMemoryMappedViewHandle.AcquirePointer(ref mem);
+            try
+            {
+                mem += view.PointerOffset;
+                var afterburner = System.Text.Encoding.ASCII.GetBytes(AfterburnerOwner);
+                var version = *(uint*)(mem + OffVersion);
+                var entrySize = *(uint*)(mem + OffOsdEntrySize);
+                var slot = mem + *(uint*)(mem + OffOsdArrOffset);   // Afterburner keeps slot 0
+                var hasEx2 = version >= 0x00020014 && entrySize > EntryOsdEx2;
+                while (_hideAfterburner && *(uint*)mem == Signature)
+                {
+                    if (IsOwner(slot, afterburner) && (slot[EntryOsd] != 0 || slot[EntryOsdEx] != 0 || (hasEx2 && slot[EntryOsdEx2] != 0)))
+                    {
+                        slot[EntryOsd] = 0;
+                        slot[EntryOsdEx] = 0;
+                        if (hasEx2) slot[EntryOsdEx2] = 0;
+                        Interlocked.Increment(ref *(int*)(mem + OffOsdFrame));
+                    }
+                    Thread.Sleep(1);
+                }
+            }
+            finally
+            {
+                view.SafeMemoryMappedViewHandle.ReleasePointer();
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            // RTSS closed: nothing to hide
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"RTSS: não foi possível esconder o OSD do Afterburner: {ex.Message}");
+        }
+    }
+
+    // RTSSSharedMemoryV2 (RTSS SDK, RTSSSharedMemory.h): header offsets and OSD entry layout.
+    private const uint Signature = 0x52545353;   // 'RTSS'
+    private const int OffVersion = 4, OffOsdEntrySize = 20, OffOsdArrOffset = 24, OffOsdArrSize = 28, OffOsdFrame = 32, OffBusy = 36;
+    private const int EntryOsd = 0, EntryOwner = 256, EntryOsdEx = 512, OsdSize = 256, OwnerSize = 256, OsdExSize = 4096;
+    private const int EntryOsdEx2 = EntryOsdEx + OsdExSize + 262144;   // after szOSDEx and the 256 KB object buffer
+    private const string AfterburnerOwner = "MSIAfterburner";
+
+    /// <summary>null = release our slot. Mirrors UpdateOSD/ReleaseOSD from the SDK sample.</summary>
+    private static unsafe bool WriteOverlaySlot(string? text)
+    {
+        try
+        {
+            using var map = MemoryMappedFile.OpenExisting("RTSSSharedMemoryV2", MemoryMappedFileRights.ReadWrite);
+            using var view = map.CreateViewAccessor(0, 0, MemoryMappedFileAccess.ReadWrite);
+            byte* mem = null;
+            view.SafeMemoryMappedViewHandle.AcquirePointer(ref mem);
+            try
+            {
+                mem += view.PointerOffset;
+                var version = *(uint*)(mem + OffVersion);
+                if (*(uint*)mem != Signature || version < 0x00020000) return false;
+
+                var entrySize = *(uint*)(mem + OffOsdEntrySize);
+                var arrOffset = *(uint*)(mem + OffOsdArrOffset);
+                var arrSize = *(uint*)(mem + OffOsdArrSize);
+                var owner = System.Text.Encoding.ASCII.GetBytes(RtssOverlay.Owner);
+                var entries = mem + arrOffset;
+
+                if (text is null)
+                {
+                    // Slot 0 belongs to the primary client (Afterburner); third parties start at 1.
+                    for (uint i = 1; i < arrSize; i++)
+                    {
+                        var entry = entries + i * entrySize;
+                        if (!IsOwner(entry, owner)) continue;
+                        new Span<byte>(entry, (int)entrySize).Clear();
+                        Interlocked.Increment(ref *(int*)(mem + OffOsdFrame));
+                    }
+                    return true;
+                }
+
+                // The slot we hold already, else the first free one.
+                byte* slot = null;
+                for (uint i = 1; i < arrSize && slot is null; i++)
+                    if (IsOwner(entries + i * entrySize, owner)) slot = entries + i * entrySize;
+                for (uint i = 1; i < arrSize && slot is null; i++)
+                {
+                    var entry = entries + i * entrySize;
+                    if (entry[EntryOwner] != 0) continue;
+                    owner.CopyTo(new Span<byte>(entry + EntryOwner, OwnerSize));
+                    slot = entry;
+                }
+                if (slot is null) return false;
+
+                var bytes = System.Text.Encoding.ASCII.GetBytes(text);
+                var extended = version >= 0x00020007;
+                var target = new Span<byte>(slot + (extended ? EntryOsdEx : EntryOsd), extended ? OsdExSize : OsdSize);
+                // v2.14+: bit 0 of dwBusy locks the OSD while the renderer reads it.
+                var lockable = version >= 0x0002000e;
+                ref var busy = ref *(int*)(mem + OffBusy);
+                for (var spin = 0; lockable && (Interlocked.Or(ref busy, 1) & 1) != 0; spin++)
+                {
+                    if (spin > 200) return false;
+                    Thread.Sleep(1);
+                }
+                try
+                {
+                    target.Clear();
+                    bytes.AsSpan(0, Math.Min(bytes.Length, target.Length - 1)).CopyTo(target);
+                }
+                finally
+                {
+                    if (lockable) Interlocked.And(ref busy, ~1);
+                }
+                Interlocked.Increment(ref *(int*)(mem + OffOsdFrame));
+                return true;
+            }
+            finally
+            {
+                view.SafeMemoryMappedViewHandle.ReleasePointer();
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            return false;   // RTSS isn't running: nothing on screen to show or clear
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"RTSS: não foi possível atualizar o contador de FPS: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static unsafe bool IsOwner(byte* entry, byte[] owner) =>
+        new ReadOnlySpan<byte>(entry + EntryOwner, owner.Length + 1).SequenceEqual([.. owner, (byte)0]);
 
     private bool Backup(ConsoleRuntimeState state)
     {
