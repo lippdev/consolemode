@@ -4,6 +4,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.6.0-beta.5]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
 ### What's new
 - Session menu: without ControlFS installed, pressing A on "File explorer (ControlFS)" now downloads and installs ControlFS right there, without leaving the controller: the row shows the progress, the installer is checked (SHA-256) before it runs and, when done, ControlFS opens full screen. If it can't (no internet, for example), the row says so and the next A opens the download page. (#136)
 
