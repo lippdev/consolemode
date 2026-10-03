@@ -18,6 +18,9 @@ public static class ControlFsInstaller
     public static async Task<string> InstallAsync(IProgress<double>? progress, CancellationToken ct = default)
     {
         if (!Environment.Is64BitOperatingSystem) throw new PlatformNotSupportedException("ControlFS só tem instalador x64.");
+        // A setup from an earlier attempt (or its Inno child, "ControlFS-Setup-x64.tmp") may still be at work:
+        // never start a second one next to it.
+        if (IsSetupRunning()) throw new InvalidOperationException("outro instalador do ControlFS ainda está rodando");
 
         var setup = await UpdateService.FindControlFsSetupAsync(ct)
             ?? throw new InvalidOperationException("nenhuma release com instalador verificável");
@@ -57,5 +60,19 @@ public static class ControlFsInstaller
         }
 
         return ControlFsService.FindExe() ?? throw new InvalidOperationException("instalado, mas o ControlFS.exe não foi encontrado");
+    }
+
+    private static bool IsSetupRunning()
+    {
+        var running = false;
+        foreach (var process in Process.GetProcesses())
+        {
+            using (process)
+            {
+                try { running |= process.ProcessName.StartsWith("ControlFS-Setup", StringComparison.OrdinalIgnoreCase); }
+                catch { /* exited while listing */ }
+            }
+        }
+        return running;
     }
 }
