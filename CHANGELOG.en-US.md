@@ -5,7 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### Fixes
-- Session menu: after installing ControlFS from the "File explorer" row, the menu stays in front and the row says "Installed · press to open"; ControlFS opens on the next A. Before, it opened by itself behind the game and the menu went away.
+- Session menu: after installing ControlFS from the "File explorer" row, the menu stays in front and the row says "Installed · press to open"; ControlFS opens on the next A. Before, it opened by itself behind the game and the menu went away. (#137)
 
 ## [1.6.0-beta.5]
 ### Heads-up: beta version, not the stable one

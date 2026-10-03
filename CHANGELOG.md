@@ -5,7 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Correções
-- Menu da sessão: depois de instalar o ControlFS pela linha "Explorador de arquivos", o menu continua na frente e a linha diz "Instalado · aperte para abrir"; o ControlFS abre no próximo A. Antes ele abria sozinho atrás do jogo e o menu sumia.
+- Menu da sessão: depois de instalar o ControlFS pela linha "Explorador de arquivos", o menu continua na frente e a linha diz "Instalado · aperte para abrir"; o ControlFS abre no próximo A. Antes ele abria sozinho atrás do jogo e o menu sumia. (#137)
 
 ## [1.6.0-beta.5]
 ### Atenção: versão beta, não é a estável
