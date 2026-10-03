@@ -276,6 +276,37 @@ public static class CcdHelper
         return DisplayConfigGetDeviceInfo(ref req) != 0 ? null : req.viewGdiDeviceName;
     }
 
+    /// <summary>
+    /// Moves active screens to the given desktop positions in one CCD call. Only the paths that are active
+    /// right now are touched, so a screen that is detached stays detached (unlike the registry-based
+    /// ChangeDisplaySettingsEx flush, which can bring one back). 0 = nothing to change or applied.
+    /// </summary>
+    public static int SetPositions(IReadOnlyDictionary<string, (int X, int Y)> positions)
+    {
+        var err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out var numPaths, out var numModes);
+        if (err != 0) return err;
+        var paths = new PATH_INFO[numPaths];
+        var modes = new MODE_INFO[numModes];
+        err = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, 0);
+        if (err != 0) return err;
+
+        var changed = false;
+        for (var i = 0; i < numModes; i++)
+        {
+            if (modes[i].infoType != MODE_INFO_TYPE_SOURCE) continue;
+            var name = GetSourceGdiName(modes[i].adapterId, modes[i].id);
+            if (name is null || !positions.TryGetValue(name, out var target)) continue;
+            if (modes[i].mode.sourceMode.position.x == target.X && modes[i].mode.sourceMode.position.y == target.Y) continue;
+            modes[i].mode.sourceMode.position.x = target.X;
+            modes[i].mode.sourceMode.position.y = target.Y;
+            changed = true;
+        }
+        if (!changed) return 0;
+
+        return SetDisplayConfig(numPaths, paths, numModes, modes,
+            SDC_APPLY | SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_SAVE_TO_DATABASE | SDC_ALLOW_CHANGES);
+    }
+
     public static int SetPrimary(string gdiDeviceName)
     {
         var err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out var numPaths, out var numModes);

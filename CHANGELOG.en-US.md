@@ -8,6 +8,21 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 - Returning from Big Picture now closes only Steam's client window to the tray, keeping Steam running; games and other windows are preserved. (#131)
 - Console interface settings: grouped controller options, a saved Automatic/Xbox/PlayStation button layout with a preview, and shortcut editing with cards and larger buttons. (#131)
 
+## [1.6.0-beta.2]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
+### Fixes
+- Session menu: ← and → move across the open-window cards by position without failing; nothing moves past the last card of a row. (#133)
+- Controllers: a DualSense (PS5) over Bluetooth is read again by the shortcuts and the session menu; the log records the first report format of each Sony pad. (#132)
+
+## [1.6.0-beta.1]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
+### Fixes
+- Displays: going back to the PC restores the exact layout from before (the second monitor no longer slides aside) and keeps the TV off. Only the screens that were on come back, the TV is detached before the positions, and the result is checked against the backup and redone if needed. (#134)
+
 ## [1.6.0-alpha.5]
 
 ### Fixes

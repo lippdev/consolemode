@@ -291,6 +291,16 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (sa
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
 
+## Restaurar a mesa: posições das telas
+
+Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas telas empilhadas ou lado a lado, p. ex. uma ultrawide com outra logo abaixo, alinhadas à esquerda); anote o mapa em Configurações → Sistema → Tela antes de começar.
+
+- [ ] Estratégia "Desconectar": **Jogar agora** e depois **Voltar ao PC** (botão, menu da sessão e tray): o mapa em Configurações → Sistema → Tela volta **idêntico** ao anotado (cada tela no mesmo lugar, mesma tela principal, a TV desligada como antes). Resultado: ______
+- [ ] O `consolemode.log` mostra a ordem `Telas: desativar <TV>` **antes** de `Telas: layout restaurado => 0` e não tem `posições fora do backup`. Se tiver, o texto diz quais telas e em qual tentativa a restauração acertou. Resultado: ______
+- [ ] Repetir 3 vezes seguidas: o layout não deriva a cada ciclo. Resultado: ______
+- [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
+- [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
+
 ## Telas com código próprio (issue #91)
 
 Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.
@@ -329,9 +339,12 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Repetir por Bluetooth e com Steam Input/DS4Windows ligado: cada toque produz uma única ação, sem movimento em repouso. Resultado: ______
 - [ ] Com um Xbox também conectado, repetir a navegação com o DualShock. Resultado: ______
 - [ ] Reconectar o DualShock com a tela Console aberta: a navegação volta a responder. Resultado: ______
+- [ ] **DualSense (PS5) por Bluetooth**, sem Steam Input/DS4Windows e com o jogo/Big Picture em foco: Select + Y (Create + △) abre o overlay e, nele, D-pad, ✕, ○ e □ respondem. Repetir por USB. Resultado: ______
+- [ ] O `consolemode.log` tem, por controle Sony, uma linha `Controle: HID DualSense: relatório 0x.. com N bytes (descritor declara M)`. Se o menu não responder, essa linha (e `relatório 0x.. não reconhecido`, se houver) diz o motivo. Resultado: ______
 - [ ] Durante o jogo, Share + △ (Select + Y) abre o overlay; → em uma opção lateral leva ao primeiro cartão de janela e ✕ ativa a janela escolhida. Resultado: ______
 - [ ] No primeiro cartão de uma coluna, ← retorna à opção lateral de origem; ↑/↓ e ←/→ navegam pelos demais cartões, inclusive com rolagem. Resultado: ______
 - [ ] Com seletor de sessão ou confirmação de fechamento aberto, as direções ficam dentro do diálogo. Sem janelas abertas, → não perde o foco. Resultado: ______
+- [ ] Com **3 ou mais janelas** abertas (uma linha de cartões): → e ← percorrem a linha cartão a cartão; → no último cartão não faz nada (não pula para outro lugar); ← no primeiro volta à opção lateral de origem. Com várias linhas: → e ← ficam na linha do cartão. Resultado: ______
 - [ ] Os cartões não exibem o botão X no canto. Quadrado/Delete continuam pedindo confirmação para fechar a janela selecionada. Resultado: ______
 - [ ] A logo fornecida do ControlFS aparece no painel fixo do overlay, tanto instalado quanto ausente, inclusive no aplicativo publicado. Resultado: ______
 - [ ] Com overlay aberto ou outro aplicativo em primeiro plano, a tela Console ao fundo não reage ao DualShock. Resultado: ______

@@ -8,6 +8,21 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Voltar do Big Picture agora fecha apenas a janela da Steam para a bandeja, mantendo o cliente em execução; jogos e outras janelas são preservados. (#131)
 - Ajustes da interface Console: opções de controle agrupadas, escolha persistente do layout Automático/Xbox/PlayStation com prévia e editor de atalhos com cartões e botões maiores. (#131)
 
+## [1.6.0-beta.2]
+### Atenção: versão beta, não é a estável
+- Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha/beta. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
+
+### Correções
+- Menu da sessão: ← e → percorrem os cartões das janelas abertas pela posição, sem falhar; no último cartão da linha nada se move. (#133)
+- Controles: o DualSense (PS5) por Bluetooth voltou a ser lido pelas teclas de atalho e pelo menu da sessão; o log registra o formato do primeiro relatório de cada controle Sony. (#132)
+
+## [1.6.0-beta.1]
+### Atenção: versão beta, não é a estável
+- Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
+
+### Correções
+- Telas: ao voltar para o PC o layout volta idêntico ao de antes (a tela 2 não desliza mais para o lado) e a TV continua desligada. Só voltam as telas que estavam ligadas, a TV é desconectada antes das posições, o resultado é conferido com o backup e refeito se preciso. (#134)
+
 ## [1.6.0-alpha.5]
 
 ### Correções
