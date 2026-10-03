@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Contador de FPS sobre o jogo, pelo RivaTuner (RTSS), no estilo do Console Mode: escolha em Ajustes ou alterne com A na nova linha "Contador de FPS" do menu da sessão. Estilos: Afterburner (padrão; não mexe em nada), Desligado (nada na tela), Compacto (só o FPS), Detalhado (API, FPS e tempo de quadro) e Personalizado, em que você escolhe os itens, se ficam numa linha só e a cor dos números. Fora de "Afterburner", o OSD do MSI Afterburner fica escondido durante a sessão e volta sozinho ao voltar ao PC; a configuração do Afterburner não é alterada. (#PR)
+- Contador de FPS sobre o jogo, pelo RivaTuner (RTSS), no estilo do Console Mode: escolha em Ajustes ou alterne com A na nova linha "Contador de FPS" do menu da sessão. Estilos: Afterburner (padrão; não mexe em nada), Desligado (nada na tela), Compacto (só o FPS), Detalhado (API, FPS e tempo de quadro) e Personalizado, em que você escolhe os itens, se ficam numa linha só e a cor dos números. Fora de "Afterburner", o OSD do MSI Afterburner fica escondido durante a sessão e volta sozinho ao voltar ao PC; a configuração do Afterburner não é alterada. (#138)
 
 ## [1.6.0-beta.6]
 ### Atenção: versão beta, não é a estável
