@@ -157,6 +157,11 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                             <TextBlock Style="{StaticResource TileValue}" FontSize="18" Text="{x:Bind ViewModel.Texts.ControlFsCard, Mode=OneWay}"/>
                             <TextBlock Style="{StaticResource TileLabel}" FontSize="14" Text="{x:Bind ViewModel.ControlFsRowText, Mode=OneWay}"/>
+                            <!-- Installing from this row: the download fills the bar, the setup leaves it running. -->
+                            <ProgressBar Minimum="0" Maximum="100" Height="4" CornerRadius="2" Margin="0,3,0,0"
+                                         Value="{x:Bind ViewModel.ControlFsProgress, Mode=OneWay}"
+                                         IsIndeterminate="{x:Bind ViewModel.ControlFsSetupRunning, Mode=OneWay}"
+                                         Visibility="{x:Bind ViewModel.ControlFsInstalling, Mode=OneWay}"/>
                         </StackPanel>
                     </Grid>
                 </Button>

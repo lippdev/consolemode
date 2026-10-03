@@ -195,6 +195,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ControlFsCard => LocalizationService.Get(nameof(ControlFsCard));
     public string ControlFsOpen => LocalizationService.Get(nameof(ControlFsOpen));
     public string ControlFsMissing => LocalizationService.Get(nameof(ControlFsMissing));
+    public string ControlFsInstalling => LocalizationService.Get(nameof(ControlFsInstalling));
+    public string ControlFsInstallFailed => LocalizationService.Get(nameof(ControlFsInstallFailed));
     public string SessionWindowsCard => LocalizationService.Get(nameof(SessionWindowsCard));
     public string SwitcherEmpty => LocalizationService.Get(nameof(SwitcherEmpty));
     public string SwitcherOpen => LocalizationService.Get(nameof(SwitcherOpen));

@@ -159,7 +159,7 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 
 ## 1d. Explorador de arquivos (ControlFS) no menu da sessão
 
-Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS).
+Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS), exceto nos itens de instalação pelo menu.
 
 - [ ] Select + Y: no topo da lateral esquerda, fora da lista que rola, há o painel "Explorador de arquivos (ControlFS)"; o restante das opções rola por baixo dele. Resultado: ______
 - [ ] Direcional para cima a partir de "Voltar ao jogo" chega nele; A abre o ControlFS em tela cheia na TV, por cima do jogo/Big Picture, e o menu fecha. Resultado: ______
@@ -170,7 +170,11 @@ Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS)
 - [ ] Com o ControlFS já aberto: A só o traz para a frente (não abre uma segunda instância). Resultado: ______
 - [ ] A sessão **não** termina nem restaura a mesa enquanto o ControlFS está na frente; ao sair dele (Menu do ControlFS → Sair) volta-se ao jogo. Resultado: ______
 - [ ] Select + Y com o ControlFS na frente abre o menu por cima dele (saída de emergência). Resultado: ______
-- [ ] Sem o ControlFS instalado: a linha diz "Não instalado · aperte para baixar" e A abre a página de releases no navegador. Resultado: ______
+- [ ] **Instalar pelo menu** (desinstale o ControlFS antes): a linha diz "Não instalado · aperte para baixar e instalar". A começa o download: a linha mostra "Baixando… N%" com a barra enchendo, depois "Instalando…" com a barra em movimento, sem nenhuma janela de instalador nem pedido de administrador. Ao terminar, o menu fecha e o ControlFS abre em tela cheia na tela da sessão. Resultado: ______
+- [ ] Durante o download o menu continua respondendo (direcional, volume); apertar A de novo na linha não começa um segundo download. Resultado: ______
+- [ ] Fechar o menu durante a instalação: ela termina em segundo plano e o ControlFS **não** abre por cima do jogo; ao reabrir o menu a linha já diz "Navegue pelos seus arquivos com o controle". Resultado: ______
+- [ ] Sem internet (cabo/Wi-Fi desligado): A na linha mostra "Não deu para instalar · aperte para abrir a página de download" e o log registra `ControlFS: instalar: ...`; o A seguinte abre a página de releases no navegador. Reabrindo o menu, a linha volta a oferecer a instalação. Resultado: ______
+- [ ] Depois de instalado pelo menu, o ControlFS aparece em Configurações → Aplicativos instalados e nenhum `ControlFS-Setup-x64.exe` sobra em `%TEMP%ConsoleModeUpdate`. Resultado: ______
 - [ ] Fora da sessão (prévia do menu) o painel funciona igual. Resultado: ______
 
 ## 2. Links `consolemode://`
