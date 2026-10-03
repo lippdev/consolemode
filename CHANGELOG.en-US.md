@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
-- Session menu: a new "FPS counter" row shows the FPS over the game through RivaTuner (RTSS), in Console Mode's style. A cycles Off, Compact (FPS only) and Detailed (API, FPS and frame time); the choice carries over to the next sessions and the counter goes away when you go back to the PC. If you already use MSI Afterburner, its OSD stays: ours takes its own slot in RTSS and shows alongside it, without touching Afterburner's. (#PR)
+- Session menu: a new "FPS counter" row shows the FPS over the game through RivaTuner (RTSS), in Console Mode's style. A cycles Off, Compact (FPS only) and Detailed (API, FPS and frame time); the choice carries over to the next sessions and the counter goes away when you go back to the PC. With MSI Afterburner open, its OSD is hidden while our counter is on and comes back by itself (within 1 s) when you turn ours off or go back to the PC; Afterburner's settings are not changed. (#PR)
 
 ## [1.6.0-beta.6]
 ### Heads-up: beta version, not the stable one

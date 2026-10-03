@@ -386,6 +386,6 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Em sessão, com um jogo aberto: A na linha alterna Desligado → Compacto → Detalhado → Desligado, e o contador muda no jogo na hora.
 - [ ] Compacto mostra o FPS; Detalhado mostra a API (D3D11/D3D12/Vulkan), o FPS e o tempo de quadro em ms.
 - [ ] Com o RTSS fechado, ligar o contador abre o RTSS e o contador aparece.
-- [ ] Com o MSI Afterburner aberto e o OSD dele ligado: os dois aparecem, o do Afterburner primeiro; ao desligar o nosso, o do Afterburner continua igual.
-- [ ] Voltar ao PC some com o nosso contador; o do Afterburner fica.
+- [ ] Com o MSI Afterburner aberto e o OSD dele ligado: com o nosso ligado, só o nosso aparece (no máximo um piscar rápido do Afterburner de vez em quando); ao desligar o nosso, o do Afterburner volta em até 1 s.
+- [ ] Voltar ao PC some com o nosso contador e o do Afterburner volta.
 - [ ] A escolha fica salva: na próxima sessão o contador já aparece no estilo escolhido.
