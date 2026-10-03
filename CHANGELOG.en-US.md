@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixes
+- Session menu: after installing ControlFS from the "File explorer" row, the menu stays in front and the row says "Installed · press to open"; ControlFS opens on the next A. Before, it opened by itself behind the game and the menu went away.
+
 ## [1.6.0-beta.5]
 ### Heads-up: beta version, not the stable one
 - This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
