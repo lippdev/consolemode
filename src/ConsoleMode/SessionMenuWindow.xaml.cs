@@ -555,7 +555,11 @@ public sealed partial class SessionMenuWindow : Window
         if (CloseConfirmOverlay.Visibility == Visibility.Visible) return;
         _pendingCloseItem = item;
         _pendingCloseIndex = index;
-        CloseConfirmBodyText.Text = LocalizationService.Get("SwitcherCloseConfirmBody", item.Title);
+        CloseConfirmProcessText.Text = item.ProcessName;
+        CloseConfirmProcessText.Visibility = item.ProcessName.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        CloseConfirmTitleText.Text = item.Title;
+        CloseConfirmIcon.Source = item.Icon;
+        CloseConfirmGlyph.Visibility = item.HasNoIcon ? Visibility.Visible : Visibility.Collapsed;
         CloseConfirmOverlay.Visibility = Visibility.Visible;
         CancelCloseButton.Focus(FocusState.Programmatic);
     }
