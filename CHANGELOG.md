@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- Menu da sessão: nova linha "Contador de FPS" mostra o FPS sobre o jogo pelo RivaTuner (RTSS), no estilo do Console Mode. A alterna entre Desligado, Compacto (só o FPS) e Detalhado (API, FPS e tempo de quadro); a escolha vale para as próximas sessões e o contador some ao voltar ao PC. Quem já usa o MSI Afterburner continua com o OSD dele: o nosso ocupa um espaço próprio no RTSS e aparece junto, sem mexer no dele. (#PR)
 
 ## [1.6.0-beta.6]
 ### Atenção: versão beta, não é a estável

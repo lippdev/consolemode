@@ -150,6 +150,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string VrrCard => LocalizationService.Get(nameof(VrrCard));
     public string VrrDescription => LocalizationService.Get(nameof(VrrDescription));
     public string FpsCard => LocalizationService.Get(nameof(FpsCard));
+    public string FpsOverlayCard => LocalizationService.Get(nameof(FpsOverlayCard));
     public string FpsPlaceholder => LocalizationService.Get(nameof(FpsPlaceholder));
     public string AppSection => LocalizationService.Get(nameof(AppSection));
     public string StartupCard => LocalizationService.Get(nameof(StartupCard));

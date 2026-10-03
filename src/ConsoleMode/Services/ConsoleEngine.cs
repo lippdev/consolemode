@@ -177,6 +177,10 @@ public sealed class ConsoleEngine
                 AppLog.Write(rtss.Message);
         }
 
+        if (RtssOverlay.Normalize(config.FpsOverlay) != RtssOverlay.Off && Rtss.IsInstalled
+            && !Rtss.SetOverlay(RtssOverlay.Text(config.FpsOverlay)))
+            AppLog.Write("RTSS: o contador de FPS não pôde ser exibido");
+
         switch (config.FullscreenMode)
         {
             case "bigPicture":
@@ -282,6 +286,7 @@ public sealed class ConsoleEngine
         {
             OnUi(BlackCurtain.Close);
             Rtss.Restore(State);
+            Rtss.SetOverlay("");
             return;
         }
 
@@ -302,6 +307,7 @@ public sealed class ConsoleEngine
             }
             Audio.Restore(State.BackupAudioId);
             Rtss.Restore(State);
+            Rtss.SetOverlay("");
             Monitors.ClearCache();
             Audio.ClearCache();
             if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);

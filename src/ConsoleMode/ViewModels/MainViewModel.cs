@@ -906,6 +906,7 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
             FpsLimit = ReadFpsLimit(),
+            FpsOverlay = _loadedConfig.FpsOverlay,
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             TourDone = _loadedConfig.TourDone,

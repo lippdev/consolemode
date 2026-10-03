@@ -376,3 +376,16 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Tente usar uma combinação já atribuída e confirme que a mensagem de conflito aparece inteira e não corta os botões.
 - [ ] Reduza a altura da janela e confirme que o editor rola até **Voltar**, sem esconder os cartões.
 - [ ] Feche o editor durante uma captura e confirme que ela para; reabra-o e confirme que nenhum botão fica preso em captura.
+
+## Contador de FPS no menu da sessão (RTSS)
+
+Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Display" ligado.
+
+- [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão.
+- [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
+- [ ] Em sessão, com um jogo aberto: A na linha alterna Desligado → Compacto → Detalhado → Desligado, e o contador muda no jogo na hora.
+- [ ] Compacto mostra o FPS; Detalhado mostra a API (D3D11/D3D12/Vulkan), o FPS e o tempo de quadro em ms.
+- [ ] Com o RTSS fechado, ligar o contador abre o RTSS e o contador aparece.
+- [ ] Com o MSI Afterburner aberto e o OSD dele ligado: os dois aparecem, o do Afterburner primeiro; ao desligar o nosso, o do Afterburner continua igual.
+- [ ] Voltar ao PC some com o nosso contador; o do Afterburner fica.
+- [ ] A escolha fica salva: na próxima sessão o contador já aparece no estilo escolhido.
