@@ -4,6 +4,13 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.6.0-beta.5]
+### Atenção: versão beta, não é a estável
+- Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha/beta. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
+
+### Novidades
+- Menu da sessão: sem o ControlFS instalado, apertar A em "Explorador de arquivos (ControlFS)" agora baixa e instala o ControlFS ali mesmo, sem sair do controle: a linha mostra o progresso, o instalador é conferido (SHA-256) antes de rodar e, ao terminar, o ControlFS abre em tela cheia. Se não der (sem internet, por exemplo), a linha avisa e o próximo A abre a página de download. (#136)
+
 ## [1.6.0-beta.4]
 ### Atenção: versão beta, não é a estável
 - Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha/beta. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
