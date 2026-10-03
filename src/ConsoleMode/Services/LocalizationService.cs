@@ -200,6 +200,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string SwitcherOpen => LocalizationService.Get(nameof(SwitcherOpen));
     public string SwitcherCloseWindow => LocalizationService.Get(nameof(SwitcherCloseWindow));
     public string SwitcherCloseConfirmTitle => LocalizationService.Get(nameof(SwitcherCloseConfirmTitle));
+    public string SwitcherCloseConfirmBody => LocalizationService.Get(nameof(SwitcherCloseConfirmBody));
     public string SwitcherCloseConfirmAction => LocalizationService.Get(nameof(SwitcherCloseConfirmAction));
     public string ShortcutCancel => LocalizationService.Get(nameof(ShortcutCancel));
     public string BackgroundCard => LocalizationService.Get(nameof(BackgroundCard));

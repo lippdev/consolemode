@@ -97,7 +97,7 @@
   "SwitcherOpen": "Abrir",
   "SwitcherCloseWindow": "Fechar janela",
   "SwitcherCloseConfirmTitle": "Fechar esta janela?",
-  "SwitcherCloseConfirmBody": "{0} será fechado. Se houver alterações sem salvar, o aplicativo ainda poderá pedir que você as salve.",
+  "SwitcherCloseConfirmBody": "Se houver alterações sem salvar, o aplicativo ainda poderá pedir que você as salve.",
   "SwitcherCloseConfirmAction": "Fechar janela",
   "SessionPreviewBadge": "Prévia · fora da sessão",
   "ConsoleActiveHint": "Ou segure {0} no controle por 1 segundo.",
