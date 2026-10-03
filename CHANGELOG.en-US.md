@@ -5,7 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### Fixes
-- Session menu: the window cards are all the same size and show each program's right icon (Microsoft Store apps too), sharp on the TV; the close-window confirmation is now its own card with the window's icon and title, and clear "Cancel" and "Close window" buttons.
+- Session menu: the window cards are all the same size and show each program's right icon (Microsoft Store apps too), sharp on the TV; the close-window confirmation is now its own card with the window's icon and title, and clear "Cancel" and "Close window" buttons. (#135)
 
 ## [1.6.0-beta.3]
 ### Heads-up: beta version, not the stable one

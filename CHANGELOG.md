@@ -5,7 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Correções
-- Menu da sessão: os cartões das janelas têm todos o mesmo tamanho e mostram o ícone certo de cada programa (também de apps da Microsoft Store), nítido na TV; a confirmação de fechar janela ganhou um cartão próprio com o ícone e o título da janela, "Cancelar" e "Fechar janela" em destaque.
+- Menu da sessão: os cartões das janelas têm todos o mesmo tamanho e mostram o ícone certo de cada programa (também de apps da Microsoft Store), nítido na TV; a confirmação de fechar janela ganhou um cartão próprio com o ícone e o título da janela, "Cancelar" e "Fechar janela" em destaque. (#135)
 
 ## [1.6.0-beta.3]
 ### Atenção: versão beta, não é a estável
