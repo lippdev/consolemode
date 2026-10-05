@@ -136,7 +136,8 @@ public sealed class LaunchService
     /// <summary>
     /// Leaves Big Picture the clean way, through Steam's own URL (back to the desktop client), so it does not
     /// stay open on the desk once the screens are back. Halfway through the wait, if it is still there, the
-    /// window is asked to close (WM_CLOSE: the X button, not a kill). Returns whether it is gone.
+    /// window is asked to close (WM_CLOSE: the X button, not a kill), and only if it belongs to Steam: a game in
+    /// full screen can pass for Big Picture in <see cref="GetBigPictureHandles"/>. Returns whether it is gone.
     /// </summary>
     public bool CloseBigPicture(ConsoleRuntimeState state, int timeoutMs = 6000)
     {
@@ -155,10 +156,25 @@ public sealed class LaunchService
             {
                 nudged = true;
                 foreach (var handle in handles.Concat(GetBigPictureHandles()).Distinct())
-                    NativeWindows.PostMessage(handle, NativeWindows.WmClose, 0, 0);
+                {
+                    if (IsSteamWindow(handle)) NativeWindows.PostMessage(handle, NativeWindows.WmClose, 0, 0);
+                    else AppLog.Write("Fechar Big Picture: janela em tela cheia não é da Steam, mantida aberta");
+                }
             }
         }
         return !IsBigPictureActive(state);
+    }
+
+    private static bool IsSteamWindow(nint handle)
+    {
+        NativeWindows.GetWindowThreadProcessId(handle, out var processId);
+        if (processId == 0) return false;
+        try
+        {
+            using var process = Process.GetProcessById(unchecked((int)processId));
+            return SteamShutdown.IsSteamProcess(process.ProcessName);
+        }
+        catch { return false; /* gone, or not ours to read: not known to be Steam, so left alone */ }
     }
 
     public bool IsBigPictureActive(ConsoleRuntimeState state)
