@@ -87,6 +87,19 @@ public sealed class AppConfig
     /// <summary>Turning the TV on / to the PC's input when console mode starts (issue #75).</summary>
     public TvControlConfig Tv { get; set; } = new();
 
+    /// <summary>
+    /// A copy with other monitor fields and every other setting as it is here. A copy, not a field-by-field
+    /// rebuild: a setting added later is carried along without anyone having to remember it.
+    /// </summary>
+    public AppConfig WithMonitors(string focusMonitor, List<string> hideMonitors, Dictionary<string, SavedDisplayMode> monitorModes)
+    {
+        var copy = (AppConfig)MemberwiseClone();
+        copy.FocusMonitor = focusMonitor;
+        copy.HideMonitors = hideMonitors;
+        copy.MonitorModes = monitorModes;
+        return copy;
+    }
+
     [JsonIgnore]
     public string SetupKey =>
         $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";
