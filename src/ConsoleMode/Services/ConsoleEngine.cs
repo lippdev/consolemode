@@ -407,40 +407,7 @@ public sealed class ConsoleEngine
         foreach (var (key, mode) in config.MonitorModes)
             modes[Monitors.ResolveName(key)] = mode;
 
-        return new AppConfig
-        {
-            Version = config.Version,
-            AppLanguage = config.AppLanguage,
-            FocusMonitor = focus,
-            HideMonitors = hide,
-            HideStrategy = config.HideStrategy,
-            FullscreenMode = config.FullscreenMode,
-            PlaynitePath = config.PlaynitePath,
-            AudioDeviceId = config.AudioDeviceId,
-            AudioDeviceName = config.AudioDeviceName,
-            AudioAutoSwitch = config.AudioAutoSwitch,
-            FpsLimit = config.FpsLimit,
-            MonitorModes = modes,
-            HdrEnable = config.HdrEnable,
-            VrrEnable = config.VrrEnable,
-            UiMode = config.UiMode,
-            TourDone = config.TourDone,
-            ConfirmedSetup = config.ConfirmedSetup,
-            CheckUpdates = config.CheckUpdates,
-            BetaUpdates = config.BetaUpdates,
-            HomeShortcut = config.HomeShortcut,
-            MenuShortcut = config.MenuShortcut,
-            ExitShortcut = config.ExitShortcut,
-            ShortcutsOnboardingDone = config.ShortcutsOnboardingDone,
-            HomeButtonShortPress = config.HomeButtonShortPress,
-            CloseSteamOnRestore = config.CloseSteamOnRestore,
-            AutoStartOnController = config.AutoStartOnController,
-            InterfaceSounds = config.InterfaceSounds,
-            ConsoleBackground = config.ConsoleBackground,
-            ConsoleBackgroundImage = config.ConsoleBackgroundImage,
-            SkippedUpdateVersion = config.SkippedUpdateVersion,
-            Tv = config.Tv
-        };
+        return config.WithMonitors(focus, hide, modes);
     }
 
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)

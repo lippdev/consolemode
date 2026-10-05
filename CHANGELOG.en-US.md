@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- FPS counter: the style saved in Settings now applies as soon as the session starts. Before, the counter only showed up after cycling the "FPS counter" row in the session menu. (#139)
 
 ## [1.6.0-beta.7]
 ### Heads-up: beta version, not the stable one

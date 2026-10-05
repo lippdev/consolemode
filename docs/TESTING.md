@@ -393,3 +393,4 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com o RTSS fechado, ligar Compacto abre o RTSS e o contador aparece.
 - [ ] Voltar ao PC: o nosso some e o do Afterburner volta.
 - [ ] A escolha e o layout ficam salvos para a próxima sessão.
+- [ ] Com Compacto (ou outro estilo nosso) já salvo em Ajustes, iniciar a sessão: o contador aparece e o do Afterburner some sem precisar mexer na linha do menu.

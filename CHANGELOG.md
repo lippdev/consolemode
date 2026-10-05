@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Correções
+- Contador de FPS: o estilo salvo em Ajustes agora vale assim que a sessão começa. Antes, o contador só aparecia depois de alternar a linha "Contador de FPS" no menu da sessão. (#139)
 
 ## [1.6.0-beta.7]
 ### Atenção: versão beta, não é a estável
