@@ -5,6 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 ### Correções
 - Contador de FPS: o estilo salvo em Ajustes agora vale assim que a sessão começa. Antes, o contador só aparecia depois de alternar a linha "Contador de FPS" no menu da sessão. (#139)
+- Voltar ao PC: o pedido de fechar o Big Picture só vai para janelas da própria Steam. Antes, um jogo em tela cheia (os feitos com SDL, como os da Valve e muitos indies) podia receber o pedido e fechar. (#140)
 
 ## [1.6.0-beta.7]
 ### Atenção: versão beta, não é a estável

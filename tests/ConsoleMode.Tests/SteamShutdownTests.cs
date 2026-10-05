@@ -17,6 +17,17 @@ public class SteamShutdownTests
     public void Only_unowned_visible_steam_client_windows_are_close_candidates(string process, string title, string className, bool visible, bool owned, bool expected) =>
         Assert.Equal(expected, SteamShutdown.IsClientWindowCandidate(process, title, className, visible, owned));
 
+    [Theory]
+    [InlineData("steam", true)]
+    [InlineData("steamwebhelper", true)]
+    [InlineData("SteamWebHelper", true)]
+    [InlineData("cs2", false)]
+    [InlineData("steamapp", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void Only_steams_own_processes_may_be_asked_to_close(string? process, bool expected) =>
+        Assert.Equal(expected, SteamShutdown.IsSteamProcess(process));
+
     [Fact]
     public void Steam_window_is_closed_to_tray_when_big_picture_was_the_launcher_and_no_game_is_running()
     {

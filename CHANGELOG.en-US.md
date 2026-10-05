@@ -5,6 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### Fixes
 - FPS counter: the style saved in Settings now applies as soon as the session starts. Before, the counter only showed up after cycling the "FPS counter" row in the session menu. (#139)
+- Back to the PC: the request to close Big Picture now only goes to Steam's own windows. Before, a full-screen game (SDL ones, like Valve's and many indies) could get it and close. (#140)
 
 ## [1.6.0-beta.7]
 ### Heads-up: beta version, not the stable one

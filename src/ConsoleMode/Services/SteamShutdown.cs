@@ -5,10 +5,17 @@ namespace ConsoleMode.Services;
 /// </summary>
 public static class SteamShutdown
 {
+    /// <summary>
+    /// Steam's own processes. Only their windows may be asked to close: a game is an SDL_app in full
+    /// screen just like Big Picture, and it must never get the WM_CLOSE meant for Steam.
+    /// </summary>
+    public static bool IsSteamProcess(string? processName) =>
+        string.Equals(processName, "steam", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(processName, "steamwebhelper", StringComparison.OrdinalIgnoreCase);
+
     public static bool IsClientWindowCandidate(string processName, string title, string className, bool visible, bool hasOwner) =>
         visible && !hasOwner &&
-        (string.Equals(processName, "steam", StringComparison.OrdinalIgnoreCase) ||
-         string.Equals(processName, "steamwebhelper", StringComparison.OrdinalIgnoreCase)) &&
+        IsSteamProcess(processName) &&
         string.Equals(title.Trim(), "Steam", StringComparison.OrdinalIgnoreCase) &&
         (string.Equals(className, "Chrome_WidgetWin_1", StringComparison.Ordinal) ||
          string.Equals(className, "vguiPopupWindow", StringComparison.Ordinal) ||

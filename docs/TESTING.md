@@ -238,6 +238,7 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam par
 - [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam permanece na bandeja. Resultado: ______
 - [ ] O processo da Steam continua no Gerenciador de Tarefas; clicar no ícone da bandeja reabre o cliente sem login nem reinício. Resultado: ______
 - [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
+- [ ] Com um **jogo SDL em tela cheia sem bordas** aberto (ex.: CS2, Dota 2, Half-Life: Alyx ou um indie feito com SDL) e não salvo: voltar ao PC **não fecha o jogo**; o Big Picture fecha e, se o jogo passou por Big Picture na detecção, o log mostra `Fechar Big Picture: janela em tela cheia não é da Steam, mantida aberta`. Resultado: ______
 - [ ] Com o ajuste **desligado**: o Big Picture fecha, a Steam fica aberta (`Steam: mantida aberta (desligado nos ajustes)`). Resultado: ______
 - [ ] Desligar o ajuste, fechar e reabrir o Console Mode e iniciar uma sessão Big Picture: a preferência continua desligada e a Steam fica aberta. Resultado: ______
 - [ ] Com o Steam aberto e o estado do jogo indisponível no Registro (valor `RunningAppID` ausente ou ilegível): a Steam fica aberta e o log informa que não foi possível verificar se há jogo em execução. Resultado: ______
