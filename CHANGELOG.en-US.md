@@ -3,6 +3,11 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+
+## [1.6.0-beta.8]
+### Heads-up: beta version, not the stable one
+- This is a test version of 1.6. The stable version is still 1.5.1, and people on it don't get this update automatically: only those who turned on Settings → "Receive test versions (alpha and beta)" or are already on an alpha/beta. If something breaks, go back to 1.5.1 and report it with the feedback button (attach `consolemode.log`).
+
 ### Fixes
 - FPS counter: the style saved in Settings now applies as soon as the session starts. Before, the counter only showed up after cycling the "FPS counter" row in the session menu. (#139)
 - Back to the PC: the request to close Big Picture now only goes to Steam's own windows. Before, a full-screen game (SDL ones, like Valve's and many indies) could get it and close. (#140)
