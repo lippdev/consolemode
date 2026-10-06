@@ -4,6 +4,39 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.6.0]
+### Novidades
+- Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation), blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR). (#117)
+- Menu da sessão redesenhado como o overlay do Steam (Shift+Tab): cobre a tela inteira, o jogo escurece e desfoca por trás, um painel lateral reúne as opções (volume com medidor, resolução, áudio, FPS, HDR) e no meio ficam as **janelas abertas**, um Alt+Tab interno: o direcional escolhe, A traz a janela para a frente, X a fecha (com confirmação) e B volta ao jogo. Os cartões mostram o ícone de cada programa. Fora da sessão ele abre como prévia. (#120, #127, #133, #135)
+- Explorador de arquivos no menu da sessão: a linha "Explorador de arquivos (ControlFS)" abre o ControlFS, o gerenciador de arquivos de código aberto da equipe, feito para o controle, em tela cheia na tela da sessão. Se ele não estiver instalado, A baixa e instala ali mesmo, com o instalador conferido (SHA-256) antes de rodar. (#122, #136, #137)
+- Contador de FPS sobre o jogo, pelo RivaTuner (RTSS): escolha em Ajustes ou alterne com A na linha "Contador de FPS" do menu da sessão. Estilos: Afterburner (padrão; não mexe em nada), Desligado, Compacto (só o FPS), Detalhado (API, FPS e tempo de quadro) e Personalizado, em que você escolhe os itens, se ficam numa linha só e a cor dos números. Fora de "Afterburner", o OSD do MSI Afterburner fica escondido durante a sessão e volta sozinho ao voltar ao PC. (#138, #139)
+- Atalhos do controle à sua escolha: o botão que abre o Console Mode, o do menu da sessão e o de voltar ao PC são configuráveis em Ajustes (segure os botões que você quer e solte). Nenhum vem ligado: na primeira abertura o app mostra a configuração, com uma sugestão para cada ação (Home, Select + Y e Start + Select). Um mesmo botão não pode servir para duas ações. (#116)
+- Ajustes → TV: o modo console liga a Google TV / Android TV pela rede e troca para a entrada HDMI do PC; também pode colocá-la em espera ao voltar ao PC. (#126)
+- Plano de fundo da interface Console: por padrão, uma colagem com as capas dos seus jogos instalados na Steam sob um gradiente escuro (o app só lê as imagens que a Steam já baixou). Dá para trocar por só o gradiente ou por uma imagem sua, em Sistema → Plano de fundo. (#117)
+- Sons na interface Console ao mover o foco, escolher e voltar, criados pelo próprio app. Dá para desligar em Ajustes → Sons da interface. (#117)
+- Interface Console: a aba Sistema dá acesso aos ajustes do modo PC (Playnite, TV, contador de FPS, Steam, tutorial e pasta de dados), com as opções de controle agrupadas, a escolha do layout dos botões (Automático, Xbox ou PlayStation) com prévia e um editor de atalhos com cartões e botões maiores. (#128, #131)
+
+### Mudanças
+- Telas e áudio agora são controlados pelas APIs do próprio Windows. O app não embute mais o MultiMonitorTool nem o SoundVolumeView, da NirSoft: o pacote fica só com código do projeto e o rtss-cli (MIT), o que abre caminho para assinar o executável e reduz alertas falsos de antivírus. As telas salvas, a saída de áudio escolhida e o backup da mesa continuam valendo. (#91, #97, #98, #99, #110, #119)
+- Steam: ao voltar ao PC, o Big Picture é fechado e a janela da Steam vai para a bandeja, com o cliente ainda em execução. O pedido só vai para janelas da própria Steam, então jogos e outras janelas não são tocados, e nada acontece se houver um jogo rodando. Dá para desligar em Ajustes → "Mandar a Steam para a bandeja ao voltar ao PC". (#121, #131, #140)
+- Publicar uma versão estável também abre o PR de atualização no winget (`winget install lippdev.ConsoleMode`). (#106)
+
+### Correções
+- Telas: ao voltar para o PC o layout volta idêntico ao de antes (a tela 2 não desliza mais para o lado) e a TV continua desligada. O resultado é conferido com o backup e refeito se preciso. (#134)
+- Telas: um monitor girado (em retrato) volta em retrato ao restaurar a mesa; antes a rotação não era salva. (#108)
+- Telas: a tela principal vem da flag do próprio Windows, então com telas clonadas não há mais ambiguidade. (#110)
+- Playnite: quando ele demora para abrir, o app não volta mais para o PC depois de alguns segundos; só restaura a mesa quando o Playnite fecha de verdade. (#83)
+- Áudio: se a troca da saída falhar, a sessão continua em vez de ser desfeita depois de as telas já terem sido trocadas. (#109)
+- Controles: o DualSense (PS5) por Bluetooth e o DualShock são lidos direto por HID nos atalhos, na interface Console e no menu da sessão. (#130, #132)
+- Controles: um controle que manda leituras impossíveis (muitos botões apertados ao mesmo tempo, direcional preso) é ignorado. (#115)
+- Interface Console: navegar pelo controle não trava mais; "para cima" e "para baixo" funcionam entre colunas e, ao trocar de aba, o foco cai no primeiro item dela. (#117)
+- Menu da sessão: o aviso que mostra o atalho no início da sessão não fica mais preso na tela. (#114)
+
+### Atualizando da 1.5.1
+- O app mostra o aviso: clique em **Atualizar agora**. As configurações, as telas salvas e a saída de áudio são mantidas.
+- Os atalhos do controle precisam ser escolhidos de novo: quem usava o botão Home ou Start + Select confirma (ou troca) na configuração que o app mostra na primeira abertura.
+- Os arquivos antigos do MultiMonitorTool e do SoundVolumeView ficam na pasta `tools` até você apagá-los à mão; o app não os usa mais.
+
 ## [1.6.0-beta.8]
 ### Atenção: versão beta, não é a estável
 - Esta é uma versão de teste da 1.6. A versão estável continua sendo a 1.5.1, e quem está nela não recebe esta atualização automaticamente: só quem ligou Ajustes → "Receber versões de teste (alpha e beta)" ou já está numa alpha/beta. Se algo falhar, volte para a 1.5.1 e conte pelo botão de feedback (anexe o `consolemode.log`).
