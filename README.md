@@ -16,6 +16,7 @@ Get **[1.6.0](https://github.com/lippdev/consolemode/releases/tag/v1.6.0)**, the
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
+- Or with winget: `winget install lippdev.ConsoleMode`
 
 On 1.5? The app offers the update and keeps your settings; you pick your controller shortcuts again the first time it opens.
 
@@ -67,7 +68,7 @@ All the details in the [release notes](https://github.com/lippdev/consolemode/re
 
 ## Roadmap
 
-**Next:** JoyChromium (the web with a controller, straight from Console Mode), record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Later:** per-game profiles ([#69](https://github.com/lippdev/consolemode/issues/69)), winget ([#13](https://github.com/lippdev/consolemode/issues/13)), more languages ([#14](https://github.com/lippdev/consolemode/issues/14)) · **Exploring:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
+**Next:** JoyChromium (the web with a controller, straight from Console Mode), record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Later:** per-game profiles ([#69](https://github.com/lippdev/consolemode/issues/69)), more languages ([#14](https://github.com/lippdev/consolemode/issues/14)) · **Exploring:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
 
 ## More
 
