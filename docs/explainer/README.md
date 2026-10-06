@@ -62,6 +62,15 @@ npm run alpha3
 
 Grava `out/alpha3-x.mp4` (H.264 yuv420p + AAC, faststart).
 
+## Tour da 1.6 (`Features16`)
+
+GIF de ~36 s no mesmo formato do tour da 1.5 (`Features`): título, nove recursos numerados com barra de progresso e o final. Mostra a escolha da tela, o novo menu da sessão, o Alt + Tab com o controle, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, as melhorias e o JoyChromium (em breve, tela ilustrativa). Sem vídeo de jogo nem desfoque, para o GIF ficar nítido e leve. Inglês e português (prop `lang`):
+
+```console
+npm run features16      # assets/features-1.6.gif
+npm run features16:pt   # assets/features-1.6.pt-BR.gif
+```
+
 ## Console Mode 1.6 (`Release16`)
 
 Vídeo de ~54 s em inglês com tudo da 1.6: um clique leva o jogo para a TV, o novo menu da sessão sobre o jogo, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, as correções e o JoyChromium (navegador para o controle, em breve; a tela é ilustrativa). Reaproveita a abertura do `Launch` e as cenas do `Alpha3`.
