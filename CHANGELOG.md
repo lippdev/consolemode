@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+
+## [1.6.1]
 ### Novidades
 - Tour guiado do menu da sessão: na primeira vez que o menu abre, ele oferece um tour opcional que destaca cada opção e explica o que ela faz, incluindo a diferença entre **Voltar ao PC** (restaura a mesa e o app fica na bandeja) e **Sair do Console Mode** (restaura e fecha o app). Para ver de novo, aperte Y (△) ou F1 no menu, ou use Ajustes → Tour do menu da sessão. (#144)
 - Contador de FPS repaginado: os números ficam num card escuro e arredondado (dá para desligar) em três tamanhos, Pequeno, Médio e Grande. Dá para escolher o canto da tela onde ele aparece (ou deixar a posição do RTSS) e ajustar tudo pelo próprio menu da sessão: A em "Contador de FPS" abre a lista com estilo, tamanho, posição, fundo, cor e, no Personalizado, os itens. Novos estilos: Apenas FPS, Compacto (FPS e uso de CPU, GPU e RAM numa linha) e Detalhado (FPS, tempo de quadro e API, mais clock da CPU, clock e temperatura da GPU, VRAM e RAM). No Personalizado, os itens do PC também podem ser escolhidos um a um. Os dados vêm do Windows e do driver de vídeo, sem instalar nada; quem já usava "Compacto" continua vendo só o FPS. (#146)
@@ -10,6 +12,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Mudanças
 - O menu da sessão não mostra mais a linha "Gravar os últimos 30 s · em breve", que nunca funcionou. (#147)
+
+### Atualizando da 1.6.0
+- O app mostra o aviso: clique em **Atualizar agora**. As configurações são mantidas; quem usava o contador "Compacto" continua vendo só o FPS (agora com o nome "Apenas FPS").
 
 ## [1.6.0]
 ### Novidades

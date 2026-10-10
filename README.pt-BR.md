@@ -12,7 +12,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ## Download
 
-Baixe a **[1.6.0](https://github.com/lippdev/consolemode/releases/tag/v1.6.0)**, a versão estável mais recente:
+Baixe a **[1.6.1](https://github.com/lippdev/consolemode/releases/tag/v1.6.1)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
@@ -48,11 +48,16 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - O áudio vai para a TV (ou qualquer saída) e volta depois
 - [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
-- **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS)
-- **Cursor do mouse fora do caminho:** some quando fica parado e pode ser movido pelo controle, pelo menu da sessão, quando um jogo ou emulador não aceita o controle
+- **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS)
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation, abas no LB/RB, as capas da sua Steam como plano de fundo)
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês e espanhol
+
+## Novidades da 1.6.1
+
+- **Contador de FPS num card:** três tamanhos, o canto da tela que você quiser e os novos estilos Apenas FPS, Compacto (uso de CPU, GPU e RAM) e Detalhado (clocks, temperatura da GPU, VRAM e RAM), tudo ajustado pelo próprio menu da sessão
+- **Cursor do mouse pelo menu da sessão:** esconda até ligar de novo, ou mova com o controle (o analógico move, A clica)
+- **Tour do menu da sessão:** na primeira vez que o menu abre, ele oferece um tour rápido por cada opção
 
 ## Novidades da 1.6.0
 
@@ -65,7 +70,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - **Só código do projeto:** telas e áudio pelas APIs do Windows, sem as ferramentas da NirSoft
 - A Steam vai para a bandeja ao voltar ao PC, o layout da mesa volta idêntico (monitores em retrato também) e o Playnite demorando para abrir não encerra mais a sessão
 
-Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.6.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
+Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.6.1) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
 ## Roadmap
 
