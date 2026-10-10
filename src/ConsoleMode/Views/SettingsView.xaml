@@ -186,7 +186,7 @@
                 </StackPanel>
             </ctk:SettingsCard>
             <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}" Description="{x:Bind ViewModel.FpsOverlayStatusText, Mode=OneWay}"
-                                  IsEnabled="{x:Bind ViewModel.IsRtssInstalled, Mode=OneWay}" IsExpanded="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                                  IsEnabled="{x:Bind ViewModel.IsRtssInstalled, Mode=OneWay}" IsExpanded="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
                 <ctk:SettingsExpander.HeaderIcon>
                     <FontIcon Glyph="&#xE9D9;"/>
                 </ctk:SettingsExpander.HeaderIcon>
@@ -195,22 +195,51 @@
                           SelectedItem="{x:Bind ViewModel.SelectedFpsOverlay, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
                 <ctk:SettingsExpander.Items>
-                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayItems, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="16">
-                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowApi, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowApi, Mode=TwoWay}"/>
-                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFps, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFps, Mode=TwoWay}"/>
-                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFrameTime, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFrameTime, Mode=TwoWay}"/>
-                        </StackPanel>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlaySize, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
+                        <ComboBox MinWidth="160"
+                                  ItemsSource="{x:Bind ViewModel.FpsOverlaySizeOptions, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedFpsOverlaySize, Mode=TwoWay}"
+                                  DisplayMemberPath="Text"/>
                     </ctk:SettingsCard>
-                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlaySingleLine, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                        <ToggleSwitch IsOn="{x:Bind ViewModel.OverlaySingleLine, Mode=TwoWay}"
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayPosition, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
+                        <ComboBox MinWidth="220"
+                                  ItemsSource="{x:Bind ViewModel.FpsOverlayPositionOptions, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedFpsOverlayPosition, Mode=TwoWay}"
+                                  DisplayMemberPath="Text"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayCardBackground, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.FpsOverlayCardBackgroundDescription, Mode=OneWay}"
+                                      IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.OverlayCard, Mode=TwoWay}"
                                       OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
                     </ctk:SettingsCard>
-                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayColor, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayColor, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
                         <ComboBox MinWidth="160"
                                   ItemsSource="{x:Bind ViewModel.FpsOverlayColorOptions, Mode=OneWay}"
                                   SelectedItem="{x:Bind ViewModel.SelectedFpsOverlayColor, Mode=TwoWay}"
                                   DisplayMemberPath="Text"/>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayItems, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFps, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFps, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowFrameTime, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowFrameTime, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowApi, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowApi, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayPcItems, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.FpsOverlayPcItemsDescription, Mode=OneWay}"
+                                      IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}" ContentAlignment="Vertical" HorizontalContentAlignment="Left">
+                        <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" ItemWidth="170">
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowCpu, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowCpu, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowCpuClock, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowCpuClock, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowRam, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowRam, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowVram, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowVram, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowGpu, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowGpu, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowGpuClock, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowGpuClock, Mode=TwoWay}"/>
+                            <CheckBox Content="{x:Bind ViewModel.Texts.FpsOverlayShowGpuTemp, Mode=OneWay}" IsChecked="{x:Bind ViewModel.OverlayShowGpuTemp, Mode=TwoWay}"/>
+                        </VariableSizedWrapGrid>
+                    </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlaySingleLine, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind ViewModel.OverlaySingleLine, Mode=TwoWay}"
+                                      OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
                     </ctk:SettingsCard>
                 </ctk:SettingsExpander.Items>
             </ctk:SettingsExpander>

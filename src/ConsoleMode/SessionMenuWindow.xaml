@@ -237,7 +237,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
+                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="overlay"
                                 Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
