@@ -157,6 +157,24 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 - [ ] Jogo em **tela cheia exclusiva**: o menu não aparece por cima (limitação documentada); Select + Y não quebra nada. Resultado: ______
 - [ ] `start consolemode://menu` no cmd abre o menu; fora da sessão, não faz nada. Resultado: ______
 
+### Tour guiado do menu
+
+Pré-condição para o convite: `SessionMenuTourDone` ausente ou `false` no `config.json` da pasta de dados.
+
+- [ ] **Convite na primeira vez**: ao abrir o menu (sessão ou prévia), depois que as linhas terminam de entrar, aparece um cartão centralizado "Primeira vez neste menu?", com "Agora não" (B) e "Fazer o tour" (A, em foco). A dica do convite mostra o botão certo (Y no Xbox, △ no PlayStation). Resultado: ______
+- [ ] **Agora não** (ou B): o cartão some, o foco volta para "Voltar ao jogo" e o convite **não** aparece mais ao reabrir o menu (`SessionMenuTourDone: true` no config). Resultado: ______
+- [ ] **Fechar o menu com o convite aberto** (pelo atalho): o convite aparece de novo na próxima abertura. Resultado: ______
+- [ ] **Paradas**: A avança por Voltar ao jogo → Explorador de arquivos → Volume → Tela e som → FPS (só com RTSS e fora da prévia) → Janelas → Voltar ao PC (ou "Fechar menu" na prévia) → Sair do Console Mode. Cada parada escurece o resto do menu, contorna na cor de destaque só as linhas certas (resolução e áudio juntas e o HDR à parte quando as linhas de FPS estão entre eles) e mostra "n de N". Resultado: ______
+- [ ] **Balão**: fica à direita do painel lateral, na altura das linhas destacadas, sem sair da tela; na parada Janelas fica sobre o painel lateral. Os textos não ficam cortados a 1080p nem a 4K com escala. Resultado: ______
+- [ ] **Rolagem**: numa tela em que o painel lateral precisa rolar (1080p com escala de 125%+), as paradas Voltar ao PC e Sair do Console Mode rolam o painel até as linhas e o destaque acompanha. Resultado: ______
+- [ ] **Textos das saídas**: em sessão, "Voltar ao PC" explica que restaura e o app fica na bandeja, e "Sair do Console Mode" que também fecha o app; na prévia, "Fechar menu" diz que só fecha o menu. Resultado: ______
+- [ ] **Controle no tour**: A e → avançam, ← volta uma parada (nunca para o convite), B sai; nenhum botão aciona a opção destacada nem mexe no menu por trás (X não fecha janela, Y não reinicia o tour). Na última parada o botão diz "Entendi" e encerra. Resultado: ______
+- [ ] **Teclado e mouse no tour**: Enter/Espaço acionam o botão em foco no balão, Tab alterna entre os dois, ←/→ trocam de parada, Esc sai; clicar numa linha destacada não faz nada. Resultado: ______
+- [ ] **Ver de novo**: Y (△) ou F1 com o menu aberto inicia o tour direto, sem convite; a barra de dicas mostra "Y Tour". Com o seletor ou a confirmação de fechar janela aberta, Y não faz nada. Resultado: ______
+- [ ] **Select + Y não abre o tour**: com o atalho do menu em Select + Y, segurar o atalho para **fechar** o menu não mostra o tour antes de fechar. Resultado: ______
+- [ ] **Pelas Configurações**: Ajustes → "Tour do menu da sessão" → "Ver o tour" (desktop) e Sistema → "Tour do menu da sessão" (interface Console) abrem o menu em prévia já com o tour, sem convite. Resultado: ______
+- [ ] Ao sair do tour, o foco volta para a linha ou o card onde estava antes. Sem animações do Windows, o tour aparece e troca de parada sem movimento. Em alto contraste, o véu e o balão usam as cores do sistema. Resultado: ______
+
 ## 1d. Explorador de arquivos (ControlFS) no menu da sessão
 
 Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS), exceto nos itens de instalação pelo menu.

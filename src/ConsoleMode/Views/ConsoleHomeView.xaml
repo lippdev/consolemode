@@ -639,6 +639,9 @@
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.StartTourCommand}">
                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TutorialCard, Mode=OneWay}"/>
                             </Button>
+                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.ShowSessionMenuTourCommand}">
+                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.SessionTourCard, Mode=OneWay}"/>
+                            </Button>
                             <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenDataFolderCommand}">
                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.DataFolderCard, Mode=OneWay}"/>
                             </Button>

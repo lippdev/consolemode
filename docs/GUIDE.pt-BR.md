@@ -12,6 +12,8 @@ Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in Engl
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
+No menu da sessão há duas saídas. **Voltar ao PC** encerra a sessão e devolve telas, resolução, HDR, áudio e limite de FPS ao que eram; o app continua na bandeja. **Sair do Console Mode** faz o mesmo e depois fecha o app, então os atalhos do controle param até você abri-lo de novo. Na primeira vez que o menu abre, ele oferece um tour que explica cada opção; para vê-lo depois, aperte **Y** (△ no PlayStation) ou **F1** no menu, ou use **Ajustes → Tour do menu da sessão**.
+
 ## Configurações no modo Console
 
 Em **Sistema → Controle**, escolha o layout dos botões: **Automático**, **Xbox** ou **PlayStation**. A prévia e os nomes dos atalhos acompanham a escolha, que fica salva ao fechar o app. Isso muda os símbolos exibidos; as entradas do controle mantêm o mapeamento existente.

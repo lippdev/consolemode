@@ -914,6 +914,7 @@ public partial class MainViewModel : ObservableObject
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             TourDone = _loadedConfig.TourDone,
+            SessionMenuTourDone = _loadedConfig.SessionMenuTourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
             BetaUpdates = BetaUpdates,

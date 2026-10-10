@@ -27,6 +27,7 @@
                     <SolidColorBrush x:Key="MenuDialogFill" Color="#FF171F29"/>
                     <SolidColorBrush x:Key="MenuDanger" Color="#FFC42B1C"/>
                     <SolidColorBrush x:Key="MenuOnDanger" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="MenuTourVeil" Color="#D9070A0E"/>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="MenuIconFill" Color="{ThemeResource SystemColorButtonFaceColor}"/>
@@ -38,6 +39,7 @@
                     <SolidColorBrush x:Key="MenuDialogFill" Color="{ThemeResource SystemColorWindowColor}"/>
                     <SolidColorBrush x:Key="MenuDanger" Color="{ThemeResource SystemColorHighlightColor}"/>
                     <SolidColorBrush x:Key="MenuOnDanger" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                    <SolidColorBrush x:Key="MenuTourVeil" Color="{ThemeResource SystemColorWindowColor}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <Style x:Key="RowLabel" TargetType="TextBlock">
@@ -94,6 +96,12 @@
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                 <Setter Property="MaxLines" Value="1"/>
+            </Style>
+            <!-- The outline the tour draws around each row it is talking about (made in code, one per row). -->
+            <Style x:Key="TourRing" TargetType="Border">
+                <Setter Property="BorderThickness" Value="3"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                <Setter Property="IsHitTestVisible" Value="False"/>
             </Style>
                   </ResourceDictionary>
         </Grid.Resources>
@@ -166,7 +174,7 @@
                     </Grid>
                 </Button>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <ScrollViewer x:Name="RowsScroller" Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">
                         <Button x:Name="FirstRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
                             <Button.Background>
@@ -203,7 +211,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="mode">
+                        <Button x:Name="ModeRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="mode">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                 <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE7F4;" FontSize="19"/></Border>
@@ -214,7 +222,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="audio">
+                        <Button x:Name="AudioRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="audio">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                 <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE7F5;" FontSize="19"/></Border>
@@ -225,7 +233,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="fps"
+                        <Button x:Name="FpsRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="fps"
                                 Visibility="{x:Bind ViewModel.IsFpsMenuAvailable, Mode=OneWay}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -237,7 +245,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
+                        <Button x:Name="FpsOverlayRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
                                 Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -249,7 +257,7 @@
                             </Grid>
                         </Button>
 
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
+                        <Button x:Name="HdrRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                 <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE706;" FontSize="19"/></Border>
@@ -272,7 +280,7 @@
                         <Border Height="1" Margin="8,6" Background="{ThemeResource MenuRule}"/>
 
                         <!-- The two ways out: the main one filled -->
-                        <Button Tag="row" Style="{StaticResource SideRow}" Height="64" Command="{x:Bind ViewModel.RestoreFromMenuCommand}"
+                        <Button x:Name="BackToPcRow" Tag="row" Style="{StaticResource SideRow}" Height="64" Command="{x:Bind ViewModel.RestoreFromMenuCommand}"
                                 Background="{ThemeResource AccentFillColorDefaultBrush}" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                 FocusVisualPrimaryBrush="White">
                             <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
@@ -280,7 +288,7 @@
                                 <TextBlock Text="{x:Bind ViewModel.BackToPcText, Mode=OneWay}" FontSize="19" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button Tag="row" Style="{StaticResource SideRow}" Height="64" Command="{x:Bind ViewModel.ExitFromMenuCommand}">
+                        <Button x:Name="ExitRow" Tag="row" Style="{StaticResource SideRow}" Height="64" Command="{x:Bind ViewModel.ExitFromMenuCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
                                 <FontIcon Glyph="&#xE7E8;" FontSize="20" VerticalAlignment="Center"/>
                                 <TextBlock Style="{StaticResource RowLabel}" FontSize="19" Text="{x:Bind ViewModel.Texts.ExitConsoleMode, Mode=OneWay}"/>
@@ -348,6 +356,10 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Border Style="{StaticResource HintBadge}"><TextBlock Text="◀ ▶" FontWeight="Bold" VerticalAlignment="Center"/></Border>
                 <TextBlock Text="{x:Bind ViewModel.Texts.HintVolume, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintAlt, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
+                <TextBlock Text="{x:Bind ViewModel.Texts.SessionTourHint, Mode=OneWay}" VerticalAlignment="Center" FontSize="17"/>
             </StackPanel>
         </StackPanel>
 
@@ -419,6 +431,49 @@
                     </Button>
                 </Grid>
             </Grid>
+        </Grid>
+
+        <!-- Guided tour: everything dims except the rows of the current stop, outlined, and a bubble beside
+             them says what they do. Placed in code (LayoutTour); the transparent fill keeps clicks off the menu. -->
+        <Grid x:Name="TourOverlay" Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="Collapsed" Background="Transparent">
+            <Path x:Name="TourVeil" Fill="{ThemeResource MenuTourVeil}"/>
+            <Canvas x:Name="TourRings" IsHitTestVisible="False"/>
+            <Canvas>
+                <Border x:Name="TourBubble" Width="480" CornerRadius="24" Padding="30,26,30,24"
+                        Background="{ThemeResource MenuDialogFill}" BorderBrush="{ThemeResource MenuRule}" BorderThickness="1"
+                        XYFocusKeyboardNavigation="Enabled">
+                    <StackPanel Spacing="22">
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Name="TourProgressText" Text="{x:Bind ViewModel.SessionTourProgress, Mode=OneWay}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.SessionTourTitle, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind ViewModel.SessionTourBody, Mode=OneWay}" FontSize="18" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource MenuTextSecondary}"/>
+                        </StackPanel>
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Button x:Name="TourSecondaryButton" Style="{StaticResource SideRow}" Height="56" Padding="12,0"
+                                    Command="{x:Bind ViewModel.EndSessionTourCommand}"
+                                    AutomationProperties.Name="{x:Bind ViewModel.SessionTourSecondaryText, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintBack, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
+                                    <TextBlock Text="{x:Bind ViewModel.SessionTourSecondaryText, Mode=OneWay}" FontSize="17" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="TourPrimaryButton" Grid.Column="1" Style="{StaticResource SideRow}" Height="56" Padding="12,0"
+                                    Command="{x:Bind ViewModel.SessionTourNextCommand}"
+                                    Background="{ThemeResource AccentFillColorDefaultBrush}" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    FocusVisualPrimaryBrush="White"
+                                    AutomationProperties.Name="{x:Bind ViewModel.SessionTourPrimaryText, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <Border Style="{StaticResource HintBadge}"><TextBlock Text="{x:Bind ViewModel.HintConfirm, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/></Border>
+                                    <TextBlock Text="{x:Bind ViewModel.SessionTourPrimaryText, Mode=OneWay}" FontSize="17" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Canvas>
         </Grid>
 
         <!-- Busy veil while a blocking change runs -->
