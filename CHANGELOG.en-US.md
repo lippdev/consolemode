@@ -6,6 +6,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Revamped FPS counter: the numbers sit on a dark rounded card (it can be turned off) in three sizes, Small, Medium and Large. You can pick the screen corner it shows in (or keep RTSS's position) and tune it all from the session menu itself: A on "FPS counter" opens the list with style, size, position, background, color and, in Custom, the items. New styles: FPS only, Compact (FPS plus CPU, GPU and RAM usage on one line) and Detailed (FPS, frame time and API, plus CPU clock, GPU clock and temperature, VRAM and RAM). In Custom, the PC items can be picked one by one too. The data comes from Windows and the graphics driver, nothing to install; anyone already on "Compact" keeps seeing just the FPS. (#146)
 
+### Changes
+- The session menu no longer shows the "Record the last 30 s · coming soon" row, which never worked. (#147)
+
 ## [1.6.0]
 ### What's new
 - Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation), screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR). (#117)

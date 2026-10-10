@@ -6,6 +6,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Novidades
 - Contador de FPS repaginado: os números ficam num card escuro e arredondado (dá para desligar) em três tamanhos, Pequeno, Médio e Grande. Dá para escolher o canto da tela onde ele aparece (ou deixar a posição do RTSS) e ajustar tudo pelo próprio menu da sessão: A em "Contador de FPS" abre a lista com estilo, tamanho, posição, fundo, cor e, no Personalizado, os itens. Novos estilos: Apenas FPS, Compacto (FPS e uso de CPU, GPU e RAM numa linha) e Detalhado (FPS, tempo de quadro e API, mais clock da CPU, clock e temperatura da GPU, VRAM e RAM). No Personalizado, os itens do PC também podem ser escolhidos um a um. Os dados vêm do Windows e do driver de vídeo, sem instalar nada; quem já usava "Compacto" continua vendo só o FPS. (#146)
 
+### Mudanças
+- O menu da sessão não mostra mais a linha "Gravar os últimos 30 s · em breve", que nunca funcionou. (#147)
+
 ## [1.6.0]
 ### Novidades
 - Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation), blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR). (#117)

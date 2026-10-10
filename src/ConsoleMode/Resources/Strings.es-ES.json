@@ -72,8 +72,6 @@
   "SessionMenuHint": "El atajo del menú de la sesión abre este menú en cualquier momento.",
   "SessionHintTitle": "Menú de Console Mode",
   "SessionHintBody": "Mantén {0} para abrir el panel sobre el juego.",
-  "RecordLast30": "Grabar los últimos 30 s",
-  "ComingSoonSuffix": " · próximamente",
   "ExitConsoleMode": "Salir de Console Mode",
   "HintVolume": "Volumen",
   "SessionElapsed": "Jugando desde hace {0}",

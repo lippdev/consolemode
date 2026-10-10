@@ -65,7 +65,6 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(BackToPcText));
     }
     public string VolumeText => VolumePercent < 0 ? "—" : IsMuted ? LocalizationService.Get("Muted") : $"{VolumePercent}%";
-    public string RecordRowText => LocalizationService.Get("RecordLast30") + LocalizationService.Get("ComingSoonSuffix");
 
     partial void OnVolumePercentChanged(int value) => OnPropertyChanged(nameof(VolumeText));
     partial void OnIsMutedChanged(bool value) => OnPropertyChanged(nameof(VolumeText));
