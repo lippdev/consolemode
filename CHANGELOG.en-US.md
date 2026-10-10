@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
-- Revamped FPS counter: the numbers sit on a dark rounded card (it can be turned off) in three sizes, Small, Medium and Large. You can pick the screen corner it shows in (or keep RTSS's position) and tune it all from the session menu itself: A on "FPS counter" opens the list with style, size, position, background, color and, in Custom, the items. New styles: FPS only, Compact (FPS plus CPU, GPU and RAM usage on one line) and Detailed (FPS, frame time and API, plus CPU clock, GPU clock and temperature, VRAM and RAM). In Custom, the PC items can be picked one by one too. The data comes from Windows and the graphics driver, nothing to install; anyone already on "Compact" keeps seeing just the FPS.
+- Revamped FPS counter: the numbers sit on a dark rounded card (it can be turned off) in three sizes, Small, Medium and Large. You can pick the screen corner it shows in (or keep RTSS's position) and tune it all from the session menu itself: A on "FPS counter" opens the list with style, size, position, background, color and, in Custom, the items. New styles: FPS only, Compact (FPS plus CPU, GPU and RAM usage on one line) and Detailed (FPS, frame time and API, plus CPU clock, GPU clock and temperature, VRAM and RAM). In Custom, the PC items can be picked one by one too. The data comes from Windows and the graphics driver, nothing to install; anyone already on "Compact" keeps seeing just the FPS. (#146)
 
 ## [1.6.0]
 ### What's new
