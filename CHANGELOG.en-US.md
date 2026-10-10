@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### What's new
-- Guided tour of the session menu: the first time the menu opens, it offers an optional tour that highlights each option and explains what it does, including the difference between **Back to the PC** (restores the desk and the app stays in the tray) and **Exit Console Mode** (restores and closes the app). To see it again, press Y (△) or F1 in the menu, or use Settings → Session menu tour.
+- Guided tour of the session menu: the first time the menu opens, it offers an optional tour that highlights each option and explains what it does, including the difference between **Back to the PC** (restores the desk and the app stays in the tray) and **Exit Console Mode** (restores and closes the app). To see it again, press Y (△) or F1 in the menu, or use Settings → Session menu tour. (#144)
 
 ## [1.6.0]
 ### What's new

@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Tour guiado do menu da sessão: na primeira vez que o menu abre, ele oferece um tour opcional que destaca cada opção e explica o que ela faz, incluindo a diferença entre **Voltar ao PC** (restaura a mesa e o app fica na bandeja) e **Sair do Console Mode** (restaura e fecha o app). Para ver de novo, aperte Y (△) ou F1 no menu, ou use Ajustes → Tour do menu da sessão.
+- Tour guiado do menu da sessão: na primeira vez que o menu abre, ele oferece um tour opcional que destaca cada opção e explica o que ela faz, incluindo a diferença entre **Voltar ao PC** (restaura a mesa e o app fica na bandeja) e **Sair do Console Mode** (restaura e fecha o app). Para ver de novo, aperte Y (△) ou F1 no menu, ou use Ajustes → Tour do menu da sessão. (#144)
 
 ## [1.6.0]
 ### Novidades
