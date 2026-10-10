@@ -36,6 +36,9 @@ public sealed class AppConfig
     /// <summary>The first-run tour was finished or skipped.</summary>
     public bool TourDone { get; set; }
 
+    /// <summary>The session menu's tour was taken, finished or declined: it is no longer offered when the menu opens.</summary>
+    public bool SessionMenuTourDone { get; set; }
+
     /// <summary>
     /// Game screen + mode the user confirmed they can see ("id|WxH@Hz"). A different setup
     /// asks for confirmation on the TV before launching, and rolls back if nobody answers.

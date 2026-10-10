@@ -4,6 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Tour guiado do menu da sessão: na primeira vez que o menu abre, ele oferece um tour opcional que destaca cada opção e explica o que ela faz, incluindo a diferença entre **Voltar ao PC** (restaura a mesa e o app fica na bandeja) e **Sair do Console Mode** (restaura e fecha o app). Para ver de novo, aperte Y (△) ou F1 no menu, ou use Ajustes → Tour do menu da sessão. (#144)
 - Contador de FPS repaginado: os números ficam num card escuro e arredondado (dá para desligar) em três tamanhos, Pequeno, Médio e Grande. Dá para escolher o canto da tela onde ele aparece (ou deixar a posição do RTSS) e ajustar tudo pelo próprio menu da sessão: A em "Contador de FPS" abre a lista com estilo, tamanho, posição, fundo, cor e, no Personalizado, os itens. Novos estilos: Apenas FPS, Compacto (FPS e uso de CPU, GPU e RAM numa linha) e Detalhado (FPS, tempo de quadro e API, mais clock da CPU, clock e temperatura da GPU, VRAM e RAM). No Personalizado, os itens do PC também podem ser escolhidos um a um. Os dados vêm do Windows e do driver de vídeo, sem instalar nada; quem já usava "Compacto" continua vendo só o FPS. (#146)
 
 ### Mudanças

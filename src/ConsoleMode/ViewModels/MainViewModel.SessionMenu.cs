@@ -89,7 +89,7 @@ public partial class MainViewModel
             _sessionMenu = null;
             return;
         }
-        _sessionMenu.Closed += (_, _) => { _sessionMenu = null; IsSessionMenuOpen = false; StopSessionClock(); };
+        _sessionMenu.Closed += (_, _) => { _sessionMenu = null; IsSessionMenuOpen = false; StopSessionClock(); DropSessionTour(); };
         IsSessionMenuOpen = true;
         IsSessionPickerOpen = false;
         ControlFsInstalled = ControlFsService.FindExe() is not null;

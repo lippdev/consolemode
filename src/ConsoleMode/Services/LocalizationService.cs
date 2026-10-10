@@ -269,6 +269,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string TutorialCard => LocalizationService.Get(nameof(TutorialCard));
     public string TutorialDescription => LocalizationService.Get(nameof(TutorialDescription));
     public string SeeAgain => LocalizationService.Get(nameof(SeeAgain));
+    public string SessionTourCard => LocalizationService.Get(nameof(SessionTourCard));
+    public string SessionTourDescription => LocalizationService.Get(nameof(SessionTourDescription));
+    public string SessionTourHint => LocalizationService.Get(nameof(SessionTourHint));
+    public string ShowTour => LocalizationService.Get(nameof(ShowTour));
     public string OneClickCard => LocalizationService.Get(nameof(OneClickCard));
     public string OneClickDescription => LocalizationService.Get(nameof(OneClickDescription));
     public string CreateShortcut => LocalizationService.Get(nameof(CreateShortcut));

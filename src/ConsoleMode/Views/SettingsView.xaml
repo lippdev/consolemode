@@ -336,6 +336,12 @@
                 </ctk:SettingsCard.HeaderIcon>
                 <Button Content="{x:Bind ViewModel.Texts.SeeAgain, Mode=OneWay}" Command="{x:Bind ViewModel.StartTourCommand}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.SessionTourCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.SessionTourDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Texts.ShowTour, Mode=OneWay}" Command="{x:Bind ViewModel.ShowSessionMenuTourCommand}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.OneClickCard, Mode=OneWay}"
                               Description="{x:Bind ViewModel.Texts.OneClickDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
