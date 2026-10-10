@@ -1,6 +1,6 @@
 namespace ConsoleMode.Services;
 
-/// <summary>Pure rules behind ControllerMouse and CursorHider, kept apart so the tests cover them.</summary>
+/// <summary>Pure rules behind ControllerMouse, kept apart so the tests cover them.</summary>
 public static class ControllerMouseMath
 {
     /// <summary>Radial dead zone of the left stick (pointer); worn sticks rest a little off center.</summary>
@@ -11,8 +11,6 @@ public static class ControllerMouseMath
     public const double ScreensPerSecond = 1.1;
     public const double MinNotchesPerSecond = 3;
     public const double MaxNotchesPerSecond = 16;
-    /// <summary>The pointer is hidden after sitting still this long.</summary>
-    public static readonly TimeSpan CursorIdleDelay = TimeSpan.FromSeconds(3);
 
     /// <summary>XInput stick value (-32768..32767, Y up) to -1..1.</summary>
     public static double FromXInput(short value) => Math.Max(-1, value / 32767.0);
@@ -33,8 +31,6 @@ public static class ControllerMouseMath
         return (x * factor, y * factor);
     }
 
-    /// <summary>A pointer that has not moved for <see cref="CursorIdleDelay"/> is hidden; CursorHider shows it again on the next move.</summary>
-    public static bool ShouldHideCursor(TimeSpan stillFor) => stillFor >= CursorIdleDelay;
 }
 
 /// <summary>Left stick to pointer pixels, carrying the fractions between samples so slow moves don't stall.</summary>

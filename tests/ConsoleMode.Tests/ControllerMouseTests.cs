@@ -149,11 +149,4 @@ public class ControllerMouseTests
         Assert.False(gesture.Reset());
         Assert.Empty(Run(gesture, (500, true), (900, true)));   // still waiting for A to go up
     }
-
-    [Theory]
-    [InlineData(0, false)]
-    [InlineData(2999, false)]
-    [InlineData(3000, true)]
-    public void Pointer_hides_after_three_seconds_still(int stillMs, bool expected) =>
-        Assert.Equal(expected, ControllerMouseMath.ShouldHideCursor(Ms(stillMs)));
 }

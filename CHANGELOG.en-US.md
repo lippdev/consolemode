@@ -5,7 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### What's new
-- The mouse pointer stays out of the way: during a session it disappears after 3 seconds without moving and comes back as soon as the mouse moves (handy for emulators that leave it in the middle of the TV); turn it off in Settings → "Hide the mouse pointer while playing". And for games and emulators whose menus ignore the controller, the session menu's "Control the mouse with the controller" row makes the left stick move the pointer, the right stick scroll, A click, A twice right-click and A held drag. It lasts until the session ends. (#145)
+- The mouse pointer stays out of the way: the session menu's "Hide the mouse pointer" row hides it (handy for emulators that leave it in the middle of the TV) until you turn it off or go back to the PC; nothing happens by itself. And for games and emulators whose menus ignore the controller, the session menu's "Control the mouse with the controller" row makes the left stick move the pointer, the right stick scroll, A click, A twice right-click and A held drag. It lasts until the session ends. (#145)
 
 ## [1.6.0]
 ### What's new

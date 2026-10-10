@@ -69,9 +69,6 @@ public sealed class AppConfig
     /// </summary>
     public bool CloseSteamOnRestore { get; set; } = true;
 
-    /// <summary>During a session, hide the mouse pointer after a few seconds still (CursorHider).</summary>
-    public bool HideCursor { get; set; } = true;
-
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 

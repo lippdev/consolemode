@@ -177,16 +177,18 @@ Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS)
 - [ ] Depois de instalado pelo menu, o ControlFS aparece em Configurações → Aplicativos instalados e nenhum `ControlFS-Setup-x64.exe` sobra em `%TEMP%ConsoleModeUpdate`. Resultado: ______
 - [ ] Fora da sessão (prévia do menu) o painel funciona igual. Resultado: ______
 
-## 1e. Cursor do mouse: ocultar parado e controlar pelo controle
+## 1e. Cursor do mouse: ocultar e controlar pelo controle
 
 Pré-condição: um emulador ou jogo que deixa o cursor visível (ex.: um emulador aberto pelo Playnite).
 
 ### Ocultar o cursor
-- [ ] Na sessão, deixe o mouse parado: depois de ~3 s o cursor some da TV, também por cima do emulador. Resultado: ______
-- [ ] Mexa o mouse físico: o cursor volta na hora, com o esquema de ponteiros do Windows de sempre (tamanho e cor de Configurações → Acessibilidade → Ponteiro do mouse). Resultado: ______
-- [ ] Voltar ao PC com o cursor oculto: ele reaparece normal na mesa. Resultado: ______
-- [ ] Ajustes (PC e aba Sistema da interface Console) → "Ocultar o cursor do mouse durante o jogo" desligado: o cursor não some mais na sessão. Religado durante a sessão, volta a sumir. Resultado: ______
-- [ ] Fora da sessão o cursor nunca some. Resultado: ______
+- [ ] Menu da sessão: a linha "Ocultar o cursor do mouse" começa em Desativado, com a explicação embaixo inteira (sem cortar). Na prévia (fora da sessão) a linha não aparece. Resultado: ______
+- [ ] A na linha: Ativado, e o cursor some da TV, também por cima do emulador. Resultado: ______
+- [ ] Com ele oculto, deixe parado e depois mexa o mouse físico: o cursor **não** volta sozinho. Resultado: ______
+- [ ] A na linha de novo: Desativado, e o cursor volta com o esquema de ponteiros do Windows de sempre (tamanho e cor de Configurações → Acessibilidade → Ponteiro do mouse). Resultado: ______
+- [ ] Com o cursor oculto, ligar "Controlar o mouse com o controle" desliga "Ocultar o cursor" (o cursor aparece); ligar "Ocultar o cursor" desliga o controle do mouse. Resultado: ______
+- [ ] Voltar ao PC com o cursor oculto: ele reaparece normal na mesa, e na próxima sessão a linha começa em Desativado. Resultado: ______
+- [ ] Ajustes (PC e aba Sistema da interface Console) não têm mais a opção de ocultar o cursor. Resultado: ______
 - [ ] Encerre o Console Mode à força (Gerenciador de Tarefas) com o cursor oculto: o cursor continua invisível até abrir o Console Mode de novo, que o restaura logo na abertura (log: `Cursor: restaurado após um encerramento inesperado`). Resultado: ______
 
 ### Controlar o mouse pelo controle (Xbox **e** PlayStation)

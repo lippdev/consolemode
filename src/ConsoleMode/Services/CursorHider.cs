@@ -1,16 +1,16 @@
 using System.Runtime.InteropServices;
-using Microsoft.UI.Dispatching;
 
 namespace ConsoleMode.Services;
 
 /// <summary>
-/// Hides the mouse pointer during a session once it sits still for a few seconds (emulators and some games
-/// leave it in the middle of the TV) and shows it again the moment it moves, by hand or by ControllerMouse.
+/// Hides the mouse pointer during a session when the user asks for it in the session menu (emulators and
+/// some games leave it in the middle of the TV), and shows it again when they turn it off or the session
+/// ends. Nothing automatic: moving the mouse doesn't bring it back.
 /// Windows has no "hide the pointer for every app" call, so the system cursors are swapped for a blank one
 /// (SetSystemCursor) and reloaded from the user's scheme afterwards (SPI_SETCURSORS). A marker file covers
 /// a crash in between: the next start puts the cursors back (<see cref="RecoverAfterCrash"/>).
 /// </summary>
-public sealed class CursorHider : IDisposable
+public static class CursorHider
 {
     // OCR_NORMAL, IBEAM, WAIT, CROSS, UP, SIZENWSE, SIZENESW, SIZEWE, SIZENS, SIZEALL, NO, HAND, APPSTARTING, HELP, PIN, PERSON.
     private static readonly uint[] SystemCursors =
@@ -23,58 +23,10 @@ public sealed class CursorHider : IDisposable
     private static bool _hidden;
     private static bool _exitHooked;
 
-    private readonly DispatcherQueueTimer _timer;
-    private Point _lastPosition;
-    private DateTime _lastMove;
-
-    public CursorHider(DispatcherQueue dispatcher)
+    public static void SetHidden(bool hidden)
     {
-        _timer = dispatcher.CreateTimer();
-        _timer.Interval = TimeSpan.FromMilliseconds(150);
-        _timer.Tick += (_, _) => Poll();
-    }
-
-    public bool IsRunning => _timer.IsRunning;
-
-    public void Start()
-    {
-        if (_timer.IsRunning) return;
-        lock (Gate)
-        {
-            if (!_exitHooked)
-            {
-                _exitHooked = true;
-                AppDomain.CurrentDomain.ProcessExit += (_, _) => Show();
-            }
-        }
-        GetCursorPos(out _lastPosition);
-        _lastMove = DateTime.UtcNow;
-        _timer.Start();
-        AppLog.Write("Cursor: ocultar quando parado ligado");
-    }
-
-    public void Stop()
-    {
-        if (!_timer.IsRunning) return;
-        _timer.Stop();
-        Show();
-    }
-
-    public void Dispose() => Stop();
-
-    private void Poll()
-    {
-        var now = DateTime.UtcNow;
-        // On the secure desktop (UAC) the position can't be read: count it as still.
-        var moved = GetCursorPos(out var position) && (position.X != _lastPosition.X || position.Y != _lastPosition.Y);
-        if (moved)
-        {
-            _lastPosition = position;
-            _lastMove = now;
-            Show();
-            return;
-        }
-        if (ControllerMouseMath.ShouldHideCursor(now - _lastMove)) Hide();
+        if (hidden) Hide();
+        else Show();
     }
 
     private static void Hide()
@@ -82,6 +34,11 @@ public sealed class CursorHider : IDisposable
         lock (Gate)
         {
             if (_hidden) return;
+            if (!_exitHooked)
+            {
+                _exitHooked = true;
+                AppDomain.CurrentDomain.ProcessExit += (_, _) => Show();
+            }
             _hidden = true;
             WriteMarker(true);
             var blank = CreateBlankCursor();
@@ -156,17 +113,6 @@ public sealed class CursorHider : IDisposable
         var xor = new byte[size];
         return CreateCursor(GetModuleHandle(null), 0, 0, width, height, and, xor);
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct Point
-    {
-        public int X;
-        public int Y;
-    }
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetCursorPos(out Point point);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern nint CreateCursor(nint instance, int hotX, int hotY, int width, int height, byte[] andPlane, byte[] xorPlane);

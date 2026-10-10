@@ -5,7 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Novidades
-- Cursor do mouse fora do caminho: durante a sessão ele some depois de 3 segundos parado e volta assim que o mouse se mexe (útil em emuladores que deixam o cursor no meio da TV); dá para desligar em Ajustes → "Ocultar o cursor do mouse durante o jogo". E, para jogos e emuladores cujos menus não aceitam o controle, a linha "Controlar o mouse com o controle" do menu da sessão faz o analógico esquerdo mover o cursor, o direito rolar, A clicar, A duas vezes clicar com o botão direito e A segurado arrastar. Vale até o fim da sessão. (#145)
+- Cursor do mouse fora do caminho: a linha "Ocultar o cursor do mouse" do menu da sessão esconde o cursor (útil em emuladores que deixam o cursor no meio da TV) até você desligá-la ou voltar ao PC; nada acontece sozinho. E, para jogos e emuladores cujos menus não aceitam o controle, a linha "Controlar o mouse com o controle" do menu da sessão faz o analógico esquerdo mover o cursor, o direito rolar, A clicar, A duas vezes clicar com o botão direito e A segurado arrastar. Vale até o fim da sessão. (#145)
 
 ## [1.6.0]
 ### Novidades
