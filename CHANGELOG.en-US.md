@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Revamped FPS counter: the numbers sit on a dark rounded card (it can be turned off) in three sizes, Small, Medium and Large. New styles: FPS only, Compact (FPS plus CPU, GPU and RAM usage on one line) and Detailed (FPS, frame time and API, plus CPU clock, GPU clock and temperature, VRAM and RAM). In Custom, the PC items can be picked one by one too. The data comes from Windows and the graphics driver, nothing to install; anyone already on "Compact" keeps seeing just the FPS.
 
 ## [1.6.0]
 ### What's new

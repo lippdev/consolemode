@@ -193,7 +193,7 @@ public partial class MainViewModel
         SessionAudioText = audioName;
         VolumePercent = volume ?? -1;
         SessionFpsText = state.FpsLimit > 0 ? $"{state.FpsLimit} FPS" : LocalizationService.Get("FpsNoLimit");
-        SessionOverlayText = SelectedFpsOverlay?.Text ?? "";
+        SessionOverlayText = FpsOverlayShortName;
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
         OnPropertyChanged(nameof(IsFpsOverlayAvailable));
     }

@@ -385,7 +385,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão e o cartão em Ajustes fica desabilitado.
 - [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
 - [ ] Config nova: o estilo é "Afterburner (não mexer)" e o OSD do Afterburner aparece normal na sessão.
-- [ ] Em sessão, A na linha alterna Afterburner → Desligado → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora.
+- [ ] Em sessão, A na linha alterna Afterburner → Desligado → Apenas FPS → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora.
 - [ ] Desligado: nada na tela, nem o nosso nem o do Afterburner (no máximo um piscar rápido do Afterburner de vez em quando).
 - [ ] Compacto / Detalhado / Personalizado: só o nosso aparece; o do Afterburner fica escondido.
 - [ ] Afterburner: o nosso some e o do Afterburner volta em até 1 s.
@@ -395,3 +395,20 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Voltar ao PC: o nosso some e o do Afterburner volta.
 - [ ] A escolha e o layout ficam salvos para a próxima sessão.
 - [ ] Com Compacto (ou outro estilo nosso) já salvo em Ajustes, iniciar a sessão: o contador aparece e o do Afterburner some sem precisar mexer na linha do menu.
+
+### Card, tamanhos e dados do PC (1.6.1)
+
+- [ ] Apenas FPS / Compacto / Detalhado aparecem dentro de um card escuro, translúcido e de cantos arredondados, com uma folga em volta do texto; o card acompanha o tamanho do texto (não cobre a tela toda nem o OSD de outro programa).
+- [ ] O card fica na posição do OSD escolhida no RTSS (canto superior esquerdo, direito etc.), não num lugar fixo.
+- [ ] "Fundo em card" desligado: o texto volta a ficar direto sobre o jogo, sem fundo.
+- [ ] Tamanho Pequeno / Médio / Grande muda o tamanho de todo o contador na hora; no Grande o texto continua nítido e as unidades (FPS, %, GHz) ficam alinhadas na base dos números.
+- [ ] Compacto: uma linha com FPS, CPU %, GPU % e RAM %; os números não fazem o texto "pular" quando mudam de 2 para 3 dígitos.
+- [ ] Detalhado: FPS, tempo de quadro e API na primeira linha; CPU (uso e clock), GPU (uso, clock e °C), VRAM (usada / total) e RAM (usada / total) em linhas alinhadas.
+- [ ] Os valores batem com o Gerenciador de Tarefas (CPU %, velocidade, GPU %, memória dedicada, temperatura da GPU) e atualizam a cada ~1 s.
+- [ ] No primeiro segundo os valores aparecem como "--" e depois são preenchidos.
+- [ ] Notebook com GPU integrada + dedicada: os dados de GPU são da placa que está rodando o jogo.
+- [ ] GPU cujo driver não informa temperatura ou clock: esses itens simplesmente não aparecem (sem "0 MHz").
+- [ ] Personalizado: marcar/desmarcar cada item do PC (uso/clock da CPU, RAM, VRAM, uso/clock/temperatura da GPU) muda o contador na hora; com "Tudo em uma linha" ligado, fica tudo numa linha.
+- [ ] Config salva na 1.6.0 com "Compacto": depois de atualizar, aparece "Apenas FPS" e o jogo mostra só o FPS.
+- [ ] Voltar ao PC com Compacto/Detalhado: o contador some e não volta sozinho segundos depois.
+- [ ] Uso de CPU do Console Mode com Detalhado ligado continua baixo (Gerenciador de Tarefas, < 1%).
