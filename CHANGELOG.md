@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Mudanças
-- O menu da sessão não mostra mais a linha "Gravar os últimos 30 s · em breve", que nunca funcionou.
+- O menu da sessão não mostra mais a linha "Gravar os últimos 30 s · em breve", que nunca funcionou. (#147)
 
 ## [1.6.0]
 ### Novidades

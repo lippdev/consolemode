@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Changes
-- The session menu no longer shows the "Record the last 30 s · coming soon" row, which never worked.
+- The session menu no longer shows the "Record the last 30 s · coming soon" row, which never worked. (#147)
 
 ## [1.6.0]
 ### What's new
