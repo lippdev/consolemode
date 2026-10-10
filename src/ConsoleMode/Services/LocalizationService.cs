@@ -172,7 +172,6 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string BackToGame => LocalizationService.Get(nameof(BackToGame));
     public string VolumeRow => LocalizationService.Get(nameof(VolumeRow));
     public string SessionMenuHint => LocalizationService.Get(nameof(SessionMenuHint));
-    public string RecordLast30 => LocalizationService.Get(nameof(RecordLast30));
     public string ExitConsoleMode => LocalizationService.Get(nameof(ExitConsoleMode));
     public string HintVolume => LocalizationService.Get(nameof(HintVolume));
     public string SessionMenuCard => LocalizationService.Get(nameof(SessionMenuCard));
