@@ -245,7 +245,7 @@
                             </Grid>
                         </Button>
 
-                        <Button x:Name="FpsOverlayRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
+                        <Button x:Name="FpsOverlayRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="overlay"
                                 Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -265,15 +265,6 @@
                                     <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
                                     <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.SessionHdrOn), Mode=OneWay}"/>
                                 </StackPanel>
-                            </Grid>
-                        </Button>
-
-                        <Button Style="{StaticResource SideRow}" IsEnabled="False">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE714;" FontSize="19"/></Border>
-                                <TextBlock Grid.Column="1" Style="{StaticResource TileValue}" FontSize="16" VerticalAlignment="Center"
-                                           Text="{x:Bind ViewModel.RecordRowText, Mode=OneWay}"/>
                             </Grid>
                         </Button>
 

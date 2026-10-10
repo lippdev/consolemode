@@ -217,6 +217,7 @@ public sealed partial class SessionMenuWindow : Window
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
 
         ViewModel.PropertyChanged += OnViewModelChanged;
+        ViewModel.SessionPickerRefocus += FocusPickerSelection;
         Ui.ColorValuesChanged += OnColorValuesChanged;
         VolumeRow.LostFocus += (_, _) => SetEditingVolume(false);
         // BringToFront runs before the tree exists; the real first focus happens here.
@@ -241,6 +242,7 @@ public sealed partial class SessionMenuWindow : Window
         Closed += (_, _) =>
         {
             ViewModel.PropertyChanged -= OnViewModelChanged;
+            ViewModel.SessionPickerRefocus -= FocusPickerSelection;
             Ui.ColorValuesChanged -= OnColorValuesChanged;
             _tourTimer?.Stop();
             _navigator.Dispose();
@@ -968,7 +970,9 @@ public sealed partial class SessionMenuWindow : Window
 
     private void FocusPickerSelection()
     {
-        var index = Math.Max(ViewModel.SessionPickerOptions.ToList().FindIndex(o => o.IsSelected), 0);
+        var index = ViewModel.SessionPickerFocusIndex >= 0
+            ? ViewModel.SessionPickerFocusIndex
+            : Math.Max(ViewModel.SessionPickerOptions.ToList().FindIndex(o => o.IsSelected), 0);
         if (TryFocusPickerRow(index)) return;
         void OnLayout(object? s, object e)
         {

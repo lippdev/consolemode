@@ -151,6 +151,58 @@ public sealed class RtssService
     /// </summary>
     public bool SetOverlay(string text, bool hideOthers)
     {
+        StopTicker();
+        return ShowOverlay(text, hideOthers);
+    }
+
+    /// <summary>
+    /// Applies a style from <see cref="RtssOverlay"/>. Styles with CPU/GPU/memory are rewritten every
+    /// second from a <see cref="HardwareMonitor"/> until the next SetOverlay/ApplyOverlay.
+    /// </summary>
+    public bool ApplyOverlay(string? style, FpsOverlayLayout? layout)
+    {
+        var generation = StopTicker();
+        var text = RtssOverlay.Text(style, layout);
+        if (!ShowOverlay(text, RtssOverlay.HidesOthers(style))) return false;
+        if (text.Length > 0 && RtssOverlay.NeedsHardware(style, layout))
+            new Thread(() => TickOverlay(generation, style, layout)) { IsBackground = true, Name = "RTSS counter" }.Start();
+        return true;
+    }
+
+    private readonly object _slotLock = new();
+    private int _overlayGeneration;
+
+    /// <summary>Ends the running ticker (its next write sees a newer generation) and returns the new generation.</summary>
+    private int StopTicker()
+    {
+        lock (_slotLock) return ++_overlayGeneration;
+    }
+
+    private void TickOverlay(int generation, string? style, FpsOverlayLayout? layout)
+    {
+        try
+        {
+            using var monitor = new HardwareMonitor();
+            while (Volatile.Read(ref _overlayGeneration) == generation)
+            {
+                Thread.Sleep(1000);
+                var text = RtssOverlay.Text(style, layout, monitor.Sample());
+                // Checked under the lock so a session that just ended can't get the counter back.
+                lock (_slotLock)
+                {
+                    if (_overlayGeneration != generation) return;
+                    WriteOverlaySlot(text);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"RTSS: o contador parou de atualizar CPU/GPU: {ex.Message}");
+        }
+    }
+
+    private bool ShowOverlay(string text, bool hideOthers)
+    {
         if (string.IsNullOrEmpty(text))
         {
             WriteOverlaySlot(null);
@@ -173,10 +225,6 @@ public sealed class RtssService
         }
         return false;
     }
-
-    /// <summary>Applies a style from <see cref="RtssOverlay"/>.</summary>
-    public bool ApplyOverlay(string? style, FpsOverlayLayout? layout) =>
-        SetOverlay(RtssOverlay.Text(style, layout), RtssOverlay.HidesOthers(style));
 
     private volatile bool _hideAfterburner;
     private Thread? _afterburnerHider;
@@ -292,7 +340,7 @@ public sealed class RtssService
                 }
                 if (slot is null) return false;
 
-                var bytes = System.Text.Encoding.ASCII.GetBytes(text);
+                var bytes = System.Text.Encoding.Latin1.GetBytes(text);   // RTSS's font has ° (0xB0)
                 var extended = version >= 0x00020007;
                 var target = new Span<byte>(slot + (extended ? EntryOsdEx : EntryOsd), extended ? OsdExSize : OsdSize);
                 // v2.14+: bit 0 of dwBusy locks the OSD while the renderer reads it.

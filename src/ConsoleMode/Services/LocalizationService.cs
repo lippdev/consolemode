@@ -157,6 +157,19 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string FpsOverlayShowFrameTime => LocalizationService.Get(nameof(FpsOverlayShowFrameTime));
     public string FpsOverlaySingleLine => LocalizationService.Get(nameof(FpsOverlaySingleLine));
     public string FpsOverlayColor => LocalizationService.Get(nameof(FpsOverlayColor));
+    public string FpsOverlayPcItems => LocalizationService.Get(nameof(FpsOverlayPcItems));
+    public string FpsOverlayPcItemsDescription => LocalizationService.Get(nameof(FpsOverlayPcItemsDescription));
+    public string FpsOverlayShowCpu => LocalizationService.Get(nameof(FpsOverlayShowCpu));
+    public string FpsOverlayShowCpuClock => LocalizationService.Get(nameof(FpsOverlayShowCpuClock));
+    public string FpsOverlayShowGpu => LocalizationService.Get(nameof(FpsOverlayShowGpu));
+    public string FpsOverlayShowGpuClock => LocalizationService.Get(nameof(FpsOverlayShowGpuClock));
+    public string FpsOverlayShowGpuTemp => LocalizationService.Get(nameof(FpsOverlayShowGpuTemp));
+    public string FpsOverlayShowVram => LocalizationService.Get(nameof(FpsOverlayShowVram));
+    public string FpsOverlayShowRam => LocalizationService.Get(nameof(FpsOverlayShowRam));
+    public string FpsOverlaySize => LocalizationService.Get(nameof(FpsOverlaySize));
+    public string FpsOverlayPosition => LocalizationService.Get(nameof(FpsOverlayPosition));
+    public string FpsOverlayCardBackground => LocalizationService.Get(nameof(FpsOverlayCardBackground));
+    public string FpsOverlayCardBackgroundDescription => LocalizationService.Get(nameof(FpsOverlayCardBackgroundDescription));
     public string FpsPlaceholder => LocalizationService.Get(nameof(FpsPlaceholder));
     public string AppSection => LocalizationService.Get(nameof(AppSection));
     public string StartupCard => LocalizationService.Get(nameof(StartupCard));
@@ -172,7 +185,6 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string BackToGame => LocalizationService.Get(nameof(BackToGame));
     public string VolumeRow => LocalizationService.Get(nameof(VolumeRow));
     public string SessionMenuHint => LocalizationService.Get(nameof(SessionMenuHint));
-    public string RecordLast30 => LocalizationService.Get(nameof(RecordLast30));
     public string ExitConsoleMode => LocalizationService.Get(nameof(ExitConsoleMode));
     public string HintVolume => LocalizationService.Get(nameof(HintVolume));
     public string SessionMenuCard => LocalizationService.Get(nameof(SessionMenuCard));
