@@ -44,7 +44,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 
 - Esconde as outras telas **desconectando**, com **cortinas pretas** ou por **DDC/CI**, tudo pelas APIs do próprio Windows: nenhuma ferramenta de terceiros para telas ou áudio vem embutida
 - **Resolução e Hz** por tela, **HDR**, **VRR** e **limite de FPS** (RTSS) enquanto você joga
-- **Contador de FPS** sobre o jogo (RTSS): compacto, detalhado ou do seu jeito
+- **Contador de FPS** sobre o jogo (RTSS) num card em três tamanhos: apenas FPS, compacto (uso de CPU, GPU e RAM), detalhado (clocks, temperatura da GPU e memória) ou do seu jeito
 - O áudio vai para a TV (ou qualquer saída) e volta depois
 - [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC

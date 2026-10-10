@@ -20,7 +20,7 @@ public sealed class AppConfig
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
     public int FpsLimit { get; set; }
-    /// <summary>RtssOverlay style: "external" | "off" | "compact" | "detailed" | "custom". Applied over the game during a session.</summary>
+    /// <summary>RtssOverlay style: "external" | "off" | "compact" (FPS only) | "stats" | "detailed" | "custom". Applied over the game during a session.</summary>
     public string FpsOverlay { get; set; } = RtssOverlay.External;
     public FpsOverlayLayout FpsOverlayLayout { get; set; } = new();
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
@@ -35,6 +35,9 @@ public sealed class AppConfig
 
     /// <summary>The first-run tour was finished or skipped.</summary>
     public bool TourDone { get; set; }
+
+    /// <summary>The session menu's tour was taken, finished or declined: it is no longer offered when the menu opens.</summary>
+    public bool SessionMenuTourDone { get; set; }
 
     /// <summary>
     /// Game screen + mode the user confirmed they can see ("id|WxH@Hz"). A different setup

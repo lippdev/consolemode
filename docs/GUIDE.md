@@ -12,6 +12,8 @@ Details that don't fit in the [README](../README.md). 🇧🇷 [Guia em portugu�
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
+The session menu has two ways out. **Back to the PC** ends the session and puts screens, resolution, HDR, audio and the FPS limit back as they were; the app stays in the tray. **Exit Console Mode** does the same and then closes the app, so the controller shortcuts stop until you open it again. The first time the menu opens, it offers a tour that explains each option; to see it later, press **Y** (△ on PlayStation) or **F1** in the menu, or use **Settings → Session menu tour**.
+
 ## Settings in Console mode
 
 In **System → Controller**, choose the button layout: **Automatic**, **Xbox** or **PlayStation**. The preview and shortcut labels follow the choice, which is saved when you close the app. This changes the displayed symbols; the controller's inputs keep their existing mapping.

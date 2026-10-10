@@ -81,6 +81,8 @@ public sealed partial class SessionMenuWindow : Window
             SearchRoot = () => CloseConfirmOverlay.Visibility == Visibility.Visible ? CloseConfirmCard
                 : ViewModel.IsSessionPickerOpen ? PickerCard
                 : _lastDirection is FocusNavigationDirection.Up or FocusNavigationDirection.Down ? RegionOfFocus() : Root,
+            // The tour takes every press while it is up: A next, Left/Right between stops, B leaves it.
+            Intercept = OnTourPress,
             // Adjust mode on the volume row: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
@@ -127,12 +129,26 @@ public sealed partial class SessionMenuWindow : Window
             else if (_editingVolume) SetEditingVolume(false);
             else ViewModel.SessionMenuBack();
         };
+        // Y / Triangle: the tour, on demand.
+        _navigator.AltRequested += RequestTourFromPad;
         _navigator.Start();
 
         // PreviewKeyDown (tunneling): the ScrollViewer would otherwise handle the arrows as scrolling
         // before they ever bubble up to Root.
         Root.PreviewKeyDown += (_, e) =>
         {
+            if (ViewModel.IsSessionTourOpen)
+            {
+                e.Handled = OnTourKey(e.Key);
+                return;
+            }
+            // F1: the tour, like Y on the pad.
+            if (e.Key == Windows.System.VirtualKey.F1)
+            {
+                e.Handled = true;
+                StartTourOnDemand();
+                return;
+            }
             if (CloseConfirmOverlay.Visibility == Visibility.Visible)
             {
                 var confirmDirection = e.Key switch
@@ -201,6 +217,7 @@ public sealed partial class SessionMenuWindow : Window
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
 
         ViewModel.PropertyChanged += OnViewModelChanged;
+        ViewModel.SessionPickerRefocus += FocusPickerSelection;
         Ui.ColorValuesChanged += OnColorValuesChanged;
         VolumeRow.LostFocus += (_, _) => SetEditingVolume(false);
         // BringToFront runs before the tree exists; the real first focus happens here.
@@ -208,7 +225,13 @@ public sealed partial class SessionMenuWindow : Window
         {
             FirstRow.Focus(FocusState.Keyboard);
             if (Animate) PlayEntrance();
+            // The tour (offered, or asked for from Settings) waits for the rows to finish coming in.
+            AfterDelay(Animate ? EntranceDuration : TimeSpan.Zero, () => { if (!_closing) ViewModel.OnSessionMenuShown(); });
         };
+        TourOverlay.SizeChanged += (_, _) => LayoutTour();
+        TourBubble.SizeChanged += (_, _) => LayoutTour();
+        RowsScroller.ViewChanged += (_, _) => LayoutTour();
+        RowsPanel.SizeChanged += (_, _) => LayoutTour();
         Activated += (_, args) =>
         {
             // XamlRoot is null on the very first activation; GetFocusedElement(null) throws.
@@ -219,7 +242,9 @@ public sealed partial class SessionMenuWindow : Window
         Closed += (_, _) =>
         {
             ViewModel.PropertyChanged -= OnViewModelChanged;
+            ViewModel.SessionPickerRefocus -= FocusPickerSelection;
             Ui.ColorValuesChanged -= OnColorValuesChanged;
+            _tourTimer?.Stop();
             _navigator.Dispose();
         };
     }
@@ -437,6 +462,300 @@ public sealed partial class SessionMenuWindow : Window
         }
     }
 
+    // ── Guided tour ──────────────────────────────────────────────────────────────────────────
+
+    private const double TourHolePadding = 6;
+    private const double TourHoleRadius = 18;
+    private const double TourMargin = 32;
+    /// <summary>How long Y waits to tell a press of its own from Select + Y, the suggested shortcut that closes this menu.</summary>
+    private static readonly TimeSpan TourChordWait = TimeSpan.FromMilliseconds(150);
+    private Microsoft.UI.Dispatching.DispatcherQueueTimer? _tourTimer;
+    private Control? _tourOpener;
+
+    /// <summary>When the entrance is over: the last row starts 120 + 40 ms per row in and takes 260 (PlayEntrance).</summary>
+    private TimeSpan EntranceDuration => TimeSpan.FromMilliseconds(120 + RowsPanel.Children.Count * 40 + 260);
+
+    /// <summary>The rows (or the panel) each stop is about.</summary>
+    private FrameworkElement[] TourTargets(SessionTourStop stop) => stop switch
+    {
+        SessionTourStop.BackToGame => [FirstRow],
+        SessionTourStop.ControlFs => [ControlFsRow],
+        SessionTourStop.Volume => [VolumeRow],
+        SessionTourStop.Display => [ModeRow, AudioRow, HdrRow],
+        SessionTourStop.Fps => [FpsRow, FpsOverlayRow],
+        SessionTourStop.Windows => [WindowsPanel],
+        SessionTourStop.BackToPc => [BackToPcRow],
+        SessionTourStop.Exit => [ExitRow],
+        _ => []
+    };
+
+    /// <summary>Runs <paramref name="action"/> on the UI thread after <paramref name="delay"/>; a newer call replaces a pending one.</summary>
+    private void AfterDelay(TimeSpan delay, Action action)
+    {
+        _tourTimer?.Stop();
+        _tourTimer = DispatcherQueue.CreateTimer();
+        _tourTimer.Interval = delay > TimeSpan.Zero ? delay : TimeSpan.FromMilliseconds(1);
+        _tourTimer.IsRepeating = false;
+        _tourTimer.Tick += (timer, _) =>
+        {
+            timer.Stop();
+            action();
+        };
+        _tourTimer.Start();
+    }
+
+    /// <summary>Y: the tour, a moment later and only if Y was not part of a shortcut being held.</summary>
+    private void RequestTourFromPad()
+    {
+        if (ViewModel.IsSessionTourOpen) return;
+        AfterDelay(TourChordWait, () =>
+        {
+            var shortcuts = ControllerShortcuts.Slots.Select(ViewModel.GetShortcut);
+            if (SessionMenuTour.IsTourPress(shortcuts, ControllerHoldWatcher.ReadHeldByDevice().Values)) StartTourOnDemand();
+        });
+    }
+
+    /// <summary>Y or F1: the tour without the invite, unless something else is open over the menu.</summary>
+    private void StartTourOnDemand()
+    {
+        if (_closing || ViewModel.IsSessionTourOpen || ViewModel.IsSessionPickerOpen
+            || CloseConfirmOverlay.Visibility == Visibility.Visible) return;
+        UiSounds.Play(UiSound.Confirm);
+        ViewModel.StartSessionTour(invite: false);
+    }
+
+    /// <summary>The pad while the tour is up: A next, Right next (not on the invite), Left back, B leaves; the rest is swallowed.</summary>
+    private bool OnTourPress(ControllerAction action)
+    {
+        if (!ViewModel.IsSessionTourOpen) return false;
+        switch (action)
+        {
+            case ControllerAction.Confirm:
+                UiSounds.Play(UiSound.Confirm);
+                ViewModel.SessionTourNextCommand.Execute(null);
+                break;
+            case ControllerAction.Right when !ViewModel.IsSessionTourInvite:
+                UiSounds.Play(UiSound.Move);
+                ViewModel.SessionTourNextCommand.Execute(null);
+                break;
+            case ControllerAction.Left:
+                if (ViewModel.SessionTourPrevious()) UiSounds.Play(UiSound.Move);
+                break;
+            case ControllerAction.Back:
+                UiSounds.Play(UiSound.Back);
+                ViewModel.EndSessionTourCommand.Execute(null);
+                break;
+        }
+        return true;
+    }
+
+    /// <summary>The keyboard while the tour is up; Enter and Space go to the focused button of the bubble. True when handled.</summary>
+    private bool OnTourKey(Windows.System.VirtualKey key)
+    {
+        switch (key)
+        {
+            case Windows.System.VirtualKey.Enter or Windows.System.VirtualKey.Space:
+                return false;
+            case Windows.System.VirtualKey.Right when !ViewModel.IsSessionTourInvite:
+                ViewModel.SessionTourNextCommand.Execute(null);
+                break;
+            case Windows.System.VirtualKey.Left:
+                ViewModel.SessionTourPrevious();
+                break;
+            case Windows.System.VirtualKey.Escape or Windows.System.VirtualKey.Back:
+                ViewModel.EndSessionTourCommand.Execute(null);
+                break;
+            case Windows.System.VirtualKey.Tab:
+                var focused = Root.XamlRoot is { } root ? FocusManager.GetFocusedElement(root) : null;
+                (ReferenceEquals(focused, TourPrimaryButton) ? TourSecondaryButton : TourPrimaryButton).Focus(FocusState.Keyboard);
+                break;
+        }
+        // Everything else (Up, Down, Delete...) would reach the menu underneath.
+        return true;
+    }
+
+    /// <summary>Shows the current stop, or puts the tour away and gives the focus back to where it was.</summary>
+    private void ShowTourStop()
+    {
+        if (!ViewModel.IsSessionTourOpen)
+        {
+            if (TourOverlay.Visibility == Visibility.Collapsed) return;
+            TourOverlay.Visibility = Visibility.Collapsed;
+            TourRings.Children.Clear();
+            if (!_closing) (_tourOpener ?? FirstRow).Focus(FocusState.Keyboard);
+            _tourOpener = null;
+            return;
+        }
+
+        var opening = TourOverlay.Visibility == Visibility.Collapsed;
+        if (opening)
+        {
+            _tourOpener = Root.XamlRoot is { } root ? FocusManager.GetFocusedElement(root) as Control : null;
+            SetEditingVolume(false);
+            TourOverlay.Visibility = Visibility.Visible;
+        }
+        TourProgressText.Visibility = ViewModel.IsSessionTourInvite ? Visibility.Collapsed : Visibility.Visible;
+        BringTourIntoView();
+        LayoutTour();
+        TourPrimaryButton.Focus(FocusState.Keyboard);
+        if (!Animate) return;
+        try
+        {
+            if (opening)
+            {
+                ElementCompositionPreview.GetElementVisual(TourOverlay).Opacity = 0f;
+                Enter(TourOverlay, 0f, 0f, 200, 0);
+            }
+            ElementCompositionPreview.GetElementVisual(TourBubble).Opacity = 0f;
+            Enter(TourBubble, 0f, 14f, 240, opening ? 60 : 0);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Menu da sessão: animação: {ex.Message}");
+            ElementCompositionPreview.GetElementVisual(TourOverlay).Opacity = 1f;
+            ElementCompositionPreview.GetElementVisual(TourBubble).Opacity = 1f;
+        }
+    }
+
+    /// <summary>Scrolls the side panel so the rows of the stop are in sight: on smaller screens the ways out sit below the fold.</summary>
+    private void BringTourIntoView()
+    {
+        var rows = TourTargets(ViewModel.SessionTourStop)
+            .Where(row => row.Visibility == Visibility.Visible && IsInside(RowsPanel, row))
+            .ToList();
+        if (rows.Count == 0) return;
+        RowsPanel.UpdateLayout();
+        double Top(FrameworkElement row) => row.TransformToVisual(RowsPanel).TransformPoint(new Windows.Foundation.Point(0, 0)).Y;
+        var top = rows.Min(Top) - TourHolePadding;
+        var bottom = rows.Max(row => Top(row) + row.ActualHeight) + TourHolePadding;
+        var offset = RowsScroller.VerticalOffset;
+        var viewport = RowsScroller.ViewportHeight;
+        if (top < offset || bottom - top > viewport) offset = top;
+        else if (bottom > offset + viewport) offset = bottom - viewport;
+        else return;
+        RowsScroller.ChangeView(null, Math.Max(offset, 0), null, disableAnimation: true);
+    }
+
+    /// <summary>
+    /// Cuts a hole in the veil around the rows of the stop (rows next to each other share one), outlines it,
+    /// and puts the bubble beside it. Run again whenever something moves: the panel scrolls, the text changes.
+    /// </summary>
+    private void LayoutTour()
+    {
+        if (!ViewModel.IsSessionTourOpen || TourOverlay.Visibility != Visibility.Visible) return;
+        var width = TourOverlay.ActualWidth;
+        var height = TourOverlay.ActualHeight;
+        if (width <= 0 || height <= 0) return;
+        try
+        {
+            var scroller = BoundsInTour(RowsScroller);
+            var holes = new List<Windows.Foundation.Rect>();
+            foreach (var target in TourTargets(ViewModel.SessionTourStop))
+            {
+                if (target.Visibility != Visibility.Visible || target.ActualWidth <= 0 || target.ActualHeight <= 0) continue;
+                var bounds = BoundsInTour(target);
+                // A row half scrolled out of the panel: only the part in sight.
+                if (IsInside(RowsPanel, target)) bounds = Clip(bounds, scroller);
+                if (bounds.Height < 8) continue;
+                var hole = new Windows.Foundation.Rect(bounds.X - TourHolePadding, bounds.Y - TourHolePadding,
+                    bounds.Width + 2 * TourHolePadding, bounds.Height + 2 * TourHolePadding);
+                // Holes that touch become one: overlapping holes would cancel out under the even-odd fill.
+                if (holes.Count > 0 && hole.Y <= holes[^1].Y + holes[^1].Height + 1)
+                {
+                    var last = holes[^1];
+                    var left = Math.Min(last.X, hole.X);
+                    var right = Math.Max(last.X + last.Width, hole.X + hole.Width);
+                    holes[^1] = new Windows.Foundation.Rect(left, last.Y, right - left, Math.Max(last.Y + last.Height, hole.Y + hole.Height) - last.Y);
+                }
+                else holes.Add(hole);
+            }
+
+            var veil = new GeometryGroup { FillRule = FillRule.EvenOdd };
+            veil.Children.Add(new RectangleGeometry { Rect = new Windows.Foundation.Rect(0, 0, width, height) });
+            TourRings.Children.Clear();
+            var ringStyle = (Style)Root.Resources["TourRing"];
+            foreach (var hole in holes)
+            {
+                veil.Children.Add(RoundedRectangle(hole, TourHoleRadius));
+                var ring = new Border { Style = ringStyle, Width = hole.Width, Height = hole.Height, CornerRadius = new CornerRadius(TourHoleRadius) };
+                Canvas.SetLeft(ring, hole.X);
+                Canvas.SetTop(ring, hole.Y);
+                TourRings.Children.Add(ring);
+            }
+            TourVeil.Data = veil;
+            PlaceTourBubble(holes, width, height);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Menu da sessão: tour: {ex.Message}");
+        }
+    }
+
+    /// <summary>Beside the rows of the side panel; over the side panel when the stop is the windows; centred for the invite.</summary>
+    private void PlaceTourBubble(List<Windows.Foundation.Rect> holes, double width, double height)
+    {
+        var bubbleWidth = TourBubble.Width;
+        var bubbleHeight = TourBubble.ActualHeight;
+        if (bubbleHeight <= 0)
+        {
+            TourBubble.Measure(new Windows.Foundation.Size(bubbleWidth, double.PositiveInfinity));
+            bubbleHeight = TourBubble.DesiredSize.Height;
+        }
+        double x, y;
+        if (holes.Count == 0)
+        {
+            x = (width - bubbleWidth) / 2;
+            y = (height - bubbleHeight) / 2;
+        }
+        else
+        {
+            var left = holes.Min(h => h.X);
+            var top = holes.Min(h => h.Y);
+            var bottom = holes.Max(h => h.Y + h.Height);
+            var sidebar = BoundsInTour(SidebarPanel);
+            x = left >= sidebar.X + sidebar.Width
+                ? sidebar.X + (sidebar.Width - bubbleWidth) / 2
+                : sidebar.X + sidebar.Width + TourMargin;
+            y = (top + bottom - bubbleHeight) / 2;
+        }
+        Canvas.SetLeft(TourBubble, Math.Clamp(x, TourMargin, Math.Max(TourMargin, width - bubbleWidth - TourMargin)));
+        Canvas.SetTop(TourBubble, Math.Clamp(y, TourMargin, Math.Max(TourMargin, height - bubbleHeight - TourMargin)));
+    }
+
+    private Windows.Foundation.Rect BoundsInTour(FrameworkElement element) =>
+        element.TransformToVisual(TourOverlay).TransformBounds(new Windows.Foundation.Rect(0, 0, element.ActualWidth, element.ActualHeight));
+
+    private static Windows.Foundation.Rect Clip(Windows.Foundation.Rect rect, Windows.Foundation.Rect to)
+    {
+        var left = Math.Max(rect.X, to.X);
+        var top = Math.Max(rect.Y, to.Y);
+        var right = Math.Min(rect.X + rect.Width, to.X + to.Width);
+        var bottom = Math.Min(rect.Y + rect.Height, to.Y + to.Height);
+        return new Windows.Foundation.Rect(left, top, Math.Max(right - left, 0), Math.Max(bottom - top, 0));
+    }
+
+    /// <summary>A rectangle with round corners as a path: RectangleGeometry has no corner radius.</summary>
+    private static PathGeometry RoundedRectangle(Windows.Foundation.Rect rect, double radius)
+    {
+        radius = Math.Min(radius, Math.Min(rect.Width, rect.Height) / 2);
+        var corner = new Windows.Foundation.Size(radius, radius);
+        double left = rect.X, top = rect.Y, right = rect.X + rect.Width, bottom = rect.Y + rect.Height;
+        var figure = new PathFigure { StartPoint = new Windows.Foundation.Point(left + radius, top), IsClosed = true };
+        void Line(double x, double y) => figure.Segments.Add(new LineSegment { Point = new Windows.Foundation.Point(x, y) });
+        void Arc(double x, double y) => figure.Segments.Add(new ArcSegment { Point = new Windows.Foundation.Point(x, y), Size = corner, SweepDirection = SweepDirection.Clockwise });
+        Line(right - radius, top);
+        Arc(right, top + radius);
+        Line(right, bottom - radius);
+        Arc(right - radius, bottom);
+        Line(left + radius, bottom);
+        Arc(left, bottom - radius);
+        Line(left, top + radius);
+        Arc(left + radius, top);
+        var geometry = new PathGeometry();
+        geometry.Figures.Add(figure);
+        return geometry;
+    }
+
     // ── Volume adjust mode ───────────────────────────────────────────────────────────────────
 
     private bool IsVolumeFocused() =>
@@ -633,6 +952,9 @@ public sealed partial class SessionMenuWindow : Window
             case nameof(MainViewModel.IsConsoleActive) when !ViewModel.IsConsoleActive && !ViewModel.IsSessionMenuPreview:
                 Close();
                 break;
+            case nameof(MainViewModel.SessionTourIndex):
+                ShowTourStop();
+                break;
             case nameof(MainViewModel.IsSessionPickerOpen):
                 // Read the focus now: by the time the queued work runs, the picker already took it.
                 if (ViewModel.IsSessionPickerOpen && Root.XamlRoot is { } xamlRoot)
@@ -648,7 +970,9 @@ public sealed partial class SessionMenuWindow : Window
 
     private void FocusPickerSelection()
     {
-        var index = Math.Max(ViewModel.SessionPickerOptions.ToList().FindIndex(o => o.IsSelected), 0);
+        var index = ViewModel.SessionPickerFocusIndex >= 0
+            ? ViewModel.SessionPickerFocusIndex
+            : Math.Max(ViewModel.SessionPickerOptions.ToList().FindIndex(o => o.IsSelected), 0);
         if (TryFocusPickerRow(index)) return;
         void OnLayout(object? s, object e)
         {
