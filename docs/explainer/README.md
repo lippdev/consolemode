@@ -62,6 +62,19 @@ npm run alpha3
 
 Grava `out/alpha3-x.mp4` (H.264 yuv420p + AAC, faststart).
 
+## Tour do Console Mode (`Showcase`)
+
+O GIF do topo dos READMEs (~55 s): para quem é o Console Mode, o trabalho que ele tira de quem joga na TV e o que ele entrega (um clique, ajustes para a TV, launchers, atalhos do controle, menu sobre o jogo, duas interfaces, volta automática, automação, open source). Não é sobre uma versão.
+
+Feito para a melhor qualidade que um GIF permite: a composição roda a 25 fps (taxa que o GIF representa sem tremer), cores chapadas (sem desfoque, brilho ou gradiente grande), imagens de jogo paradas, 1280 px, uma paleta de 256 cores por cena e uma passada leve do gifsicle (`--lossy=15`, sem diferença visível). Inglês e português:
+
+```console
+npm run showcase      # assets/console-mode-tour.gif (README.md)
+npm run showcase:pt   # assets/console-mode-tour.pt-BR.gif (README.pt-BR.md)
+```
+
+As durações das cenas ficam em `DURS`, em `src/Showcase.tsx` e em `scripts/showcase-gif.sh` (precisam ser iguais).
+
 ## Tour da 1.6 (`Features16`)
 
 GIF de ~36 s no mesmo formato do tour da 1.5 (`Features`): título, nove recursos numerados com barra de progresso e o final. Mostra a escolha da tela, o novo menu da sessão, o Alt + Tab com o controle, o ControlFS, a interface Console redesenhada, as capas da Steam, os atalhos do controle, as melhorias e o JoyChromium (em breve, tela ilustrativa). Sem vídeo de jogo nem desfoque, para o GIF ficar nítido e leve. Inglês e português (prop `lang`):

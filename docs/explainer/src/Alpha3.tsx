@@ -44,7 +44,9 @@ export type Glyph =
   | "steam"
   | "rotate"
   | "flask"
-  | "gamepad";
+  | "gamepad"
+  | "menu"
+  | "tv";
 
 /** Line icons standing in for the Segoe Fluent glyphs the app uses. */
 export const G: React.FC<{ name: Glyph; size?: number; color?: string }> = ({ name, size = 24, color = "#fff" }) => {
@@ -118,6 +120,13 @@ export const G: React.FC<{ name: Glyph; size?: number; color?: string }> = ({ na
       </>
     ),
     flask: <path d="M9.5 3h5M10.5 3v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5.5-10V3M7.5 15h9" {...p} />,
+    menu: <path d="M5 7h14M5 12h14M5 17h14" {...p} strokeWidth={2.2} />,
+    tv: (
+      <>
+        <rect x="2.5" y="5" width="19" height="12" rx="1.5" {...p} />
+        <path d="M8 20h8M12 17v3" {...p} />
+      </>
+    ),
     gamepad: (
       <>
         <rect x="3" y="7" width="18" height="10" rx="5" {...p} />

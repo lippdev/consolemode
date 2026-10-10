@@ -8,7 +8,7 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.6-short.gif" alt="Tour of Console Mode 1.6: one click moves the game to the TV, the session menu over the game with the open windows, the built-in ControlFS file explorer, the Console interface with its Home, Session and System tabs, and controller shortcuts you choose." width="800">
+<img src="assets/console-mode-tour.gif" alt="Console Mode tour: who it is for, the chores it removes, one click to the TV, settings tuned for the TV, launchers, controller shortcuts, the menu over the game, the two interfaces, automatic restore, automation, and free and open source." width="800">
 
 ## Download
 

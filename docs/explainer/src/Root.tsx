@@ -7,6 +7,7 @@ import { ROADMAP_DURATION, Roadmap } from "./Roadmap";
 import { KEYNOTE_DURATION, Keynote } from "./Keynote";
 import { FEATURES_DURATION, Features } from "./Features";
 import { FEATURES16_DURATION, Features16 } from "./Features16";
+import { SHOWCASE_DURATION, SHOWCASE_FPS, Showcase } from "./Showcase";
 import { LAUNCH_DURATION, Launch } from "./Launch";
 import { ALPHA3_DURATION, Alpha3 } from "./Alpha3";
 import { RELEASE16_DURATION, Release16 } from "./Release16";
@@ -84,6 +85,15 @@ export const RemotionRoot: FC = () => {
         component={Features16}
         durationInFrames={FEATURES16_DURATION}
         fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{ lang: "en" as const }}
+      />
+      <Composition
+        id="Showcase"
+        component={Showcase}
+        durationInFrames={SHOWCASE_DURATION}
+        fps={SHOWCASE_FPS}
         width={1920}
         height={1080}
         defaultProps={{ lang: "en" as const }}
