@@ -28,6 +28,8 @@ public sealed class FpsOverlayLayout
     public string Size { get; set; } = RtssOverlay.Small;
     /// <summary>Draw the counter on a translucent rounded card instead of straight over the game.</summary>
     public bool Card { get; set; } = true;
+    /// <summary>One of <see cref="RtssOverlay.Positions"/>: where RTSS puts its OSD, or a corner of the screen.</summary>
+    public string Position { get; set; } = RtssOverlay.PositionRtss;
 }
 
 /// <summary>
@@ -62,11 +64,16 @@ public static partial class RtssOverlay
     public const string Large = "large";
     public static readonly string[] Sizes = [Small, Medium, Large];
 
+    public const string PositionRtss = "rtss";
+    public const string TopLeft = "top-left";
+    public const string TopRight = "top-right";
+    public const string BottomLeft = "bottom-left";
+    public const string BottomRight = "bottom-right";
+    /// <summary>The RTSS position first (the default): it keeps whatever the user set in RTSS.</summary>
+    public static readonly string[] Positions = [PositionRtss, TopLeft, TopRight, BottomLeft, BottomRight];
+
     public static string Normalize(string? style) =>
         Styles.FirstOrDefault(s => string.Equals(s, style, StringComparison.OrdinalIgnoreCase)) ?? External;
-
-    /// <summary>A on the session menu row walks <see cref="Styles"/> and wraps around.</summary>
-    public static string Next(string? style) => Styles[(Array.IndexOf(Styles, Normalize(style)) + 1) % Styles.Length];
 
     /// <summary>Whether this style keeps Afterburner's OSD off the screen.</summary>
     public static bool HidesOthers(string? style) => Normalize(style) != External;
@@ -77,6 +84,9 @@ public static partial class RtssOverlay
 
     public static string NormalizeSize(string? size) =>
         Sizes.FirstOrDefault(s => string.Equals(s, size, StringComparison.OrdinalIgnoreCase)) ?? Small;
+
+    public static string NormalizePosition(string? position) =>
+        Positions.FirstOrDefault(p => string.Equals(p, position, StringComparison.OrdinalIgnoreCase)) ?? PositionRtss;
 
     /// <summary>Whether the style shows CPU/GPU/memory, which RTSS doesn't know: the text then needs a fresh sample every second.</summary>
     public static bool NeedsHardware(string? style, FpsOverlayLayout? layout = null) =>
@@ -175,10 +185,21 @@ public static partial class RtssOverlay
             .Append($"<{ValueSize}={Percent(100, scale)}><{UnitSize}=-{Percent(55, scale)}><{LabelSize}=-{Percent(70, scale)}>")
             .Append($"<{FpsSize}={Percent(singleLine ? 100 : 130, scale)}>")
             .Append("<A0=-3><A1=-4><A2=5>");
+        // A corner is a sticky position (<P0> top left, <P2> top right, <P6> bottom left, <P8> bottom
+        // right of RTSS's 3x3 screen grid), which ignores the OSD position set in RTSS; it needs a layer.
+        var corner = NormalizePosition(layout.Position) switch
+        {
+            TopLeft => "<P0>", TopRight => "<P2>", BottomLeft => "<P6>", BottomRight => "<P8>", _ => ""
+        };
+        header.Append(corner);
         if (layout.Card)
         {
             var pad = (int)Math.Round(6 * scale);
             header.Append($"<M={pad + 2},{pad},{pad + 2},{pad}><L0><{CardFill}><B=0,0,R{pad + 2}>\b<C>");
+        }
+        else if (corner.Length > 0)
+        {
+            header.Append("<L0>");
         }
         return header + string.Join(singleLine ? Gap + Gap : "\n", rows);
     }

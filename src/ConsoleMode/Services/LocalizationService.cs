@@ -167,6 +167,7 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string FpsOverlayShowVram => LocalizationService.Get(nameof(FpsOverlayShowVram));
     public string FpsOverlayShowRam => LocalizationService.Get(nameof(FpsOverlayShowRam));
     public string FpsOverlaySize => LocalizationService.Get(nameof(FpsOverlaySize));
+    public string FpsOverlayPosition => LocalizationService.Get(nameof(FpsOverlayPosition));
     public string FpsOverlayCardBackground => LocalizationService.Get(nameof(FpsOverlayCardBackground));
     public string FpsOverlayCardBackgroundDescription => LocalizationService.Get(nameof(FpsOverlayCardBackgroundDescription));
     public string FpsPlaceholder => LocalizationService.Get(nameof(FpsPlaceholder));

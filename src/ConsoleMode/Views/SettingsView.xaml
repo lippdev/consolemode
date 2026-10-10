@@ -201,6 +201,12 @@
                                   SelectedItem="{x:Bind ViewModel.SelectedFpsOverlaySize, Mode=TwoWay}"
                                   DisplayMemberPath="Text"/>
                     </ctk:SettingsCard>
+                    <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayPosition, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
+                        <ComboBox MinWidth="220"
+                                  ItemsSource="{x:Bind ViewModel.FpsOverlayPositionOptions, Mode=OneWay}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedFpsOverlayPosition, Mode=TwoWay}"
+                                  DisplayMemberPath="Text"/>
+                    </ctk:SettingsCard>
                     <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.FpsOverlayCardBackground, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.FpsOverlayCardBackgroundDescription, Mode=OneWay}"
                                       IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
                         <ToggleSwitch IsOn="{x:Bind ViewModel.OverlayCard, Mode=TwoWay}"

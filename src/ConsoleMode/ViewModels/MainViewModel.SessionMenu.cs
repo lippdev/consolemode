@@ -21,6 +21,11 @@ public partial class MainViewModel
 
     public ObservableCollection<PickerItem> SessionPickerOptions { get; } = [];
 
+    /// <summary>Row the picker focuses when it opens or is rebuilt; -1 = the selected option.</summary>
+    public int SessionPickerFocusIndex { get; private set; } = -1;
+    /// <summary>The open picker was rebuilt in place (the FPS counter picker): focus SessionPickerFocusIndex again.</summary>
+    public event Action? SessionPickerRefocus;
+
     [ObservableProperty] private bool _isSessionMenuOpen;
     [ObservableProperty] private bool _isSessionMenuBusy;
     [ObservableProperty] private bool _isSessionMenuPreview;
@@ -247,6 +252,10 @@ public partial class MainViewModel
                 var id = SessionAudioId;
                 options = Engine.Audio.GetDevices().Where(d => d.IsActive).Select(d => (d.Name, d.FriendlyId, d.FriendlyId == id));
                 break;
+            case "overlay":
+                title = LocalizationService.Get("FpsOverlayCard");
+                options = OverlayPickerOptions();
+                break;
             case "fps":
                 title = LocalizationService.Get("FpsCard");
                 options = new[] { (LocalizationService.Get("FpsNoLimit"), "0", state.FpsLimit == 0) }
@@ -256,6 +265,7 @@ public partial class MainViewModel
                 return;
         }
         _sessionPickerKey = key;
+        SessionPickerFocusIndex = key == "overlay" ? 0 : -1;
         SessionPickerTitle = title;
         SessionPickerOptions.Clear();
         foreach (var (text, value, selected) in options) SessionPickerOptions.Add(new PickerItem(text, value, selected));
@@ -266,6 +276,11 @@ public partial class MainViewModel
     private async Task PickSessionOptionAsync(PickerItem? item)
     {
         if (item is null) return;
+        if (_sessionPickerKey == "overlay")
+        {
+            ChangeOverlaySetting(item.Value);   // the counter picker stays open
+            return;
+        }
         IsSessionPickerOpen = false;
         var key = _sessionPickerKey;
         await RunSessionActionAsync(() =>

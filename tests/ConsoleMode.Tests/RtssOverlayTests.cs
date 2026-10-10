@@ -10,17 +10,37 @@ public class RtssOverlayTests
         VramUsedMb = 5324, VramTotalMb = 8192, RamUsedMb = 15155, RamTotalMb = 32768
     };
 
+    [Fact]
+    public void Styles_are_listed_from_least_to_most()
+    {
+        Assert.Equal(["external", "off", "compact", "stats", "detailed", "custom"], RtssOverlay.Styles);
+        Assert.Equal(RtssOverlay.External, RtssOverlay.Normalize("bogus"));
+    }
+
     [Theory]
-    [InlineData(null, "off")]
-    [InlineData("external", "off")]
-    [InlineData("off", "compact")]
-    [InlineData("compact", "stats")]
-    [InlineData("stats", "detailed")]
-    [InlineData("detailed", "custom")]
-    [InlineData("custom", "external")]
-    [InlineData("bogus", "off")]
-    public void Menu_row_walks_every_style(string? current, string expected) =>
-        Assert.Equal(expected, RtssOverlay.Next(current));
+    [InlineData("top-left", "<P0>")]
+    [InlineData("top-right", "<P2>")]
+    [InlineData("bottom-left", "<P6>")]
+    [InlineData("bottom-right", "<P8>")]
+    public void A_corner_pins_the_counter_there_with_or_without_the_card(string position, string tag)
+    {
+        foreach (var card in new[] { true, false })
+        {
+            var text = RtssOverlay.Text(RtssOverlay.FpsOnly, new FpsOverlayLayout { Position = position, Card = card });
+            Assert.Contains(tag + (card ? "<M=" : "<L0>"), text);
+        }
+    }
+
+    [Theory]
+    [InlineData("rtss")]
+    [InlineData(null)]
+    [InlineData("middle")]
+    public void Otherwise_it_follows_the_rtss_osd_position(string? position)
+    {
+        var text = RtssOverlay.Text(RtssOverlay.FpsOnly, new FpsOverlayLayout { Position = position!, Card = false });
+        Assert.DoesNotContain("<P", text);
+        Assert.DoesNotContain("<L", text);
+    }
 
     [Fact]
     public void Default_leaves_afterburner_alone()

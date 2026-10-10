@@ -14,10 +14,12 @@ public partial class MainViewModel
     public ObservableCollection<ComboOption> FpsOverlayOptions { get; } = [];
     public ObservableCollection<ComboOption> FpsOverlayColorOptions { get; } = [];
     public ObservableCollection<ComboOption> FpsOverlaySizeOptions { get; } = [];
+    public ObservableCollection<ComboOption> FpsOverlayPositionOptions { get; } = [];
 
     [ObservableProperty] private ComboOption? _selectedFpsOverlay;
     [ObservableProperty] private ComboOption? _selectedFpsOverlayColor;
     [ObservableProperty] private ComboOption? _selectedFpsOverlaySize;
+    [ObservableProperty] private ComboOption? _selectedFpsOverlayPosition;
     [ObservableProperty] private bool _overlayShowApi = true;
     [ObservableProperty] private bool _overlayShowFps = true;
     [ObservableProperty] private bool _overlayShowFrameTime = true;
@@ -56,6 +58,7 @@ public partial class MainViewModel
         SingleLine = OverlaySingleLine,
         Color = RtssOverlay.NormalizeColor(SelectedFpsOverlayColor?.Value),
         Size = RtssOverlay.NormalizeSize(SelectedFpsOverlaySize?.Value),
+        Position = RtssOverlay.NormalizePosition(SelectedFpsOverlayPosition?.Value),
         Card = OverlayCard
     };
 
@@ -64,6 +67,7 @@ public partial class MainViewModel
         var style = FpsOverlayStyle;
         var color = RtssOverlay.NormalizeColor(SelectedFpsOverlayColor?.Value);
         var size = RtssOverlay.NormalizeSize(SelectedFpsOverlaySize?.Value);
+        var position = RtssOverlay.NormalizePosition(SelectedFpsOverlayPosition?.Value);
         FpsOverlayOptions.Clear();
         // Settings says what Compact and Detailed show; the session menu tile keeps the short name.
         foreach (var s in RtssOverlay.Styles)
@@ -87,6 +91,11 @@ public partial class MainViewModel
         for (var i = 0; i < RtssOverlay.Sizes.Length; i++)
             FpsOverlaySizeOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsOverlaySize" + sizes[i]), Value = RtssOverlay.Sizes[i] });
         SelectedFpsOverlaySize = FpsOverlaySizeOptions.First(o => o.Value == size);
+
+        FpsOverlayPositionOptions.Clear();
+        foreach (var p in RtssOverlay.Positions)
+            FpsOverlayPositionOptions.Add(new ComboOption { Text = LocalizationService.Get(PositionKey(p)), Value = p });
+        SelectedFpsOverlayPosition = FpsOverlayPositionOptions.First(o => o.Value == position);
         OnPropertyChanged(nameof(FpsOverlayStatusText));
     }
 
@@ -100,12 +109,22 @@ public partial class MainViewModel
         _ => "FpsOverlayExternal"
     };
 
+    private static string PositionKey(string position) => position switch
+    {
+        RtssOverlay.TopLeft => "FpsOverlayPositionTopLeft",
+        RtssOverlay.TopRight => "FpsOverlayPositionTopRight",
+        RtssOverlay.BottomLeft => "FpsOverlayPositionBottomLeft",
+        RtssOverlay.BottomRight => "FpsOverlayPositionBottomRight",
+        _ => "FpsOverlayPositionRtss"
+    };
+
     private void LoadFpsOverlay(AppConfig config)
     {
         var layout = config.FpsOverlayLayout ?? new FpsOverlayLayout();
         SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == RtssOverlay.Normalize(config.FpsOverlay)) ?? FpsOverlayOptions.FirstOrDefault();
         SelectedFpsOverlayColor = FpsOverlayColorOptions.FirstOrDefault(o => o.Value == RtssOverlay.NormalizeColor(layout.Color)) ?? FpsOverlayColorOptions.FirstOrDefault();
         SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == RtssOverlay.NormalizeSize(layout.Size)) ?? FpsOverlaySizeOptions.FirstOrDefault();
+        SelectedFpsOverlayPosition = FpsOverlayPositionOptions.FirstOrDefault(o => o.Value == RtssOverlay.NormalizePosition(layout.Position)) ?? FpsOverlayPositionOptions.FirstOrDefault();
         OverlayShowApi = layout.ShowApi;
         OverlayShowFps = layout.ShowFps;
         OverlayShowFrameTime = layout.ShowFrameTime;
@@ -123,6 +142,7 @@ public partial class MainViewModel
     partial void OnSelectedFpsOverlayChanged(ComboOption? value) => FpsOverlayChanged();
     partial void OnSelectedFpsOverlayColorChanged(ComboOption? value) => FpsOverlayChanged();
     partial void OnSelectedFpsOverlaySizeChanged(ComboOption? value) => FpsOverlayChanged();
+    partial void OnSelectedFpsOverlayPositionChanged(ComboOption? value) => FpsOverlayChanged();
     partial void OnOverlayShowApiChanged(bool value) => FpsOverlayChanged();
     partial void OnOverlayShowFpsChanged(bool value) => FpsOverlayChanged();
     partial void OnOverlayShowFrameTimeChanged(bool value) => FpsOverlayChanged();
@@ -153,11 +173,80 @@ public partial class MainViewModel
         });
     }
 
-    /// <summary>A on the session menu row: the next style, shown at once and kept for the next sessions.</summary>
-    [RelayCommand]
-    private void CycleFpsOverlay()
+    // The session menu edits the counter in its picker: one row per setting, A moves that setting to
+    // its next value (or ticks a Custom item) and the list stays open, so everything can be tuned over
+    // the game. Same properties as Settings, so it is saved and shown at once.
+
+    private static readonly (string Value, string Key)[] OverlayItems =
+    [
+        ("Fps", "FpsOverlayShowFps"), ("FrameTime", "FpsOverlayShowFrameTime"), ("Api", "FpsOverlayShowApi"),
+        ("Cpu", "FpsOverlayShowCpu"), ("CpuClock", "FpsOverlayShowCpuClock"), ("Ram", "FpsOverlayShowRam"),
+        ("Vram", "FpsOverlayShowVram"), ("Gpu", "FpsOverlayShowGpu"), ("GpuClock", "FpsOverlayShowGpuClock"),
+        ("GpuTemp", "FpsOverlayShowGpuTemp")
+    ];
+
+    private IEnumerable<(string Text, string Value, bool Selected)> OverlayPickerOptions()
     {
-        var next = RtssOverlay.Next(FpsOverlayStyle);
-        SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == next) ?? SelectedFpsOverlay;
+        static string Row(string key, string? value) => $"{LocalizationService.Get(key)}: {value}";
+        yield return (Row("FpsOverlayStyle", FpsOverlayShortName), "style", false);
+        if (!IsFpsOverlayDrawn) yield break;
+        yield return (Row("FpsOverlaySize", SelectedFpsOverlaySize?.Text), "size", false);
+        yield return (Row("FpsOverlayPosition", SelectedFpsOverlayPosition?.Text), "position", false);
+        yield return (Row("FpsOverlayCardBackground", OnOff(OverlayCard)), "card", false);
+        yield return (Row("FpsOverlayColor", SelectedFpsOverlayColor?.Text), "color", false);
+        if (!IsFpsOverlayCustom) yield break;
+        yield return (Row("FpsOverlaySingleLine", OnOff(OverlaySingleLine)), "single", false);
+        foreach (var (value, key) in OverlayItems)
+            yield return (LocalizationService.Get(key), "item:" + value, IsOverlayItemOn(value));
+    }
+
+    private bool IsOverlayItemOn(string item) => item switch
+    {
+        "Fps" => OverlayShowFps, "FrameTime" => OverlayShowFrameTime, "Api" => OverlayShowApi,
+        "Cpu" => OverlayShowCpu, "CpuClock" => OverlayShowCpuClock, "Ram" => OverlayShowRam,
+        "Vram" => OverlayShowVram, "Gpu" => OverlayShowGpu, "GpuClock" => OverlayShowGpuClock,
+        _ => OverlayShowGpuTemp
+    };
+
+    private void ToggleOverlayItem(string item)
+    {
+        switch (item)
+        {
+            case "Fps": OverlayShowFps = !OverlayShowFps; break;
+            case "FrameTime": OverlayShowFrameTime = !OverlayShowFrameTime; break;
+            case "Api": OverlayShowApi = !OverlayShowApi; break;
+            case "Cpu": OverlayShowCpu = !OverlayShowCpu; break;
+            case "CpuClock": OverlayShowCpuClock = !OverlayShowCpuClock; break;
+            case "Ram": OverlayShowRam = !OverlayShowRam; break;
+            case "Vram": OverlayShowVram = !OverlayShowVram; break;
+            case "Gpu": OverlayShowGpu = !OverlayShowGpu; break;
+            case "GpuClock": OverlayShowGpuClock = !OverlayShowGpuClock; break;
+            case "GpuTemp": OverlayShowGpuTemp = !OverlayShowGpuTemp; break;
+        }
+    }
+
+    /// <summary>A on a row of the counter picker: that setting's next value; the list is rebuilt with focus kept on the row.</summary>
+    private void ChangeOverlaySetting(string setting)
+    {
+        static ComboOption? Next(IList<ComboOption> options, ComboOption? current) =>
+            options.Count == 0 ? current : options[(options.IndexOf(current!) + 1) % options.Count];
+
+        switch (setting)
+        {
+            case "style": SelectedFpsOverlay = Next(FpsOverlayOptions, SelectedFpsOverlay); break;
+            case "size": SelectedFpsOverlaySize = Next(FpsOverlaySizeOptions, SelectedFpsOverlaySize); break;
+            case "position": SelectedFpsOverlayPosition = Next(FpsOverlayPositionOptions, SelectedFpsOverlayPosition); break;
+            case "color": SelectedFpsOverlayColor = Next(FpsOverlayColorOptions, SelectedFpsOverlayColor); break;
+            case "card": OverlayCard = !OverlayCard; break;
+            case "single": OverlaySingleLine = !OverlaySingleLine; break;
+            default:
+                if (setting.StartsWith("item:", StringComparison.Ordinal)) ToggleOverlayItem(setting[5..]);
+                break;
+        }
+        var options = OverlayPickerOptions().ToList();
+        SessionPickerOptions.Clear();
+        foreach (var (text, value, selected) in options) SessionPickerOptions.Add(new PickerItem(text, value, selected));
+        SessionPickerFocusIndex = Math.Max(options.FindIndex(o => o.Value == setting), 0);
+        SessionPickerRefocus?.Invoke();
     }
 }

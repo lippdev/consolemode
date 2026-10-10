@@ -385,7 +385,8 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão e o cartão em Ajustes fica desabilitado.
 - [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
 - [ ] Config nova: o estilo é "Afterburner (não mexer)" e o OSD do Afterburner aparece normal na sessão.
-- [ ] Em sessão, A na linha alterna Afterburner → Desligado → Apenas FPS → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora.
+- [ ] Em sessão, A na linha "Contador de FPS" abre a lista de ajustes do contador. A em "Estilo" alterna Afterburner → Desligado → Apenas FPS → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora; a lista continua aberta com o foco na mesma linha.
+- [ ] Na lista do contador, Tamanho, Posição, Fundo em card e Cor mudam o contador na hora; com Personalizado aparecem "Tudo em uma linha" e os itens (com ✓ nos ligados), e A liga/desliga cada um. B fecha a lista e volta para a linha do contador. Os ajustes ficam salvos e aparecem iguais em Ajustes.
 - [ ] Desligado: nada na tela, nem o nosso nem o do Afterburner (no máximo um piscar rápido do Afterburner de vez em quando).
 - [ ] Compacto / Detalhado / Personalizado: só o nosso aparece; o do Afterburner fica escondido.
 - [ ] Afterburner: o nosso some e o do Afterburner volta em até 1 s.
@@ -399,7 +400,8 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 ### Card, tamanhos e dados do PC (1.6.1)
 
 - [ ] Apenas FPS / Compacto / Detalhado aparecem dentro de um card escuro, translúcido e de cantos arredondados, com uma folga em volta do texto; o card acompanha o tamanho do texto (não cobre a tela toda nem o OSD de outro programa).
-- [ ] O card fica na posição do OSD escolhida no RTSS (canto superior esquerdo, direito etc.), não num lugar fixo.
+- [ ] Posição "A do RTSS": o card fica na posição do OSD escolhida no RTSS.
+- [ ] Posição em cada um dos quatro cantos: o contador vai para aquele canto da tela, com e sem o card, e não sai da tela nos cantos da direita e de baixo.
 - [ ] "Fundo em card" desligado: o texto volta a ficar direto sobre o jogo, sem fundo.
 - [ ] Tamanho Pequeno / Médio / Grande muda o tamanho de todo o contador na hora; no Grande o texto continua nítido e as unidades (FPS, %, GHz) ficam alinhadas na base dos números.
 - [ ] Compacto: uma linha com FPS, CPU %, GPU % e RAM %; os números não fazem o texto "pular" quando mudam de 2 para 3 dígitos.
