@@ -38,6 +38,8 @@ public sealed partial class SessionMenuWindow : Window
     private Control? _lastSidebarFocus;
     private FocusNavigationDirection _lastDirection;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _closeTimer;
+    private SwitchWindowItem? _pendingCloseItem;
+    private int _pendingCloseIndex;
 
     public MainViewModel ViewModel { get; }
 
@@ -76,16 +78,34 @@ public sealed partial class SessionMenuWindow : Window
             ReadingOrderFallback = false,
             // Focus may only land inside the picker while it is open (it covers everything else); up and
             // down stay inside the panel or the grid they start in, so the end of a list is an end.
-            SearchRoot = () => ViewModel.IsSessionPickerOpen ? PickerCard
+            SearchRoot = () => CloseConfirmOverlay.Visibility == Visibility.Visible ? CloseConfirmCard
+                : ViewModel.IsSessionPickerOpen ? PickerCard
                 : _lastDirection is FocusNavigationDirection.Up or FocusNavigationDirection.Down ? RegionOfFocus() : Root,
             // Adjust mode on the volume row: Left/Right change it, Up/Down are swallowed.
             BeforeMove = direction =>
             {
                 _lastDirection = direction;
+                if (CloseConfirmOverlay.Visibility == Visibility.Visible) return false;
                 // Left from the first column of windows goes back to the row of the panel you came from.
                 if (!_editingVolume && direction == FocusNavigationDirection.Left && !ViewModel.IsSessionPickerOpen && IsOnLeftmostCard())
                 {
                     (_lastSidebarFocus ?? FirstRow).Focus(FocusState.Keyboard);
+                    UiSounds.Play(UiSound.Move);
+                    return true;
+                }
+                // Along a row of window cards: pick the neighbour by position, not by the spatial search.
+                if (!_editingVolume && direction is (FocusNavigationDirection.Left or FocusNavigationDirection.Right)
+                    && !ViewModel.IsSessionPickerOpen && MoveAcrossWindowCards(direction))
+                {
+                    UiSounds.Play(UiSound.Move);
+                    return true;
+                }
+                // Cross into the grid explicitly; spatial focus may prefer another sidebar row.
+                if (!_editingVolume && direction == FocusNavigationDirection.Right && !ViewModel.IsSessionPickerOpen
+                    && Root.XamlRoot is { } root
+                    && FocusManager.GetFocusedElement(root) is DependencyObject focused
+                    && IsInside(SidebarPanel, focused) && FocusFirstWindowCard())
+                {
                     UiSounds.Play(UiSound.Move);
                     return true;
                 }
@@ -98,11 +118,13 @@ public sealed partial class SessionMenuWindow : Window
         // X / Square: close the highlighted window, or mute on the volume row.
         _navigator.OptionRequested += () =>
         {
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible) return;
             if (!CloseFocusedWindow() && IsVolumeFocused()) ViewModel.ToggleMuteCommand.Execute(null);
         };
         _navigator.BackRequested += () =>
         {
-            if (_editingVolume) SetEditingVolume(false);
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible) CancelCloseConfirmation();
+            else if (_editingVolume) SetEditingVolume(false);
             else ViewModel.SessionMenuBack();
         };
         _navigator.Start();
@@ -111,6 +133,38 @@ public sealed partial class SessionMenuWindow : Window
         // before they ever bubble up to Root.
         Root.PreviewKeyDown += (_, e) =>
         {
+            if (CloseConfirmOverlay.Visibility == Visibility.Visible)
+            {
+                var confirmDirection = e.Key switch
+                {
+                    Windows.System.VirtualKey.Up => FocusNavigationDirection.Up,
+                    Windows.System.VirtualKey.Down => FocusNavigationDirection.Down,
+                    Windows.System.VirtualKey.Left => FocusNavigationDirection.Left,
+                    Windows.System.VirtualKey.Right => FocusNavigationDirection.Right,
+                    _ => FocusNavigationDirection.None
+                };
+                if (confirmDirection != FocusNavigationDirection.None)
+                {
+                    e.Handled = true;
+                    _navigator.Navigate(confirmDirection);
+                    return;
+                }
+                if (e.Key == Windows.System.VirtualKey.Tab)
+                {
+                    e.Handled = true;
+                    var focused = Root.XamlRoot is { } confirmRoot ? FocusManager.GetFocusedElement(confirmRoot) : null;
+                    if (ReferenceEquals(focused, CancelCloseButton)) ConfirmCloseButton.Focus(FocusState.Keyboard);
+                    else CancelCloseButton.Focus(FocusState.Keyboard);
+                    return;
+                }
+                if (e.Key is Windows.System.VirtualKey.Escape or Windows.System.VirtualKey.Back)
+                {
+                    e.Handled = true;
+                    CancelCloseConfirmation();
+                }
+                else if (e.Key == Windows.System.VirtualKey.Delete) e.Handled = true;
+                return;
+            }
             // Arrows go through the same navigator as the D-pad (aligned, then the nearest).
             var direction = e.Key switch
             {
@@ -139,6 +193,8 @@ public sealed partial class SessionMenuWindow : Window
         {
             ScaleFocused(e.OriginalSource, grow: true);
             if (e.OriginalSource is Control focused && IsInside(SidebarPanel, focused)) _lastSidebarFocus = focused;
+            if (e.OriginalSource is FrameworkElement { DataContext: SwitchWindowItem } card)
+                card.StartBringIntoView();
         };
         Root.LostFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: false);
         // Mouse clicks sound like a confirm (the pad has its own sounds in the navigator).
@@ -410,6 +466,65 @@ public sealed partial class SessionMenuWindow : Window
         return Root;
     }
 
+    /// <summary>Enter the windows grid even when spatial focus cannot reach it from the sidebar.</summary>
+    private bool FocusFirstWindowCard()
+    {
+        SwitcherList.UpdateLayout();
+        for (var i = 0; i < ViewModel.SwitcherWindows.Count; i++)
+        {
+            if (SwitcherList.ContainerFromIndex(i) is { } container
+                && FocusManager.FindFirstFocusableElement(container) is Control card
+                && card.Focus(FocusState.Keyboard))
+            {
+                card.StartBringIntoView();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Left/right between window cards by position: the card on the same row with the next X to that side.
+    /// The XY focus search can miss the neighbour (cards scaled while focused, clipped or scrolled in the
+    /// panel), which left the grid impossible to cross sideways. The end of a row is an end: Right on the last
+    /// card is consumed so the search can't jump somewhere else; Left on the first column is the caller's
+    /// (back to the side panel). False when the focus is not on a window card.
+    /// </summary>
+    private bool MoveAcrossWindowCards(FocusNavigationDirection direction)
+    {
+        if (Root.XamlRoot is not { } root
+            || FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem } current)
+            return false;
+
+        Windows.Foundation.Point Origin(FrameworkElement e) => e.TransformToVisual(SwitcherList).TransformPoint(new Windows.Foundation.Point(0, 0));
+        var from = Origin(current);
+        var rowTolerance = Math.Max(current.ActualHeight / 2, 1);
+
+        Control? best = null;
+        var bestX = 0d;
+        for (var i = 0; i < ViewModel.SwitcherWindows.Count; i++)
+        {
+            if (SwitcherList.ContainerFromIndex(i) is not { } container
+                || FocusManager.FindFirstFocusableElement(container) is not Control card
+                || ReferenceEquals(card, current))
+                continue;
+            var at = Origin(card);
+            if (Math.Abs(at.Y - from.Y) > rowTolerance) continue;
+            var dx = at.X - from.X;
+            if (direction == FocusNavigationDirection.Right ? dx <= 1 : dx >= -1) continue;
+            if (best is null || (direction == FocusNavigationDirection.Right ? at.X < bestX : at.X > bestX))
+            {
+                best = card;
+                bestX = at.X;
+            }
+        }
+
+        if (best is null) return direction == FocusNavigationDirection.Right;
+        best.Focus(FocusState.Keyboard);
+        best.StartBringIntoView();
+        return true;
+    }
+
     /// <summary>True when the focus is on a window card with no card to its left (the first column of the grid).</summary>
     private bool IsOnLeftmostCard()
     {
@@ -431,22 +546,76 @@ public sealed partial class SessionMenuWindow : Window
         if (Root.XamlRoot is not { } root) return false;
         if (FocusManager.GetFocusedElement(root) is not FrameworkElement { DataContext: SwitchWindowItem item }) return false;
         var index = ViewModel.SwitcherWindows.IndexOf(item);
-        _ = CloseAndRefocusAsync(item, index);
+        ShowCloseConfirmation(item, index);
         return true;
     }
 
-    /// <summary>The card goes away once its window closes: the focus moves to the next one (or the previous, or the first row).</summary>
+    private void ShowCloseConfirmation(SwitchWindowItem item, int index)
+    {
+        if (CloseConfirmOverlay.Visibility == Visibility.Visible) return;
+        _pendingCloseItem = item;
+        _pendingCloseIndex = index;
+        CloseConfirmProcessText.Text = item.ProcessName;
+        CloseConfirmProcessText.Visibility = item.ProcessName.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        CloseConfirmTitleText.Text = item.Title;
+        CloseConfirmIcon.Source = item.Icon;
+        CloseConfirmGlyph.Visibility = item.HasNoIcon ? Visibility.Visible : Visibility.Collapsed;
+        CloseConfirmOverlay.Visibility = Visibility.Visible;
+        CancelCloseButton.Focus(FocusState.Programmatic);
+    }
+
+    private void CancelCloseConfirmation()
+    {
+        var item = _pendingCloseItem;
+        var index = _pendingCloseIndex;
+        _pendingCloseItem = null;
+        CloseConfirmOverlay.Visibility = Visibility.Collapsed;
+        FocusSwitcherCard(item, index, FocusState.Programmatic);
+    }
+
+    private async void ConfirmCloseClick(object sender, RoutedEventArgs e)
+    {
+        var item = _pendingCloseItem;
+        var index = _pendingCloseIndex;
+        _pendingCloseItem = null;
+        CloseConfirmOverlay.Visibility = Visibility.Collapsed;
+        FocusSwitcherCard(item, index, FocusState.Programmatic);
+        if (item is not null) await CloseAndRefocusAsync(item, index);
+    }
+
+    private void CancelCloseClick(object sender, RoutedEventArgs e) => CancelCloseConfirmation();
+
+    /// <summary>Keep focus on the target while the close request is pending, then move to a neighbor if it closes.</summary>
     private async Task CloseAndRefocusAsync(SwitchWindowItem item, int index)
     {
         await ViewModel.CloseSwitcherWindowAsync(item);
-        if (ViewModel.SwitcherWindows.Contains(item)) return;   // it asked to save: the card stays, so does the focus
-        var count = ViewModel.SwitcherWindows.Count;
-        if (count == 0) { FirstRow.Focus(FocusState.Keyboard); return; }
-        var next = Math.Clamp(index, 0, count - 1);
+        FocusSwitcherCard(item, index, FocusState.Keyboard);
+    }
+
+    /// <summary>Focus the requested card if it remains; otherwise the card now occupying its old position.</summary>
+    private void FocusSwitcherCard(SwitchWindowItem? item, int oldIndex, FocusState focusState)
+    {
+        var target = item is not null && ViewModel.SwitcherWindows.Contains(item)
+            ? item
+            : ViewModel.SwitcherWindows.Count == 0 ? null
+            : ViewModel.SwitcherWindows[Math.Clamp(oldIndex, 0, ViewModel.SwitcherWindows.Count - 1)];
+        if (target is null)
+        {
+            FirstRow.Focus(focusState);
+            return;
+        }
+
+        var next = ViewModel.SwitcherWindows.IndexOf(target);
         SwitcherList.UpdateLayout();
         if (SwitcherList.ContainerFromIndex(next) is { } container
-            && FocusManager.FindFirstFocusableElement(container) is Control card)
-            card.Focus(FocusState.Keyboard);
+            && FocusManager.FindFirstFocusableElement(container) is Control card
+            && ReferenceEquals(card.DataContext, target))
+        {
+            card.Focus(focusState);
+            return;
+        }
+
+        FirstRow.Focus(focusState);
     }
 
     /// <summary>Windows won't hand a background process the foreground; this forces it (PlayStation pads need it).</summary>

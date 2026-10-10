@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Numerics;
 using Microsoft.UI.Xaml.Hosting;
 using ConsoleMode.Services;
+using ConsoleMode.Controls;
 using ConsoleMode.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,6 +26,9 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         ViewModel = App.ViewModel!;
         InitializeComponent();
+        HomeShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Home, consoleStyle: true);
+        MenuShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Menu, consoleStyle: true);
+        ExitShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Exit, consoleStyle: true);
         Loaded += OnLoaded;
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
@@ -60,20 +64,34 @@ public sealed partial class ConsoleHomeView : UserControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _navigator ??= new GamepadNavigator(DispatcherQueue, this,
-            App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0);
+            App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0,
+            readSonyHid: true);
         _navigator.SearchRoot = () =>
             ViewModel.IsControllerTestOpen ? ControllerTestPanel
+            : ViewModel.IsConsoleTutorialOpen ? ConsoleTutorialPanel
+            : ViewModel.IsShortcutEditorOpen ? ShortcutEditorPanel
             : ViewModel.IsPickerOpen ? PickerPanel
             : ViewModel.IsConsoleSettingsOpen ? SettingsPanel
             : ViewModel.IsRolePanelOpen ? RolePanel
             : Root;
         _navigator.Sounds = true;
         _navigator.BackRequested += GoBack;
+        _navigator.Intercept = action =>
+        {
+            if (!ViewModel.IsCapturingShortcut) return false;
+            return true;
+        };
         _navigator.TabRequested += StepTab;
-        _navigator.MenuRequested += () => { if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen && !ViewModel.IsPickerOpen && !ViewModel.IsUpdateOpen) ViewModel.StartCommand.Execute(null); };
+        _navigator.MenuRequested += () =>
+        {
+            if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen
+                && !ViewModel.IsPickerOpen && !ViewModel.IsShortcutEditorOpen && !ViewModel.IsConsoleTutorialOpen
+                && !ViewModel.IsControllerTestOpen && !ViewModel.IsUpdateOpen)
+                ViewModel.StartCommand.Execute(null);
+        };
         _navigator.AltRequested += () =>
         {
-            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen) return;
+            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTutorialOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen) return;
             if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
             else ViewModel.OpenFullSettingsCommand.Execute(null);
         };
@@ -127,6 +145,31 @@ public sealed partial class ConsoleHomeView : UserControl
                     else FocusDefault();
                 });
                 break;
+            case nameof(MainViewModel.IsShortcutEditorOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsShortcutEditorOpen)
+                        FocusShortcutEditorTarget();
+                    else
+                    {
+                        (HomeShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
+                        (MenuShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
+                        (ExitShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
+                        FocusShortcutEditorRow();
+                    }
+                    RefreshNavigator();
+                });
+                break;
+            case nameof(MainViewModel.IsConsoleTutorialOpen):
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (ViewModel.IsConsoleTutorialOpen) ConsoleTutorialNextButton.Focus(FocusState.Keyboard);
+                    else FocusDefault();
+                });
+                break;
+            case MainViewModel.ShortcutsProperty:
+                RefreshNavigator();
+                break;
             case nameof(MainViewModel.ConsoleTabIndex):
                 DispatcherQueue.TryEnqueue(() =>
                 {
@@ -166,6 +209,8 @@ public sealed partial class ConsoleHomeView : UserControl
         if (!ViewModel.IsConsoleUi) return;
         if (ViewModel.IsConsoleActive) { RestoreButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsUpdateOpen) { UpdateNowButton.Focus(FocusState.Keyboard); return; }
+        if (ViewModel.IsConsoleTutorialOpen) { ConsoleTutorialNextButton.Focus(FocusState.Keyboard); return; }
+        if (ViewModel.IsShortcutEditorOpen) { FocusShortcutEditorTarget(); return; }
         if (ViewModel.IsSystemTab) { FirstSettingsRow.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsSessionTab) { (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard); return; }
         if (ViewModel.CanStart) { PlayButton.Focus(FocusState.Keyboard); return; }
@@ -235,7 +280,7 @@ public sealed partial class ConsoleHomeView : UserControl
     /// <summary>LB / RB: the previous / next tab, unless a panel is open over the page.</summary>
     private void StepTab(int step)
     {
-        if (ViewModel.IsConsoleActive || ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsControllerTestOpen) return;
+        if (ViewModel.IsConsoleActive || ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTutorialOpen || ViewModel.IsControllerTestOpen) return;
         if (ViewModel.StepConsoleTab(step)) UiSounds.Play(UiSound.Move);
     }
 
@@ -243,9 +288,39 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         if (ViewModel.IsControllerTestOpen) ViewModel.CloseControllerTestCommand.Execute(null);
         else if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
+        else if (ViewModel.IsShortcutEditorOpen) ViewModel.CloseShortcutEditorCommand.Execute(null);
+        else if (ViewModel.IsConsoleTutorialOpen) ViewModel.EndTourCommand.Execute(null);
         else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
         else if (!ViewModel.IsHomeTab) ViewModel.SelectConsoleTabCommand.Execute("0");
         else if (ViewModel.IsUpdateOpen && !ViewModel.IsUpdating) ViewModel.DismissUpdateCommand.Execute(null);
+    }
+
+    private void FocusShortcutEditorTarget()
+    {
+        // Visibility changed before the dispatch callback; measure the cards before focusing their buttons.
+        ShortcutEditorPanel.UpdateLayout();
+        var picker = ViewModel.ShortcutEditorSlot switch
+        {
+            "home" => HomeShortcutPickerHost.Content as ShortcutPicker,
+            "menu" => MenuShortcutPickerHost.Content as ShortcutPicker,
+            "exit" => ExitShortcutPickerHost.Content as ShortcutPicker,
+            _ => null
+        };
+        if (picker?.FocusCaptureButton() != true)
+            (FocusManager.FindFirstFocusableElement(ShortcutEditorPanel) as Control)?.Focus(FocusState.Keyboard);
+    }
+
+    private void FocusShortcutEditorRow()
+    {
+        var row = ViewModel.ShortcutEditorSlot switch
+        {
+            "home" => HomeShortcutRow,
+            "menu" => MenuShortcutRow,
+            "exit" => ExitShortcutRow,
+            _ => FirstSettingsRow
+        };
+        if (ViewModel.IsConsoleUi && ViewModel.IsSystemTab && row.Focus(FocusState.Keyboard)) return;
+        FocusDefault();
     }
 
     private void StartClock()
@@ -311,6 +386,12 @@ public sealed partial class ConsoleHomeView : UserControl
         {
             StepTab(1);
             e.Handled = true;
+        }
+        else if (Root.XamlRoot is { } root && FocusManager.GetFocusedElement(root) is TextBox
+                 && (e.Key is VirtualKey.Left or VirtualKey.Right or VirtualKey.Up or VirtualKey.Down))
+        {
+            // Let text inputs move the caret/selection; the console menu only handles arrows elsewhere.
+            return;
         }
         else if (_navigator is not null && Arrow(e.Key) is { } direction)
         {

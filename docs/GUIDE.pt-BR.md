@@ -12,7 +12,15 @@ Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in Engl
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
-`consolemode://stop`, `ConsoleMode.exe --stop` e o atalho configuravel **Voltar ao PC** fecham o Playnite em tela cheia antes de restaurar. As acoes **Voltar ao PC** e **Sair do Console Mode** do menu da sessao, e **Restaurar setup** da bandeja, mantem o comportamento de restauracao; na previa do menu, **Voltar ao PC** apenas fecha a previa.
+## Configurações no modo Console
+
+Em **Sistema → Controle**, escolha o layout dos botões: **Automático**, **Xbox** ou **PlayStation**. A prévia e os nomes dos atalhos acompanham a escolha, que fica salva ao fechar o app. Isso muda os símbolos exibidos; as entradas do controle mantêm o mapeamento existente.
+
+A aba **Sistema** oferece os mesmos ajustes do modo PC, incluindo os atalhos do controle, Playnite, Android TV, FPS personalizado e pasta de dados. Os valores são compartilhados entre as duas interfaces e permanecem salvos ao reabrir o app.
+
+Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar**, segure a combinação desejada em um único controle e solte os botões. **Remover** desativa aquele atalho. Durante a captura, os botões não navegam pela interface; use **Cancelar** ou **Esc** para interrompê-la. Fora da captura, **B** volta do editor. Campos de endereço e FPS personalizado aceitam digitação por teclado.
+
+Ao voltar do Big Picture, **Mandar a Steam para a bandeja ao voltar ao PC** fecha a janela do cliente e mantém a Steam em execução. Com a opção desligada, o cliente desktop fica aberto. As janelas da Steam são preservadas quando há jogo rodando ou não é possível verificar esse estado.
 
 ## API de controle local
 

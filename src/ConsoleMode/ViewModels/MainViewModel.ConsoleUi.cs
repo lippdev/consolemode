@@ -11,12 +11,15 @@ namespace ConsoleMode.ViewModels;
 public partial class MainViewModel
 {
     public ObservableCollection<ComboOption> UiModeOptions { get; } = [];
+    public ObservableCollection<ComboOption> ControllerLayoutOptions { get; } = [];
 
     [ObservableProperty] private bool _isConsoleUi;
     [ObservableProperty] private ComboOption? _selectedUiMode;
     [ObservableProperty] private bool _isRolePanelOpen;
     [ObservableProperty] private MonitorRowViewModel? _rolePanelMonitor;
     [ObservableProperty] private bool _isPlayStationHints;
+    [ObservableProperty] private ComboOption? _selectedControllerLayout;
+    private ControllerFamily _detectedControllerFamily;
 
     /// <summary>Set by App when the session was requested from the controller's Home button.</summary>
     public bool LaunchedByController { get; set; }
@@ -32,11 +35,22 @@ public partial class MainViewModel
     public string HintAlt => IsPlayStationHints ? "△" : "Y";
     public string HintOption => IsPlayStationHints ? "□" : "X";
     public string HintMenu => IsPlayStationHints ? "OPTIONS" : "☰";
+    public string ControllerLayoutPreview => IsPlayStationHints ? "✕  ·  ○  ·  □  ·  △  ·  L1/R1" : "A  ·  B  ·  X  ·  Y  ·  LB/RB";
+
+    partial void OnSelectedControllerLayoutChanged(ComboOption? value)
+    {
+        if (value is null) return;
+        RefreshControllerHints();
+        SaveQuietly();
+    }
 
     partial void OnIsConsoleUiChanged(bool value)
     {
         OnPropertyChanged(nameof(IsDesktopHome));
         OnPropertyChanged(nameof(IsDesktopSettings));
+        OnPropertyChanged(nameof(IsTourMap));
+        OnPropertyChanged(nameof(IsTourRole));
+        OnPropertyChanged(nameof(IsTourPlay));
         if (value) { IsRolePanelOpen = false; IsControllerToastOpen = false; }
         else { ConsoleTabIndex = HomeTabIndex; IsPickerOpen = false; }
     }
@@ -71,6 +85,17 @@ public partial class MainViewModel
         UiModeOptions.Add(new ComboOption { Text = LocalizationService.Get("UiModeDesktop"), Value = UiModeResolver.Desktop });
         UiModeOptions.Add(new ComboOption { Text = LocalizationService.Get("UiModeConsole"), Value = UiModeResolver.Console });
         SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == current) ?? UiModeOptions[0];
+        BuildControllerLayoutOptions();
+    }
+
+    private void BuildControllerLayoutOptions()
+    {
+        var current = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout;
+        ControllerLayoutOptions.Clear();
+        ControllerLayoutOptions.Add(new ComboOption { Text = LocalizationService.Get("ControllerLayoutAuto"), Value = "auto" });
+        ControllerLayoutOptions.Add(new ComboOption { Text = LocalizationService.Get("ControllerLayoutXbox"), Value = "xbox" });
+        ControllerLayoutOptions.Add(new ComboOption { Text = LocalizationService.Get("ControllerLayoutPlaystation"), Value = "playstation" });
+        SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == current) ?? ControllerLayoutOptions[0];
     }
 
     [ObservableProperty] private bool _controllerDetected;
@@ -95,10 +120,21 @@ public partial class MainViewModel
     /// <summary>Called after the config is applied and whenever the choice changes.</summary>
     private void ResolveUi()
     {
-        var family = ControllerInput.DetectFamily();
-        IsPlayStationHints = family == ControllerFamily.PlayStation;
-        ControllerDetected = family != ControllerFamily.None;
+        _detectedControllerFamily = ControllerInput.DetectFamily();
+        RefreshControllerHints();
+        ControllerDetected = _detectedControllerFamily != ControllerFamily.None;
         IsConsoleUi = UiModeResolver.IsConsole(SelectedUiMode?.Value, ControllerDetected, LaunchedByController);
+    }
+
+    private void RefreshControllerHints()
+    {
+        IsPlayStationHints = (SelectedControllerLayout?.Value ?? "auto") switch
+        {
+            "playstation" => true,
+            "xbox" => false,
+            _ => _detectedControllerFamily == ControllerFamily.PlayStation
+        };
+        OnPropertyChanged(nameof(ControllerLayoutPreview));
     }
 
     /// <summary>
@@ -130,6 +166,10 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HdrText));
         OnPropertyChanged(nameof(VrrText));
         OnPropertyChanged(nameof(BackgroundModeText));
+        OnPropertyChanged(nameof(ConsoleTutorialTitle));
+        OnPropertyChanged(nameof(ConsoleTutorialBody));
+        OnPropertyChanged(nameof(ConsoleTutorialAction));
+        if (IsShortcutEditorOpen) ShortcutEditorTitle = ShortcutName(_shortcutEditorSlot);
     }
 
     /// <summary>"desktop" / "console": the on-screen switch, remembered as an explicit choice.</summary>
@@ -142,6 +182,32 @@ public partial class MainViewModel
     }
 
     [ObservableProperty] private bool _isConsoleSettingsOpen;
+    [ObservableProperty] private bool _isShortcutEditorOpen;
+    [ObservableProperty] private string _shortcutEditorTitle = "";
+    [ObservableProperty] private bool _isConsoleTutorialOpen;
+    private ShortcutSlot _shortcutEditorSlot;
+
+    public string ShortcutEditorSlot => _shortcutEditorSlot.ToString().ToLowerInvariant();
+    public string ConsoleTutorialTitle => LocalizationService.Get(TourStep switch
+    {
+        2 => "TourRoleTitle",
+        3 => "TourPlayTitle",
+        _ => "TourMapTitle"
+    });
+    public string ConsoleTutorialBody => TourStep switch
+    {
+        2 => LocalizationService.Get("TourRoleDescription"),
+        3 => LocalizationService.Get("TourPlayDescription"),
+        _ => TourMapText
+    };
+    public string ConsoleTutorialAction => LocalizationService.Get(TourStep >= 3 ? "GotIt" : "Next");
+
+    partial void OnTourStepChanged(int value)
+    {
+        OnPropertyChanged(nameof(ConsoleTutorialTitle));
+        OnPropertyChanged(nameof(ConsoleTutorialBody));
+        OnPropertyChanged(nameof(ConsoleTutorialAction));
+    }
 
     /// <summary>x:Bind helper for on/off rows.</summary>
     public string OnOff(bool value) => LocalizationService.Get(value ? "ToggleOn" : "ToggleOff");
@@ -195,8 +261,31 @@ public partial class MainViewModel
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
             case "betas": BetaUpdates = !BetaUpdates; break;
+            case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;
+            case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
         }
     }
+
+    [RelayCommand]
+    private void OpenShortcutEditor(string slot)
+    {
+        if (IsConsoleActive) return;
+        var target = slot switch
+        {
+            "home" => ShortcutSlot.Home,
+            "menu" => ShortcutSlot.Menu,
+            "exit" => ShortcutSlot.Exit,
+            _ => (ShortcutSlot?)null
+        };
+        if (target is null) return;
+        _shortcutEditorSlot = target.Value;
+        ShortcutEditorTitle = ShortcutName(target.Value);
+        OnPropertyChanged(nameof(ShortcutEditorSlot));
+        IsShortcutEditorOpen = true;
+    }
+
+    [RelayCommand]
+    private void CloseShortcutEditor() => IsShortcutEditorOpen = false;
 
     private static ComboOption? Next(IList<ComboOption> options, ComboOption? current, int step)
     {
@@ -222,10 +311,13 @@ public partial class MainViewModel
         {
             "launch" => (LocalizationService.Get("LaunchCard"), LaunchOptions.Select(o => (o.Text, o.Value)), SelectedLaunch?.Value),
             "audio" => (LocalizationService.Get("AudioOutputCard"), AudioOptions.Select(o => (o.Text, o.Value)), SelectedAudio?.Value),
-            "fps" => (LocalizationService.Get("FpsCard"), FpsOptions.Where(o => o.Value != FpsCustomValue.ToString()).Select(o => (o.Text, o.Value)), SelectedFps?.Value),
+            "fps" => (LocalizationService.Get("FpsCard"), FpsOptions.Select(o => (o.Text, o.Value)), SelectedFps?.Value),
             "hide" => (LocalizationService.Get("HideOtherScreensCard"), HideStrategies.Select(o => (o.Text, o.Value)), SelectedHideStrategy?.Value),
             "language" => (LocalizationService.Get("LanguageCard"), LanguageOptions.Select(o => (o.Text, o.Value)), SelectedLanguage?.Value),
             "ui" => (LocalizationService.Get("UiModeCard"), UiModeOptions.Select(o => (o.Text, o.Value)), SelectedUiMode?.Value),
+            "controllerlayout" => (LocalizationService.Get("ControllerLayoutCard"), ControllerLayoutOptions.Select(o => (o.Text, o.Value)), SelectedControllerLayout?.Value),
+            "tvprovider" => (LocalizationService.Get("TvControlCard"), TvProviders.Select(o => (o.Text, o.Value)), SelectedTvProvider?.Value),
+            "tvhdmi" => (LocalizationService.Get("TvHdmiCard"), TvHdmiInputs.Select(o => (o.Text, o.Value)), SelectedTvHdmiInput?.Value),
             "mode" when FocusRow is not null => (LocalizationService.Get("ResolutionRefreshCard"), FocusRow.Modes.Select(m => (m.Text, m.Key)), FocusRow.SelectedMode?.Key),
             _ => (null, null, null)
         };
@@ -252,6 +344,9 @@ public partial class MainViewModel
             case "hide": SelectedHideStrategy = HideStrategies.FirstOrDefault(o => o.Value == item.Value) ?? SelectedHideStrategy; break;
             case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
             case "ui": SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedUiMode; break;
+            case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
+            case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
+            case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
             case "mode":
                 if (FocusRow?.Modes.FirstOrDefault(m => m.Key == item.Value) is { } mode)
                 {

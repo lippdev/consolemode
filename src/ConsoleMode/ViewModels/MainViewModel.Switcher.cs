@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices.WindowsRuntime;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ConsoleMode.Native;
@@ -18,7 +19,10 @@ public sealed partial class SwitchWindowItem : ObservableObject
     public string ProcessName => Window.ProcessName;
 
     /// <summary>The program's icon, loaded after the card shows; the card draws a generic one until then.</summary>
-    [ObservableProperty] private ImageSource? _icon;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasNoIcon))] private ImageSource? _icon;
+
+    /// <summary>Still on the generic icon (loading, or the program has none).</summary>
+    public bool HasNoIcon => Icon is null;
 }
 
 // The "Alt + Tab" inside the session menu: the open windows, always on screen, picked with the pad.
@@ -41,21 +45,22 @@ public partial class MainViewModel
         foreach (var item in SwitcherWindows.ToList()) _ = LoadIconAsync(item);
     }
 
+    /// <summary>Asked from Windows in pixels: sharp on a 4K TV, where the card draws it at more than twice its 48.</summary>
+    private const int IconSize = 128;
+
     private static async Task LoadIconAsync(SwitchWindowItem item)
     {
-        if (item.Window.ExePath is not { } path) return;
+        var bitmap = await Task.Run(() => WindowIcons.Load(item.Window, IconSize));
+        if (bitmap is null) return;
         try
         {
-            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(path);
-            using var thumbnail = await file.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.SingleItem, 64);
-            if (thumbnail is null) return;
-            var image = new BitmapImage();
-            await image.SetSourceAsync(thumbnail);
+            var image = new WriteableBitmap(bitmap.Width, bitmap.Height);
+            using (var stream = image.PixelBuffer.AsStream()) stream.Write(bitmap.Pixels);
             item.Icon = image;
         }
-        catch
+        catch (Exception ex)
         {
-            // Protected folders (packaged apps) refuse: the generic icon stays.
+            AppLog.Write($"Janelas: ícone de \"{item.ProcessName}\": {ex.Message}");
         }
     }
 

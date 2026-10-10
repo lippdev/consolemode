@@ -177,6 +177,10 @@ public sealed class ConsoleEngine
                 AppLog.Write(rtss.Message);
         }
 
+        if (RtssOverlay.HidesOthers(config.FpsOverlay) && Rtss.IsInstalled
+            && !Rtss.ApplyOverlay(config.FpsOverlay, config.FpsOverlayLayout))
+            AppLog.Write("RTSS: o contador de FPS não pôde ser exibido");
+
         switch (config.FullscreenMode)
         {
             case "bigPicture":
@@ -282,6 +286,7 @@ public sealed class ConsoleEngine
         {
             OnUi(BlackCurtain.Close);
             Rtss.Restore(State);
+            Rtss.SetOverlay("", hideOthers: false);
             return;
         }
 
@@ -302,6 +307,7 @@ public sealed class ConsoleEngine
             }
             Audio.Restore(State.BackupAudioId);
             Rtss.Restore(State);
+            Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
             Audio.ClearCache();
             if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
@@ -349,9 +355,7 @@ public sealed class ConsoleEngine
     }
 
     /// <summary>
-    /// Going back to the PC: Big Picture is closed (it would otherwise be left on the desk monitor when the
-    /// screens come back), and Steam is asked to quit its own way, because after Big Picture it is often left
-    /// half-working. Never a kill, never when a game is running, and never a reason to fail the restore.
+    /// Going back to the PC closes Big Picture and Steam's client window to the tray; the process remains running.
     /// </summary>
     private void CloseSteamForRestore()
     {
@@ -363,7 +367,7 @@ public sealed class ConsoleEngine
             var appId = SteamSession.RunningAppId();
             var decision = SteamShutdown.Decide(State.FullscreenMode, State.CloseSteamOnRestore, SteamSession.IsRunning(), appId);
             AppLog.Write(SteamShutdown.Describe(decision, appId));
-            if (decision == SteamShutdown.Decision.Shutdown) SteamSession.RequestShutdown();
+            if (decision == SteamShutdown.Decision.CloseToTray) SteamSession.CloseWindowToTray();
         }
         catch (Exception ex)
         {
@@ -403,40 +407,7 @@ public sealed class ConsoleEngine
         foreach (var (key, mode) in config.MonitorModes)
             modes[Monitors.ResolveName(key)] = mode;
 
-        return new AppConfig
-        {
-            Version = config.Version,
-            AppLanguage = config.AppLanguage,
-            FocusMonitor = focus,
-            HideMonitors = hide,
-            HideStrategy = config.HideStrategy,
-            FullscreenMode = config.FullscreenMode,
-            PlaynitePath = config.PlaynitePath,
-            AudioDeviceId = config.AudioDeviceId,
-            AudioDeviceName = config.AudioDeviceName,
-            AudioAutoSwitch = config.AudioAutoSwitch,
-            FpsLimit = config.FpsLimit,
-            MonitorModes = modes,
-            HdrEnable = config.HdrEnable,
-            VrrEnable = config.VrrEnable,
-            UiMode = config.UiMode,
-            TourDone = config.TourDone,
-            ConfirmedSetup = config.ConfirmedSetup,
-            CheckUpdates = config.CheckUpdates,
-            BetaUpdates = config.BetaUpdates,
-            HomeShortcut = config.HomeShortcut,
-            MenuShortcut = config.MenuShortcut,
-            ExitShortcut = config.ExitShortcut,
-            ShortcutsOnboardingDone = config.ShortcutsOnboardingDone,
-            HomeButtonShortPress = config.HomeButtonShortPress,
-            CloseSteamOnRestore = config.CloseSteamOnRestore,
-            AutoStartOnController = config.AutoStartOnController,
-            InterfaceSounds = config.InterfaceSounds,
-            ConsoleBackground = config.ConsoleBackground,
-            ConsoleBackgroundImage = config.ConsoleBackgroundImage,
-            SkippedUpdateVersion = config.SkippedUpdateVersion,
-            Tv = config.Tv
-        };
+        return config.WithMonitors(focus, hide, modes);
     }
 
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)

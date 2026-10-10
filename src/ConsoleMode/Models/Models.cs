@@ -20,12 +20,18 @@ public sealed class AppConfig
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
     public int FpsLimit { get; set; }
+    /// <summary>RtssOverlay style: "external" | "off" | "compact" | "detailed" | "custom". Applied over the game during a session.</summary>
+    public string FpsOverlay { get; set; } = RtssOverlay.External;
+    public FpsOverlayLayout FpsOverlayLayout { get; set; } = new();
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }
 
     /// <summary>"auto" | "desktop" | "console": which interface to show (UiModeResolver).</summary>
     public string UiMode { get; set; } = "auto";
+
+    /// <summary>"auto" | "xbox" | "playstation": which controller symbols to show in the console UI.</summary>
+    public string ControllerLayout { get; set; } = "auto";
 
     /// <summary>The first-run tour was finished or skipped.</summary>
     public bool TourDone { get; set; }
@@ -58,7 +64,7 @@ public sealed class AppConfig
     public bool HomeButtonShortPress { get; set; }
 
     /// <summary>
-    /// Going back to the PC also quits Steam (its own Exit, never a kill), unless a game is running.
+    /// Going back to the PC closes Steam's client window to the tray, unless a game is running.
     /// Big Picture itself is always closed.
     /// </summary>
     public bool CloseSteamOnRestore { get; set; } = true;
@@ -80,6 +86,19 @@ public sealed class AppConfig
 
     /// <summary>Turning the TV on / to the PC's input when console mode starts (issue #75).</summary>
     public TvControlConfig Tv { get; set; } = new();
+
+    /// <summary>
+    /// A copy with other monitor fields and every other setting as it is here. A copy, not a field-by-field
+    /// rebuild: a setting added later is carried along without anyone having to remember it.
+    /// </summary>
+    public AppConfig WithMonitors(string focusMonitor, List<string> hideMonitors, Dictionary<string, SavedDisplayMode> monitorModes)
+    {
+        var copy = (AppConfig)MemberwiseClone();
+        copy.FocusMonitor = focusMonitor;
+        copy.HideMonitors = hideMonitors;
+        copy.MonitorModes = monitorModes;
+        return copy;
+    }
 
     [JsonIgnore]
     public string SetupKey =>

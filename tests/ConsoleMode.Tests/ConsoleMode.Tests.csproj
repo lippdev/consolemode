@@ -30,6 +30,7 @@
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/RtssOverlay.cs" Link="RtssOverlay.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
@@ -37,9 +38,10 @@
     <Compile Include="../../src/ConsoleMode/Services/UiSoundSynth.cs" Link="UiSoundSynth.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SteamArt.cs" Link="SteamArt.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AltTabRules.cs" Link="AltTabRules.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/IconPixels.cs" Link="IconPixels.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControlFsLocator.cs" Link="ControlFsLocator.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControlFsRelease.cs" Link="ControlFsRelease.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SteamShutdown.cs" Link="SteamShutdown.cs" />
-    <Compile Include="../../src/ConsoleMode/Services/RestoreWaitPolicy.cs" Link="RestoreWaitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbProtocol.cs" Link="Tv/AdbProtocol.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbShellOutput.cs" Link="Tv/AdbShellOutput.cs" />

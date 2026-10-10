@@ -26,26 +26,72 @@ public sealed class ShortcutPicker : StackPanel
         Foreground = new SolidColorBrush(Color.FromArgb(255, 232, 88, 88)),
         Visibility = Visibility.Collapsed
     };
+    private readonly TextBlock _captureHint = new()
+    {
+        TextWrapping = TextWrapping.Wrap,
+        MaxWidth = 460,
+        Opacity = 0.7,
+        Visibility = Visibility.Collapsed
+    };
     private readonly Button _set = new();
     private readonly Button _clear = new();
     private readonly DispatcherQueueTimer _timer;
     private ShortcutCapture? _capture;
 
     /// <param name="stacked">In the setup dialog: left-aligned under the text instead of a right-hand column.</param>
-    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool stacked = false)
+    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool stacked = false, bool consoleStyle = false)
     {
         _vm = vm;
         _slot = slot;
         Spacing = 4;
-        var side = stacked ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        HorizontalAlignment = side;
+        var side = stacked || consoleStyle ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        HorizontalAlignment = consoleStyle ? HorizontalAlignment.Stretch : side;
 
-        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = side };
-        row.Children.Add(_value);
-        row.Children.Add(_set);
-        row.Children.Add(_clear);
-        Children.Add(row);
+        if (consoleStyle)
+        {
+            _value.FontSize = 23;
+            _value.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+            _value.TextAlignment = TextAlignment.Center;
+            _value.TextWrapping = TextWrapping.Wrap;
+            _value.MinWidth = 0;
+            var badge = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(42, 255, 255, 255)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(70, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(12, 10, 12, 10),
+                Child = _value
+            };
+            Children.Add(badge);
+            _set.Style = Application.Current.Resources["ConsoleSmallButton"] as Style;
+            _clear.Style = Application.Current.Resources["ConsoleSmallButton"] as Style;
+            _set.Height = 52;
+            _clear.Height = 52;
+            _set.FontSize = 18;
+            _clear.FontSize = 18;
+            _set.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _clear.HorizontalAlignment = HorizontalAlignment.Stretch;
+            Children.Add(_set);
+            Children.Add(_clear);
+        }
+        else
+        {
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = side };
+            row.Children.Add(_value);
+            row.Children.Add(_set);
+            row.Children.Add(_clear);
+            Children.Add(row);
+        }
+        Children.Add(_captureHint);
         Children.Add(_error);
+        _captureHint.MaxWidth = consoleStyle ? 280 : 460;
+        _error.MaxWidth = consoleStyle ? 280 : 460;
+        if (consoleStyle)
+        {
+            _captureHint.FontSize = 18;
+            _error.FontSize = 18;
+        }
 
         _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(40);
@@ -77,6 +123,8 @@ public sealed class ShortcutPicker : StackPanel
         _clear.Content = LocalizationService.Get("ShortcutClear");
         _clear.Visibility = isSet && _capture is null ? Visibility.Visible : Visibility.Collapsed;
         _value.Opacity = isSet || _capture is not null ? 1 : 0.6;
+        _captureHint.Text = LocalizationService.Get("ShortcutCaptureHint", _vm.HintBack);
+        _captureHint.Visibility = _capture is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void StartCapture()
@@ -100,6 +148,12 @@ public sealed class ShortcutPicker : StackPanel
         Refresh();
     }
 
+    /// <summary>Stops the active capture when its containing console overlay is dismissed.</summary>
+    public void CancelCapture() => StopCapture();
+
+    /// <summary>Moves controller focus to this shortcut's Set/Change/Cancel action.</summary>
+    public bool FocusCaptureButton() => _set.Focus(FocusState.Keyboard);
+
     private void Poll()
     {
         if (_capture is null) return;
@@ -110,6 +164,9 @@ public sealed class ShortcutPicker : StackPanel
         if (captured is not { } mask) return;
 
         StopCapture();
+        // A lone B/Circle is never a valid shortcut, so use its release to cancel capture.
+        // Combinations containing B still reach TrySetShortcut unchanged.
+        if (mask == ControllerShortcuts.B) return;
         var error = _vm.TrySetShortcut(_slot, mask);
         _error.Text = error ?? "";
         _error.Visibility = error is null ? Visibility.Collapsed : Visibility.Visible;

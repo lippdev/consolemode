@@ -162,7 +162,11 @@ internal static class NativeDisplays
     public static int QueueMode(string gdiName, int width, int height, int frequency, int bitsPerPixel, int? x, int? y, int orientation = -1)
     {
         var dm = new NativeWindows.DEVMODE { dmSize = (short)Marshal.SizeOf<NativeWindows.DEVMODE>() };
-        if (!NativeWindows.EnumDisplaySettings(gdiName, NativeWindows.ENUM_CURRENT_SETTINGS, ref dm)) return -1;
+        if (!NativeWindows.EnumDisplaySettings(gdiName, NativeWindows.ENUM_CURRENT_SETTINGS, ref dm))
+        {
+            AppLog.Write($"Telas: {gdiName} sem modo atual; posição e modo não aplicados");
+            return -1;
+        }
         dm.dmFields = 0;
         if (width > 0 && height > 0)
         {

@@ -24,6 +24,9 @@
                     <SolidColorBrush x:Key="MenuRule" Color="#26FFFFFF"/>
                     <SolidColorBrush x:Key="MenuVeil" Color="#99070A0E"/>
                     <SolidColorBrush x:Key="MenuPickerVeil" Color="#F2070A0E"/>
+                    <SolidColorBrush x:Key="MenuDialogFill" Color="#FF171F29"/>
+                    <SolidColorBrush x:Key="MenuDanger" Color="#FFC42B1C"/>
+                    <SolidColorBrush x:Key="MenuOnDanger" Color="#FFFFFFFF"/>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="MenuIconFill" Color="{ThemeResource SystemColorButtonFaceColor}"/>
@@ -32,6 +35,9 @@
                     <SolidColorBrush x:Key="MenuRule" Color="{ThemeResource SystemColorWindowTextColor}"/>
                     <SolidColorBrush x:Key="MenuVeil" Color="{ThemeResource SystemColorWindowColor}"/>
                     <SolidColorBrush x:Key="MenuPickerVeil" Color="{ThemeResource SystemColorWindowColor}"/>
+                    <SolidColorBrush x:Key="MenuDialogFill" Color="{ThemeResource SystemColorWindowColor}"/>
+                    <SolidColorBrush x:Key="MenuDanger" Color="{ThemeResource SystemColorHighlightColor}"/>
+                    <SolidColorBrush x:Key="MenuOnDanger" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <Style x:Key="RowLabel" TargetType="TextBlock">
@@ -63,6 +69,9 @@
                 <Setter Property="FocusVisualPrimaryThickness" Value="2"/>
             </Style>
             <Style x:Key="WindowCard" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <!-- Every card fills its cell: a Button otherwise shrinks to its text, and short titles made smaller cards. -->
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="FocusVisualMargin" Value="0"/>
                 <Setter Property="FocusVisualPrimaryThickness" Value="2"/>
@@ -142,10 +151,17 @@
                     </Button.Background>
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE8B7;" FontSize="19"/></Border>
+                        <Border Width="72" Height="48" CornerRadius="8">
+                            <Image Source="{x:Bind ViewModel.ControlFsLogo}" Stretch="Uniform"/>
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                             <TextBlock Style="{StaticResource TileValue}" FontSize="18" Text="{x:Bind ViewModel.Texts.ControlFsCard, Mode=OneWay}"/>
                             <TextBlock Style="{StaticResource TileLabel}" FontSize="14" Text="{x:Bind ViewModel.ControlFsRowText, Mode=OneWay}"/>
+                            <!-- Installing from this row: the download fills the bar, the setup leaves it running. -->
+                            <ProgressBar Minimum="0" Maximum="100" Height="4" CornerRadius="2" Margin="0,3,0,0"
+                                         Value="{x:Bind ViewModel.ControlFsProgress, Mode=OneWay}"
+                                         IsIndeterminate="{x:Bind ViewModel.ControlFsSetupRunning, Mode=OneWay}"
+                                         Visibility="{x:Bind ViewModel.ControlFsInstalling, Mode=OneWay}"/>
                         </StackPanel>
                     </Grid>
                 </Button>
@@ -221,6 +237,18 @@
                             </Grid>
                         </Button>
 
+                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CycleFpsOverlayCommand}"
+                                Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE9D9;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionOverlayText, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
                         <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -229,15 +257,6 @@
                                     <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
                                     <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.SessionHdrOn), Mode=OneWay}"/>
                                 </StackPanel>
-                            </Grid>
-                        </Button>
-
-                        <Button Style="{StaticResource SideRow}" IsEnabled="False">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE714;" FontSize="19"/></Border>
-                                <TextBlock Grid.Column="1" Style="{StaticResource TileValue}" FontSize="16" VerticalAlignment="Center"
-                                           Text="{x:Bind ViewModel.RecordRowText, Mode=OneWay}"/>
                             </Grid>
                         </Button>
 
@@ -277,21 +296,25 @@
                         <ItemsControl.ItemsPanel><ItemsPanelTemplate><controls:WrapPanel Spacing="16"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:SwitchWindowItem">
-                                <Button Tag="card" Style="{StaticResource WindowCard}" Width="250" Height="178" Padding="18,16"
-                                        Command="{Binding ViewModel.SwitchToWindowCommand, ElementName=Page}" CommandParameter="{x:Bind}">
+                                <Grid Width="250" Height="178">
+                                  <Button Tag="card" Style="{StaticResource WindowCard}" Padding="18,16"
+                                          Command="{Binding ViewModel.SwitchToWindowCommand, ElementName=Page}" CommandParameter="{x:Bind}">
                                     <Grid>
                                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                                        <!-- The program's own icon; the generic one in a circle only while there is none. -->
                                         <Grid Width="52" Height="52" HorizontalAlignment="Left">
-                                            <Border CornerRadius="26" Background="{ThemeResource MenuIconFill}"/>
-                                            <FontIcon Glyph="&#xE737;" FontSize="22"/>
-                                            <Image Source="{x:Bind Icon, Mode=OneWay}" Width="34" Height="34" Stretch="Uniform"/>
+                                            <Border CornerRadius="26" Background="{ThemeResource MenuIconFill}" Visibility="{x:Bind HasNoIcon, Mode=OneWay}">
+                                                <FontIcon Glyph="&#xE737;" FontSize="22"/>
+                                            </Border>
+                                            <Image Source="{x:Bind Icon, Mode=OneWay}" Width="48" Height="48" Stretch="Uniform"/>
                                         </Grid>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
                                             <TextBlock Text="{x:Bind ProcessName}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}" TextTrimming="CharacterEllipsis" MaxLines="1"/>
                                             <TextBlock Text="{x:Bind Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </Grid>
-                                </Button>
+                                  </Button>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -341,6 +364,51 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- Confirm closing a window; the cancel action is focused by default. -->
+        <Grid x:Name="CloseConfirmOverlay" Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="Collapsed"
+              Background="{ThemeResource MenuPickerVeil}" IsTabStop="False">
+            <Grid x:Name="CloseConfirmCard" Width="600" HorizontalAlignment="Center" VerticalAlignment="Center" RowSpacing="24" Padding="32,30,32,28"
+                  CornerRadius="24" Background="{ThemeResource MenuDialogFill}" BorderBrush="{ThemeResource MenuRule}" BorderThickness="1"
+                  XYFocusKeyboardNavigation="Enabled">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseConfirmTitle, Mode=OneWay}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseConfirmBody, Mode=OneWay}" FontSize="17"
+                               Foreground="{ThemeResource MenuTextSecondary}" TextWrapping="Wrap"/>
+                </StackPanel>
+                <!-- The window in question, drawn like its card so it is recognised at a glance. -->
+                <Grid Grid.Row="1" ColumnSpacing="16" Padding="18,16" CornerRadius="16" Background="{ThemeResource MenuIconFill}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid Width="52" Height="52" VerticalAlignment="Center">
+                        <Border x:Name="CloseConfirmGlyph" CornerRadius="26" Background="{ThemeResource MenuIconFill}">
+                            <FontIcon Glyph="&#xE737;" FontSize="22"/>
+                        </Border>
+                        <Image x:Name="CloseConfirmIcon" Width="48" Height="48" Stretch="Uniform"/>
+                    </Grid>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="CloseConfirmProcessText" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                        <TextBlock x:Name="CloseConfirmTitleText" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Button x:Name="CancelCloseButton" Style="{StaticResource SideRow}" Height="64" Click="CancelCloseClick"
+                            AutomationProperties.Name="{x:Bind ViewModel.Texts.ShortcutCancel, Mode=OneWay}">
+                        <TextBlock Style="{StaticResource RowLabel}" FontSize="19" HorizontalAlignment="Center"
+                                   Text="{x:Bind ViewModel.Texts.ShortcutCancel, Mode=OneWay}"/>
+                    </Button>
+                    <Button x:Name="ConfirmCloseButton" Grid.Column="1" Style="{StaticResource SideRow}" Height="64" Click="ConfirmCloseClick"
+                            Background="{ThemeResource MenuDanger}" Foreground="{ThemeResource MenuOnDanger}"
+                            AutomationProperties.Name="{x:Bind ViewModel.Texts.SwitcherCloseConfirmAction, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                            <FontIcon Glyph="&#xE8BB;" FontSize="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Texts.SwitcherCloseConfirmAction, Mode=OneWay}" FontSize="19" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
             </Grid>
         </Grid>
 

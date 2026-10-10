@@ -1,17 +1,30 @@
 namespace ConsoleMode.Services;
 
 /// <summary>
-/// The rule for closing Steam when the user goes back to the PC, kept pure so it is tested: Steam is
-/// asked to quit (its own "Exit", never a kill) only when Big Picture was the launcher, the setting is
-/// on, Steam is actually running and no game is running. A running game means the user may be in the
-/// middle of it, so Steam stays.
+/// Steam's client window is closed to the tray only when Big Picture was the launcher and the setting is enabled.
 /// </summary>
 public static class SteamShutdown
 {
+    /// <summary>
+    /// Steam's own processes. Only their windows may be asked to close: a game is an SDL_app in full
+    /// screen just like Big Picture, and it must never get the WM_CLOSE meant for Steam.
+    /// </summary>
+    public static bool IsSteamProcess(string? processName) =>
+        string.Equals(processName, "steam", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(processName, "steamwebhelper", StringComparison.OrdinalIgnoreCase);
+
+    public static bool IsClientWindowCandidate(string processName, string title, string className, bool visible, bool hasOwner) =>
+        visible && !hasOwner &&
+        IsSteamProcess(processName) &&
+        string.Equals(title.Trim(), "Steam", StringComparison.OrdinalIgnoreCase) &&
+        (string.Equals(className, "Chrome_WidgetWin_1", StringComparison.Ordinal) ||
+         string.Equals(className, "vguiPopupWindow", StringComparison.Ordinal) ||
+         string.Equals(className, "SDL_app", StringComparison.Ordinal));
+
     public enum Decision
     {
-        /// <summary>Ask Steam to exit.</summary>
-        Shutdown,
+        /// <summary>Close the Steam client window to the tray.</summary>
+        CloseToTray,
         /// <summary>The launcher is not Big Picture: Steam was never ours to close.</summary>
         NotBigPicture,
         /// <summary>Turned off in Settings.</summary>
@@ -31,13 +44,13 @@ public static class SteamShutdown
         if (!steamRunning) return Decision.NotRunning;
         if (runningAppId is null) return Decision.GameStateUnknown;
         if (runningAppId > 0) return Decision.GameRunning;
-        return Decision.Shutdown;
+        return Decision.CloseToTray;
     }
 
     /// <summary>The line for the log.</summary>
     public static string Describe(Decision decision, int? runningAppId) => decision switch
     {
-        Decision.Shutdown => "Steam: pedindo para fechar (sair normal)",
+        Decision.CloseToTray => "Steam: fechando a janela para a bandeja",
         Decision.SettingOff => "Steam: mantida aberta (desligado nos ajustes)",
         Decision.NotRunning => "Steam: não estava aberta",
         Decision.GameRunning => $"Steam: mantida aberta (jogo em execução, id {runningAppId})",

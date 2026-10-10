@@ -34,7 +34,6 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private CancellationTokenSource? _loopCts;
     private volatile bool _busy;
-    private bool _restoreRequestActive;
     private bool _applying;
 
     /// <summary>Last config read from disk; monitor fields survive a failed monitor listing.</summary>
@@ -192,6 +191,7 @@ public partial class MainViewModel : ObservableObject
                     LanguageOptions.Add(new ComboOption { Text = language.NativeName, Value = language.Code });
             }
 
+            BuildFpsOverlayOptions();
             BuildAudioOptions(audioValue);
             BuildUiModeOptions();
             BuildTvOptions();
@@ -316,6 +316,9 @@ public partial class MainViewModel : ObservableObject
             CloseSteamOnRestore = config.CloseSteamOnRestore;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
+            SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
+
+            LoadFpsOverlay(config);
 
             if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
             {
@@ -736,9 +739,9 @@ public partial class MainViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsTourMap), nameof(IsTourRole), nameof(IsTourPlay))]
     private int _tourStep;
 
-    public bool IsTourMap => TourStep == 1;
-    public bool IsTourRole => TourStep == 2;
-    public bool IsTourPlay => TourStep == 3;
+    public bool IsTourMap => !IsConsoleUi && TourStep == 1;
+    public bool IsTourRole => !IsConsoleUi && TourStep == 2;
+    public bool IsTourPlay => !IsConsoleUi && TourStep == 3;
 
     public string TourMapText => FocusRow is null
         ? LocalizationService.Get("TourMapGeneric")
@@ -748,6 +751,16 @@ public partial class MainViewModel : ObservableObject
     private void StartTour()
     {
         if (!HasMonitors || IsConsoleActive) return;
+        if (IsConsoleUi)
+        {
+            ConsoleTabIndex = HomeTabIndex;
+            IsConsoleTutorialOpen = true;
+            IsStatusOpen = false;
+            SelectedMonitor = FocusRow ?? SelectedMonitor;
+            OnPropertyChanged(nameof(TourMapText));
+            TourStep = 1;
+            return;
+        }
         ShowPage(settings: false);
         IsStatusOpen = false;
         SelectedMonitor = FocusRow ?? SelectedMonitor;
@@ -772,6 +785,7 @@ public partial class MainViewModel : ObservableObject
     private void EndTour()
     {
         TourStep = 0;
+        IsConsoleTutorialOpen = false;
         if (!_loadedConfig.TourDone)
         {
             var config = BuildConfig();
@@ -781,69 +795,33 @@ public partial class MainViewModel : ObservableObject
         RequestShortcutOnboarding();
     }
 
-    /// <summary>
-    /// Leave console mode on request from outside the session (consolemode://stop, the
-    /// controller exit chord): quit Big Picture / Playnite first — the loop then restores the
-    /// desk on its own, as when the user exits it — and restore explicitly if still active.
-    /// The tray's Restore keeps restoring only.
-    /// </summary>
-    public async Task StopConsoleAsync()
-    {
-        if (!IsConsoleActive) return;
-        var mode = Engine.State.FullscreenMode;
-        var closed = await Task.Run(() => Engine.Launch.CloseFrontEnd(mode, Engine.State));
-        AppLog.Write($"Stop-ConsoleMode: {mode} {(closed ? "fechado" : "ainda aberto")}");
-        if (!await WaitForRestoreToFinishAsync()) return;
-        if (IsConsoleActive) await RestoreNowAsync();
-    }
-
-    private async Task<bool> WaitForRestoreToFinishAsync()
-    {
-        var timer = Stopwatch.StartNew();
-        while (RestoreWaitPolicy.ShouldWait(Engine.State.RestoreInProgress, timer.Elapsed))
-            await Task.Delay(RestoreWaitPolicy.PollInterval);
-
-        if (!Engine.State.RestoreInProgress) return true;
-        AppLog.Write("Stop-ConsoleMode: restauração anterior ainda em andamento após 30 segundos; nova restauração adiada");
-        return false;
-    }
-
     [RelayCommand]
     public async Task RestoreNowAsync()
     {
-        if (_busy || _restoreRequestActive) return;
-        _restoreRequestActive = true;
+        if (_busy && !Engine.State.IsActive) return;
+        StopLoop();
+        _busy = true;
+        IsRestoring = true;
         try
         {
-            if (!await WaitForRestoreToFinishAsync()) return;
-            StopLoop();
-            _busy = true;
-            IsRestoring = true;
-            try
-            {
-                await Task.Run(() => Engine.Stop());
-                IsConsoleActive = false;
-                SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Write($"Restore: {ex}");
-                SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
-            }
-            finally
-            {
-                IsRestoring = false;
-                _busy = false;
-            }
-
-            // Screens were renumbered/re-enabled; refresh names and resolutions.
-            Engine.Monitors.ClearCache();
-            await ReloadAsync();
+            await Task.Run(() => Engine.Stop());
+            IsConsoleActive = false;
+            SetStatus(LocalizationService.Get("RestoreSuccess"), InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Restore: {ex}");
+            SetStatus(LocalizationService.Get("RestoreFailure", ex.Message), InfoBarSeverity.Error);
         }
         finally
         {
-            _restoreRequestActive = false;
+            IsRestoring = false;
+            _busy = false;
         }
+
+        // Screens were renumbered/re-enabled; refresh names and resolutions.
+        Engine.Monitors.ClearCache();
+        await ReloadAsync();
     }
 
     public bool TryCloseToTray() => IsConsoleActive;
@@ -931,6 +909,8 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
             FpsLimit = ReadFpsLimit(),
+            FpsOverlay = FpsOverlayStyle,
+            FpsOverlayLayout = ReadFpsOverlayLayout(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             TourDone = _loadedConfig.TourDone,
@@ -948,6 +928,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
+            ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,
             Tv = BuildTvConfig()
         };

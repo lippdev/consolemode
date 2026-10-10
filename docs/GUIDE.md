@@ -12,7 +12,15 @@ Details that don't fit in the [README](../README.md). 🇧🇷 [Guia em portugu�
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-`consolemode://stop`, `ConsoleMode.exe --stop` and the configured **Back to PC** controller shortcut close Playnite fullscreen before restoring. The session menu's **Back to the PC** and **Exit Console Mode** actions, and the tray's **Restore setup**, keep their restore behavior; in the menu preview, **Back to the PC** only closes the preview.
+## Settings in Console mode
+
+In **System → Controller**, choose the button layout: **Automatic**, **Xbox** or **PlayStation**. The preview and shortcut labels follow the choice, which is saved when you close the app. This changes the displayed symbols; the controller's inputs keep their existing mapping.
+
+The **System** tab provides the same settings as desktop mode, including controller shortcuts, Playnite, Android TV, custom FPS and the data folder. Both interfaces share the saved values, which remain after restarting the app.
+
+Open the shortcut action you want to configure, choose **Set** or **Change**, hold the desired combination on one controller and release the buttons. **Remove** disables that shortcut. During capture, controller buttons do not navigate the interface; use **Cancel** or **Esc** to stop capture. Outside capture, **B** leaves the editor. Address and custom FPS fields accept keyboard input.
+
+When returning from Big Picture, **Send Steam to the tray when going back to the PC** closes the client window while keeping Steam running. With the option off, the desktop client is left open. Steam windows are left alone when a game is running or its state cannot be checked.
 
 ## Local control API
 

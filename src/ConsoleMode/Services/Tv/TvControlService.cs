@@ -25,6 +25,7 @@ public sealed class TvControlService
     /// <summary>Enough for a TV waking from deep standby (Wake-on-LAN) to answer.</summary>
     private static readonly TimeSpan StartTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(90);
 
     /// <summary>Settings → Test: time to press "Allow" on the TV the first time.</summary>
     public static readonly TimeSpan PairingTimeout = TimeSpan.FromSeconds(60);
@@ -40,7 +41,16 @@ public sealed class TvControlService
     {
         var controller = Create(config.Provider) ?? throw new TvControlException(LocalizationService.Get("TvNotConfigured"));
         AppLog.Write($"TV: teste ({config.Provider})");
-        await controller.TurnOnAsync(config, PairingTimeout, ct);
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeoutCts.CancelAfter(TestTimeout);
+        try
+        {
+            await controller.TurnOnAsync(config, PairingTimeout, timeoutCts.Token);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            throw new TvControlException(LocalizationService.Get("TvTestTimedOut"));
+        }
     }
 
     /// <summary>Called by the engine on its worker thread; never throws.</summary>

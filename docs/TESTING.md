@@ -125,6 +125,9 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] A linha/card em foco ganha contorno branco e cresce um pouco; há som ao mover, confirmar e voltar. Resultado: ______
 - [ ] Direcional entre o painel lateral e o grid de janelas (esquerda/direita) e dentro de cada um (cima/baixo) nunca fica "morto"; com o seletor (resolução, áudio, FPS) aberto o foco não escapa para trás. Resultado: ______
 - [ ] **Janelas**: lista as janelas abertas (ícone, programa e título) em ordem de frente para trás. A traz a escolhida para a frente (restaura se estiver minimizada) e fecha o menu; X (□ no PlayStation) ou Delete pede para a janela fechar e o card some quando ela fecha; uma que pergunta "salvar?" mantém o card. Resultado: ______
+- [ ] **Confirmação ao fechar janela**: pelo X do controle, Delete e botão de fechar no cartão, aparece um modal com o título correto; Cancelar ou B mantém a janela aberta e devolve o foco ao cartão; confirmar fecha só a janela selecionada. Enquanto o modal está aberto, direcional, A, X e B não acionam opções atrás dele. Resultado: ______
+- [ ] **Cartões das janelas**: todos os cartões têm o mesmo tamanho, com título curto ou de duas linhas. Cada um mostra o ícone do próprio programa, nítido e do mesmo tamanho: um programa comum (Bloco de Notas, navegador), a Steam, uma pasta do Explorador e um app da Microsoft Store (Calculadora, Configurações). Só um programa sem ícone fica com o ícone genérico no círculo. Resultado: ______
+- [ ] **Visual da confirmação**: o modal é um cartão centralizado com cantos arredondados, o ícone, o programa e o título da janela escolhida, "Cancelar" (em foco ao abrir) e "Fechar janela" em vermelho, lado a lado e da mesma largura; título longo quebra em até 2 linhas sem estourar o cartão. Resultado: ______
 - [ ] **Falha ao ativar uma janela**: abra o menu com o Bloco de Notas aberto, feche o Bloco de Notas por outro meio depois de a lista carregar (por exemplo, `taskkill /IM notepad.exe /F`) e escolha o card obsoleto com A. O menu continua aberto, o foco permanece no card e o log mostra `Janelas: trocar ... => não conseguiu`; uma falha do Windows ao trazer uma janela válida para frente também deve manter o menu aberto. Resultado: ______
 - [ ] A lista não mostra o próprio menu, a barra de tarefas, a área de trabalho nem apps UWP suspensos; sem janelas mostra "Nenhuma janela aberta". Resultado: ______
 - [ ] Em sessão (Big Picture/Playnite aberto): trocar para outra janela **não** restaura a mesa, e voltar ao Big Picture pelo grid funciona; uma janela aberta na tela de jogo aparece na lista. Resultado: ______
@@ -156,7 +159,7 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 
 ## 1d. Explorador de arquivos (ControlFS) no menu da sessão
 
-Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS).
+Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS), exceto nos itens de instalação pelo menu.
 
 - [ ] Select + Y: no topo da lateral esquerda, fora da lista que rola, há o painel "Explorador de arquivos (ControlFS)"; o restante das opções rola por baixo dele. Resultado: ______
 - [ ] Direcional para cima a partir de "Voltar ao jogo" chega nele; A abre o ControlFS em tela cheia na TV, por cima do jogo/Big Picture, e o menu fecha. Resultado: ______
@@ -167,7 +170,11 @@ Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS)
 - [ ] Com o ControlFS já aberto: A só o traz para a frente (não abre uma segunda instância). Resultado: ______
 - [ ] A sessão **não** termina nem restaura a mesa enquanto o ControlFS está na frente; ao sair dele (Menu do ControlFS → Sair) volta-se ao jogo. Resultado: ______
 - [ ] Select + Y com o ControlFS na frente abre o menu por cima dele (saída de emergência). Resultado: ______
-- [ ] Sem o ControlFS instalado: a linha diz "Não instalado · aperte para baixar" e A abre a página de releases no navegador. Resultado: ______
+- [ ] **Instalar pelo menu** (desinstale o ControlFS antes): a linha diz "Não instalado · aperte para baixar e instalar". A começa o download: a linha mostra "Baixando… N%" com a barra enchendo, depois "Instalando…" com a barra em movimento, sem nenhuma janela de instalador nem pedido de administrador. Ao terminar, o menu continua aberto na frente e a linha diz "Instalado · aperte para abrir"; o ControlFS **não** abre sozinho. O A seguinte abre o ControlFS em tela cheia na tela da sessão, já na frente. Resultado: ______
+- [ ] Durante o download o menu continua respondendo (direcional, volume); apertar A de novo na linha não começa um segundo download. Resultado: ______
+- [ ] Fechar o menu durante a instalação: ela termina em segundo plano e o ControlFS **não** abre por cima do jogo; ao reabrir o menu a linha já diz "Navegue pelos seus arquivos com o controle". Resultado: ______
+- [ ] Sem internet (cabo/Wi-Fi desligado): A na linha mostra "Não deu para instalar · aperte para abrir a página de download" e o log registra `ControlFS: instalar: ...`; o A seguinte abre a página de releases no navegador. Reabrindo o menu, a linha volta a oferecer a instalação. Resultado: ______
+- [ ] Depois de instalado pelo menu, o ControlFS aparece em Configurações → Aplicativos instalados e nenhum `ControlFS-Setup-x64.exe` sobra em `%TEMP%ConsoleModeUpdate`. Resultado: ______
 - [ ] Fora da sessão (prévia do menu) o painel funciona igual. Resultado: ______
 
 ## 2. Links `consolemode://`
@@ -223,19 +230,21 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Um controle HID que manda leitura impossível (ex.: Switch Pro pelo driver genérico, com 6 ou mais botões "apertados" sozinhos) é ignorado mesmo quando também aparece em Windows.Gaming.Input: o app não navega nem inicia a sessão sozinho, e o log mostra `Controles: … ignorado: leitura inválida`. Reabrir o app tenta de novo. Resultado: ______
 - [ ] Com um controle HID defeituoso e outro controle normal conectados, o defeituoso não gera ações pelo HID nem pela projeção Windows.Gaming.Input, e o controle normal continua navegando. Resultado: ______
 
-## 3c. Fechar a Steam ao voltar ao PC
+## 3c. Mandar a Steam para a bandeja ao voltar ao PC
 
-Pré-condições: lançador = Steam Big Picture; Ajustes → "Fechar a Steam ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
+Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam para a bandeja ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
 
-- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha** e some da mesa, e a **Steam fecha sozinha** em alguns segundos (o ícone sai da bandeja, sem janela de erro). Resultado: ______
-- [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam também fecha. Resultado: ______
-- [ ] A Steam **não é encerrada à força**: no Gerenciador de Tarefas ela some sem o aviso "o programa não está respondendo", e o log mostra `Steam: pedindo para fechar (sair normal)`. Resultado: ______
+- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha**, a janela principal some e a **Steam continua em execução na bandeja**. Resultado: ______
+- [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam permanece na bandeja. Resultado: ______
+- [ ] O processo da Steam continua no Gerenciador de Tarefas; clicar no ícone da bandeja reabre o cliente sem login nem reinício. Resultado: ______
 - [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
+- [ ] Com um **jogo SDL em tela cheia sem bordas** aberto (ex.: CS2, Dota 2, Half-Life: Alyx ou um indie feito com SDL) e não salvo: voltar ao PC **não fecha o jogo**; o Big Picture fecha e, se o jogo passou por Big Picture na detecção, o log mostra `Fechar Big Picture: janela em tela cheia não é da Steam, mantida aberta`. Resultado: ______
 - [ ] Com o ajuste **desligado**: o Big Picture fecha, a Steam fica aberta (`Steam: mantida aberta (desligado nos ajustes)`). Resultado: ______
 - [ ] Desligar o ajuste, fechar e reabrir o Console Mode e iniciar uma sessão Big Picture: a preferência continua desligada e a Steam fica aberta. Resultado: ______
 - [ ] Com o Steam aberto e o estado do jogo indisponível no Registro (valor `RunningAppID` ausente ou ilegível): a Steam fica aberta e o log informa que não foi possível verificar se há jogo em execução. Resultado: ______
 - [ ] Steam **já fechada** antes de voltar: nada é aberto nem pedido (`Steam: não estava aberta`); a Steam não é iniciada de novo por engano. Resultado: ______
 - [ ] Lançador Playnite ou Modo Xbox: a Steam não é tocada. Resultado: ______
+- [ ] Janelas de jogo, chat/popups da Steam e outros aplicativos não recebem o pedido de fechamento da janela principal. Resultado: ______
 - [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
 
 ## 3c. Controle da TV: Google TV / Android TV (issue #75)
@@ -246,6 +255,7 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] **Testar agora** de novo: não pede mais permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
 - [ ] Recusar o pedido na TV (ou esperar 60 s): o status explica que a TV não autorizou este PC. Resultado: ______
 - [ ] IP errado / TV fora da rede: o status diz que a TV não respondeu, em poucos segundos. Resultado: ______
+- [ ] TV acessível pela rede, mas sem responder ao teste ADB: o status informa o limite de 90 s e o botão **Testar agora** volta a ficar disponível. Resultado: ______
 - [ ] **Jogar agora** com a TV em espera: ela liga, troca para o PC e o modo console segue normal. O log tem `TV: ligar (androidTv) ok`. Resultado: ______
 - [ ] Com a TV desligada da tomada: o modo console não trava; o log tem `TV: ligar ... falhou` e o fluxo segue (a TV não aparece, o app avisa como antes). Resultado: ______
 - [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
@@ -255,13 +265,17 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
 - [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
 
-Pre-condicoes para Playnite: iniciador = Playnite tela cheia; sessao ativa na TV; atalho configuravel **Voltar ao PC** definido.
+## 3d. Configurações no modo Console
 
-- [ ] `start consolemode://stop` e `ConsoleMode.exe --stop` com o app aberto: o Playnite fecha antes de a mesa voltar; o app fica na bandeja. Resultado: ______
-- [ ] Atalho configuravel **Voltar ao PC** durante Playnite: fecha o Playnite antes de restaurar. Resultado: ______
-- [ ] Fechar o Playnite por conta propria continua restaurando automaticamente. Resultado: ______
-- [ ] Menu da sessao: **Voltar ao PC** restaura sem encerrar o Playnite; **Sair do Console Mode** restaura e fecha o app. Na previa sem sessao, **Voltar ao PC** apenas fecha o menu. Resultado: ______
-- [ ] Bandeja > **Restaurar setup** continua sendo restauracao manual; **Modo Xbox** nao fecha um front-end. Resultado: ______
+- [ ] Em Sistema, as configurações do modo PC também estão disponíveis: caminho do Playnite, fechar a Steam, Android TV, FPS personalizado, atalhos, diagnóstico do controle, tutorial e pasta de dados. Resultado: ______
+- [ ] Configurar, alterar e remover os atalhos de abrir o app, menu da sessão e voltar ao PC; uma combinação em conflito mostra o mesmo erro do modo PC. Durante a captura, os botões não navegam nem iniciam uma sessão. Resultado: ______
+- [ ] Na captura, apertar e soltar B/○ sozinho cancela sem alterar o atalho; B/○ de novo fecha o editor e devolve o foco à configuração. B/○ junto com outro botão ainda pode ser salvo como combinação, mas B/○ sozinho não é um atalho válido. Teclado e mouse também conseguem abrir e fechar o editor sem acionar opções atrás dele. Resultado: ______
+- [ ] Alterar uma configuração no modo Console, trocar para PC e reabrir o app: o valor permanece igual nas duas interfaces. Resultado: ______
+- [ ] Selecionar e limpar o caminho do Playnite; cancelar o seletor mantém o valor anterior. Resultado: ______
+- [ ] Configurar a Android TV no modo Console: endereço, MAC opcional, entrada HDMI, comando da entrada e espera ao restaurar; Testar agora mostra o resultado e libera o botão após erro ou timeout. Resultado: ______
+- [ ] Selecionar FPS personalizado e digitar o limite; o modo PC mostra o mesmo valor. Sem RTSS disponível, a configuração respeita a mesma indisponibilidade das duas interfaces. Resultado: ______
+- [ ] Copiar o diagnóstico do controle, abrir a pasta de dados e rever o tutorial no modo Console; ao voltar, o foco continua em uma opção visível. Resultado: ______
+
 ## 4. Regressões
 
 - [ ] Interface Desktop: mapa de telas, `Segmented`, chips, tour de 3 passos e Ajustes continuam como antes. Resultado: ______
@@ -283,6 +297,16 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (sa
 - [ ] Uma saída **desabilitada** em Configurações → Som: escolhê-la liga a saída e o som vai para ela. Resultado: ______
 - [ ] Menu da sessão (Select + Y): o volume inicial é o do Windows; ◀/▶ muda de 5 em 5 e tira o mudo; A alterna o mudo. Resultado: ______
 - [ ] Ao restaurar a mesa, o som volta para a saída de antes do modo console. Resultado: ______
+
+## Restaurar a mesa: posições das telas
+
+Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas telas empilhadas ou lado a lado, p. ex. uma ultrawide com outra logo abaixo, alinhadas à esquerda); anote o mapa em Configurações → Sistema → Tela antes de começar.
+
+- [ ] Estratégia "Desconectar": **Jogar agora** e depois **Voltar ao PC** (botão, menu da sessão e tray): o mapa em Configurações → Sistema → Tela volta **idêntico** ao anotado (cada tela no mesmo lugar, mesma tela principal, a TV desligada como antes). Resultado: ______
+- [ ] O `consolemode.log` mostra a ordem `Telas: desativar <TV>` **antes** de `Telas: layout restaurado => 0` e não tem `posições fora do backup`. Se tiver, o texto diz quais telas e em qual tentativa a restauração acertou. Resultado: ______
+- [ ] Repetir 3 vezes seguidas: o layout não deriva a cada ciclo. Resultado: ______
+- [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
+- [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
 
 ## Telas com código próprio (issue #91)
 
@@ -315,3 +339,59 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Playnite lento para abrir (troca a janela de carregamento pela principal): o app não volta ao PC sozinho e só restaura a mesa quando o Playnite fecha. Resultado: ______
 - [ ] Fechar o app no meio da sessão e abrir de novo: "Restaurar setup" traz a mesa de volta a partir do backup. Resultado: ______
 - [ ] Um backup da mesa feito pela 1.5 (sessão iniciada na 1.5, app atualizado antes de restaurar) é restaurado pela 1.6. Resultado: ______
+
+## Regressão: DualShock e navegação entre painéis do menu
+
+- [ ] DualShock 4 por USB, sem DS4Windows/Steam Input: na tela Console, D-pad e analógico movem o foco; ✕ confirma, ○ volta e L1/R1 trocam abas. Resultado: ______
+- [ ] Repetir por Bluetooth e com Steam Input/DS4Windows ligado: cada toque produz uma única ação, sem movimento em repouso. Resultado: ______
+- [ ] Com um Xbox também conectado, repetir a navegação com o DualShock. Resultado: ______
+- [ ] Reconectar o DualShock com a tela Console aberta: a navegação volta a responder. Resultado: ______
+- [ ] **DualSense (PS5) por Bluetooth**, sem Steam Input/DS4Windows e com o jogo/Big Picture em foco: Select + Y (Create + △) abre o overlay e, nele, D-pad, ✕, ○ e □ respondem. Repetir por USB. Resultado: ______
+- [ ] O `consolemode.log` tem, por controle Sony, uma linha `Controle: HID DualSense: relatório 0x.. com N bytes (descritor declara M)`. Se o menu não responder, essa linha (e `relatório 0x.. não reconhecido`, se houver) diz o motivo. Resultado: ______
+- [ ] Durante o jogo, Share + △ (Select + Y) abre o overlay; → em uma opção lateral leva ao primeiro cartão de janela e ✕ ativa a janela escolhida. Resultado: ______
+- [ ] No primeiro cartão de uma coluna, ← retorna à opção lateral de origem; ↑/↓ e ←/→ navegam pelos demais cartões, inclusive com rolagem. Resultado: ______
+- [ ] Com seletor de sessão ou confirmação de fechamento aberto, as direções ficam dentro do diálogo. Sem janelas abertas, → não perde o foco. Resultado: ______
+- [ ] Com **3 ou mais janelas** abertas (uma linha de cartões): → e ← percorrem a linha cartão a cartão; → no último cartão não faz nada (não pula para outro lugar); ← no primeiro volta à opção lateral de origem. Com várias linhas: → e ← ficam na linha do cartão. Resultado: ______
+- [ ] Os cartões não exibem o botão X no canto. Quadrado/Delete continuam pedindo confirmação para fechar a janela selecionada. Resultado: ______
+- [ ] A logo fornecida do ControlFS aparece no painel fixo do overlay, tanto instalado quanto ausente, inclusive no aplicativo publicado. Resultado: ______
+- [ ] Com overlay aberto ou outro aplicativo em primeiro plano, a tela Console ao fundo não reage ao DualShock. Resultado: ______
+
+## Ajustes da interface Console: controle e atalhos
+
+### Layout dos botões
+
+- [ ] Abra **Sistema > Controle > Layout dos botões** com um controle conectado.
+- [ ] Em **Automático**, confirme que os símbolos acompanham o controle Xbox ou PlayStation conectado.
+- [ ] Selecione **Xbox** e confirme que a prévia e as dicas usam A, B, X, Y, LB e RB.
+- [ ] Selecione **PlayStation** e confirme que a prévia e as dicas usam ✕, ○, □, △, L1 e R1.
+- [ ] Feche e abra o app; confirme que a escolha manual continua salva.
+- [ ] Com dois tipos de controle disponíveis, troque o controle conectado em **Automático** e confirme que os símbolos acompanham o novo controle.
+- [ ] Abra o menu da sessão e confirme que as dicas também respeitam o layout escolhido.
+
+### Atalhos
+
+- [ ] Abra cada um dos três atalhos com A e confirme que os cartões ficam legíveis em 1920×1080 e em uma janela de 960×760.
+- [ ] Navegue entre **Definir/Alterar**, **Remover** e **Voltar** usando apenas o controle; confirme que o foco visível acompanha cada ação.
+- [ ] Grave uma combinação, solte os botões e confirme que o valor aparece no cartão e na linha de Ajustes.
+- [ ] Durante a gravação, pressione B/○ sozinho e confirme que a captura é cancelada sem alterar o atalho.
+- [ ] Tente usar uma combinação já atribuída e confirme que a mensagem de conflito aparece inteira e não corta os botões.
+- [ ] Reduza a altura da janela e confirme que o editor rola até **Voltar**, sem esconder os cartões.
+- [ ] Feche o editor durante uma captura e confirme que ela para; reabra-o e confirme que nenhum botão fica preso em captura.
+
+## Contador de FPS (RTSS)
+
+Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Display" ligado; MSI Afterburner aberto com o OSD dele ligado.
+
+- [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão e o cartão em Ajustes fica desabilitado.
+- [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
+- [ ] Config nova: o estilo é "Afterburner (não mexer)" e o OSD do Afterburner aparece normal na sessão.
+- [ ] Em sessão, A na linha alterna Afterburner → Desligado → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora.
+- [ ] Desligado: nada na tela, nem o nosso nem o do Afterburner (no máximo um piscar rápido do Afterburner de vez em quando).
+- [ ] Compacto / Detalhado / Personalizado: só o nosso aparece; o do Afterburner fica escondido.
+- [ ] Afterburner: o nosso some e o do Afterburner volta em até 1 s.
+- [ ] Ajustes → Contador de FPS → Personalizado: marcar/desmarcar API, FPS e tempo de quadro, "Tudo em uma linha" e a cor muda o contador no jogo na hora (com a sessão ativa).
+- [ ] Personalizado sem nenhum item marcado ainda mostra o FPS.
+- [ ] Com o RTSS fechado, ligar Compacto abre o RTSS e o contador aparece.
+- [ ] Voltar ao PC: o nosso some e o do Afterburner volta.
+- [ ] A escolha e o layout ficam salvos para a próxima sessão.
+- [ ] Com Compacto (ou outro estilo nosso) já salvo em Ajustes, iniciar a sessão: o contador aparece e o do Afterburner some sem precisar mexer na linha do menu.
