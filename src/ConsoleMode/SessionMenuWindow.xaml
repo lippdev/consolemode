@@ -261,7 +261,8 @@
                         </Button>
 
                         <!-- For games and emulators whose menus ignore the controller; works once the menu is closed. -->
-                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}"
+                        <!-- Grows with its two-line hint instead of the fixed row height. -->
+                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}"
                                 Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
