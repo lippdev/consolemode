@@ -260,15 +260,6 @@
                             </Grid>
                         </Button>
 
-                        <Button Style="{StaticResource SideRow}" IsEnabled="False">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE714;" FontSize="19"/></Border>
-                                <TextBlock Grid.Column="1" Style="{StaticResource TileValue}" FontSize="16" VerticalAlignment="Center"
-                                           Text="{x:Bind ViewModel.RecordRowText, Mode=OneWay}"/>
-                            </Grid>
-                        </Button>
-
                         <Border Height="1" Margin="8,6" Background="{ThemeResource MenuRule}"/>
 
                         <!-- The two ways out: the main one filled -->
