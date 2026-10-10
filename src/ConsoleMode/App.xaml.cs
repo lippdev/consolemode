@@ -71,6 +71,7 @@ public partial class App : Application
         try
         {
             AppPaths.Initialize();
+            CursorHider.RecoverAfterCrash();
             LocalizationService.SetLanguage(LocalizationService.ResolveInitial(
                 ConfigService.Load().AppLanguage, StartupService.ReadInstallerLanguage(), CultureInfo.CurrentUICulture.Name));
             ControllerInput.Warmup();

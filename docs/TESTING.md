@@ -195,6 +195,31 @@ Pré-condição: ControlFS instalado (https://github.com/nextestudios/ControlFS)
 - [ ] Depois de instalado pelo menu, o ControlFS aparece em Configurações → Aplicativos instalados e nenhum `ControlFS-Setup-x64.exe` sobra em `%TEMP%ConsoleModeUpdate`. Resultado: ______
 - [ ] Fora da sessão (prévia do menu) o painel funciona igual. Resultado: ______
 
+## 1e. Cursor do mouse: ocultar e controlar pelo controle
+
+Pré-condição: um emulador ou jogo que deixa o cursor visível (ex.: um emulador aberto pelo Playnite).
+
+### Ocultar o cursor
+- [ ] Menu da sessão: a linha "Ocultar o cursor do mouse" começa em Desativado, com a explicação embaixo inteira (sem cortar). Na prévia (fora da sessão) a linha não aparece. Resultado: ______
+- [ ] A na linha: Ativado, e o cursor some da TV, também por cima do emulador. Resultado: ______
+- [ ] Com ele oculto, deixe parado e depois mexa o mouse físico: o cursor **não** volta sozinho. Resultado: ______
+- [ ] A na linha de novo: Desativado, e o cursor volta com o esquema de ponteiros do Windows de sempre (tamanho e cor de Configurações → Acessibilidade → Ponteiro do mouse). Resultado: ______
+- [ ] Com o cursor oculto, ligar "Controlar o mouse com o controle" desliga "Ocultar o cursor" (o cursor aparece); ligar "Ocultar o cursor" desliga o controle do mouse. Resultado: ______
+- [ ] Voltar ao PC com o cursor oculto: ele reaparece normal na mesa, e na próxima sessão a linha começa em Desativado. Resultado: ______
+- [ ] Ajustes (PC e aba Sistema da interface Console) não têm mais a opção de ocultar o cursor. Resultado: ______
+- [ ] Encerre o Console Mode à força (Gerenciador de Tarefas) com o cursor oculto: o cursor continua invisível até abrir o Console Mode de novo, que o restaura logo na abertura (log: `Cursor: restaurado após um encerramento inesperado`). Resultado: ______
+
+### Controlar o mouse pelo controle (Xbox **e** PlayStation)
+- [ ] Menu da sessão: a linha "Controlar o mouse com o controle" mostra Desativado e a ajuda com o botão certo do controle (A no Xbox, ✕ no PlayStation). Na prévia (fora da sessão) a linha não aparece. Resultado: ______
+- [ ] A na linha: passa a Ativado. Enquanto o menu está aberto, os analógicos e o A continuam navegando no menu, sem mexer no cursor. Resultado: ______
+- [ ] Fechar o menu (B ou "Voltar ao jogo"): o A que fechou o menu **não** vira clique. Resultado: ______
+- [ ] Analógico esquerdo move o cursor com o jogo em primeiro plano; inclinação leve = movimento fino, inclinação total atravessa a TV em ~1 s, igual em 1080p e 4K. Resultado: ______
+- [ ] Analógico direito para cima/baixo rola a página (navegador, lista do emulador); para os lados rola na horizontal onde houver. Resultado: ______
+- [ ] A uma vez = clique esquerdo (com um pequeno atraso, ~¼ s); A duas vezes rápido = clique direito (abre o menu de contexto); A segurado = arrastar (solte para largar). Resultado: ______
+- [ ] Com o DualSense/DualShock **sem** Steam Input (lido por HID) o cursor também se move e clica. Resultado: ______
+- [ ] Voltar ao PC e iniciar outra sessão: a opção começa Desativada de novo. Resultado: ______
+- [ ] Limitação esperada: o jogo também recebe o A e os analógicos. Em programas abertos como administrador o cursor não mexe (o Windows bloqueia a entrada vinda de um app comum). Resultado: ______
+
 ## 2. Links `consolemode://`
 
 - [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______

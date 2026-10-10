@@ -49,6 +49,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
 - **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS)
+- **Cursor do mouse fora do caminho:** some quando fica parado e pode ser movido pelo controle, pelo menu da sessão, quando um jogo ou emulador não aceita o controle
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation, abas no LB/RB, as capas da sua Steam como plano de fundo)
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês e espanhol

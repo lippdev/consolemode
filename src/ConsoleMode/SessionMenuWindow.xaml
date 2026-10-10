@@ -268,6 +268,37 @@
                             </Grid>
                         </Button>
 
+                        <!-- Hidden until turned off here or the session ends; nothing automatic. -->
+                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleCursorHiddenCommand}"
+                                Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE8F4;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.HideCursorCard, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IsCursorHidden), Mode=OneWay}"/>
+                                    <TextBlock FontSize="13" Foreground="{ThemeResource MenuTextTertiary}" TextWrapping="Wrap"
+                                               Text="{x:Bind ViewModel.Texts.HideCursorDescription, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
+                        <!-- For games and emulators whose menus ignore the controller; works once the menu is closed. -->
+                        <!-- Grows with its two-line hint instead of the fixed row height. -->
+                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}"
+                                Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE962;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.ControllerMouseRow, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IsControllerMouseOn), Mode=OneWay}"/>
+                                    <TextBlock FontSize="13" Foreground="{ThemeResource MenuTextTertiary}" TextWrapping="Wrap"
+                                               Text="{x:Bind ViewModel.ControllerMouseHint, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
                         <Border Height="1" Margin="8,6" Background="{ThemeResource MenuRule}"/>
 
                         <!-- The two ways out: the main one filled -->

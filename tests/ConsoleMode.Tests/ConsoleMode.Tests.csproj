@@ -31,6 +31,7 @@
     <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuTour.cs" Link="SessionMenuTour.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ControllerMouseMath.cs" Link="ControllerMouseMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/RtssOverlay.cs" Link="RtssOverlay.cs" />
     <Compile Include="../../src/ConsoleMode/Services/HardwareStats.cs" Link="HardwareStats.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />

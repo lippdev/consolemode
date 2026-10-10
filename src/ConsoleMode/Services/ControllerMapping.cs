@@ -29,16 +29,7 @@ public static class ControllerMapping
     /// </param>
     public static ushort SonyButtons(ReadOnlySpan<byte> report, bool dualSense, int inputReportLength = 0)
     {
-        if (report.Length == 0) return 0;
-        // Offset of the buttons byte (hat + face) and of the left stick X, per report layout.
-        var (start, stick) = report[0] switch
-        {
-            0x31 => (9, 2),                                     // DualSense, Bluetooth
-            0x11 => (7, 3),                                     // DS4, Bluetooth
-            0x01 when IsDualSenseUsbReport(report.Length, dualSense, inputReportLength) => (8, 1), // DualSense, USB
-            0x01 => (5, 1),                                     // DS4 USB, or either pad's basic Bluetooth report
-            _ => (-1, -1)
-        };
+        var (start, stick) = SonyOffsets(report, dualSense, inputReportLength);
         if (start < 0 || report.Length < start + 3) return 0;
         var face = report[start];
         var hat = face & 0x0F;
@@ -65,6 +56,31 @@ public static class ControllerMapping
         if (x < 64) bits |= 0x0004;
         if (x > 192) bits |= 0x0008;
         return bits;
+    }
+
+    /// <summary>
+    /// Both sticks of a raw DS4/DualSense input report as bytes (0..255, 128 = center, Y grows downward):
+    /// left X, left Y, right X, right Y. Null for an unknown report. Read by ControllerMouse.
+    /// </summary>
+    public static (byte LeftX, byte LeftY, byte RightX, byte RightY)? SonySticks(ReadOnlySpan<byte> report, bool dualSense, int inputReportLength = 0)
+    {
+        var (_, stick) = SonyOffsets(report, dualSense, inputReportLength);
+        if (stick < 0 || report.Length < stick + 4) return null;
+        return (report[stick], report[stick + 1], report[stick + 2], report[stick + 3]);
+    }
+
+    /// <summary>Offset of the buttons byte (hat + face) and of the left stick X, per report layout; (-1, -1) when unknown.</summary>
+    private static (int Buttons, int Stick) SonyOffsets(ReadOnlySpan<byte> report, bool dualSense, int inputReportLength)
+    {
+        if (report.Length == 0) return (-1, -1);
+        return report[0] switch
+        {
+            0x31 => (9, 2),                                     // DualSense, Bluetooth
+            0x11 => (7, 3),                                     // DS4, Bluetooth
+            0x01 when IsDualSenseUsbReport(report.Length, dualSense, inputReportLength) => (8, 1), // DualSense, USB
+            0x01 => (5, 1),                                     // DS4 USB, or either pad's basic Bluetooth report
+            _ => (-1, -1)
+        };
     }
 
     /// <summary>Report IDs <see cref="SonyButtons"/> reads: basic/USB (0x01), DS4 Bluetooth (0x11), DualSense Bluetooth (0x31).</summary>
