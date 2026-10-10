@@ -4,6 +4,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### What's new
+- The mouse pointer stays out of the way: during a session it disappears after 3 seconds without moving and comes back as soon as the mouse moves (handy for emulators that leave it in the middle of the TV); turn it off in Settings → "Hide the mouse pointer while playing". And for games and emulators whose menus ignore the controller, the session menu's "Control the mouse with the controller" row makes the left stick move the pointer, the right stick scroll, A click, A twice right-click and A held drag. It lasts until the session ends.
+
 ## [1.6.0]
 ### What's new
 - Redesigned Console interface, made to feel like a console: a top bar with three tabs (Home, Session and System) you switch with LB/RB (L1/R1 on PlayStation), screen tiles that show what will happen to each monitor, quick settings with icons and a focus that grows as you move over it. Home brings the Play now banner and a summary of the current setup (game screen, audio, launcher and HDR/VRR). (#117)

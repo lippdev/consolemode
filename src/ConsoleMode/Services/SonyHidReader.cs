@@ -13,6 +13,7 @@ public static class SonyHidReader
 {
     private static readonly object Gate = new();
     private static readonly Dictionary<string, ushort> Buttons = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, (byte LeftX, byte LeftY, byte RightX, byte RightY)> Sticks = new(StringComparer.OrdinalIgnoreCase);
     private static CancellationTokenSource? _cts;
     private static int _users;
 
@@ -36,6 +37,12 @@ public static class SonyHidReader
         lock (Gate) return new Dictionary<string, ushort>(Buttons, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>Both sticks of each Sony pad as raw bytes (see ControllerMapping.SonySticks), for ControllerMouse.</summary>
+    public static IReadOnlyList<(byte LeftX, byte LeftY, byte RightX, byte RightY)> ReadSticks()
+    {
+        lock (Gate) return [.. Sticks.Values];
+    }
+
     public static void Acquire()
     {
         lock (Gate)
@@ -55,6 +62,7 @@ public static class SonyHidReader
             _cts?.Cancel();
             _cts = null;
             Buttons.Clear();
+            Sticks.Clear();
         }
     }
 
@@ -75,7 +83,7 @@ public static class SonyHidReader
                     _ = Task.Run(async () =>
                     {
                         await ReadLoopAsync(path, pad, ct);
-                        lock (Gate) { Buttons.Remove(path); }
+                        lock (Gate) { Buttons.Remove(path); Sticks.Remove(path); }
                         lock (reading) { reading.Remove(path); }
                     });
                 }
@@ -114,7 +122,12 @@ public static class SonyHidReader
                     AppLog.Write($"Controle: HID: relatório 0x{buffer[0]:X2} não reconhecido; os botões desse formato não são lidos");
                 }
                 var bits = ControllerMapping.SonyButtons(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength);
-                lock (Gate) { Buttons[path] = bits; }
+                var sticks = ControllerMapping.SonySticks(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength);
+                lock (Gate)
+                {
+                    Buttons[path] = bits;
+                    if (sticks is { } s) Sticks[path] = s;
+                }
             }
         }
         catch (Exception ex) when (ex is IOException or OperationCanceledException or ObjectDisposedException)

@@ -49,6 +49,7 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 - [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can put it in standby afterwards
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode, and sends Steam to the tray when you go back to the PC
 - **Session menu** over the game: switch or close the open windows, change volume, resolution, audio, FPS and HDR, and browse your files with [ControlFS](https://github.com/nextestudios/ControlFS)
+- **Mouse pointer out of the way:** hidden while it sits still, and driven by the controller from the session menu when a game or emulator ignores the pad
 - Two interfaces: **Desktop** (mouse) and **Console** (full screen, Xbox and PlayStation pads, LB/RB tabs, your Steam covers as the background)
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese and Spanish

@@ -262,6 +262,7 @@ public partial class MainViewModel
             case "updates": CheckUpdates = !CheckUpdates; break;
             case "betas": BetaUpdates = !BetaUpdates; break;
             case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;
+            case "hidecursor": HideCursor = !HideCursor; break;
             case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
         }
     }

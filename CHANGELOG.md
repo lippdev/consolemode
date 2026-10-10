@@ -4,6 +4,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+### Novidades
+- Cursor do mouse fora do caminho: durante a sessão ele some depois de 3 segundos parado e volta assim que o mouse se mexe (útil em emuladores que deixam o cursor no meio da TV); dá para desligar em Ajustes → "Ocultar o cursor do mouse durante o jogo". E, para jogos e emuladores cujos menus não aceitam o controle, a linha "Controlar o mouse com o controle" do menu da sessão faz o analógico esquerdo mover o cursor, o direito rolar, A clicar, A duas vezes clicar com o botão direito e A segurado arrastar. Vale até o fim da sessão.
+
 ## [1.6.0]
 ### Novidades
 - Interface Console redesenhada, com cara de console: barra no topo com três abas (Início, Sessão e Sistema) que você troca com LB/RB (L1/R1 no PlayStation), blocos das telas que mostram o que vai acontecer com cada monitor, ajustes rápidos com ícones e foco que cresce ao passar. Início traz o banner com Jogar agora e um resumo do setup atual (tela de jogo, áudio, iniciador e HDR/VRR). (#117)

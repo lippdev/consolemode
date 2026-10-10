@@ -260,6 +260,21 @@
                             </Grid>
                         </Button>
 
+                        <!-- For games and emulators whose menus ignore the controller; works once the menu is closed. -->
+                        <Button Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}"
+                                Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE962;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.ControllerMouseRow, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IsControllerMouseOn), Mode=OneWay}"/>
+                                    <TextBlock FontSize="13" Foreground="{ThemeResource MenuTextTertiary}" TextWrapping="Wrap"
+                                               Text="{x:Bind ViewModel.ControllerMouseHint, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
                         <Button Style="{StaticResource SideRow}" IsEnabled="False">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>

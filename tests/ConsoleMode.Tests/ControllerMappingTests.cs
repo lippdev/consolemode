@@ -116,6 +116,22 @@ public class ControllerMappingTests
         Assert.Equal(expected, ControllerMapping.SonyButtons(report, dualSense: true));
     }
 
+    [Theory]
+    [MemberData(nameof(SonyLayouts))]
+    public void Sony_sticks_are_read_from_each_layout(int id, int length, bool dualSense, int start, int stick)
+    {
+        var report = NeutralReport(id, length, start, stick);
+        report[stick] = 10;
+        report[stick + 1] = 20;
+        report[stick + 2] = 30;
+        report[stick + 3] = 40;
+        Assert.Equal(((byte)10, (byte)20, (byte)30, (byte)40), ControllerMapping.SonySticks(report, dualSense, length));
+    }
+
+    [Fact]
+    public void Sony_sticks_of_an_unknown_report_are_null() =>
+        Assert.Null(ControllerMapping.SonySticks(new byte[] { 0x05, 1, 2, 3, 4, 5 }, dualSense: false));
+
     [Fact]
     public void Sony_options_and_ps_map_to_start_and_guide()
     {
