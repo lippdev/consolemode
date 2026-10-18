@@ -55,7 +55,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 
 ## Novidades da 1.6.2
 
-- **Alemão, francês e russo:** a interface, o instalador e a lista de idiomas agora falam Deutsch (tradução de um usuário da comunidade), Français e Русский, e o app segue o Windows se ele estiver num desses idiomas
+- **Alemão, francês e russo:** a interface, o instalador e a lista de idiomas agora falam Deutsch (tradução de [u/Skinner99](https://www.reddit.com/user/Skinner99/) no Reddit), Français e Русский, e o app segue o Windows se ele estiver num desses idiomas
 - **Minimizar para a bandeja:** uma nova opção em Ajustes (e na interface Console, em Sistema) deixa o Console Mode nos ícones ocultos em vez da barra de tarefas quando você minimiza
 
 ## Novidades da 1.6.1

@@ -55,7 +55,7 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 
 ## What's new in 1.6.2
 
-- **German, French and Russian:** the interface, the installer and the language picker now speak Deutsch (translated by a community member), Français and Русский, and the app follows Windows if it is in one of them
+- **German, French and Russian:** the interface, the installer and the language picker now speak Deutsch (translated by [u/Skinner99](https://www.reddit.com/user/Skinner99/) on Reddit), Français and Русский, and the app follows Windows if it is in one of them
 - **Minimize to the system tray:** a new option in Settings (and in the Console interface, under System) keeps Console Mode in the hidden icons instead of the taskbar when you minimize it
 
 ## What's new in 1.6.1
