@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Minimize to the system tray: with the new option in Settings (also in the Console interface, under System), minimizing the window takes Console Mode off the taskbar and leaves just its icon in the hidden icons; one click on the icon opens it again. Off by default. (#PR)
 
 ## [1.6.1]
 ### What's new

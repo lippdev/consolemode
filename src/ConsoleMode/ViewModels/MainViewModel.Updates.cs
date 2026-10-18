@@ -23,6 +23,7 @@ public partial class MainViewModel
     [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
+    [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _isUpdateOpen;
     [ObservableProperty] private string _updateTitle = "";
     [ObservableProperty] private string _updateMessage = "";
@@ -79,6 +80,8 @@ public partial class MainViewModel
             SetStatus(LocalizationService.Get("StartupSettingError", ex.Message), InfoBarSeverity.Error);
         }
     }
+
+    partial void OnMinimizeToTrayChanged(bool value) => SaveQuietly();
 
     partial void OnCheckUpdatesChanged(bool value) => SaveQuietly();
 

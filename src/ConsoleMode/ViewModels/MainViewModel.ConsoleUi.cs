@@ -259,6 +259,7 @@ public partial class MainViewModel
             case "background": CycleBackgroundMode(); break;
             case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;
+            case "minimizetray": MinimizeToTray = !MinimizeToTray; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
             case "betas": BetaUpdates = !BetaUpdates; break;
             case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;

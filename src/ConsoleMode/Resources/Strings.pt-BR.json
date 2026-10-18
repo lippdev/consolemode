@@ -144,6 +144,8 @@
   "GameBarSettingError": "Não foi possível alterar o ajuste da Game Bar: {0}",
   "StartupCard": "Iniciar com o Windows",
   "StartupDescription": "Abre direto na bandeja ao ligar o PC, pronto para o atalho de 1 clique.",
+  "MinimizeToTrayCard": "Minimizar para a bandeja",
+  "MinimizeToTrayDescription": "Ao minimizar, a janela sai da barra de tarefas e fica nos ícones ocultos. Clique no ícone para abrir de novo.",
   "UpdatesCard": "Atualizações",
   "CheckNow": "Procurar agora",
   "NotifyUpdatesCard": "Avisar quando sair versão nova",

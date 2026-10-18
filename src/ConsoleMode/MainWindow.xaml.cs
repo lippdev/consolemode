@@ -49,6 +49,13 @@ public sealed partial class MainWindow : Window
             appWindow.Hide();
         };
 
+        // With "Minimize to the system tray" on, minimizing leaves the taskbar; the tray icon brings it back.
+        appWindow.Changed += (_, e) =>
+        {
+            if (!e.DidPresenterChange || !ViewModel.MinimizeToTray) return;
+            if (appWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized }) appWindow.Hide();
+        };
+
         // The console interface fills the screen, like a console; the desktop one gets its size back.
         ViewModel.PropertyChanged += (_, e) =>
         {

@@ -78,6 +78,9 @@ public sealed class AppConfig
     /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
     public bool InterfaceSounds { get; set; } = true;
 
+    /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
+    public bool MinimizeToTray { get; set; }
+
     /// <summary>Console background: "auto" (covers of the installed Steam games), "gradient" or "image".</summary>
     public string ConsoleBackground { get; set; } = "auto";
 
