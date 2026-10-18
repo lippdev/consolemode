@@ -5,7 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 
 ### What's new
-- German (Deutsch) interface, translated by a community member. With Windows in German the app opens in that language, and the installer offers it too.
+- German (Deutsch) interface, translated by a community member, plus French (Français) and Russian (Русский). With Windows in one of these languages the app opens in it, and the installer offers them too.
 
 ## [1.6.1]
 ### What's new

@@ -53,6 +53,8 @@
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.es-ES.json" Link="Strings.es-ES.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.es-ES.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.de-DE.json" Link="Strings.de-DE.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.de-DE.json" />
+    <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.fr-FR.json" Link="Strings.fr-FR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.fr-FR.json" />
+    <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.ru-RU.json" Link="Strings.ru-RU.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.ru-RU.json" />
   </ItemGroup>
 
 </Project>

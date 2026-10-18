@@ -5,7 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 
 ### Novidades
-- Interface em alemão (Deutsch), traduzida por um usuário da comunidade. Quem usa o Windows em alemão já abre o app nesse idioma, e o instalador também oferece a opção.
+- Interface em alemão (Deutsch), traduzida por um usuário da comunidade, e em francês (Français) e russo (Русский). Quem usa o Windows num desses idiomas já abre o app nele, e o instalador também oferece as opções.
 
 ## [1.6.1]
 ### Novidades

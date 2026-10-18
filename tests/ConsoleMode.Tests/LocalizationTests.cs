@@ -37,7 +37,7 @@ public sealed class LocalizationTests
         }
 
         // Unknown languages read English; a known language in another region maps to its catalog.
-        LocalizationService.SetLanguage("fr-FR");
+        LocalizationService.SetLanguage("ja-JP");
         Assert.Equal(LocalizationService.EnglishUnitedStates, LocalizationService.Language);
         LocalizationService.SetLanguage("es-MX");
         Assert.Equal(LocalizationService.SpanishSpain, LocalizationService.Language);
@@ -135,8 +135,10 @@ public sealed class LocalizationTests
     [InlineData("", "en-US", "pt-BR", "en-US")]        // installer dialog next
     [InlineData(null, null, "en-GB", "en-US")]          // then the Windows language
     [InlineData(null, null, "pt-PT", "pt-BR")]
-    [InlineData(null, null, "fr-FR", "en-US")]          // unknown languages read English
+    [InlineData(null, null, "ja-JP", "en-US")]          // unknown languages read English
     [InlineData(null, null, "de-CH", "de-DE")]
+    [InlineData(null, null, "fr-CA", "fr-FR")]
+    [InlineData(null, null, "ru-KZ", "ru-RU")]
     [InlineData(null, null, "es-MX", "es-ES")]
     [InlineData("es-ES", null, "pt-BR", "es-ES")]
     [InlineData(null, null, null, "en-US")]

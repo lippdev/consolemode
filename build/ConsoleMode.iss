@@ -1,4 +1,4 @@
-; Console Mode — per-user installer (no admin). Built by build\Publish-ConsoleMode.ps1:
+﻿; Console Mode — per-user installer (no admin). Built by build\Publish-ConsoleMode.ps1:
 ;   ISCC /DAppVersion=1.3.0 /DSourceDir=<publish folder> /DOutputDir=<dist> /DArch=x64 ConsoleMode.iss
 
 #ifndef AppVersion
@@ -56,6 +56,8 @@ Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [CustomMessages]
 ptbr.OneClickShortcut=Atalho "Console Mode 1 Click" na Área de Trabalho (entra no modo console com 1 clique)
@@ -70,6 +72,12 @@ es.LaunchApp=Abrir Console Mode
 de.OneClickShortcut=Desktop-Verknüpfung "Console Mode 1 Click" (startet den Konsolenmodus mit einem Klick)
 de.StartWithWindows=Mit Windows starten (läuft im Infobereich weiter)
 de.LaunchApp=Console Mode öffnen
+fr.OneClickShortcut=Raccourci « Console Mode 1 Click » sur le Bureau (passe en mode console en un clic)
+fr.StartWithWindows=Démarrer avec Windows (reste dans la zone de notification)
+fr.LaunchApp=Ouvrir Console Mode
+ru.OneClickShortcut=Ярлык «Console Mode 1 Click» на рабочем столе (режим консоли в один клик)
+ru.StartWithWindows=Запускать вместе с Windows (в области уведомлений)
+ru.LaunchApp=Открыть Console Mode
 
 [Tasks]
 Name: "oneclick"; Description: "{cm:OneClickShortcut}"; Flags: unchecked
@@ -94,6 +102,8 @@ Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Langu
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "en-US"; Languages: en; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "es-ES"; Languages: es; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "de-DE"; Languages: de; Flags: uninsdeletekeyifempty uninsdeletevalue
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "fr-FR"; Languages: fr; Flags: uninsdeletekeyifempty uninsdeletevalue
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "ru-RU"; Languages: ru; Flags: uninsdeletekeyifempty uninsdeletevalue
 ; consolemode://start|stop|show links (ProtocolService registers the same keys at startup).
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueData: "URL:Console Mode"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""

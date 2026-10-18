@@ -51,7 +51,7 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 - **Session menu** over the game: switch or close the open windows, change volume, resolution, audio, FPS and HDR, hide the mouse pointer or drive it with the controller, and browse your files with [ControlFS](https://github.com/nextestudios/ControlFS)
 - Two interfaces: **Desktop** (mouse) and **Console** (full screen, Xbox and PlayStation pads, LB/RB tabs, your Steam covers as the background)
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
-- English, Portuguese, Spanish and German
+- English, Portuguese, Spanish, German, French and Russian
 
 ## What's new in 1.6.1
 
