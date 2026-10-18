@@ -43,6 +43,9 @@
     <EmbeddedResource Include="Resources\Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="Resources\Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
     <EmbeddedResource Include="Resources\Strings.es-ES.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.es-ES.json" />
+    <EmbeddedResource Include="Resources\Strings.de-DE.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.de-DE.json" />
+    <EmbeddedResource Include="Resources\Strings.fr-FR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.fr-FR.json" />
+    <EmbeddedResource Include="Resources\Strings.ru-RU.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.ru-RU.json" />
   </ItemGroup>
 
   <ItemGroup>

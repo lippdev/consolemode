@@ -5,6 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 ### Novidades
 - Minimizar para a bandeja: com a nova opção em Ajustes (também na interface Console, em Sistema), minimizar a janela tira o Console Mode da barra de tarefas e deixa só o ícone nos ícones ocultos; um clique no ícone abre de novo. Vem desligada. (#150)
+- Interface em alemão (Deutsch), traduzida por um usuário da comunidade, e em francês (Français) e russo (Русский). Quem usa o Windows num desses idiomas já abre o app nele, e o instalador também oferece as opções. (#151)
 
 ## [1.6.1]
 ### Novidades
