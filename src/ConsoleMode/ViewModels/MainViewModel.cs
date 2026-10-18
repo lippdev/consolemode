@@ -312,6 +312,7 @@ public partial class MainViewModel : ObservableObject
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
             InterfaceSounds = config.InterfaceSounds;
+            MinimizeToTray = config.MinimizeToTray;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
@@ -926,6 +927,7 @@ public partial class MainViewModel : ObservableObject
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
             InterfaceSounds = InterfaceSounds,
+            MinimizeToTray = MinimizeToTray,
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
