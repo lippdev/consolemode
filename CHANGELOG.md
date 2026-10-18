@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Minimizar para a bandeja: com a nova opção em Ajustes (também na interface Console, em Sistema), minimizar a janela tira o Console Mode da barra de tarefas e deixa só o ícone nos ícones ocultos; um clique no ícone abre de novo. Vem desligada. (#PR)
+- Minimizar para a bandeja: com a nova opção em Ajustes (também na interface Console, em Sistema), minimizar a janela tira o Console Mode da barra de tarefas e deixa só o ícone nos ícones ocultos; um clique no ícone abre de novo. Vem desligada. (#150)
 
 ## [1.6.1]
 ### Novidades
