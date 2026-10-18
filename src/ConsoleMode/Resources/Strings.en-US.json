@@ -144,6 +144,8 @@
   "GameBarSettingError": "Could not change the Game Bar setting: {0}",
   "StartupCard": "Start with Windows",
   "StartupDescription": "Opens in the system tray when your PC starts, ready for the one-click shortcut.",
+  "MinimizeToTrayCard": "Minimize to the system tray",
+  "MinimizeToTrayDescription": "Minimizing hides the window from the taskbar and keeps Console Mode in the hidden icons. Click the icon to open it again.",
   "UpdatesCard": "Updates",
   "CheckNow": "Check now",
   "NotifyUpdatesCard": "Notify me when a new version is available",

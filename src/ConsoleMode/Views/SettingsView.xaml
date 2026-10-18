@@ -278,6 +278,13 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.MinimizeToTrayCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.MinimizeToTrayDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE921;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.UpdatesCard, Mode=OneWay}" Description="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE895;"/>

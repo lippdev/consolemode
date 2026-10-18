@@ -459,3 +459,13 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Config salva na 1.6.0 com "Compacto": depois de atualizar, aparece "Apenas FPS" e o jogo mostra só o FPS.
 - [ ] Voltar ao PC com Compacto/Detalhado: o contador some e não volta sozinho segundos depois.
 - [ ] Uso de CPU do Console Mode com Detalhado ligado continua baixo (Gerenciador de Tarefas, < 1%).
+
+## Minimizar para a bandeja
+
+- [ ] Ajustes → "Minimizar para a bandeja" vem desligado; minimizar deixa a janela na barra de tarefas, como antes.
+- [ ] Ligado: minimizar (botão da barra de título, Win+Down ou clique no ícone da barra de tarefas) tira o app da barra de tarefas e do Alt+Tab; o ícone continua nos ícones ocultos.
+- [ ] Clique no ícone da bandeja (ou "Mostrar janela" no menu dele) traz a janela de volta, no mesmo tamanho e posição, com foco.
+- [ ] Com a janela maximizada antes de minimizar, ela volta maximizada.
+- [ ] Interface Console → Sistema: a linha "Minimizar para a bandeja" alterna Ligado/Desligado e o modo PC mostra o mesmo valor; o valor fica salvo ao reabrir o app.
+- [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
+- [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
