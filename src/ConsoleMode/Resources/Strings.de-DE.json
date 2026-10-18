@@ -144,6 +144,8 @@
   "GameBarSettingError": "Die Game-Bar-Einstellung konnte nicht geändert werden: {0}",
   "StartupCard": "Mit Windows starten",
   "StartupDescription": "Wird beim Start des PCs im Infobereich geöffnet und ist bereit für die Verknüpfung mit einem Klick.",
+  "MinimizeToTrayCard": "In den Infobereich minimieren",
+  "MinimizeToTrayDescription": "Beim Minimieren verschwindet das Fenster aus der Taskleiste und Console Mode bleibt bei den ausgeblendeten Symbolen. Klicke auf das Symbol, um es wieder zu öffnen.",
   "UpdatesCard": "Updates",
   "CheckNow": "Jetzt suchen",
   "NotifyUpdatesCard": "Bei einer neuen Version benachrichtigen",

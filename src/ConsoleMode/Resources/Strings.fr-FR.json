@@ -144,6 +144,8 @@
   "GameBarSettingError": "Impossible de modifier le paramètre de la Game Bar : {0}",
   "StartupCard": "Démarrer avec Windows",
   "StartupDescription": "S'ouvre dans la zone de notification au démarrage du PC, prêt pour le raccourci en un clic.",
+  "MinimizeToTrayCard": "Réduire dans la zone de notification",
+  "MinimizeToTrayDescription": "La réduction retire la fenêtre de la barre des tâches et garde Console Mode dans les icônes cachées. Cliquez sur l'icône pour la rouvrir.",
   "UpdatesCard": "Mises à jour",
   "CheckNow": "Vérifier maintenant",
   "NotifyUpdatesCard": "M'avertir quand une nouvelle version est disponible",
