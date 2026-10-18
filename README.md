@@ -12,7 +12,7 @@ Turn your Windows PC into a **game console** with one click: focus the TV, turn 
 
 ## Download
 
-Get **[1.6.1](https://github.com/lippdev/consolemode/releases/tag/v1.6.1)**, the latest stable version:
+Get **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
@@ -53,6 +53,11 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese, Spanish, German, French and Russian
 
+## What's new in 1.6.2
+
+- **German, French and Russian:** the interface, the installer and the language picker now speak Deutsch (translated by a community member), Français and Русский, and the app follows Windows if it is in one of them
+- **Minimize to the system tray:** a new option in Settings (and in the Console interface, under System) keeps Console Mode in the hidden icons instead of the taskbar when you minimize it
+
 ## What's new in 1.6.1
 
 - **FPS counter on a card:** three sizes, a screen corner of your choice, and the new FPS only, Compact (CPU, GPU and RAM usage) and Detailed (clocks, GPU temperature, VRAM and RAM) styles, all tuned from the session menu itself
@@ -70,11 +75,11 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 - **All the project's own code:** displays and audio through Windows' APIs, without the NirSoft tools
 - Steam goes to the tray when you go back to the PC, the desk layout comes back exactly as it was (portrait monitors too), and slow Playnite starts no longer end the session
 
-All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.6.1) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
+All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.6.2) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
 
 ## Roadmap
 
-**Next:** JoyChromium (the web with a controller, straight from Console Mode), record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Later:** per-game profiles ([#69](https://github.com/lippdev/consolemode/issues/69)), more languages ([#14](https://github.com/lippdev/consolemode/issues/14)) · **Exploring:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
+**Next:** JoyChromium (the web with a controller, straight from Console Mode), record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Later:** per-game profiles ([#69](https://github.com/lippdev/consolemode/issues/69)) · **Exploring:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
 
 ## More
 
