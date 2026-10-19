@@ -16,19 +16,6 @@ public sealed class LaunchArtTests
         Assert.False(string.IsNullOrEmpty(art.Glyph));
         Assert.Equal(0xFFu, art.From >> 24); // opaque, so the art behind doesn't show through the tile
         Assert.Equal(0xFFu, art.To >> 24);
-        Assert.Equal(0xFFu, art.Glow >> 24);
-    }
-
-    [Theory]
-    [InlineData("bigPicture")]
-    [InlineData("playnite")]
-    [InlineData("xboxMode")]
-    [InlineData("customApp")]
-    public void The_glow_is_brighter_than_the_tile(string mode)
-    {
-        static int Luma(uint c) => (int)(((c >> 16) & 0xFF) * 299 + ((c >> 8) & 0xFF) * 587 + (c & 0xFF) * 114) / 1000;
-        var art = LaunchArt.For(mode);
-        Assert.True(Luma(art.Glow) > Luma(art.From) + 40, $"{mode}: glow {Luma(art.Glow)} vs tile {Luma(art.From)}");
     }
 
     [Fact]

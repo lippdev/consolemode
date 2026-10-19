@@ -181,21 +181,17 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <ItemsControl x:Name="LaunchRow" ItemsSource="{x:Bind ViewModel.LaunchTiles, Mode=OneWay}" Margin="24,40,8,0" HorizontalAlignment="Left">
+                    <ItemsControl x:Name="LaunchRow" ItemsSource="{x:Bind ViewModel.LaunchTiles, Mode=OneWay}" Margin="8,28,8,0" HorizontalAlignment="Left">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="34"/>
+                                <StackPanel Orientation="Horizontal" Spacing="22"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:LaunchTile">
-                                <!-- The focus picks the launcher and A plays it. The one that opens grows (ConsoleHomeView.ScaleLaunchTiles),
-                                     keeps its full colour and lights the background behind it; the others fade back. -->
-                                <Grid Opacity="{x:Bind Opacity, Mode=OneWay}">
-                                    <Grid.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Grid.OpacityTransition>
-                                    <Border Margin="-44" Background="{x:Bind Glow}" Opacity="{x:Bind GlowOpacity, Mode=OneWay}" IsHitTestVisible="False">
-                                        <Border.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Border.OpacityTransition>
-                                    </Border>
+                                <!-- The focus picks the launcher (ConsoleHomeView.ScaleTile); A plays it. -->
+                                <StackPanel Spacing="18" Opacity="{x:Bind Opacity, Mode=OneWay}">
+                                    <StackPanel.OpacityTransition><ScalarTransition Duration="0:0:0.14"/></StackPanel.OpacityTransition>
                                     <Button Style="{StaticResource LaunchTileButton}" Background="{x:Bind Background}"
                                             Command="{Binding ViewModel.PlayLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
                                             AutomationProperties.Name="{x:Bind Text}">
@@ -203,9 +199,18 @@
                                             <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Margin="0,0,0,20"/>
                                             <TextBlock Text="{x:Bind Text}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis" MaxLines="1" Foreground="#E6FFFFFF"/>
+                                            <!-- What opens: a check in the corner -->
+                                            <Grid Width="26" Height="26" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-2,0"
+                                                  Visibility="{x:Bind IsSelected, Mode=OneWay}">
+                                                <Ellipse Fill="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                                <FontIcon Glyph="&#xE73E;" FontSize="13" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                                            </Grid>
                                         </Grid>
                                     </Button>
-                                </Grid>
+                                    <!-- ...and a short bar under the tile, like the "now playing" mark on a console's game row -->
+                                    <Border Width="32" Height="4" CornerRadius="2" Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                            Visibility="{x:Bind IsSelected, Mode=OneWay}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

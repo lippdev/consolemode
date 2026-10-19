@@ -14,12 +14,9 @@ public sealed partial class LaunchTile : ObservableObject
     public string Text => Option.Text;
     public string Glyph { get; init; } = "";
     public Brush Background { get; init; } = null!;
-    /// <summary>Soft light in the launcher's colour behind the tile, lit when it is the one that opens.</summary>
-    public Brush Glow { get; init; } = null!;
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(Opacity), nameof(GlowOpacity))] private bool _isSelected;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(Opacity))] private bool _isSelected;
     /// <summary>The other launchers fade back, so the one that opens stands out.</summary>
-    public double Opacity => IsSelected ? 1 : 0.5;
-    public double GlowOpacity => IsSelected ? 1 : 0;
+    public double Opacity => IsSelected ? 1 : 0.6;
 }
 
 // The console Home is a row of launchers over the game art, like a console's game row:
@@ -42,7 +39,6 @@ public partial class MainViewModel
                 Option = option,
                 Glyph = art.Glyph,
                 Background = TileGradient(art.From, art.To),
-                Glow = TileGlow(art.Glow),
                 IsSelected = ReferenceEquals(option, SelectedLaunch)
             });
         }
@@ -82,17 +78,6 @@ public partial class MainViewModel
         {
             new GradientStop { Color = Argb(from), Offset = 0 },
             new GradientStop { Color = Argb(to), Offset = 1 }
-        }
-    };
-
-    // Strongest in the middle, gone at the edge: reads as the tile lighting up the background.
-    private static RadialGradientBrush TileGlow(uint color) => new()
-    {
-        GradientStops =
-        {
-            new GradientStop { Color = Argb(0x8C000000 | (color & 0xFFFFFF)), Offset = 0 },
-            new GradientStop { Color = Argb(0x33000000 | (color & 0xFFFFFF)), Offset = 0.55 },
-            new GradientStop { Color = Argb(color & 0xFFFFFF), Offset = 1 }
         }
     };
 
