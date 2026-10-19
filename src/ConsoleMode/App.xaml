@@ -20,6 +20,11 @@
 
             <x:Double x:Key="PageMaxWidth">880</x:Double>
 
+            <!-- Font of the console interface (Inter, variable, shipped in Assets\Fonts). Windows falls back to
+                 Segoe UI if the file can't be loaded. The console views also set it as ContentControlThemeFontFamily,
+                 so buttons and other controls pick it up too. -->
+            <FontFamily x:Key="ConsoleFontFamily">ms-appx:///Assets/Fonts/InterVariable.ttf#Inter Variable</FontFamily>
+
             <!-- Screen tile in the layout map; colors come from the row's role (MonitorRowViewModel). -->
             <Style x:Key="MonitorTileButton" TargetType="Button">
                 <Setter Property="Padding" Value="10,8"/>

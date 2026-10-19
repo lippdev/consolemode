@@ -496,9 +496,12 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 ## Interface Console no estilo console (1.7.0)
 
 ### Início
-- [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem um ponto verde em cima.
+- [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem o selo ✓ verde no canto e uma barra verde embaixo, e os outros ficam mais apagados.
 - [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
-- [ ] A num iniciador muda o ponto para ele, o título grande embaixo passa a ser o nome dele e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
+- [ ] Andar pela fileira já troca o iniciador, sem apertar A: o selo, a barra e o título grande embaixo seguem o foco, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
+- [ ] A num iniciador (ou um clique) abre direto aquele iniciador, como o Jogar agora. Sem tela de jogo escolhida, A só escolhe e não abre nada.
+- [ ] Fonte Inter: os textos da interface Console e do menu da sessão usam a Inter (o "a" e o "g" de dois andares mudam de cara em relação à Segoe), em negrito de verdade no título e no Jogar agora, sem aparência borrada de negrito sintético. Conferir também no **portátil**: se a fonte não carregar, o app cai na Segoe UI sem quebrar. O modo PC continua com a Segoe UI.
+- [ ] Russo: o cirílico aparece na Inter, sem misturar fontes no meio da palavra.
 - [ ] A linha embaixo do título mostra a resolução da tela de jogo e depois áudio, FPS, HDR e VRR quando ligados, separados por "·", e atualiza ao mudar cada um.
 - [ ] Sem tela de jogo escolhida, o texto pede para escolher a tela e Jogar agora fica desativado.
 - [ ] O botão redondo ao lado de Jogar agora abre a aba Sessão.
