@@ -500,3 +500,15 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Blocos e linhas sem borda fina, cantos mais arredondados, Jogar agora em formato de pílula; o contorno branco do foco aparece em tudo, inclusive no menu da sessão.
 - [ ] Ajustes rápidos da Sessão aparecem como quadrados do mesmo tamanho, com o texto do valor inteiro (ou em duas linhas).
 - [ ] Alto contraste do Windows: textos e foco continuam visíveis.
+## Diagnóstico (Ajustes → Atalho, ajuda e dados)
+
+- [ ] Abrir o card "Diagnóstico": o anel de carregamento aparece e, sem travar a janela, o relatório mostra versão e canal (instalado/portátil, estável/teste), Windows com build, e a versão do .NET.
+- [ ] Telas: aparecem todas as que o app vê, com resolução @ Hz, HDR ligado/desligado/sem suporte; a tela de jogo vem marcada "game screen" e as que serão ocultadas, "hidden in console mode". Trocar a tela de jogo ou as ocultas e clicar em **Atualizar** muda as marcas.
+- [ ] Ligar o HDR no Windows e clicar em **Atualizar**: a tela passa a "HDR on".
+- [ ] Áudio: lista as saídas, com a padrão do Windows e a escolhida no app marcadas; com "Ao conectar", nenhuma vem como escolhida.
+- [ ] Controles: com um Xbox e um DualSense ligados, os dois aparecem (Xbox / PlayStation); sem nenhum, "(none)".
+- [ ] Programas: Steam, Playnite, RTSS e ControlFS com caminho e versão quando instalados, e "not found" quando não; "Launches" mostra o iniciador escolhido.
+- [ ] Log: as últimas ~50 linhas do `consolemode.log` aparecem no fim.
+- [ ] Nenhum caminho mostra o nome do usuário do Windows (`C:\Users\…\`), nem com Playnite instalado em `%LOCALAPPDATA%`.
+- [ ] **Copiar relatório** mostra o aviso de copiado e o texto colado no Bloco de Notas é igual ao da tela.
+- [ ] Com uma seção falhando (ex.: sem permissão de leitura do log), ela mostra "unavailable" e o resto do relatório continua aparecendo.
