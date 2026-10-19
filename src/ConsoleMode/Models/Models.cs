@@ -16,6 +16,12 @@ public sealed class AppConfig
 
     /// <summary>Playnite folder or exe chosen by the user (portable installs); empty = auto-detect.</summary>
     public string PlaynitePath { get; set; } = "";
+
+    /// <summary>"customApp" mode: the exe to launch, its optional arguments, and an optional process to
+    /// watch instead of it (for launcher stubs that hand off to another process).</summary>
+    public string CustomAppPath { get; set; } = "";
+    public string CustomAppArguments { get; set; } = "";
+    public string CustomAppWatchProcess { get; set; } = "";
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
@@ -340,6 +346,10 @@ public sealed class ConsoleRuntimeState
     public bool AudioPendingTarget { get; set; }
     public nint CachedBigPictureHandle { get; set; }
     public DateTime? PlayniteWindowMissingSince { get; set; }
+    /// <summary>"customApp": the process name that keeps the session going, and when it went missing.</summary>
+    public string CustomAppWatchName { get; set; } = "";
+    public DateTime? CustomAppGoneSince { get; set; }
+    public bool CustomAppTimeoutLogged { get; set; }
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }

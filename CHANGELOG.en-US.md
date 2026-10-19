@@ -5,6 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### What's new
 - Update notice in Portuguese: the new version's highlight shows in the app's language when there is a changelog in it (today, Portuguese); other languages still see it in English. Applies to updates published after this version. (#158)
+- **Custom app** mode: in Settings → When entering console mode, pick any `.exe` (RetroArch, another launcher…) with optional arguments. Console Mode sets up the TV, opens the app on the game screen and restores the desk by itself when it closes. For launchers that only start another program and exit, type the real program's process name in **Process to watch**. If it never shows up, the session stays until you end it (hold Start + Select). (#161)
 
 ## [1.6.2]
 ### What's new

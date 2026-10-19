@@ -11,6 +11,9 @@ Detalhes que não cabem no [README](../README.pt-BR.md).
 | **Steam Big Picture** | Restauração automática (app na bandeja) |
 | **Playnite tela cheia** | Restauração automática (app na bandeja) |
 | **Modo Xbox** | Manual — *Restaurar agora*, menu da bandeja ou reabrir a janela |
+| **Aplicativo personalizado** | Restauração automática quando o app (ou o processo escolhido para acompanhar) fecha |
+
+**Aplicativo personalizado** abre qualquer `.exe` que você escolher (RetroArch, outro launcher…) a partir da própria pasta, com argumentos opcionais, e move a janela dele para a tela de jogo. A sessão termina alguns segundos depois que esse processo fecha. Se o exe só abre outro programa e fecha (um launcher intermediário), digite o nome do processo do programa de verdade em **Processo a acompanhar**. Se o processo acompanhado nunca aparecer, a sessão continua até você encerrá-la (segurar Start + Select, o menu da sessão ou a bandeja).
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 

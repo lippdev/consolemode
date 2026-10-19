@@ -36,6 +36,9 @@ public sealed class ConsoleEngine
     public void Start(AppConfig config, MonitorInfo? focusInfo, Func<ScreenRect?, bool>? confirmScreen = null)
     {
         if (State.IsActive) throw new InvalidOperationException(LocalizationService.Get("AlreadyConsoleActive"));
+        // Before anything changes on screen: a custom app that can't be launched blocks the start.
+        if (config.FullscreenMode == CustomApp.Mode && CustomApp.ProblemText(config.CustomAppPath) is { } problem)
+            throw new InvalidOperationException(problem);
         config = ResolveMonitorNames(config);
         AppLog.Write($"Start: foco={config.FocusMonitor}, esconder={string.Join('+', config.HideMonitors)}, estratégia={config.HideStrategy}, modo={config.FullscreenMode}");
 
@@ -59,6 +62,9 @@ public sealed class ConsoleEngine
         State.AbsenceCount = 0;
         State.CachedBigPictureHandle = 0;
         State.PlayniteWindowMissingSince = null;
+        State.CustomAppWatchName = "";
+        State.CustomAppGoneSince = null;
+        State.CustomAppTimeoutLogged = false;
         State.CachedXboxHandle = 0;
         State.AudioWatchComplete = false;
         State.BigPictureWatchActive = false;
@@ -196,6 +202,13 @@ public sealed class ConsoleEngine
                 Monitors.UpdateFocusRect(config.FocusMonitor, State, true);
                 Launch.StartPlaynite();
                 break;
+            case CustomApp.Mode:
+                Thread.Sleep(400);
+                Monitors.UpdateFocusRect(config.FocusMonitor, State, true);
+                State.CustomAppWatchName = CustomApp.WatchedProcess(config.CustomAppPath, config.CustomAppWatchProcess);
+                AppLog.Write($"Start: aplicativo personalizado {CustomApp.CleanPath(config.CustomAppPath)}, acompanhando o processo {State.CustomAppWatchName}");
+                Launch.StartCustomApp(config.CustomAppPath, config.CustomAppArguments);
+                break;
         }
 
         State.ModeLaunched = true;
@@ -211,6 +224,13 @@ public sealed class ConsoleEngine
         var mode = State.FullscreenMode;
         if (mode == "xboxMode")
         {
+            TickAudio();
+            return "running";
+        }
+
+        if (mode == CustomApp.Mode)
+        {
+            if (IsCustomAppExit()) return "exit";
             TickAudio();
             return "running";
         }
@@ -341,6 +361,9 @@ public sealed class ConsoleEngine
             State.LastAudioSwitchName = null;
             State.AudioPendingTarget = false;
             State.CachedBigPictureHandle = 0;
+            State.CustomAppWatchName = "";
+            State.CustomAppGoneSince = null;
+            State.CustomAppTimeoutLogged = false;
             State.CachedXboxHandle = 0;
             State.AudioWatchComplete = false;
             State.BigPictureWatchActive = false;
@@ -459,6 +482,62 @@ public sealed class ConsoleEngine
         var exit = PlayniteExitPolicy.IsExit(Launch.IsPlayniteRunning(), showing, State.PlayniteWindowMissingSince, DateTime.Now);
         if (exit) AppLog.Write("Loop: Playnite fechou");
         return exit;
+    }
+
+    /// <summary>
+    /// "customApp": the session lasts while the watched process runs. It ends once that process has
+    /// appeared and stayed gone for a grace period; one that never shows up keeps the session until ended by hand.
+    /// </summary>
+    private bool IsCustomAppExit()
+    {
+        var name = State.CustomAppWatchName;
+        var now = DateTime.Now;
+        var running = LaunchService.IsProcessRunning(name);
+        if (running)
+        {
+            State.CustomAppGoneSince = null;
+            if (!State.HasAppeared) AppLog.Write($"Loop: processo {name} apareceu");
+            State.HasAppeared = true;
+            PlaceCustomAppWindow(name);
+        }
+        else if (State.HasAppeared)
+        {
+            State.CustomAppGoneSince ??= now;
+        }
+        else if (!State.CustomAppTimeoutLogged && CustomApp.HasTimedOut(State.HasAppeared, State.LaunchTime, now))
+        {
+            State.CustomAppTimeoutLogged = true;
+            AppLog.Write($"Loop: processo {name} não apareceu em {CustomApp.AppearTimeout.TotalSeconds:0} s; a sessão continua até ser encerrada manualmente");
+        }
+
+        var exit = CustomApp.IsExit(State.HasAppeared, running, State.CustomAppGoneSince, now);
+        if (exit) AppLog.Write($"Loop: processo {name} fechou");
+        return exit;
+    }
+
+    /// <summary>Once its main window shows: moves it to the game screen (a few tries) and brings it to the front.</summary>
+    private void PlaceCustomAppWindow(string name)
+    {
+        if (State.SteamMoved || string.IsNullOrWhiteSpace(State.FocusMonitor)) return;
+        var handles = LaunchService.GetProcessWindows(name);
+        if (handles.Length == 0) return;
+
+        Monitors.UpdateFocusRect(State.FocusMonitor, State, true);
+        var rect = Monitors.GetMonitorRect(State.FocusMonitor, State);
+        var handle = handles[0];
+        if (rect is not null && !NativeWindows.IsWindowCenterOnRect(handle, rect.X, rect.Y, rect.Width, rect.Height))
+        {
+            if (State.MoveCount < 8)
+            {
+                Monitors.MoveProcessWindows(State.FocusMonitor, rect, name);
+                State.MoveCount++;
+                return;
+            }
+            AppLog.Write($"Loop: janela de {name} não chegou na tela de jogo; deixando onde está");
+        }
+
+        State.SteamMoved = true;
+        if (!WindowSwitcher.Activate(handle)) AppLog.Write($"Loop: janela de {name} não veio para frente");
     }
 
     private bool AudioWatchNeeded()

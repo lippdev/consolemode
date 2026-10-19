@@ -5,6 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 ### Novidades
 - Aviso de atualização em português: o destaque da nova versão aparece no idioma do app quando há um changelog nele (hoje, português); os outros idiomas continuam vendo o destaque em inglês. Vale a partir das atualizações publicadas depois desta versão. (#158)
+- Modo **Aplicativo personalizado**: em Ajustes → Ao entrar no modo console, escolha qualquer `.exe` (RetroArch, outro launcher…) com argumentos opcionais. O Console Mode prepara a TV, abre o app na tela de jogo e restaura a mesa sozinho quando ele fecha. Para launchers que só abrem outro programa e fecham, informe em **Processo a acompanhar** o nome do processo do programa de verdade. Se ele nunca aparecer, a sessão continua até você encerrá-la (segurar Start + Select). (#161)
 
 ## [1.6.2]
 ### Novidades
