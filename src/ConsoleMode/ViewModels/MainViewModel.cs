@@ -83,6 +83,7 @@ public partial class MainViewModel : ObservableObject
     {
         "playnite" => LocalizationService.Get("LaunchPlayniteDescription"),
         "xboxMode" => LocalizationService.Get("LaunchXboxDescription"),
+        CustomApp.Mode => LocalizationService.Get("LaunchCustomAppDescription"),
         _ => LocalizationService.Get("LaunchSteamDescription")
     };
     public string FocusModeDescription => FocusRow is null
@@ -142,6 +143,8 @@ public partial class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(StartButtonText));
         OnPropertyChanged(nameof(LaunchDescription));
+        OnPropertyChanged(nameof(CustomAppName));
+        OnPropertyChanged(nameof(CustomAppPathText));
         OnPropertyChanged(nameof(FocusModeDescription));
         OnPropertyChanged(nameof(InstallKindText));
         OnPropertyChanged(nameof(UpdateActionText));
@@ -176,6 +179,7 @@ public partial class MainViewModel : ObservableObject
             if (IsPlayniteAvailable)
                 LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchPlaynite"), Value = "playnite" });
             LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
+            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchCustomApp"), Value = CustomApp.Mode });
             SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == launchValue) ?? LaunchOptions[0];
 
             FpsOptions.Clear();
@@ -300,6 +304,9 @@ public partial class MainViewModel : ObservableObject
 
             SelectedHideStrategy = HideStrategies.FirstOrDefault(s => s.Value == config.HideStrategy) ?? HideStrategies[0];
             PlaynitePath = config.PlaynitePath ?? "";
+            CustomAppPath = config.CustomAppPath ?? "";
+            CustomAppArguments = config.CustomAppArguments ?? "";
+            CustomAppWatchProcess = config.CustomAppWatchProcess ?? "";
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
@@ -539,6 +546,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnSelectedLaunchChanged(ComboOption? value)
     {
         OnPropertyChanged(nameof(LaunchDescription));
+        OnPropertyChanged(nameof(IsCustomApp));
         SettingChanged();
     }
 
@@ -620,6 +628,11 @@ public partial class MainViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(config.FocusMonitor))
         {
             SetStatus(LocalizationService.Get("ChooseGameScreen"), InfoBarSeverity.Warning);
+            return;
+        }
+        if (config.FullscreenMode == CustomApp.Mode && CustomApp.ProblemText(config.CustomAppPath) is { } problem)
+        {
+            SetStatus(problem, InfoBarSeverity.Warning);
             return;
         }
 
@@ -907,6 +920,9 @@ public partial class MainViewModel : ObservableObject
             HideStrategy = SelectedHideStrategy?.Value ?? "disconnect",
             FullscreenMode = SelectedLaunch?.Value ?? "bigPicture",
             PlaynitePath = PlaynitePath,
+            CustomAppPath = CustomApp.CleanPath(CustomAppPath),
+            CustomAppArguments = CustomAppArguments.Trim(),
+            CustomAppWatchProcess = CustomAppWatchProcess.Trim(),
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
@@ -994,7 +1010,7 @@ public partial class MainViewModel : ObservableObject
                 : LocalizationService.Get("SummaryFocusOnly", FocusRow.Name);
 
         SummaryItems.Clear();
-        SummaryItems.Add(SelectedLaunch?.Text ?? LocalizationService.Get("LaunchSteam"));
+        SummaryItems.Add(LaunchSummaryText);
         switch (SelectedAudio?.Value)
         {
             case null or "":
@@ -1023,6 +1039,7 @@ public partial class MainViewModel : ObservableObject
     {
         "playnite" => LocalizationService.Get("ActivePlaynite"),
         "xboxMode" => LocalizationService.Get("ActiveXbox"),
+        CustomApp.Mode => LocalizationService.Get("ActiveCustomApp", LaunchService.GetCustomAppName(config.CustomAppPath)),
         _ => LocalizationService.Get("ActiveSteam")
     };
 

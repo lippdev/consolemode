@@ -378,6 +378,16 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] "Cortinas pretas": as telas da mesa ficam pretas e voltam ao restaurar. Resultado: ______
 - [ ] "Desligar por DDC/CI" (monitor com DDC/CI ligado no menu dele): as telas da mesa apagam e voltam a acender ao restaurar. Resultado: ______
 
+### Aplicativo personalizado
+
+- [ ] RetroArch: em Ajustes → Ao entrar no modo console, escolher "Aplicativo personalizado", Procurar… e selecionar `retroarch.exe` (argumentos vazios). Iniciar: as telas trocam como nos outros modos, o RetroArch abre na TV e na frente. O resumo e a tela da sessão mostram "RetroArch". Resultado: ______
+- [ ] Argumentos: com `--fullscreen` (ou o argumento equivalente do app), o app abre em tela cheia; a pasta de trabalho é a do exe (o RetroArch acha os cores e a configuração). Resultado: ______
+- [ ] Fechar o app escolhido restaura a mesa sozinho em poucos segundos (log: `Loop: processo … fechou`). Resultado: ______
+- [ ] Launcher intermediário que abre outro processo e fecha (ex.: um atalho/launcher de jogo): com o nome do processo real em "Processo a acompanhar", a sessão continua depois que o launcher fecha e só restaura quando o processo real fecha. Resultado: ______
+- [ ] "Processo a acompanhar" com um nome que nunca aparece: depois de ~90 s o log mostra `não apareceu`, a mesa **não** volta sozinha, e segurar Start + Select (ou o menu da bandeja) restaura. Resultado: ______
+- [ ] Caminho inválido (exe apagado ou renomeado depois de escolhido) ou nenhum app escolhido: Iniciar mostra o aviso e nada muda nas telas. Resultado: ______
+- [ ] Na interface Console, a linha "Aplicativo a abrir" aparece só com esse modo escolhido e abre o seletor de arquivos. Resultado: ______
+
 ### Janelas e recuperação
 
 - [ ] Big Picture ou Playnite abrindo na tela errada é movido para a TV. Resultado: ______

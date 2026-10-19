@@ -11,6 +11,7 @@ Detalles que no caben en el [README](../README.es-ES.md).
 | **Steam Big Picture** | Restauración automática (la aplicación sigue en la bandeja) |
 | **Playnite a pantalla completa** | Restauración automática (la aplicación sigue en la bandeja) |
 | **Modo Xbox** | Manual: usa *Restaurar ahora*, el menú de la bandeja o vuelve a abrir la ventana |
+| **Aplicación personalizada** | Restauración automática cuando se cierra la aplicación (o el proceso que elegiste vigilar) |
 
 También puedes restaurar en cualquier momento desde la bandeja (*Restaurar pantallas* / *Mostrar ventana*). Con las pantallas negras, **ESC** quita las cortinas.
 
