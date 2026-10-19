@@ -381,5 +381,9 @@
   "SessionTourExitPreviewBody": "Fecha o Console Mode por completo: ele sai da bandeja e os atalhos do controle param de funcionar até você abri-lo de novo.",
   "SessionTourCard": "Tour do menu da sessão",
   "SessionTourDescription": "Explica cada opção do menu sobre o jogo. Abre o menu numa prévia, sem iniciar uma sessão.",
-  "ShowTour": "Ver o tour"
+  "ShowTour": "Ver o tour",
+  "ControllerBattery": "Bateria do controle: {0}",
+  "ControllerBatteryCharging": "Bateria do controle: {0}, carregando",
+  "LowBatteryTitle": "Bateria do controle fraca",
+  "LowBatteryBody": "Restam {0} de bateria. Conecte o cabo ou carregue o controle."
 }

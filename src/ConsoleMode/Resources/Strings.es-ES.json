@@ -381,5 +381,9 @@
   "SessionTourExitPreviewBody": "Cierra Console Mode por completo: sale de la bandeja y los atajos del mando dejan de funcionar hasta que lo abras de nuevo.",
   "SessionTourCard": "Recorrido del menú de sesión",
   "SessionTourDescription": "Explica cada opción del menú sobre el juego. Abre el menú como vista previa, sin iniciar una sesión.",
-  "ShowTour": "Ver el recorrido"
+  "ShowTour": "Ver el recorrido",
+  "ControllerBattery": "Batería del mando: {0}",
+  "ControllerBatteryCharging": "Batería del mando: {0}, cargando",
+  "LowBatteryTitle": "Batería del mando baja",
+  "LowBatteryBody": "Queda {0} de batería. Conecta el cable o carga el mando."
 }

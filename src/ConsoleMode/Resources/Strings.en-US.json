@@ -381,5 +381,9 @@
   "SessionTourExitPreviewBody": "Closes Console Mode completely: it leaves the tray and the controller shortcuts stop working until you open it again.",
   "SessionTourCard": "Session menu tour",
   "SessionTourDescription": "Explains each option of the menu over the game. Opens the menu as a preview, without starting a session.",
-  "ShowTour": "Show the tour"
+  "ShowTour": "Show the tour",
+  "ControllerBattery": "Controller battery: {0}",
+  "ControllerBatteryCharging": "Controller battery: {0}, charging",
+  "LowBatteryTitle": "Controller battery low",
+  "LowBatteryBody": "{0} left. Plug in the cable or charge the controller."
 }

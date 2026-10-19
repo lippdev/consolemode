@@ -130,6 +130,12 @@
                                    Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}"/>
                         <TextBlock Text="·" FontSize="16" Foreground="{ThemeResource MenuTextTertiary}" Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}"/>
                         <TextBlock Text="{x:Bind ViewModel.SessionControllerText, Mode=OneWay}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}"/>
+                        <!-- Battery of the emptiest pad; "~" when XInput only gives a rough level -->
+                        <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind ViewModel.HasControllerBattery, Mode=OneWay}"
+                                    AutomationProperties.Name="{x:Bind ViewModel.ControllerBatteryLabel, Mode=OneWay}">
+                            <FontIcon Glyph="{x:Bind ViewModel.ControllerBatteryGlyph, Mode=OneWay}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}"/>
+                            <TextBlock Text="{x:Bind ViewModel.ControllerBatteryText, Mode=OneWay}" FontSize="16" Foreground="{ThemeResource MenuTextSecondary}"/>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

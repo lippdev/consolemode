@@ -381,5 +381,9 @@
   "SessionTourExitPreviewBody": "Ferme complètement Console Mode : il quitte la zone de notification et les raccourcis manette ne fonctionnent plus jusqu'à ce que vous le rouvriez.",
   "SessionTourCard": "Visite du menu de session",
   "SessionTourDescription": "Explique chaque option du menu affiché par-dessus le jeu. Ouvre le menu en aperçu, sans lancer de session.",
-  "ShowTour": "Voir la visite"
+  "ShowTour": "Voir la visite",
+  "ControllerBattery": "Batterie de la manette : {0}",
+  "ControllerBatteryCharging": "Batterie de la manette : {0}, en charge",
+  "LowBatteryTitle": "Batterie de la manette faible",
+  "LowBatteryBody": "Il reste {0} de batterie. Branchez le câble ou rechargez la manette."
 }

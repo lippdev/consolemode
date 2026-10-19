@@ -6,6 +6,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### What's new
 - Update notice in Portuguese: the new version's highlight shows in the app's language when there is a changelog in it (today, Portuguese); other languages still see it in English. Applies to updates published after this version. (#158)
 - Diagnostics in Settings: a new card shows, read-only, the app's version and channel, Windows, the screens (resolution, HDR, which one is the game screen and which ones get hidden), the audio outputs, the connected controllers, whether Steam, Playnite, RTSS and ControlFS were found, and the end of the log. **Copy report** copies it all as text to paste into an issue, without your user name in paths and without keys. (#159)
+- Controller battery: the session menu header and the Console interface top bar (next to the clock) show the controller's battery level, with the charging icon when it is on the cable. Works with wireless Xbox controllers, DualSense and DualShock 4 (USB and Bluetooth); when Windows only gives a rough level, the number gets a "~". With several controllers it shows the emptiest one, and wired controllers with no battery show nothing. During a session, a notice in the corner of the TV warns when the battery reaches 15 % and again at 5 %, without repeating. (#160)
 
 ## [1.6.2]
 ### What's new

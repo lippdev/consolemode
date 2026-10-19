@@ -220,6 +220,19 @@ Pré-condição: um emulador ou jogo que deixa o cursor visível (ex.: um emulad
 - [ ] Voltar ao PC e iniciar outra sessão: a opção começa Desativada de novo. Resultado: ______
 - [ ] Limitação esperada: o jogo também recebe o A e os analógicos. Em programas abertos como administrador o cursor não mexe (o Windows bloqueia a entrada vinda de um app comum). Resultado: ______
 
+## 1f. Bateria do controle (issue #70)
+
+Onde aparece: no cabeçalho do menu da sessão (depois de "controle Xbox detectado") e na barra de cima da interface Console, ao lado do relógio. Atualiza a cada 30 s, ao conectar um controle e ao abrir o menu. Com vários controles, mostra o mais descarregado.
+
+- [ ] Controle Xbox sem fio (Bluetooth ou adaptador): ícone de bateria + porcentagem. Se só o XInput responder, o número vem com "~" (5/30/65/100 %). Compare com Configurações → Bluetooth do Windows. Resultado: ______
+- [ ] DualSense por USB: porcentagem (de 10 em 10, ex.: 65 %) com o ícone de carregando. Resultado: ______
+- [ ] DualSense por Bluetooth: porcentagem sem o ícone de carregando; desconecte e reconecte e o valor volta em até ~30 s. Resultado: ______
+- [ ] DualShock 4 por USB e por Bluetooth: igual ao DualSense (por Bluetooth, só depois que o controle passa a mandar o relatório completo; com a Steam aberta isso é imediato). Resultado: ______
+- [ ] Controle com fio sem bateria (Xbox com fio, genérico): nenhum indicador, nem no menu nem na barra. Resultado: ______
+- [ ] Carregando: ligue o cabo num controle sem fio; em até ~30 s o ícone muda para o de carregando. Resultado: ______
+- [ ] Bateria fraca na sessão: com um controle em 15 % ou menos, aparece um aviso no canto da TV ("Bateria do controle fraca"), sem tirar o foco do jogo; não repete a cada 30 s. Aparece de novo só em 5 % ou menos, ou depois de carregar. Fora da sessão não há aviso. Log: `Controle: bateria fraca (...)`. Resultado: ______
+- [ ] Leitor de tela (Narrador) no indicador: lê "Bateria do controle: 65%" (e ", carregando"). Resultado: ______
+
 ## 2. Links `consolemode://`
 
 - [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______

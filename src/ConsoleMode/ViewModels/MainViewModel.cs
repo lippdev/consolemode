@@ -131,6 +131,7 @@ public partial class MainViewModel : ObservableObject
         InitializeAppSettings();
         ResolveUi();
         _ = RecheckControllerAsync();
+        StartBatteryPolling();
         _ = RefreshBackgroundAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();

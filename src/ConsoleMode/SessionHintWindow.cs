@@ -14,7 +14,7 @@ namespace ConsoleMode;
 /// <summary>
 /// A toast in the top-right corner of the game screen, shown once when the session starts:
 /// "hold Select + Y to open the panel". It never takes the focus from the game (shown without
-/// activation, WS_EX_NOACTIVATE) and closes by itself.
+/// activation, WS_EX_NOACTIVATE) and closes by itself. Also used for the low-battery notice.
 /// </summary>
 public sealed class SessionHintWindow : Window
 {
@@ -28,9 +28,9 @@ public sealed class SessionHintWindow : Window
 
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _timer;
 
-    public SessionHintWindow(string title, string body, ScreenRect? target, TimeSpan duration)
+    public SessionHintWindow(string title, string body, ScreenRect? target, TimeSpan duration, string? glyph = null)
     {
-        var icon = new FontIcon { Glyph = "", FontSize = 30, VerticalAlignment = VerticalAlignment.Center };
+        var icon = new FontIcon { Glyph = glyph ?? "\uE7FC", FontSize = 30, VerticalAlignment = VerticalAlignment.Center };
         var text = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
         text.Children.Add(new TextBlock { Text = title, FontSize = 17, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
         text.Children.Add(new TextBlock { Text = body, FontSize = 15, TextWrapping = TextWrapping.Wrap, Opacity = 0.85 });
