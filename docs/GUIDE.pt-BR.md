@@ -18,6 +18,10 @@ No menu da sessão há duas saídas. **Voltar ao PC** encerra a sessão e devolv
 
 ## Configurações no modo Console
 
+O **Início** mostra os seus iniciadores numa fileira no topo (Steam Big Picture, Playnite, modo Xbox): **A** num deles escolhe o que abre, e **Jogar agora** logo abaixo começa. A linha embaixo do nome diz onde você vai jogar e o que muda (áudio, resolução, FPS, HDR, VRR); o botão redondo ao lado de Jogar agora abre a **Sessão**, com as telas e os ajustes rápidos.
+
+A aba **Sistema** lista as categorias à esquerda (Tela de jogo, Ao entrar no modo console, Controle, TV, Extras opcionais, App, Atalho, ajuda e dados, Outros apps do desenvolvedor). Passar por uma categoria mostra as opções dela à direita; **A** ou a direita entra nelas, e **B** ou a esquerda volta para as categorias.
+
 Em **Sistema → Controle**, escolha o layout dos botões: **Automático**, **Xbox** ou **PlayStation**. A prévia e os nomes dos atalhos acompanham a escolha, que fica salva ao fechar o app. Isso muda os símbolos exibidos; as entradas do controle mantêm o mapeamento existente.
 
 A aba **Sistema** oferece os mesmos ajustes do modo PC, incluindo os atalhos do controle, Playnite, Android TV, FPS personalizado e pasta de dados. Os valores são compartilhados entre as duas interfaces e permanecem salvos ao reabrir o app.

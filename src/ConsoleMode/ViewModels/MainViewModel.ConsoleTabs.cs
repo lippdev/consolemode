@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ConsoleMode.ViewModels;
 
-// The console interface is three tabs, switched with LB / RB (L1 / R1): Home (the play banner),
-// Session (screens and quick settings) and System (every setting).
+// The console interface is three tabs, switched with LB / RB (L1 / R1): Home (the launchers and the
+// play button), Session (screens and quick settings) and System (every setting, by category).
 public partial class MainViewModel
 {
     public const int HomeTabIndex = 0;
@@ -21,6 +21,13 @@ public partial class MainViewModel
 
     public string HintLb => IsPlayStationHints ? "L1" : "LB";
     public string HintRb => IsPlayStationHints ? "R1" : "RB";
+
+    /// <summary>The System tab's category on the left; only its options show on the right.</summary>
+    [ObservableProperty] private int _systemCategory;
+
+    /// <summary>x:Bind helper: the options of one System category show only while it is the chosen one.</summary>
+    public Microsoft.UI.Xaml.Visibility CategoryVisibility(int current, int category) =>
+        current == category ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
 
     /// <summary>x:Bind helper: the active tab is fully lit, the others dimmed.</summary>
     public double TabOpacity(int current, int tab) => current == tab ? 1.0 : 0.55;

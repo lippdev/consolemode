@@ -18,6 +18,10 @@ The session menu has two ways out. **Back to the PC** ends the session and puts 
 
 ## Settings in Console mode
 
+**Home** puts your launchers in a row at the top (Steam Big Picture, Playnite, Xbox mode): **A** on one picks what opens, and **Play now** below starts it. The line under the name says where you will play and what changes (audio, resolution, FPS, HDR, VRR); the round button next to Play now opens **Session**, with the screens and quick settings.
+
+The **System** tab lists its categories on the left (Gaming display, When entering console mode, Controller, TV, Optional extras, App, Shortcut, help, and data, More apps from the developer). Moving over a category shows its options on the right; **A** or right goes into them, and **B** or left goes back to the categories.
+
 In **System → Controller**, choose the button layout: **Automatic**, **Xbox** or **PlayStation**. The preview and shortcut labels follow the choice, which is saved when you close the app. This changes the displayed symbols; the controller's inputs keep their existing mapping.
 
 The **System** tab provides the same settings as desktop mode, including controller shortcuts, Playnite, Android TV, custom FPS and the data folder. Both interfaces share the saved values, which remain after restarting the app.
