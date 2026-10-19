@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Console interface: a new font, Inter (shipped with the app), with the title and Play now in bold, easier to read from the couch. On Home, moving along the launcher row already picks what opens, like on a PS5: the picked one gets a ✓ badge and a green bar, the others fade back, and A on a tile opens it right away. (#PR)
 
 ## [1.7.0-alpha.1]
 ### What's new

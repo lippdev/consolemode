@@ -14,11 +14,13 @@ public sealed partial class LaunchTile : ObservableObject
     public string Text => Option.Text;
     public string Glyph { get; init; } = "";
     public Brush Background { get; init; } = null!;
-    [ObservableProperty] private bool _isSelected;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(Opacity))] private bool _isSelected;
+    /// <summary>The other launchers fade back, so the one that opens stands out.</summary>
+    public double Opacity => IsSelected ? 1 : 0.6;
 }
 
 // The console Home is a row of launchers over the game art, like a console's game row:
-// A on a tile picks what opens, and the big button below plays it.
+// moving the focus onto a tile picks what opens (see ConsoleHomeView), and A on it plays it.
 public partial class MainViewModel
 {
     public ObservableCollection<LaunchTile> LaunchTiles { get; } = [];
@@ -50,7 +52,15 @@ public partial class MainViewModel
     [RelayCommand]
     private void SelectLaunchTile(LaunchTile? tile)
     {
-        if (tile is not null) SelectedLaunch = tile.Option;
+        if (tile is not null && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
+    }
+
+    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows.</summary>
+    [RelayCommand]
+    private async Task PlayLaunchTile(LaunchTile? tile)
+    {
+        SelectLaunchTile(tile);
+        if (CanStart) await StartAsync();
     }
 
     private void UpdateHomeMeta()

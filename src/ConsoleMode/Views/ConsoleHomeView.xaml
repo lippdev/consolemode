@@ -8,7 +8,12 @@
     xmlns:controls="using:ConsoleMode.Controls"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
     XYFocusKeyboardNavigation="Enabled"
-    RequestedTheme="Dark">
+    RequestedTheme="Dark"
+    FontFamily="{StaticResource ConsoleFontFamily}">
+    <UserControl.Resources>
+        <!-- Buttons and other controls take their font from this key, not from the parent. -->
+        <StaticResource x:Key="ContentControlThemeFontFamily" ResourceKey="ConsoleFontFamily"/>
+    </UserControl.Resources>
 
     <!-- 10-foot layout: big cards, thick focus ring, no mouse needed. Solid background instead of Mica. -->
     <Grid x:Name="Root" Background="#07090D" Padding="56,0,56,32">
@@ -184,24 +189,34 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:LaunchTile">
-                                <Button Style="{StaticResource LaunchTileButton}" Background="{x:Bind Background}"
-                                        Command="{Binding ViewModel.SelectLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
-                                        AutomationProperties.Name="{x:Bind Text}">
-                                    <Grid>
-                                        <FontIcon Glyph="{x:Bind Glyph}" FontSize="44" Margin="0,0,0,18"/>
-                                        <TextBlock Text="{x:Bind Text}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis" MaxLines="1" Foreground="#D9FFFFFF"/>
-                                        <!-- What opens today: a dot, like the "now playing" mark on a console's game row -->
-                                        <Ellipse Width="8" Height="8" Fill="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Top"
-                                                 Margin="0,-6,0,0" Visibility="{x:Bind IsSelected, Mode=OneWay}"/>
-                                    </Grid>
-                                </Button>
+                                <!-- The focus picks the launcher (ConsoleHomeView.ScaleTile); A plays it. -->
+                                <StackPanel Spacing="18" Opacity="{x:Bind Opacity, Mode=OneWay}">
+                                    <StackPanel.OpacityTransition><ScalarTransition Duration="0:0:0.14"/></StackPanel.OpacityTransition>
+                                    <Button Style="{StaticResource LaunchTileButton}" Background="{x:Bind Background}"
+                                            Command="{Binding ViewModel.PlayLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
+                                            AutomationProperties.Name="{x:Bind Text}">
+                                        <Grid>
+                                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Margin="0,0,0,20"/>
+                                            <TextBlock Text="{x:Bind Text}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" MaxLines="1" Foreground="#E6FFFFFF"/>
+                                            <!-- What opens: a check in the corner -->
+                                            <Grid Width="26" Height="26" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-2,0"
+                                                  Visibility="{x:Bind IsSelected, Mode=OneWay}">
+                                                <Ellipse Fill="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                                <FontIcon Glyph="&#xE73E;" FontSize="13" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Button>
+                                    <!-- ...and a short bar under the tile, like the "now playing" mark on a console's game row -->
+                                    <Border Width="32" Height="4" CornerRadius="2" Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                            Visibility="{x:Bind IsSelected, Mode=OneWay}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
                     <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="10" Margin="4,0,0,48" MaxWidth="1000" HorizontalAlignment="Left">
-                        <TextBlock Text="{x:Bind ViewModel.SelectedLaunch.Text, Mode=OneWay}" FontSize="64" FontWeight="Light"
+                        <TextBlock Text="{x:Bind ViewModel.SelectedLaunch.Text, Mode=OneWay}" FontSize="60" FontWeight="Bold" CharacterSpacing="-20"
                                    TextTrimming="CharacterEllipsis" MaxLines="1"/>
                         <TextBlock Text="{x:Bind ViewModel.SummaryTitle, Mode=OneWay}" FontSize="24" Foreground="#E6FFFFFF"
                                    TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
@@ -213,7 +228,7 @@
                                     Command="{x:Bind ViewModel.StartCommand}" IsEnabled="{x:Bind ViewModel.CanStart, Mode=OneWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="14">
                                     <FontIcon Glyph="&#xE768;" FontSize="24"/>
-                                    <TextBlock Text="{x:Bind ViewModel.StartButtonText, Mode=OneWay}" FontSize="24" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{x:Bind ViewModel.StartButtonText, Mode=OneWay}" FontSize="24" FontWeight="Bold"/>
                                 </StackPanel>
                             </Button>
                             <!-- Screens, audio and quick settings live one tab over -->

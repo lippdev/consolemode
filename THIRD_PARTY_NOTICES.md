@@ -6,6 +6,12 @@ O **Console Mode** usa as ferramentas abaixo. Algumas são baixadas automaticame
 
 Até a versão 1.5, o Console Mode embutia o [MultiMonitorTool](https://www.nirsoft.net/utils/multi_monitor_tool.html) e o [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html), da NirSoft, para controlar monitores e áudio. A partir da 1.6 isso é feito com as APIs do próprio Windows e nenhuma ferramenta da NirSoft é distribuída (issue #91).
 
+## Fonte
+
+| Fonte | Site | Uso no projeto |
+|-------|------|----------------|
+| [Inter](https://rsms.me/inter/) 4.1 | GitHub (SIL Open Font License 1.1) | Embarcada (`src/ConsoleMode/Assets/Fonts/InterVariable.ttf`) como fonte da interface Console. A licença vai junto, em `Inter-OFL.txt` |
+
 ## Limite de FPS (opcional)
 
 | Ferramenta | Site | Uso no projeto |

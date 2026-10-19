@@ -35,8 +35,8 @@ public sealed partial class ConsoleHomeView : UserControl
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
         Root.PreviewKeyDown += OnKeyDown;
-        // The focused card grows a little, like the Xbox home.
-        Root.GotFocus += (_, e) => ScaleTile(e.OriginalSource, 1.07f);
+        // The focused card grows a little, like the Xbox home; on the Home row it also picks the launcher.
+        Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); };
         Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
         // System tab: remember the option in use, so closing a picker lands back on it.
         SettingsRows.GotFocus += (_, e) => { if (e.OriginalSource is Control row) _lastSettingsRow = row; };
@@ -401,6 +401,12 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnClockTick(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args) =>
         ClockText.Text = DateTime.Now.ToString("HH:mm");
+
+    /// <summary>Like a console's game row: the launcher under the focus is the one that opens.</summary>
+    private void PickFocusedLauncher(object source)
+    {
+        if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
+    }
 
     /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>
     private static void ScaleTile(object source, float scale)

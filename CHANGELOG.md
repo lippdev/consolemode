@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- Interface Console: fonte nova, a Inter (embutida no app), com o título e o Jogar agora em negrito, mais legível de longe na TV. No Início, andar pela fileira de iniciadores já escolhe o que abre, como no PS5: o escolhido ganha um selo ✓ e uma barra verde, os outros ficam mais apagados, e A no bloco abre direto. (#PR)
 
 ## [1.7.0-alpha.1]
 ### Novidades
