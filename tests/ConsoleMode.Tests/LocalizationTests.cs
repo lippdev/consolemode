@@ -82,6 +82,33 @@ public sealed class LocalizationTests
         }
     }
 
+    /// <summary>Names that read the same in every language (products, the desktop shortcut).</summary>
+    private static readonly HashSet<string> SameInEveryLanguage =
+        ["Brand", "ShortcutName", "LaunchSteam", "FpsOverlayShowApi"];
+
+    private static readonly Regex WordPattern = new(@"\p{L}{2,}", RegexOptions.Compiled);
+
+    [Fact]
+    public void Translations_do_not_copy_english_sentences()
+    {
+        // Single words ("Volume", "Desktop", "FPS") can legitimately match English; a phrase of
+        // three or more words that matches is an English text pasted in and never translated.
+        var english = LoadCatalog(LocalizationService.EnglishUnitedStates);
+        var copied = new List<string>();
+        foreach (var language in LocalizationService.SupportedLanguages
+                     .Select(l => l.Code)
+                     .Where(code => code != LocalizationService.EnglishUnitedStates))
+        {
+            var localized = LoadCatalog(language);
+            copied.AddRange(english
+                .Where(entry => !SameInEveryLanguage.Contains(entry.Key)
+                                && WordPattern.Matches(entry.Value).Count >= 3
+                                && localized[entry.Key] == entry.Value)
+                .Select(entry => $"{language}:{entry.Key}"));
+        }
+        Assert.True(copied.Count == 0, $"Untranslated (same as en-US): {string.Join(", ", copied)}");
+    }
+
     [Fact]
     public void Display_mode_labels_follow_the_language_switch()
     {
