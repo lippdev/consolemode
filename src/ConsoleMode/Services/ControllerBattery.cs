@@ -123,6 +123,9 @@ public static class ControllerBattery
     /// <summary>"65%", or "~65%" when approximate.</summary>
     public static string Format(BatteryReading reading) => $"{(reading.Approximate ? "~" : "")}{reading.Percent}%";
 
+    /// <summary>For the diagnostics report (English on purpose): "battery 80%", "battery ~65%, charging".</summary>
+    public static string Describe(BatteryReading reading) => $"battery {Format(reading)}{(reading.Charging ? ", charging" : "")}";
+
     /// <summary>Segoe Fluent Icons battery glyph in ten steps, with the charging variant.</summary>
     public static string Glyph(int percent, bool charging)
     {

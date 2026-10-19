@@ -127,6 +127,13 @@ public class ControllerBatteryTests
         Assert.Equal("~65%", ControllerBattery.Format(Reading("a", 65, "xinput", approximate: true)));
     }
 
+    [Fact]
+    public void Diagnostics_text_is_plain_english()
+    {
+        Assert.Equal("battery 80%", ControllerBattery.Describe(Reading("a", 80, "wgi")));
+        Assert.Equal("battery ~65%, charging", ControllerBattery.Describe(new BatteryReading("x", "x", 65, true, true, "xinput")));
+    }
+
     [Theory]
     [InlineData(0, false, "")]
     [InlineData(4, false, "")]
