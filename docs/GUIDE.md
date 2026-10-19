@@ -11,6 +11,9 @@ English · [Português (Brasil)](GUIDE.pt-BR.md) · [Español](GUIDE.es-ES.md) �
 | **Steam Big Picture** | Automatic restore (app stays in the tray) |
 | **Playnite fullscreen** | Automatic restore (app stays in the tray) |
 | **Xbox mode** | Manual — use *Restore now*, the tray menu, or reopen the window |
+| **Custom app** | Automatic restore when the app (or the process you chose to watch) closes |
+
+**Custom app** opens any `.exe` you pick (RetroArch, another launcher…) from its own folder, with optional arguments, and moves its window to the game screen. The session ends a few seconds after that process closes. If the exe only starts another program and exits (a launcher stub), type the real program's process name in **Process to watch**. If the watched process never shows up, the session stays until you end it (hold Start + Select, the session menu or the tray).
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 

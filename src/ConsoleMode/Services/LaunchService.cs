@@ -22,6 +22,54 @@ public sealed class LaunchService
         ProcessRunner.StartDetached("playnite://playnite/start");
     }
 
+    /// <summary>"customApp": starts the exe from its own folder (emulators look for their files there).</summary>
+    public void StartCustomApp(string exePath, string? arguments)
+    {
+        var exe = CustomApp.CleanPath(exePath);
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = exe,
+            Arguments = arguments?.Trim() ?? "",
+            WorkingDirectory = Path.GetDirectoryName(exe) ?? "",
+            UseShellExecute = true
+        })?.Dispose();
+    }
+
+    /// <summary>The exe's FileDescription ("RetroArch"), else its file name.</summary>
+    public static string GetCustomAppName(string exePath)
+    {
+        string? description = null;
+        try
+        {
+            var exe = CustomApp.CleanPath(exePath);
+            if (File.Exists(exe)) description = FileVersionInfo.GetVersionInfo(exe).FileDescription;
+        }
+        catch { /* no version info: fall back to the file name */ }
+        return CustomApp.DisplayName(exePath, description);
+    }
+
+    public static bool IsProcessRunning(string processName)
+    {
+        if (string.IsNullOrWhiteSpace(processName)) return false;
+        var processes = Process.GetProcessesByName(processName);
+        foreach (var p in processes) p.Dispose();
+        return processes.Length > 0;
+    }
+
+    public static nint[] GetProcessWindows(string processName)
+    {
+        if (string.IsNullOrWhiteSpace(processName)) return [];
+        var handles = new List<nint>();
+        foreach (var p in Process.GetProcessesByName(processName))
+        {
+            using (p)
+            {
+                if (p.MainWindowHandle != 0) handles.Add(p.MainWindowHandle);
+            }
+        }
+        return [.. handles];
+    }
+
     public bool IsPlayniteAvailable() => GetPlaynitePath() is not null;
 
     /// <summary>User-chosen Playnite folder or exe (portable installs); tried before auto-detection.</summary>

@@ -49,6 +49,27 @@
                           SelectedItem="{x:Bind ViewModel.SelectedLaunch, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CustomAppPathCard, Mode=OneWay}" Description="{x:Bind ViewModel.CustomAppPathText, Mode=OneWay}"
+                              Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8E5;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Texts.CustomAppBrowse, Mode=OneWay}" Command="{x:Bind ViewModel.PickCustomAppPathCommand}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CustomAppArgumentsCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CustomAppArgumentsDescription, Mode=OneWay}"
+                              Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE756;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <TextBox MinWidth="220" PlaceholderText="--fullscreen" Text="{x:Bind ViewModel.CustomAppArguments, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CustomAppWatchCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CustomAppWatchDescription, Mode=OneWay}"
+                              Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7B3;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <TextBox MinWidth="220" PlaceholderText="retroarch.exe" Text="{x:Bind ViewModel.CustomAppWatchProcess, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.PlaynitePathCard, Mode=OneWay}" Description="{x:Bind ViewModel.PlaynitePathText, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8B7;"/>

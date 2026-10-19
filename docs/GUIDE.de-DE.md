@@ -11,6 +11,7 @@ Details, die nicht ins [README](../README.de-DE.md) passen.
 | **Steam Big Picture** | Automatische Wiederherstellung (die App bleibt im Infobereich) |
 | **Playnite (Vollbild)** | Automatische Wiederherstellung (die App bleibt im Infobereich) |
 | **Xbox-Modus** | Manuell: Verwende *Jetzt wiederherstellen*, das Menü im Infobereich oder öffne das Fenster erneut |
+| **Eigene App** | Automatische Wiederherstellung, wenn die App (oder der gewählte überwachte Prozess) geschlossen wird |
 
 Du kannst auch jederzeit über den Infobereich wiederherstellen (*Konfiguration wiederherstellen* / *Fenster anzeigen*). Bei schwarzen Bildschirmen blendest du die Abdeckungen mit **ESC** aus.
 

@@ -149,6 +149,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string PlaynitePathCard => LocalizationService.Get(nameof(PlaynitePathCard));
     public string PlaynitePathChoose => LocalizationService.Get(nameof(PlaynitePathChoose));
     public string PlaynitePathClear => LocalizationService.Get(nameof(PlaynitePathClear));
+    public string CustomAppPathCard => LocalizationService.Get(nameof(CustomAppPathCard));
+    public string CustomAppBrowse => LocalizationService.Get(nameof(CustomAppBrowse));
+    public string CustomAppArgumentsCard => LocalizationService.Get(nameof(CustomAppArgumentsCard));
+    public string CustomAppArgumentsDescription => LocalizationService.Get(nameof(CustomAppArgumentsDescription));
+    public string CustomAppWatchCard => LocalizationService.Get(nameof(CustomAppWatchCard));
+    public string CustomAppWatchDescription => LocalizationService.Get(nameof(CustomAppWatchDescription));
     public string AudioOutputCard => LocalizationService.Get(nameof(AudioOutputCard));
     public string OptionalExtrasSection => LocalizationService.Get(nameof(OptionalExtrasSection));
     public string HdrCard => LocalizationService.Get(nameof(HdrCard));
