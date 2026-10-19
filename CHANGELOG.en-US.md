@@ -3,12 +3,14 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+
+## [1.7.0-alpha.1]
 ### What's new
 - A Console interface that looks like a home console: Home shows your launchers in a row at the top, over your games' art (A picks what opens, a pill-shaped Play now right below, with the screen, audio, resolution and HDR on one line), the tabs sit on the left, and the System tab is now a list of categories on the left with only that category's options on the right. Tiles without hairlines, rounder corners and less repetition: the setup summary left Home (it is in Session). (#162)
-- Update notice in Portuguese: the new version's highlight shows in the app's language when there is a changelog in it (today, Portuguese); other languages still see it in English. Applies to updates published after this version. (#158)
 - **Custom app** mode: in Settings → When entering console mode, pick any `.exe` (RetroArch, another launcher…) with optional arguments. Console Mode sets up the TV, opens the app on the game screen and restores the desk by itself when it closes. For launchers that only start another program and exit, type the real program's process name in **Process to watch**. If it never shows up, the session stays until you end it (hold Start + Select). (#161)
-- Diagnostics in Settings: a new card shows, read-only, the app's version and channel, Windows, the screens (resolution, HDR, which one is the game screen and which ones get hidden), the audio outputs, the connected controllers, whether Steam, Playnite, RTSS and ControlFS were found, and the end of the log. **Copy report** copies it all as text to paste into an issue, without your user name in paths and without keys. (#159)
 - Controller battery: the session menu header and the Console interface top bar (next to the clock) show the controller's battery level, with the charging icon when it is on the cable. Works with wireless Xbox controllers, DualSense and DualShock 4 (USB and Bluetooth); when Windows only gives a rough level, the number gets a "~". With several controllers it shows the emptiest one, and wired controllers with no battery show nothing. During a session, a notice in the corner of the TV warns when the battery reaches 15 % and again at 5 %, without repeating. (#160)
+- Diagnostics in Settings: a new card shows, read-only, the app's version and channel, Windows, the screens (resolution, HDR, which one is the game screen and which ones get hidden), the audio outputs, the connected controllers, whether Steam, Playnite, RTSS and ControlFS were found, and the end of the log. **Copy report** copies it all as text to paste into an issue, without your user name in paths and without keys. (#159)
+- Update notice in Portuguese: the new version's highlight shows in the app's language when there is a changelog in it (today, Portuguese); other languages still see it in English. Applies to updates published after this version. (#158)
 
 ## [1.6.2]
 ### What's new
