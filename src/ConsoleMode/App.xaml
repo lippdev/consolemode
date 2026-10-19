@@ -77,38 +77,40 @@
                 <Setter Property="Padding" Value="10,3"/>
             </Style>
 
-            <!-- Console (10-foot) interface: big cards with a thick accent focus ring for controller navigation. -->
+            <!-- Console (10-foot) interface: flat dark tiles over the game art, no hairlines; the focus is a clean
+                 white outline and the tile grows a little (see ConsoleHomeView), like a console home. -->
             <Style x:Key="ConsoleCard" TargetType="Button">
                 <Setter Property="MinWidth" Value="220"/>
                 <Setter Property="MinHeight" Value="120"/>
                 <Setter Property="Padding" Value="22,18"/>
-                <Setter Property="CornerRadius" Value="16"/>
+                <Setter Property="CornerRadius" Value="18"/>
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="#26FFFFFF" Offset="0"/>
-                            <GradientStop Color="#0FFFFFFF" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="BorderBrush" Value="#1AFFFFFF"/>
-                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Background" Value="#D9131820"/>
+                <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="UseSystemFocusVisuals" Value="True"/>
-                <!-- Xbox-style focus: a clean white outline, and the card grows a little (see ConsoleHomeView). -->
                 <Setter Property="FocusVisualPrimaryBrush" Value="White"/>
                 <Setter Property="FocusVisualPrimaryThickness" Value="3"/>
                 <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
                 <Setter Property="FocusVisualMargin" Value="-5"/>
             </Style>
-            <!-- A tab in the console top bar; the active one is at full opacity with an underline. -->
+            <!-- One launcher in the console Home row: a square tile with the launcher's colours. -->
+            <Style x:Key="LaunchTileButton" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
+                <Setter Property="Width" Value="156"/>
+                <Setter Property="Height" Value="156"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="Padding" Value="12,14"/>
+                <Setter Property="CornerRadius" Value="22"/>
+                <Setter Property="FocusVisualMargin" Value="-6"/>
+            </Style>
+            <!-- A tab in the console top bar: plain text, the active one lit with a short underline. -->
             <Style x:Key="ConsoleTab" TargetType="Button">
-                <Setter Property="Padding" Value="20,10"/>
+                <Setter Property="Padding" Value="16,8"/>
                 <Setter Property="CornerRadius" Value="22"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="FontSize" Value="21"/>
+                <Setter Property="FontSize" Value="22"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <!-- Reached with LB / RB (or a click), never by moving the focus. -->
                 <Setter Property="IsTabStop" Value="False"/>
@@ -150,17 +152,28 @@
 
             <!-- One settings row in the console settings list: label left, value right. -->
             <Style x:Key="ConsoleRow" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
-                <Setter Property="MinHeight" Value="76"/>
-                <Setter Property="Height" Value="76"/>
+                <Setter Property="MinHeight" Value="72"/>
+                <Setter Property="Height" Value="72"/>
                 <Setter Property="Padding" Value="24,0"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Background" Value="#14FFFFFF"/>
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FocusVisualMargin" Value="-3"/>
+            </Style>
+            <!-- A category in the console System tab's left column: just its name, no tile. -->
+            <Style x:Key="ConsoleCategory" TargetType="Button" BasedOn="{StaticResource ConsoleRow}">
+                <Setter Property="MinHeight" Value="60"/>
+                <Setter Property="Height" Value="60"/>
+                <Setter Property="Padding" Value="20,0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             </Style>
             <Style x:Key="ConsolePlayButton" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
                 <Setter Property="Height" Value="64"/>
-                <Setter Property="MinWidth" Value="280"/>
-                <Setter Property="Padding" Value="32,0"/>
-                <Setter Property="CornerRadius" Value="14"/>
+                <Setter Property="MinWidth" Value="300"/>
+                <Setter Property="Padding" Value="36,0"/>
+                <Setter Property="CornerRadius" Value="32"/>
                 <Setter Property="FocusVisualPrimaryBrush" Value="White"/>
                 <Setter Property="FocusVisualPrimaryThickness" Value="4"/>
                 <Setter Property="FocusVisualSecondaryThickness" Value="0"/>

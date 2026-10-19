@@ -182,6 +182,7 @@ public partial class MainViewModel : ObservableObject
             LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
             LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchCustomApp"), Value = CustomApp.Mode });
             SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == launchValue) ?? LaunchOptions[0];
+            RebuildLaunchTiles();
 
             FpsOptions.Clear();
             FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsNoLimit"), Value = "0" });
@@ -547,6 +548,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnSelectedLaunchChanged(ComboOption? value)
     {
         OnPropertyChanged(nameof(LaunchDescription));
+        SyncLaunchTiles();
         OnPropertyChanged(nameof(IsCustomApp));
         SettingChanged();
     }
@@ -1027,6 +1029,7 @@ public partial class MainViewModel : ObservableObject
         if (IsFpsAvailable && fps > 0) SummaryItems.Add(LocalizationService.Get("SummaryFps", fps));
         if (HdrEnable) SummaryItems.Add("HDR");
         if (VrrEnable) SummaryItems.Add("VRR");
+        UpdateHomeMeta();
     }
 
     private static string JoinLocalized(IReadOnlyList<string> values)

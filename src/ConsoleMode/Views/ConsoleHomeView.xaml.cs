@@ -19,6 +19,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private bool _windowActive = true;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _clock;
     private static Style? _cardStyle;
+    private static Style? _launchTileStyle;
+    private Control? _lastSettingsRow;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
 
@@ -36,6 +38,9 @@ public sealed partial class ConsoleHomeView : UserControl
         // The focused card grows a little, like the Xbox home.
         Root.GotFocus += (_, e) => ScaleTile(e.OriginalSource, 1.07f);
         Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
+        // System tab: remember the option in use, so closing a picker lands back on it.
+        SettingsRows.GotFocus += (_, e) => { if (e.OriginalSource is Control row) _lastSettingsRow = row; };
+        CategoryRail.GettingFocus += OnRailGettingFocus;
         // Mouse clicks on buttons sound like a confirm (the pad has its own sounds in the navigator).
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
         ViewModel.PropertyChanged += OnViewModelChanged;
@@ -133,7 +138,7 @@ public sealed partial class ConsoleHomeView : UserControl
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsPickerOpen) FocusPickerSelection();
-                    else if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
+                    else if (ViewModel.IsConsoleSettingsOpen) FocusSystemRow();
                     else FocusDefault();
                 });
                 break;
@@ -141,7 +146,7 @@ public sealed partial class ConsoleHomeView : UserControl
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsControllerTestOpen) CopyDiagnosticsButton.Focus(FocusState.Keyboard);
-                    else if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
+                    else if (ViewModel.IsConsoleSettingsOpen) FocusSystemRow();
                     else FocusDefault();
                 });
                 break;
@@ -184,7 +189,7 @@ public sealed partial class ConsoleHomeView : UserControl
             case nameof(MainViewModel.IsConsoleSettingsOpen):
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    if (ViewModel.IsConsoleSettingsOpen) FirstSettingsRow.Focus(FocusState.Keyboard);
+                    if (ViewModel.IsConsoleSettingsOpen) FocusSystemCategory();
                     else FocusDefault();
                 });
                 break;
@@ -211,7 +216,7 @@ public sealed partial class ConsoleHomeView : UserControl
         if (ViewModel.IsUpdateOpen) { UpdateNowButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsConsoleTutorialOpen) { ConsoleTutorialNextButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsShortcutEditorOpen) { FocusShortcutEditorTarget(); return; }
-        if (ViewModel.IsSystemTab) { FirstSettingsRow.Focus(FocusState.Keyboard); return; }
+        if (ViewModel.IsSystemTab) { FocusSystemCategory(); return; }
         if (ViewModel.IsSessionTab) { (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard); return; }
         if (ViewModel.CanStart) { PlayButton.Focus(FocusState.Keyboard); return; }
         (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard);
@@ -291,6 +296,7 @@ public sealed partial class ConsoleHomeView : UserControl
         else if (ViewModel.IsShortcutEditorOpen) ViewModel.CloseShortcutEditorCommand.Execute(null);
         else if (ViewModel.IsConsoleTutorialOpen) ViewModel.EndTourCommand.Execute(null);
         else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
+        else if (ViewModel.IsSystemTab && IsFocusInside(SettingsRows)) FocusSystemCategory();
         else if (!ViewModel.IsHomeTab) ViewModel.SelectConsoleTabCommand.Execute("0");
         else if (ViewModel.IsUpdateOpen && !ViewModel.IsUpdating) ViewModel.DismissUpdateCommand.Execute(null);
     }
@@ -317,10 +323,70 @@ public sealed partial class ConsoleHomeView : UserControl
             "home" => HomeShortcutRow,
             "menu" => MenuShortcutRow,
             "exit" => ExitShortcutRow,
-            _ => FirstSettingsRow
+            _ => null
         };
-        if (ViewModel.IsConsoleUi && ViewModel.IsSystemTab && row.Focus(FocusState.Keyboard)) return;
+        if (ViewModel.IsConsoleUi && ViewModel.IsSystemTab && row?.Focus(FocusState.Keyboard) == true) return;
         FocusDefault();
+    }
+
+    private Button CategoryButton(int index) => (Button)CategoryRail.Children[Math.Clamp(index, 0, CategoryRail.Children.Count - 1)];
+
+    private StackPanel SystemSection(int index) => index switch
+    {
+        0 => SystemSection0,
+        1 => SystemSection1,
+        2 => SystemSection2,
+        3 => SystemSection3,
+        4 => SystemSection4,
+        5 => SystemSection5,
+        6 => SystemSection6,
+        _ => SystemSection7
+    };
+
+    private void FocusSystemCategory() => CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
+
+    /// <summary>Back to the option that was in use, else the first one of the category, else the category itself.</summary>
+    private void FocusSystemRow()
+    {
+        if (_lastSettingsRow?.Focus(FocusState.Keyboard) == true) return;
+        var section = SystemSection(ViewModel.SystemCategory);
+        section.UpdateLayout();
+        if ((FocusManager.FindFirstFocusableElement(section) as Control)?.Focus(FocusState.Keyboard) == true) return;
+        FocusSystemCategory();
+    }
+
+    /// <summary>Moving over a category shows its options, like a console's settings.</summary>
+    private void OnCategoryFocused(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: string tag } || !int.TryParse(tag, out var index) || index == ViewModel.SystemCategory) return;
+        ViewModel.SystemCategory = index;
+        _lastSettingsRow = null;
+        SettingsRows.ChangeView(null, 0, null, true);
+    }
+
+    /// <summary>A on a category goes into its options.</summary>
+    private void OnCategoryClick(object sender, RoutedEventArgs e)
+    {
+        _lastSettingsRow = null;
+        FocusSystemRow();
+    }
+
+    /// <summary>Coming back from the options (left), land on the category they belong to, not the nearest one.</summary>
+    private void OnRailGettingFocus(UIElement sender, GettingFocusEventArgs args)
+    {
+        var current = CategoryButton(ViewModel.SystemCategory);
+        if (args.OldFocusedElement is DependencyObject old && IsInside(old, SettingsRows) && !ReferenceEquals(args.NewFocusedElement, current))
+            args.TrySetNewFocusedElement(current);
+    }
+
+    private bool IsFocusInside(DependencyObject container) =>
+        Root.XamlRoot is { } root && FocusManager.GetFocusedElement(root) is DependencyObject focused && IsInside(focused, container);
+
+    private static bool IsInside(DependencyObject node, DependencyObject container)
+    {
+        for (var current = node; current is not null; current = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(current))
+            if (ReferenceEquals(current, container)) return true;
+        return false;
     }
 
     private void StartClock()
@@ -336,12 +402,14 @@ public sealed partial class ConsoleHomeView : UserControl
     private void OnClockTick(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args) =>
         ClockText.Text = DateTime.Now.ToString("HH:mm");
 
-    /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves.</summary>
+    /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>
     private static void ScaleTile(object source, float scale)
     {
         if (source is not Button button) return;
         _cardStyle ??= Application.Current.Resources["ConsoleCard"] as Style;
-        if (!ReferenceEquals(button.Style, _cardStyle)) return;
+        _launchTileStyle ??= Application.Current.Resources["LaunchTileButton"] as Style;
+        if (ReferenceEquals(button.Style, _launchTileStyle)) scale = scale > 1f ? 1.14f : 1f;
+        else if (!ReferenceEquals(button.Style, _cardStyle)) return;
         button.CenterPoint = new Vector3((float)button.ActualWidth / 2, (float)button.ActualHeight / 2, 0);
         button.ScaleTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(140) };
         button.Scale = new Vector3(scale, scale, 1);

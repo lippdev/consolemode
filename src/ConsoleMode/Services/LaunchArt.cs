@@ -1,0 +1,21 @@
+namespace ConsoleMode.Services;
+
+/// <summary>
+/// How each launcher looks as a tile in the console Home row: a Segoe Fluent glyph and the two colours
+/// of its gradient (ARGB). Unknown modes get the neutral tile, so a new mode never shows up blank.
+/// </summary>
+public static class LaunchArt
+{
+    public readonly record struct Art(string Glyph, uint From, uint To);
+
+    public static readonly Art Neutral = new("", 0xFF2A3038, 0xFF161A20);
+
+    public static Art For(string? mode) => mode switch
+    {
+        "bigPicture" => new("", 0xFF2A475E, 0xFF15202C),
+        "playnite" => new("", 0xFF4A3470, 0xFF1D1530),
+        "xboxMode" => new("", 0xFF178A17, 0xFF0A440A),
+        "customApp" => new("", 0xFF3A4250, 0xFF1A1E25),
+        _ => Neutral
+    };
+}

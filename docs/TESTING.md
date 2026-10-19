@@ -493,6 +493,36 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Interface Console no estilo console (1.7.0)
+
+### Início
+- [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem um ponto verde em cima.
+- [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
+- [ ] A num iniciador muda o ponto para ele, o título grande embaixo passa a ser o nome dele e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
+- [ ] A linha embaixo do título mostra a resolução da tela de jogo e depois áudio, FPS, HDR e VRR quando ligados, separados por "·", e atualiza ao mudar cada um.
+- [ ] Sem tela de jogo escolhida, o texto pede para escolher a tela e Jogar agora fica desativado.
+- [ ] O botão redondo ao lado de Jogar agora abre a aba Sessão.
+- [ ] Com capas da Steam como fundo, as capas aparecem mais à direita e o lado esquerdo e a parte de baixo ficam escuros; o texto continua legível. Com imagem própria e sem fundo também.
+- [ ] Nomes longos (alemão, russo) não estouram: o título corta com reticências numa linha.
+
+### Barra do topo e dicas
+- [ ] As abas ficam à esquerda, ao lado do ícone, com LB/RB (L1/R1) em volta; o relógio continua à direita.
+- [ ] A barra de dicas embaixo não mostra mais LB/RB "Abas"; as outras dicas continuam.
+
+### Sistema
+- [ ] Ao abrir a aba, o foco fica na categoria em uso, com a barrinha verde ao lado e o nome aceso; as outras categorias ficam apagadas.
+- [ ] Descer e subir pelas categorias troca as opções da direita na hora, e a lista volta para o topo.
+- [ ] A ou direita entra na primeira opção; esquerda ou B volta para a categoria certa (a da barrinha, não a que estiver na mesma altura).
+- [ ] Abrir uma escolha (por exemplo Idioma, em App) e voltar com B ou escolhendo: o foco volta para a mesma linha.
+- [ ] Atalhos (Controle): abrir o editor e voltar devolve o foco para a linha do atalho.
+- [ ] Teste do controle (Atalho, ajuda e dados): ao fechar, o foco volta para a linha.
+- [ ] Fundo, imagem do fundo e sons da interface ficam em App; Fechar a Steam ao voltar ao PC fica em Ao entrar no modo console.
+- [ ] Campos de texto da TV e do FPS personalizado continuam aceitando digitação e as setas movem o cursor neles.
+
+### Visual geral
+- [ ] Blocos e linhas sem borda fina, cantos mais arredondados, Jogar agora em formato de pílula; o contorno branco do foco aparece em tudo, inclusive no menu da sessão.
+- [ ] Ajustes rápidos da Sessão aparecem como quadrados do mesmo tamanho, com o texto do valor inteiro (ou em duas linhas).
+- [ ] Alto contraste do Windows: textos e foco continuam visíveis.
 ## Diagnóstico (Ajustes → Atalho, ajuda e dados)
 
 - [ ] Abrir o card "Diagnóstico": o anel de carregamento aparece e, sem travar a janela, o relatório mostra versão e canal (instalado/portátil, estável/teste), Windows com build, e a versão do .NET.
