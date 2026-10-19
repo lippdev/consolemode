@@ -393,5 +393,9 @@
   "SessionTourExitPreviewBody": "Schließt Console Mode vollständig: Die App wird aus dem Infobereich beendet und die Controller-Tastenkombinationen funktionieren erst wieder, wenn du sie erneut öffnest.",
   "SessionTourCard": "Führung durch das Sitzungsmenü",
   "SessionTourDescription": "Erklärt die einzelnen Optionen des Menüs über dem Spiel. Öffnet eine Vorschau des Menüs, ohne eine Sitzung zu starten.",
-  "ShowTour": "Führung anzeigen"
+  "ShowTour": "Führung anzeigen",
+  "ControllerBattery": "Controller-Akku: {0}",
+  "ControllerBatteryCharging": "Controller-Akku: {0}, wird geladen",
+  "LowBatteryTitle": "Controller-Akku schwach",
+  "LowBatteryBody": "Noch {0} Akku. Schließe das Kabel an oder lade den Controller auf."
 }

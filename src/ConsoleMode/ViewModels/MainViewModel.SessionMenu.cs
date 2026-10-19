@@ -98,6 +98,7 @@ public partial class MainViewModel
         ControlFsJustInstalled = false;
         RefreshSessionHeader();
         StartSessionClock();
+        _ = RefreshBatteryAsync();
         _sessionMenu.Activate();
         _sessionMenu.BringToFront();
         _ = LoadSessionValuesAsync();

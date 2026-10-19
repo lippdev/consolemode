@@ -144,6 +144,7 @@ public partial class MainViewModel
     /// </summary>
     public void OnControllerPresenceChanged()
     {
+        _ = RefreshBatteryAsync();
         if (IsConsoleActive) return;
         ResolveUi();
     }
