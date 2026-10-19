@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Interface Console: fonte nova, a Inter (embutida no app), com o título e o Jogar agora em negrito, mais legível de longe na TV. No Início, andar pela fileira de iniciadores já escolhe o que abre, como no PS5: o escolhido ganha um selo ✓ e uma barra verde, os outros ficam mais apagados, e A no bloco abre direto. (#PR)
+- Interface Console: fonte nova, a Inter (embutida no app), com o título e o Jogar agora em negrito, mais legível de longe na TV. No Início, andar pela fileira de iniciadores já escolhe o que abre, como no PS5: o escolhido ganha um selo ✓ e uma barra verde, os outros ficam mais apagados, e A no bloco abre direto. (#164)
 
 ## [1.7.0-alpha.1]
 ### Novidades
