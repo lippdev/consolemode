@@ -1,6 +1,8 @@
 # Guia do Console Mode
 
-Detalhes que não cabem no [README](../README.pt-BR.md). 🇺🇸 [Guide in English](GUIDE.md)
+Detalhes que não cabem no [README](../README.pt-BR.md).
+
+[English](GUIDE.md) · Português (Brasil) · [Español](GUIDE.es-ES.md) · [Deutsch](GUIDE.de-DE.md) · [Français](GUIDE.fr-FR.md) · [Русский](GUIDE.ru-RU.md)
 
 ## Modos e restauração
 

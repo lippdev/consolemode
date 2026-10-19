@@ -2,7 +2,7 @@
 
 Turn your Windows PC into a **game console** with one click: focus the TV, turn off the other screens, switch the audio and launch your game UI. Quit the game and your desk comes back on its own.
 
-🇧🇷 [Leia em português](README.pt-BR.md)
+English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Русский](README.ru-RU.md)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
@@ -85,6 +85,7 @@ All the details in the [release notes](https://github.com/lippdev/consolemode/re
 
 - [Guide](docs/GUIDE.md): modes and restore, control API, HDR/VRR/FPS, troubleshooting, building from source
 - **Feedback:** the button next to Settings in the app, or [this form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). A ⭐ helps other couch gamers find the project.
+- **Translations:** fix a line or add your language with the [translation guide](docs/TRANSLATING.md); no Windows needed.
 - The releases are not code-signed yet, so Windows SmartScreen or an antivirus may warn about the download; the source is all here.
 
 [GNU Affero General Public License v3.0 only](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Code signing policy](docs/CODE_SIGNING.md)
