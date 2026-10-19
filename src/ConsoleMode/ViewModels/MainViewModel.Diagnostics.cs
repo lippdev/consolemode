@@ -99,12 +99,14 @@ public partial class MainViewModel
     };
 
     /// <summary>
-    /// One entry per controller Windows lists. Detail is left empty here: it's where per-pad
-    /// extras (e.g. battery) go.
+    /// One entry per controller Windows lists, with its battery from the last
+    /// ControllerBatteryMonitor reading in Detail (the Sony HID or XInput value for a pad
+    /// Windows itself has no battery for).
     /// </summary>
     private static List<DiagnosticsController> CollectControllers()
     {
         var list = new List<DiagnosticsController>();
+        var batteries = ControllerBatteryMonitor.Snapshot.ToList();
         foreach (var raw in RawGameController.RawGameControllers)
         {
             var type = raw.HardwareVendorId switch
@@ -115,7 +117,13 @@ public partial class MainViewModel
                 _ => "Other"
             };
             if (Gamepad.FromGameController(raw) is not null) type += " (gamepad)";
-            list.Add(new DiagnosticsController($"{raw.DisplayName} ({raw.HardwareVendorId:X4}:{raw.HardwareProductId:X4})", type));
+            var battery = batteries.FirstOrDefault(b => b.Id == raw.NonRoamableId)
+                ?? batteries.FirstOrDefault(b => b.Source == (raw.HardwareVendorId == ControllerMapping.SonyVendorId
+                    ? ControllerBattery.SourceSony
+                    : ControllerBattery.SourceXInput));
+            if (battery is not null) batteries.Remove(battery);
+            list.Add(new DiagnosticsController($"{raw.DisplayName} ({raw.HardwareVendorId:X4}:{raw.HardwareProductId:X4})", type,
+                battery is null ? null : ControllerBattery.Describe(battery)));
         }
         return list;
     }

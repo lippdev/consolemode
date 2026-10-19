@@ -120,6 +120,11 @@
                         <FontIcon Glyph="&#xE7F4;" FontSize="22"/>
                     </Button>
                     <FontIcon Glyph="&#xE7FC;" FontSize="22" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.HasControllerBattery, Mode=OneWay}"
+                                AutomationProperties.Name="{x:Bind ViewModel.ControllerBatteryLabel, Mode=OneWay}">
+                        <FontIcon Glyph="{x:Bind ViewModel.ControllerBatteryGlyph, Mode=OneWay}" FontSize="20" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{x:Bind ViewModel.ControllerBatteryText, Mode=OneWay}" FontSize="18" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
                     <TextBlock x:Name="ClockText" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>

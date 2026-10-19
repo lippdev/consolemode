@@ -14,6 +14,7 @@ public static class SonyHidReader
     private static readonly object Gate = new();
     private static readonly Dictionary<string, ushort> Buttons = new(StringComparer.OrdinalIgnoreCase);
     private static readonly Dictionary<string, (byte LeftX, byte LeftY, byte RightX, byte RightY)> Sticks = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, BatteryReading> Batteries = new(StringComparer.OrdinalIgnoreCase);
     private static CancellationTokenSource? _cts;
     private static int _users;
 
@@ -43,6 +44,12 @@ public static class SonyHidReader
         lock (Gate) return [.. Sticks.Values];
     }
 
+    /// <summary>Battery of each Sony pad being read (refreshed every few seconds), for ControllerBatteryMonitor.</summary>
+    public static IReadOnlyList<BatteryReading> ReadBatteries()
+    {
+        lock (Gate) return [.. Batteries.Values];
+    }
+
     public static void Acquire()
     {
         lock (Gate)
@@ -63,6 +70,7 @@ public static class SonyHidReader
             _cts = null;
             Buttons.Clear();
             Sticks.Clear();
+            Batteries.Clear();
         }
     }
 
@@ -83,7 +91,7 @@ public static class SonyHidReader
                     _ = Task.Run(async () =>
                     {
                         await ReadLoopAsync(path, pad, ct);
-                        lock (Gate) { Buttons.Remove(path); Sticks.Remove(path); }
+                        lock (Gate) { Buttons.Remove(path); Sticks.Remove(path); Batteries.Remove(path); }
                         lock (reading) { reading.Remove(path); }
                     });
                 }
@@ -106,6 +114,7 @@ public static class SonyHidReader
             var buffer = new byte[Math.Max(pad.ReportLength, 64)];
             var loggedFirst = false;
             var loggedUnknown = false;
+            long nextBattery = 0;
             while (!ct.IsCancellationRequested)
             {
                 var read = await stream.ReadAsync(buffer.AsMemory(0, pad.ReportLength), ct);
@@ -123,10 +132,16 @@ public static class SonyHidReader
                 }
                 var bits = ControllerMapping.SonyButtons(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength);
                 var sticks = ControllerMapping.SonySticks(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength);
+                // The battery barely moves: parse it every few seconds, not on every report.
+                var now = Environment.TickCount64;
+                var battery = now >= nextBattery ? ControllerBattery.FromSonyReport(buffer.AsSpan(0, read), pad.DualSense, pad.ReportLength) : null;
+                if (now >= nextBattery) nextBattery = now + 5000;
                 lock (Gate)
                 {
                     Buttons[path] = bits;
                     if (sticks is { } s) Sticks[path] = s;
+                    if (battery is { } b)
+                        Batteries[path] = new BatteryReading(path, pad.DualSense ? "DualSense" : "DualShock 4", b.Percent, b.Charging, false, ControllerBattery.SourceSony);
                 }
             }
         }
