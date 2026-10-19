@@ -5,6 +5,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ## [Unreleased]
 ### Novidades
 - Aviso de atualização em português: o destaque da nova versão aparece no idioma do app quando há um changelog nele (hoje, português); os outros idiomas continuam vendo o destaque em inglês. Vale a partir das atualizações publicadas depois desta versão. (#158)
+- Diagnóstico em Ajustes: um card novo mostra, só para leitura, a versão e o canal do app, o Windows, as telas (resolução, HDR, qual é a de jogo e quais são ocultadas), as saídas de áudio, os controles conectados, se Steam, Playnite, RTSS e ControlFS foram encontrados e o fim do log. **Copiar relatório** copia tudo em texto para colar numa issue, sem o seu nome de usuário nos caminhos e sem chaves. (#159)
 
 ## [1.6.2]
 ### Novidades
