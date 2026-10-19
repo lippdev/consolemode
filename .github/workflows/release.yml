@@ -63,7 +63,7 @@ jobs:
           "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
           "publish=$($publish.ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
-      - name: Prepare release notes (English, with a link to the Portuguese changelog)
+      - name: Prepare release notes (English, a link to the Portuguese changelog, a summary per translated changelog)
         if: steps.version.outputs.publish == 'true'
         shell: pwsh
         env:
@@ -79,10 +79,29 @@ jobs:
             return $notes
           }
           # Both changelogs must have the section; the Portuguese one is linked, not pasted.
-          $null = Get-Notes "CHANGELOG.md"
+          $pt = Get-Notes "CHANGELOG.md"
           $en = Get-Notes "CHANGELOG.en-US.md"
-          # English only, no language headings: ReleaseNotes.cs shows the first item to every
-          # language. A "(#NN)" at the end of an item becomes a link to that PR on GitHub.
+          # One hidden "<!-- summary <code>: ... -->" line per translated changelog (CHANGELOG.md is
+          # pt-BR, any CHANGELOG.<code>.md another language): the update notice shows it instead
+          # of the English first item (ReleaseNotes.cs). They go at the very end of the body, so
+          # clients up to 1.6.x, which show the first line they find, keep showing the English one.
+          function Get-FirstItem([string]$notes) {
+            $item = $notes -split "\r?\n" | Where-Object { $_ -match '^\s*[-*]\s+\S' } | Select-Object -First 1
+            if (-not $item) { return $null }
+            return ($item -replace '^\s*[-*]\s+', '' -replace '-->', '').Trim()
+          }
+          $summaries = @()
+          $ptItem = Get-FirstItem $pt
+          if ($ptItem) { $summaries += "<!-- summary pt-BR: $ptItem -->" }
+          foreach ($file in Get-ChildItem -Name -Filter "CHANGELOG.*.md" | Where-Object { $_ -ne "CHANGELOG.en-US.md" } | Sort-Object) {
+            $code = $file -replace '^CHANGELOG\.|\.md$', ''
+            # Optional: a translated changelog without this version's section is skipped, not fatal.
+            $notes = try { Get-Notes $file } catch { Write-Host "$file sem a seção $($env:VERSION); sem resumo em $code."; $null }
+            $item = if ($notes) { Get-FirstItem $notes }
+            if ($item) { $summaries += "<!-- summary ${code}: $item -->" }
+          }
+          # English, no language headings: ReleaseNotes.cs shows its first item to every
+          # language without a summary. A "(#NN)" at the end of an item becomes a link to that PR on GitHub.
           $tag = "v$($env:VERSION)"
           $releaseNotes = @(
             $en
@@ -96,7 +115,9 @@ jobs:
             "---"
             ""
             "🇧🇷 Notas em português: [CHANGELOG.md](https://github.com/lippdev/consolemode/blob/$tag/CHANGELOG.md)"
-          ) -join "`n"
+          )
+          if ($summaries.Count -gt 0) { $releaseNotes += @("") + $summaries }
+          $releaseNotes = $releaseNotes -join "`n"
           Set-Content -LiteralPath "release-notes.md" -Value $releaseNotes -Encoding utf8
 
       - name: Run tests

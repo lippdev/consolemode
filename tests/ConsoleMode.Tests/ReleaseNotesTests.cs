@@ -80,6 +80,51 @@ public sealed class ReleaseNotesTests
         Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.SpanishSpain));
     }
 
+    private const string WithSummaries = """
+        ### What's new
+        - **Minimize to the system tray:** a new option in Settings. (#150)
+
+        ---
+
+        🇧🇷 Notas em português: [CHANGELOG.md](https://example.com/CHANGELOG.md)
+
+        <!-- summary pt-BR: **Minimizar para a bandeja:** traduzida por [u/Skinner99](https://www.reddit.com/user/Skinner99/). (#150) -->
+        """;
+
+    [Fact]
+    public void FirstLine_HiddenSummaryWinsForItsLanguage()
+    {
+        Assert.Equal("Minimizar para a bandeja: traduzida por u/Skinner99. (#150)",
+            ReleaseNotes.FirstLine(WithSummaries, LocalizationService.PortugueseBrazil));
+        Assert.Equal("Minimizar para a bandeja: traduzida por u/Skinner99. (#150)",
+            ReleaseNotes.FirstLine(WithSummaries.Replace("\n", "\r\n"), LocalizationService.PortugueseBrazil));
+    }
+
+    [Fact]
+    public void FirstLine_LanguagesWithoutASummaryReadTheEnglishNotes()
+    {
+        Assert.Equal("Minimize to the system tray: a new option in Settings. (#150)",
+            ReleaseNotes.FirstLine(WithSummaries, LocalizationService.EnglishUnitedStates));
+        Assert.Equal("Minimize to the system tray: a new option in Settings. (#150)",
+            ReleaseNotes.FirstLine(WithSummaries, LocalizationService.GermanGermany));
+    }
+
+    [Fact]
+    public void FirstLine_EmptyOrUnclosedSummaryFallsBackToTheNotes()
+    {
+        Assert.Equal("Item.", ReleaseNotes.FirstLine("- Item.\n<!-- summary pt-BR:   -->", LocalizationService.PortugueseBrazil));
+        Assert.Equal("Item.", ReleaseNotes.FirstLine("- Item.\n<!-- summary pt-BR: sem fim", LocalizationService.PortugueseBrazil));
+    }
+
+    /// <summary>Clients up to 1.6.x show the first line they find; the summaries sit at the end so they keep showing the English item.</summary>
+    [Fact]
+    public void Summaries_StayAfterTheNotesForOlderClients()
+    {
+        var firstLine = WithSummaries.Split('\n').Select(l => l.Trim())
+            .First(l => l.Length > 0 && !l.StartsWith('#') && l != "---");
+        Assert.StartsWith("- **Minimize", firstLine);
+    }
+
     [Fact]
     public void FirstLine_EmptyBodyIsNull()
     {
