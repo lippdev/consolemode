@@ -205,6 +205,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string CopyDiagnostics => LocalizationService.Get(nameof(CopyDiagnostics));
     public string ControllerDevicesHeading => LocalizationService.Get(nameof(ControllerDevicesHeading));
     public string ControllerSampleHeading => LocalizationService.Get(nameof(ControllerSampleHeading));
+    public string DiagnosticsCard => LocalizationService.Get(nameof(DiagnosticsCard));
+    public string DiagnosticsDescription => LocalizationService.Get(nameof(DiagnosticsDescription));
+    public string RefreshDiagnostics => LocalizationService.Get(nameof(RefreshDiagnostics));
+    public string CopyReport => LocalizationService.Get(nameof(CopyReport));
     public string SessionMenuDescription => LocalizationService.Get(nameof(SessionMenuDescription));
     public string ConsoleScreensHeading => LocalizationService.Get(nameof(ConsoleScreensHeading));
     public string ConsoleQuickHeading => LocalizationService.Get(nameof(ConsoleQuickHeading));

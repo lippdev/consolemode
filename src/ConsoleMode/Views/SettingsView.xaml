@@ -330,6 +330,23 @@
                     </ctk:SettingsCard>
                 </ctk:SettingsExpander.Items>
             </ctk:SettingsExpander>
+            <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.DiagnosticsCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.DiagnosticsDescription, Mode=OneWay}"
+                                  IsExpanded="{x:Bind ViewModel.IsDiagnosticsOpen, Mode=TwoWay}">
+                <ctk:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE9D9;"/>
+                </ctk:SettingsExpander.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ProgressRing Width="18" Height="18" IsActive="{x:Bind ViewModel.IsLoadingDiagnostics, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.IsLoadingDiagnostics, Mode=OneWay}"/>
+                    <Button Content="{x:Bind ViewModel.Texts.RefreshDiagnostics, Mode=OneWay}" Command="{x:Bind ViewModel.RefreshDiagnosticsCommand}"/>
+                    <Button Content="{x:Bind ViewModel.Texts.CopyReport, Mode=OneWay}" Command="{x:Bind ViewModel.CopyDiagnosticsReportCommand}"/>
+                </StackPanel>
+                <ctk:SettingsExpander.Items>
+                    <ctk:SettingsCard ContentAlignment="Vertical">
+                        <TextBlock Text="{x:Bind ViewModel.DiagnosticsText, Mode=OneWay}" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+                    </ctk:SettingsCard>
+                </ctk:SettingsExpander.Items>
+            </ctk:SettingsExpander>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.TvConfirmationCard, Mode=OneWay}"
                               Description="{x:Bind ViewModel.Texts.TvConfirmationDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>

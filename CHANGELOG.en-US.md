@@ -5,6 +5,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### What's new
 - Update notice in Portuguese: the new version's highlight shows in the app's language when there is a changelog in it (today, Portuguese); other languages still see it in English. Applies to updates published after this version. (#158)
+- Diagnostics in Settings: a new card shows, read-only, the app's version and channel, Windows, the screens (resolution, HDR, which one is the game screen and which ones get hidden), the audio outputs, the connected controllers, whether Steam, Playnite, RTSS and ControlFS were found, and the end of the log. **Copy report** copies it all as text to paste into an issue, without your user name in paths and without keys. (#159)
 
 ## [1.6.2]
 ### What's new
