@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- Interface Console com cara de console de mesa: o Início mostra os iniciadores numa fileira no topo, sobre a arte dos seus jogos (A escolhe o que abre, Jogar agora em formato de pílula logo abaixo, com a tela, o áudio, a resolução e o HDR numa linha só), as abas ficam à esquerda e a aba Sistema virou uma lista de categorias à esquerda com só as opções daquela categoria à direita. Blocos sem borda fina, cantos mais arredondados e menos repetição: o resumo do setup saiu do Início (está na Sessão). (#PR)
+- Interface Console com cara de console de mesa: o Início mostra os iniciadores numa fileira no topo, sobre a arte dos seus jogos (A escolhe o que abre, Jogar agora em formato de pílula logo abaixo, com a tela, o áudio, a resolução e o HDR numa linha só), as abas ficam à esquerda e a aba Sistema virou uma lista de categorias à esquerda com só as opções daquela categoria à direita. Blocos sem borda fina, cantos mais arredondados e menos repetição: o resumo do setup saiu do Início (está na Sessão). (#162)
 - Aviso de atualização em português: o destaque da nova versão aparece no idioma do app quando há um changelog nele (hoje, português); os outros idiomas continuam vendo o destaque em inglês. Vale a partir das atualizações publicadas depois desta versão. (#158)
 
 ## [1.6.2]
