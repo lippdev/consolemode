@@ -19,7 +19,6 @@ public sealed partial class ConsoleHomeView : UserControl
     private bool _windowActive = true;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _clock;
     private static Style? _cardStyle;
-    private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
@@ -36,8 +35,9 @@ public sealed partial class ConsoleHomeView : UserControl
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
         Root.PreviewKeyDown += OnKeyDown;
         // The focused card grows a little, like the Xbox home; on the Home row it also picks the launcher.
-        Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); };
-        Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
+        Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); ScaleLaunchTiles(); };
+        Root.LostFocus += (_, e) => { ScaleTile(e.OriginalSource, 1f); DispatcherQueue.TryEnqueue(ScaleLaunchTiles); };
+        ViewModel.LaunchTiles.CollectionChanged += (_, _) => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, ScaleLaunchTiles);
         // System tab: remember the option in use, so closing a picker lands back on it.
         SettingsRows.GotFocus += (_, e) => { if (e.OriginalSource is Control row) _lastSettingsRow = row; };
         CategoryRail.GettingFocus += OnRailGettingFocus;
@@ -68,6 +68,7 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, ScaleLaunchTiles);
         _navigator ??= new GamepadNavigator(DispatcherQueue, this,
             App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0,
             readSonyHid: true);
@@ -115,6 +116,9 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         switch (e.PropertyName)
         {
+            case nameof(MainViewModel.SelectedLaunch):
+                DispatcherQueue.TryEnqueue(ScaleLaunchTiles);
+                break;
             case nameof(MainViewModel.IsConsoleUi):
             case nameof(MainViewModel.IsConsoleActive):
                 RefreshNavigator();
@@ -408,16 +412,43 @@ public sealed partial class ConsoleHomeView : UserControl
         if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
     }
 
-    /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>
+    /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves. Launchers: see ScaleLaunchTiles.</summary>
     private static void ScaleTile(object source, float scale)
     {
         if (source is not Button button) return;
         _cardStyle ??= Application.Current.Resources["ConsoleCard"] as Style;
-        _launchTileStyle ??= Application.Current.Resources["LaunchTileButton"] as Style;
-        if (ReferenceEquals(button.Style, _launchTileStyle)) scale = scale > 1f ? 1.14f : 1f;
-        else if (!ReferenceEquals(button.Style, _cardStyle)) return;
+        if (!ReferenceEquals(button.Style, _cardStyle)) return;
+        SetScale(button, scale);
+    }
+
+    /// <summary>
+    /// The launcher row has no focus ring: the tile with the focus grows the most, and the one that opens stays
+    /// a little bigger while the focus is elsewhere (on Play now, for instance), so it is always clear which one it is.
+    /// </summary>
+    private void ScaleLaunchTiles()
+    {
+        if (XamlRoot is null) return;
+        var focused = FocusManager.GetFocusedElement(XamlRoot);
+        for (var i = 0; i < ViewModel.LaunchTiles.Count; i++)
+        {
+            if (LaunchRow.ContainerFromIndex(i) is not DependencyObject container || FindButton(container) is not { } button) continue;
+            var tile = ViewModel.LaunchTiles[i];
+            SetScale(button, ReferenceEquals(focused, button) ? 1.22f : tile.IsSelected ? 1.1f : 1f);
+        }
+    }
+
+    private static Button? FindButton(DependencyObject node)
+    {
+        if (node is Button button) return button;
+        for (var i = 0; i < Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(node); i++)
+            if (FindButton(Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(node, i)) is { } found) return found;
+        return null;
+    }
+
+    private static void SetScale(Button button, float scale)
+    {
         button.CenterPoint = new Vector3((float)button.ActualWidth / 2, (float)button.ActualHeight / 2, 0);
-        button.ScaleTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(140) };
+        button.ScaleTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(160) };
         button.Scale = new Vector3(scale, scale, 1);
     }
 

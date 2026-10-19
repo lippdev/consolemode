@@ -99,7 +99,8 @@
                 <Setter Property="FocusVisualSecondaryThickness" Value="0"/>
                 <Setter Property="FocusVisualMargin" Value="-5"/>
             </Style>
-            <!-- One launcher in the console Home row: a square tile with the launcher's colours. -->
+            <!-- One launcher in the console Home row: a square tile with the launcher's colours. No focus ring: the tile
+                 that has the focus is the one that opens, so it shows by growing and lighting up (ConsoleHomeView). -->
             <Style x:Key="LaunchTileButton" TargetType="Button" BasedOn="{StaticResource ConsoleCard}">
                 <Setter Property="Width" Value="156"/>
                 <Setter Property="Height" Value="156"/>
@@ -107,7 +108,7 @@
                 <Setter Property="MinHeight" Value="0"/>
                 <Setter Property="Padding" Value="12,14"/>
                 <Setter Property="CornerRadius" Value="22"/>
-                <Setter Property="FocusVisualMargin" Value="-6"/>
+                <Setter Property="UseSystemFocusVisuals" Value="False"/>
             </Style>
             <!-- A tab in the console top bar: plain text, the active one lit with a short underline. -->
             <Style x:Key="ConsoleTab" TargetType="Button">

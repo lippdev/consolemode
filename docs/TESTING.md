@@ -496,9 +496,9 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 ## Interface Console no estilo console (1.7.0)
 
 ### Início
-- [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem o selo ✓ verde no canto e uma barra verde embaixo, e os outros ficam mais apagados.
-- [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
-- [ ] Andar pela fileira já troca o iniciador, sem apertar A: o selo, a barra e o título grande embaixo seguem o foco, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
+- [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje fica um pouco maior, com a cor cheia e um brilho da cor dele atrás, e os outros ficam mais apagados. Nenhum bloco da fileira tem contorno branco.
+- [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce mais, sem encostar nos vizinhos nem cortar no topo, e o brilho não fica cortado em quadrado.
+- [ ] Andar pela fileira já troca o iniciador, sem apertar A: o tamanho, o brilho e o título grande embaixo seguem o foco, a troca é suave (sem piscar), e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
 - [ ] A num iniciador (ou um clique) abre direto aquele iniciador, como o Jogar agora. Sem tela de jogo escolhida, A só escolhe e não abre nada.
 - [ ] Fonte Inter: os textos da interface Console e do menu da sessão usam a Inter (o "a" e o "g" de dois andares mudam de cara em relação à Segoe), em negrito de verdade no título e no Jogar agora, sem aparência borrada de negrito sintético. Conferir também no **portátil**: se a fonte não carregar, o app cai na Segoe UI sem quebrar. O modo PC continua com a Segoe UI.
 - [ ] Russo: o cirílico aparece na Inter, sem misturar fontes no meio da palavra.
