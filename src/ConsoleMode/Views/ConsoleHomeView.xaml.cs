@@ -21,6 +21,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private static Style? _cardStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
+    /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
+    private long _railPointerPressedAt = long.MinValue / 2;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
 
@@ -41,6 +43,7 @@ public sealed partial class ConsoleHomeView : UserControl
         // System tab: remember the option in use, so closing a picker lands back on it.
         SettingsRows.GotFocus += (_, e) => { if (e.OriginalSource is Control row) _lastSettingsRow = row; };
         CategoryRail.GettingFocus += OnRailGettingFocus;
+        CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // Mouse clicks on buttons sound like a confirm (the pad has its own sounds in the navigator).
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
         ViewModel.PropertyChanged += OnViewModelChanged;
@@ -364,16 +367,19 @@ public sealed partial class ConsoleHomeView : UserControl
         SettingsRows.ChangeView(null, 0, null, true);
     }
 
-    /// <summary>A on a category goes into its options.</summary>
+    /// <summary>A on a category goes into its options; a mouse click only picks the category (its focus already did).</summary>
     private void OnCategoryClick(object sender, RoutedEventArgs e)
     {
+        if (Environment.TickCount64 - _railPointerPressedAt < 1500) return;
         _lastSettingsRow = null;
         FocusSystemRow();
     }
 
-    /// <summary>Coming back from the options (left), land on the category they belong to, not the nearest one.</summary>
+    /// <summary>Coming back from the options (left), land on the category they belong to, not the nearest one.
+    /// Only for the pad and the keyboard: a click on another category must reach it.</summary>
     private void OnRailGettingFocus(UIElement sender, GettingFocusEventArgs args)
     {
+        if (args.FocusState == FocusState.Pointer || args.InputDevice is FocusInputDeviceKind.Mouse or FocusInputDeviceKind.Touch or FocusInputDeviceKind.Pen) return;
         var current = CategoryButton(ViewModel.SystemCategory);
         if (args.OldFocusedElement is DependencyObject old && IsInside(old, SettingsRows) && !ReferenceEquals(args.NewFocusedElement, current))
             args.TrySetNewFocusedElement(current);

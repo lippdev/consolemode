@@ -75,6 +75,7 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 - [ ] Sistema → Plano de fundo alterna Aurora / Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
 - [ ] Na aba Sistema o fundo (Aurora, capas ou imagem) escurece com transição, e as linhas de opções ficam legíveis por cima de qualquer capa; ao voltar para Início ou Sessão, o fundo clareia de novo. Resultado: ______
 - [ ] Aba Sistema numa TV larga (1920 px ou mais) e na janela pequena: a lista de opções começa logo ao lado das categorias, nenhuma linha passa da borda direita e o valor (em verde) fica todo visível; textos longos (alemão, russo) quebram em até duas linhas. A linha "Limpar" fica alinhada com as outras. Resultado: ______
+- [ ] Aba Sistema com o mouse: clicar em cada categoria (de Tela de jogo a Outros apps) mostra as opções dela, também depois de entrar nas opções de outra categoria pelo controle; o clique só escolhe a categoria, sem pular para a primeira opção. Pelo controle, A numa categoria entra nas opções e ← volta para a categoria delas. Resultado: ______
 - [ ] A escolha fica salva ao reabrir (`consoleBackground` e `consoleBackgroundImage` no `config.json`). Resultado: ______
 
 ### Sons

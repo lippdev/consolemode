@@ -10,7 +10,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Fixed
 
-- Configurações do modo Console: a lista de opções da aba Sistema não passa mais da borda direita da tela e começa logo ao lado das categorias, e o fundo escurece nessa aba para as linhas ficarem legíveis sobre qualquer capa ou imagem. (#165)
+- Configurações do modo Console: a lista de opções da aba Sistema não passa mais da borda direita da tela e começa logo ao lado das categorias, e o fundo escurece nessa aba para as linhas ficarem legíveis sobre qualquer capa ou imagem. Clicar com o mouse numa categoria agora sempre a abre; antes, depois de entrar nas opções, o clique voltava para a categoria anterior. (#165)
 
 - Configurações do modo Console: botões das categorias e opções sem o cinza e o texto apagado do estilo padrão; passar o mouse e clicar agora têm transição suave, e a categoria escolhida acende com animação. (#165)
 
