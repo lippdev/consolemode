@@ -13,6 +13,8 @@
     <UserControl.Resources>
         <!-- Buttons and other controls take their font from this key, not from the parent. -->
         <StaticResource x:Key="ContentControlThemeFontFamily" ResourceKey="ConsoleFontFamily"/>
+        <!-- Lights and dims the System categories smoothly instead of switching them at once. -->
+        <ScalarTransition x:Key="ConsoleFade" Duration="0:0:0.18"/>
     </UserControl.Resources>
 
     <!-- 10-foot layout: big cards, thick focus ring, no mouse needed. Solid background instead of Mica. -->
@@ -40,8 +42,74 @@
             </Style>
         </Grid.Resources>
 
-        <!-- Background: covers of your installed Steam games (or your picture) under a solid-colour gradient -->
+        <!-- Background: the built-in wallpaper, covers of your installed Steam games or your picture, under a solid-colour gradient -->
         <Grid x:Name="BackgroundLayer" IsHitTestVisible="False" Margin="-56,0,-56,-32">
+            <!-- Built-in wallpaper ("Aurora"): soft green and blue glows over a deep blue-black with a few faint
+                 orbit lines, all on the right, where the gradients below leave the art visible -->
+            <Grid Visibility="{x:Bind ViewModel.ShowBackgroundWallpaper, Mode=OneWay}">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#FF0C1828" Offset="0"/>
+                            <GradientStop Color="#FF080E17" Offset="0.5"/>
+                            <GradientStop Color="#FF07090D" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.82,0.12" GradientOrigin="0.82,0.12" RadiusX="0.5" RadiusY="0.85">
+                            <GradientStop Color="#A62FB88C" Offset="0"/>
+                            <GradientStop Color="#3D1E9C74" Offset="0.45"/>
+                            <GradientStop Color="#001E9C74" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="1.04,0.78" GradientOrigin="1.04,0.78" RadiusX="0.42" RadiusY="0.7">
+                            <GradientStop Color="#A62F6FE0" Offset="0"/>
+                            <GradientStop Color="#382F6FE0" Offset="0.5"/>
+                            <GradientStop Color="#002F6FE0" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.66,-0.06" GradientOrigin="0.66,-0.06" RadiusX="0.32" RadiusY="0.55">
+                            <GradientStop Color="#666A4FE0" Offset="0"/>
+                            <GradientStop Color="#006A4FE0" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Ellipse Width="1300" Height="1300" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-440,-460,0" StrokeThickness="1.5">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#00FFFFFF" Offset="0.55"/>
+                            <GradientStop Color="#59FFFFFF" Offset="0.85"/>
+                            <GradientStop Color="#14FFFFFF" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+                <Ellipse Width="1800" Height="1800" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-660,-700,0" StrokeThickness="1">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#009BEACF" Offset="0.55"/>
+                            <GradientStop Color="#479BEACF" Offset="0.85"/>
+                            <GradientStop Color="#109BEACF" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+                <Ellipse Width="2400" Height="2400" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-940,-1000,0" StrokeThickness="1">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#00FFFFFF" Offset="0.6"/>
+                            <GradientStop Color="#2EFFFFFF" Offset="0.85"/>
+                            <GradientStop Color="#0AFFFFFF" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+            </Grid>
             <Grid Visibility="{x:Bind ViewModel.ShowBackgroundCovers, Mode=OneWay}" Opacity="0.55">
                 <ItemsControl ItemsSource="{x:Bind ViewModel.BackgroundCovers, Mode=OneWay}">
                     <ItemsControl.ItemsPanel>
@@ -77,6 +145,9 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
+            <!-- System tab: the art dims much more, so the rows of options stay readable over any cover or picture -->
+            <Rectangle Fill="#D207090D" Opacity="{x:Bind ViewModel.ShownOpacity(ViewModel.IsConsoleSettingsOpen), Mode=OneWay}"
+                       OpacityTransition="{StaticResource ConsoleFade}"/>
         </Grid>
 
         <!-- ───────────── Idle (console-style: tabs on top, one page below) ───────────── -->
@@ -434,76 +505,96 @@
                     <Grid ColumnSpacing="48">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="340"/>
-                            <ColumnDefinition Width="*"/>
+                            <!-- Capped here, not on the list: the options stay right next to the categories on a wide TV -->
+                            <ColumnDefinition Width="*" MaxWidth="1100"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel x:Name="CategoryRail" Spacing="4" Padding="14,4,0,0">
                             <Button Style="{StaticResource ConsoleCategory}" Tag="0" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 0), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="1" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 1), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="2" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 2), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="3" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 3), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="4" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 4), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="5" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 5), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="6" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 6), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="7" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 7), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                         </StackPanel>
-                        <ScrollViewer x:Name="SettingsRows" Grid.Column="1" VerticalScrollBarVisibility="Hidden">
-                            <Grid MaxWidth="1100" HorizontalAlignment="Stretch" Padding="0,4,0,24">
+                        <!-- Vertical only: the rows are measured at the column's width (long labels wrap instead of
+                             widening the list past the screen edge). -->
+                        <ScrollViewer x:Name="SettingsRows" Grid.Column="1" VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+                            <Grid Padding="0,4,0,24">
                                 <StackPanel x:Name="SystemSection0" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 0), Mode=OneWay}">
                                     <Button x:Name="FirstSettingsRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="mode" IsEnabled="{x:Bind ViewModel.HasFocusRow, Mode=OneWay}">
                                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>

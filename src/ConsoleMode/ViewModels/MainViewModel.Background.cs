@@ -6,8 +6,9 @@ using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace ConsoleMode.ViewModels;
 
-// The console background: by default a collage of the covers of the user's installed Steam games
-// under a solid-colour gradient; or just the gradient, or a picture of their own.
+// The console background: by default the built-in wallpaper (soft glows drawn in XAML); or a collage of
+// the covers of the user's installed Steam games under a solid-colour gradient, just the gradient, or a
+// picture of their own.
 public partial class MainViewModel
 {
     /// <summary>Covers in the collage: enough to fill a 4K screen of 220 px posters.</summary>
@@ -23,11 +24,13 @@ public partial class MainViewModel
     public event Action? PickBackgroundImageRequested;
 
     public bool IsBackgroundImageMode => ConsoleBackgroundMode == ConsoleBackgroundService.ModeImage;
-    public bool ShowBackgroundCovers => ConsoleBackgroundMode == ConsoleBackgroundService.ModeAuto && BackgroundCovers.Count > 0;
+    public bool ShowBackgroundWallpaper => ConsoleBackgroundMode == ConsoleBackgroundService.ModeAuto;
+    public bool ShowBackgroundCovers => ConsoleBackgroundMode == ConsoleBackgroundService.ModeCovers && BackgroundCovers.Count > 0;
     public bool ShowBackgroundCustom => ConsoleBackgroundMode == ConsoleBackgroundService.ModeImage && BackgroundCustomImage is not null;
 
     public string BackgroundModeText => LocalizationService.Get(ConsoleBackgroundMode switch
     {
+        ConsoleBackgroundService.ModeCovers => "BackgroundCovers",
         ConsoleBackgroundService.ModeGradient => "BackgroundGradient",
         ConsoleBackgroundService.ModeImage => "BackgroundImage",
         _ => "BackgroundAuto"
@@ -54,13 +57,14 @@ public partial class MainViewModel
 
     private void NotifyBackground()
     {
+        OnPropertyChanged(nameof(ShowBackgroundWallpaper));
         OnPropertyChanged(nameof(ShowBackgroundCovers));
         OnPropertyChanged(nameof(IsBackgroundImageMode));
         OnPropertyChanged(nameof(ShowBackgroundCustom));
         OnPropertyChanged(nameof(BackgroundModeText));
     }
 
-    /// <summary>Auto → gradient → image → auto (the console rows cycle with A).</summary>
+    /// <summary>Wallpaper → covers → gradient → image → wallpaper (the console rows cycle with A).</summary>
     public void CycleBackgroundMode()
     {
         var modes = ConsoleBackgroundService.Modes;
@@ -85,7 +89,7 @@ public partial class MainViewModel
         {
             var mode = ConsoleBackgroundMode;
             var custom = ConsoleBackgroundImage;
-            var covers = mode == ConsoleBackgroundService.ModeAuto
+            var covers = mode == ConsoleBackgroundService.ModeCovers
                 ? await Task.Run(() => ConsoleBackgroundService.FindCovers(BackgroundCoverCount))
                 : [];
             if (mode != ConsoleBackgroundMode) return;   // changed while reading

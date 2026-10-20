@@ -4,6 +4,16 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### What's new
+
+- Console interface: a new default background, **Aurora**, with soft green and blue glows and thin arcs over a deep blue-black. The Steam covers are still there under System → Background → Steam covers (if you used the default background, you now get Aurora). (#165)
+
+### Fixed
+
+- Console settings: the System tab's option list no longer runs past the right edge of the screen and starts right next to the categories, and the background dims on that tab so the rows stay readable over any cover or picture. Clicking a category with the mouse now always opens it; before, once you had gone into the options, the click jumped back to the previous category. (#165)
+
+- Console settings: category and option buttons no longer show the stock grey fill and dimmed text; hover and press now animate smoothly, and the chosen category lights up with a fade. (#165)
+
 ## [1.7.0-alpha.1]
 ### What's new
 - A Console interface that looks like a home console: Home shows your launchers in a row at the top, over your games' art (a pill-shaped Play now right below, with the screen, audio, resolution and HDR on one line), the tabs sit on the left, and the System tab is now a list of categories on the left with only that category's options on the right. Tiles without hairlines, rounder corners and less repetition: the setup summary left Home (it is in Session). (#162)

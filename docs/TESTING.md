@@ -69,8 +69,13 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 
 ### Plano de fundo
 
-- [ ] Padrão ("Capas da Steam"): colagem de capas dos jogos instalados sob o gradiente, o texto continua legível; sem Steam ou sem capas, só o gradiente. Resultado: ______
-- [ ] Sistema → Plano de fundo alterna Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
+- [ ] Padrão ("Aurora"): fundo azul-escuro com brilhos suaves verde (alto, à direita), azul (embaixo, à direita) e roxo (no alto), e três linhas finas em arco à direita; o lado esquerdo fica escuro e o texto continua legível. Sem faixas nem serrilhado nos degradês, na TV e no monitor. Resultado: ______
+- [ ] Um `config.json` com `consoleBackground: "auto"` (o padrão das versões anteriores) abre com a Aurora; quem quiser as capas escolhe "Capas da Steam". Resultado: ______
+- [ ] "Capas da Steam": colagem de capas dos jogos instalados sob o gradiente, o texto continua legível; sem Steam ou sem capas, só o gradiente. Resultado: ______
+- [ ] Sistema → Plano de fundo alterna Aurora / Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
+- [ ] Na aba Sistema o fundo (Aurora, capas ou imagem) escurece com transição, e as linhas de opções ficam legíveis por cima de qualquer capa; ao voltar para Início ou Sessão, o fundo clareia de novo. Resultado: ______
+- [ ] Aba Sistema numa TV larga (1920 px ou mais) e na janela pequena: a lista de opções começa logo ao lado das categorias, nenhuma linha passa da borda direita e o valor (em verde) fica todo visível; textos longos (alemão, russo) quebram em até duas linhas. A linha "Limpar" fica alinhada com as outras. Resultado: ______
+- [ ] Aba Sistema com o mouse: clicar em cada categoria (de Tela de jogo a Outros apps) mostra as opções dela, também depois de entrar nas opções de outra categoria pelo controle; o clique só escolhe a categoria, sem pular para a primeira opção. Pelo controle, A numa categoria entra nas opções e ← volta para a categoria delas. Resultado: ______
 - [ ] A escolha fica salva ao reabrir (`consoleBackground` e `consoleBackgroundImage` no `config.json`). Resultado: ______
 
 ### Sons
@@ -333,6 +338,8 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] Configurar a Android TV no modo Console: endereço, MAC opcional, entrada HDMI, comando da entrada e espera ao restaurar; Testar agora mostra o resultado e libera o botão após erro ou timeout. Resultado: ______
 - [ ] Selecionar FPS personalizado e digitar o limite; o modo PC mostra o mesmo valor. Sem RTSS disponível, a configuração respeita a mesma indisponibilidade das duas interfaces. Resultado: ______
 - [ ] Copiar o diagnóstico do controle, abrir a pasta de dados e rever o tutorial no modo Console; ao voltar, o foco continua em uma opção visível. Resultado: ______
+- [ ] Passar o mouse sobre categorias, opções, abas e cards: o realce aparece e some suavemente (sem cinza brusco), e o texto não fica apagado ao clicar; clicar afunda o item de leve. Trocar de categoria acende a barra verde e o nome com transição. Resultado: ______
+- [ ] Desativar uma opção (ex.: atalho de toque curto sem atalho Home) a deixa esmaecida e sem realce. Menu da sessão: as mesmas linhas e cards continuam legíveis no tema claro. Resultado: ______
 
 ## 4. Regressões
 

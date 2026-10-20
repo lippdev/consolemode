@@ -29,6 +29,12 @@ public partial class MainViewModel
     public Microsoft.UI.Xaml.Visibility CategoryVisibility(int current, int category) =>
         current == category ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
 
+    /// <summary>x:Bind helper: the accent bar shows only next to the chosen System category (it fades, so it's an opacity).</summary>
+    public double IndicatorOpacity(int current, int category) => current == category ? 1.0 : 0.0;
+
+    /// <summary>x:Bind helper: a veil that shows (fading) only while the flag is on.</summary>
+    public double ShownOpacity(bool shown) => shown ? 1.0 : 0.0;
+
     /// <summary>x:Bind helper: the active tab is fully lit, the others dimmed.</summary>
     public double TabOpacity(int current, int tab) => current == tab ? 1.0 : 0.55;
 

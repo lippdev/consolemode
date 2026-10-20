@@ -5,11 +5,13 @@ namespace ConsoleMode.Services;
 /// <summary>Finds Steam on this PC and lists the covers of the user's installed games (see <see cref="SteamArt"/>).</summary>
 public static class ConsoleBackgroundService
 {
+    /// <summary>The built-in wallpaper (soft green and blue glows, drawn in XAML). The default.</summary>
     public const string ModeAuto = "auto";
+    public const string ModeCovers = "covers";
     public const string ModeGradient = "gradient";
     public const string ModeImage = "image";
 
-    public static readonly string[] Modes = [ModeAuto, ModeGradient, ModeImage];
+    public static readonly string[] Modes = [ModeAuto, ModeCovers, ModeGradient, ModeImage];
 
     public static string NormalizeMode(string? mode) =>
         Modes.Contains(mode, StringComparer.OrdinalIgnoreCase) ? mode!.ToLowerInvariant() : ModeAuto;

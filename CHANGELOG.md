@@ -4,6 +4,16 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+### Novidades
+
+- Interface Console: plano de fundo novo por padrão, a **Aurora**, com brilhos suaves verde e azul e linhas finas em arco sobre um azul bem escuro. As capas da Steam continuam disponíveis em Sistema → Plano de fundo → Capas da Steam (quem usava o fundo padrão passa a ver a Aurora). (#165)
+
+### Fixed
+
+- Configurações do modo Console: a lista de opções da aba Sistema não passa mais da borda direita da tela e começa logo ao lado das categorias, e o fundo escurece nessa aba para as linhas ficarem legíveis sobre qualquer capa ou imagem. Clicar com o mouse numa categoria agora sempre a abre; antes, depois de entrar nas opções, o clique voltava para a categoria anterior. (#165)
+
+- Configurações do modo Console: botões das categorias e opções sem o cinza e o texto apagado do estilo padrão; passar o mouse e clicar agora têm transição suave, e a categoria escolhida acende com animação. (#165)
+
 ## [1.7.0-alpha.1]
 ### Novidades
 - Interface Console com cara de console de mesa: o Início mostra os iniciadores numa fileira no topo, sobre a arte dos seus jogos (Jogar agora em formato de pílula logo abaixo, com a tela, o áudio, a resolução e o HDR numa linha só), as abas ficam à esquerda e a aba Sistema virou uma lista de categorias à esquerda com só as opções daquela categoria à direita. Blocos sem borda fina, cantos mais arredondados e menos repetição: o resumo do setup saiu do Início (está na Sessão). (#162)
