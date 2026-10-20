@@ -68,44 +68,44 @@
                 <Rectangle>
                     <Rectangle.Fill>
                         <RadialGradientBrush Center="1.04,0.78" GradientOrigin="1.04,0.78" RadiusX="0.42" RadiusY="0.7">
-                            <GradientStop Color="#8C2F6FE0" Offset="0"/>
-                            <GradientStop Color="#262F6FE0" Offset="0.5"/>
+                            <GradientStop Color="#A62F6FE0" Offset="0"/>
+                            <GradientStop Color="#382F6FE0" Offset="0.5"/>
                             <GradientStop Color="#002F6FE0" Offset="1"/>
                         </RadialGradientBrush>
                     </Rectangle.Fill>
                 </Rectangle>
                 <Rectangle>
                     <Rectangle.Fill>
-                        <RadialGradientBrush Center="0.52,-0.08" GradientOrigin="0.52,-0.08" RadiusX="0.38" RadiusY="0.5">
-                            <GradientStop Color="#4D6A4FE0" Offset="0"/>
+                        <RadialGradientBrush Center="0.66,-0.06" GradientOrigin="0.66,-0.06" RadiusX="0.32" RadiusY="0.55">
+                            <GradientStop Color="#666A4FE0" Offset="0"/>
                             <GradientStop Color="#006A4FE0" Offset="1"/>
                         </RadialGradientBrush>
                     </Rectangle.Fill>
                 </Rectangle>
                 <Ellipse Width="1300" Height="1300" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-440,-460,0" StrokeThickness="1.5">
                     <Ellipse.Stroke>
-                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                            <GradientStop Color="#00FFFFFF" Offset="0.1"/>
-                            <GradientStop Color="#40FFFFFF" Offset="0.5"/>
-                            <GradientStop Color="#0AFFFFFF" Offset="0.9"/>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#00FFFFFF" Offset="0.55"/>
+                            <GradientStop Color="#59FFFFFF" Offset="0.85"/>
+                            <GradientStop Color="#14FFFFFF" Offset="1"/>
                         </LinearGradientBrush>
                     </Ellipse.Stroke>
                 </Ellipse>
                 <Ellipse Width="1800" Height="1800" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-660,-700,0" StrokeThickness="1">
                     <Ellipse.Stroke>
-                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                            <GradientStop Color="#00FFFFFF" Offset="0.15"/>
-                            <GradientStop Color="#2E9BEACF" Offset="0.5"/>
-                            <GradientStop Color="#00FFFFFF" Offset="0.95"/>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#009BEACF" Offset="0.55"/>
+                            <GradientStop Color="#479BEACF" Offset="0.85"/>
+                            <GradientStop Color="#109BEACF" Offset="1"/>
                         </LinearGradientBrush>
                     </Ellipse.Stroke>
                 </Ellipse>
                 <Ellipse Width="2400" Height="2400" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-940,-1000,0" StrokeThickness="1">
                     <Ellipse.Stroke>
-                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                            <GradientStop Color="#00FFFFFF" Offset="0.2"/>
-                            <GradientStop Color="#1FFFFFFF" Offset="0.55"/>
-                            <GradientStop Color="#00FFFFFF" Offset="0.9"/>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#00FFFFFF" Offset="0.6"/>
+                            <GradientStop Color="#2EFFFFFF" Offset="0.85"/>
+                            <GradientStop Color="#0AFFFFFF" Offset="1"/>
                         </LinearGradientBrush>
                     </Ellipse.Stroke>
                 </Ellipse>
