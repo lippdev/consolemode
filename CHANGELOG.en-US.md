@@ -4,14 +4,12 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.7.0-alpha.2]
 ### What's new
-
 - Console interface: a new default background, **Aurora**, with soft green and blue glows and thin arcs over a deep blue-black. The Steam covers are still there under System → Background → Steam covers (if you used the default background, you now get Aurora). (#165)
 
-### Fixed
-
+### Fixes
 - Console settings: the System tab's option list no longer runs past the right edge of the screen and starts right next to the categories, and the background dims on that tab so the rows stay readable over any cover or picture. Clicking a category with the mouse now always opens it; before, once you had gone into the options, the click jumped back to the previous category. (#165)
-
 - Console settings: category and option buttons no longer show the stock grey fill and dimmed text; hover and press now animate smoothly, and the chosen category lights up with a fade. (#165)
 
 ## [1.7.0-alpha.1]
