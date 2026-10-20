@@ -13,6 +13,8 @@
     <UserControl.Resources>
         <!-- Buttons and other controls take their font from this key, not from the parent. -->
         <StaticResource x:Key="ContentControlThemeFontFamily" ResourceKey="ConsoleFontFamily"/>
+        <!-- Lights and dims the System categories smoothly instead of switching them at once. -->
+        <ScalarTransition x:Key="ConsoleFade" Duration="0:0:0.18"/>
     </UserControl.Resources>
 
     <!-- 10-foot layout: big cards, thick focus ring, no mouse needed. Solid background instead of Mica. -->
@@ -440,65 +442,81 @@
                             <Button Style="{StaticResource ConsoleCategory}" Tag="0" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 0), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="1" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 1), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="2" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 2), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="3" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 3), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="4" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 4), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="5" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 5), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="6" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 6), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                             <Button Style="{StaticResource ConsoleCategory}" Tag="7" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 7), Mode=OneWay}"/>
+                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
+                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"/>
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
+                                               OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
                         </StackPanel>

@@ -4,6 +4,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+### Fixed
+
+- Configurações do modo Console: botões das categorias e opções sem o cinza e o texto apagado do estilo padrão; passar o mouse e clicar agora têm transição suave, e a categoria escolhida acende com animação.
+
 ## [1.7.0-alpha.1]
 ### Novidades
 - Interface Console com cara de console de mesa: o Início mostra os iniciadores numa fileira no topo, sobre a arte dos seus jogos (Jogar agora em formato de pílula logo abaixo, com a tela, o áudio, a resolução e o HDR numa linha só), as abas ficam à esquerda e a aba Sistema virou uma lista de categorias à esquerda com só as opções daquela categoria à direita. Blocos sem borda fina, cantos mais arredondados e menos repetição: o resumo do setup saiu do Início (está na Sessão). (#162)

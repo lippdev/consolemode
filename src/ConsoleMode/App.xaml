@@ -82,6 +82,54 @@
                 <Setter Property="Padding" Value="10,3"/>
             </Style>
 
+            <!-- Template of every console surface (cards, rows, categories, tabs, round buttons): the hover is a soft
+                 veil that fades in and out, a press sinks the tile a little. No grey Fluent fills or dimmed text. -->
+            <ControlTemplate x:Key="ConsoleSurfaceTemplate" TargetType="Button">
+                <Grid x:Name="Root" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <ScaleTransform x:Name="Scale"/>
+                    </Grid.RenderTransform>
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualStateGroup.Transitions>
+                                <VisualTransition To="Pressed" GeneratedDuration="0:0:0.08"/>
+                                <VisualTransition GeneratedDuration="0:0:0.2">
+                                    <VisualTransition.GeneratedEasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </VisualTransition.GeneratedEasingFunction>
+                                </VisualTransition>
+                            </VisualStateGroup.Transitions>
+                            <VisualState x:Name="Normal"/>
+                            <VisualState x:Name="PointerOver">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="1" Duration="0"/>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Hover" Storyboard.TargetProperty="Opacity" To="1" Duration="0"/>
+                                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0"/>
+                                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0"/>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0"/>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"/>
+                    <Border x:Name="Hover" Opacity="0" Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False"/>
+                    <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                </Grid>
+            </ControlTemplate>
+
             <!-- Console (10-foot) interface: flat dark tiles over the game art, no hairlines; the focus is a clean
                  white outline and the tile grows a little (see ConsoleHomeView), like a console home. -->
             <Style x:Key="ConsoleCard" TargetType="Button">
@@ -92,6 +140,8 @@
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                 <Setter Property="Background" Value="#D9131820"/>
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
+                <Setter Property="Template" Value="{StaticResource ConsoleSurfaceTemplate}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="UseSystemFocusVisuals" Value="True"/>
                 <Setter Property="FocusVisualPrimaryBrush" Value="White"/>
@@ -111,6 +161,8 @@
             </Style>
             <!-- A tab in the console top bar: plain text, the active one lit with a short underline. -->
             <Style x:Key="ConsoleTab" TargetType="Button">
+                <Setter Property="Template" Value="{StaticResource ConsoleSurfaceTemplate}"/>
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
                 <Setter Property="Padding" Value="16,8"/>
                 <Setter Property="CornerRadius" Value="22"/>
                 <Setter Property="Background" Value="Transparent"/>
@@ -129,6 +181,8 @@
             </Style>
             <!-- Round icon button in the console top bar (settings, desktop). -->
             <Style x:Key="ConsoleNavButton" TargetType="Button">
+                <Setter Property="Template" Value="{StaticResource ConsoleSurfaceTemplate}"/>
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
                 <Setter Property="Width" Value="52"/>
                 <Setter Property="Height" Value="52"/>
                 <Setter Property="Padding" Value="0"/>

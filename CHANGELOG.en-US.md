@@ -4,6 +4,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+### Fixed
+
+- Console settings: category and option buttons no longer show the stock grey fill and dimmed text; hover and press now animate smoothly, and the chosen category lights up with a fade.
+
 ## [1.7.0-alpha.1]
 ### What's new
 - A Console interface that looks like a home console: Home shows your launchers in a row at the top, over your games' art (a pill-shaped Play now right below, with the screen, audio, resolution and HDR on one line), the tabs sit on the left, and the System tab is now a list of categories on the left with only that category's options on the right. Tiles without hairlines, rounder corners and less repetition: the setup summary left Home (it is in Session). (#162)

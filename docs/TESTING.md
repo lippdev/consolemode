@@ -333,6 +333,8 @@ Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuraç�
 - [ ] Configurar a Android TV no modo Console: endereço, MAC opcional, entrada HDMI, comando da entrada e espera ao restaurar; Testar agora mostra o resultado e libera o botão após erro ou timeout. Resultado: ______
 - [ ] Selecionar FPS personalizado e digitar o limite; o modo PC mostra o mesmo valor. Sem RTSS disponível, a configuração respeita a mesma indisponibilidade das duas interfaces. Resultado: ______
 - [ ] Copiar o diagnóstico do controle, abrir a pasta de dados e rever o tutorial no modo Console; ao voltar, o foco continua em uma opção visível. Resultado: ______
+- [ ] Passar o mouse sobre categorias, opções, abas e cards: o realce aparece e some suavemente (sem cinza brusco), e o texto não fica apagado ao clicar; clicar afunda o item de leve. Trocar de categoria acende a barra verde e o nome com transição. Resultado: ______
+- [ ] Desativar uma opção (ex.: atalho de toque curto sem atalho Home) a deixa esmaecida e sem realce. Menu da sessão: as mesmas linhas e cards continuam legíveis no tema claro. Resultado: ______
 
 ## 4. Regressões
 
