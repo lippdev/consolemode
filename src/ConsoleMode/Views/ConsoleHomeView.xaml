@@ -42,8 +42,74 @@
             </Style>
         </Grid.Resources>
 
-        <!-- Background: covers of your installed Steam games (or your picture) under a solid-colour gradient -->
+        <!-- Background: the built-in wallpaper, covers of your installed Steam games or your picture, under a solid-colour gradient -->
         <Grid x:Name="BackgroundLayer" IsHitTestVisible="False" Margin="-56,0,-56,-32">
+            <!-- Built-in wallpaper ("Aurora"): soft green and blue glows over a deep blue-black with a few faint
+                 orbit lines, all on the right, where the gradients below leave the art visible -->
+            <Grid Visibility="{x:Bind ViewModel.ShowBackgroundWallpaper, Mode=OneWay}">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                            <GradientStop Color="#FF0C1828" Offset="0"/>
+                            <GradientStop Color="#FF080E17" Offset="0.5"/>
+                            <GradientStop Color="#FF07090D" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.82,0.12" GradientOrigin="0.82,0.12" RadiusX="0.5" RadiusY="0.85">
+                            <GradientStop Color="#A62FB88C" Offset="0"/>
+                            <GradientStop Color="#3D1E9C74" Offset="0.45"/>
+                            <GradientStop Color="#001E9C74" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="1.04,0.78" GradientOrigin="1.04,0.78" RadiusX="0.42" RadiusY="0.7">
+                            <GradientStop Color="#8C2F6FE0" Offset="0"/>
+                            <GradientStop Color="#262F6FE0" Offset="0.5"/>
+                            <GradientStop Color="#002F6FE0" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush Center="0.52,-0.08" GradientOrigin="0.52,-0.08" RadiusX="0.38" RadiusY="0.5">
+                            <GradientStop Color="#4D6A4FE0" Offset="0"/>
+                            <GradientStop Color="#006A4FE0" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Ellipse Width="1300" Height="1300" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-440,-460,0" StrokeThickness="1.5">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                            <GradientStop Color="#00FFFFFF" Offset="0.1"/>
+                            <GradientStop Color="#40FFFFFF" Offset="0.5"/>
+                            <GradientStop Color="#0AFFFFFF" Offset="0.9"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+                <Ellipse Width="1800" Height="1800" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-660,-700,0" StrokeThickness="1">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                            <GradientStop Color="#00FFFFFF" Offset="0.15"/>
+                            <GradientStop Color="#2E9BEACF" Offset="0.5"/>
+                            <GradientStop Color="#00FFFFFF" Offset="0.95"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+                <Ellipse Width="2400" Height="2400" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-940,-1000,0" StrokeThickness="1">
+                    <Ellipse.Stroke>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                            <GradientStop Color="#00FFFFFF" Offset="0.2"/>
+                            <GradientStop Color="#1FFFFFFF" Offset="0.55"/>
+                            <GradientStop Color="#00FFFFFF" Offset="0.9"/>
+                        </LinearGradientBrush>
+                    </Ellipse.Stroke>
+                </Ellipse>
+            </Grid>
             <Grid Visibility="{x:Bind ViewModel.ShowBackgroundCovers, Mode=OneWay}" Opacity="0.55">
                 <ItemsControl ItemsSource="{x:Bind ViewModel.BackgroundCovers, Mode=OneWay}">
                     <ItemsControl.ItemsPanel>
@@ -79,6 +145,9 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
+            <!-- System tab: the art dims much more, so the rows of options stay readable over any cover or picture -->
+            <Rectangle Fill="#D207090D" Opacity="{x:Bind ViewModel.ShownOpacity(ViewModel.IsConsoleSettingsOpen), Mode=OneWay}"
+                       OpacityTransition="{StaticResource ConsoleFade}"/>
         </Grid>
 
         <!-- ───────────── Idle (console-style: tabs on top, one page below) ───────────── -->
@@ -436,7 +505,8 @@
                     <Grid ColumnSpacing="48">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="340"/>
-                            <ColumnDefinition Width="*"/>
+                            <!-- Capped here, not on the list: the options stay right next to the categories on a wide TV -->
+                            <ColumnDefinition Width="*" MaxWidth="1100"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel x:Name="CategoryRail" Spacing="4" Padding="14,4,0,0">
                             <Button Style="{StaticResource ConsoleCategory}" Tag="0" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
@@ -520,8 +590,11 @@
                                 </Grid>
                             </Button>
                         </StackPanel>
-                        <ScrollViewer x:Name="SettingsRows" Grid.Column="1" VerticalScrollBarVisibility="Hidden">
-                            <Grid MaxWidth="1100" HorizontalAlignment="Stretch" Padding="0,4,0,24">
+                        <!-- Vertical only: the rows are measured at the column's width (long labels wrap instead of
+                             widening the list past the screen edge). -->
+                        <ScrollViewer x:Name="SettingsRows" Grid.Column="1" VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+                            <Grid Padding="0,4,0,24">
                                 <StackPanel x:Name="SystemSection0" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 0), Mode=OneWay}">
                                     <Button x:Name="FirstSettingsRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="mode" IsEnabled="{x:Bind ViewModel.HasFocusRow, Mode=OneWay}">
                                         <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>

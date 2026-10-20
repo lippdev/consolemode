@@ -47,7 +47,7 @@ Los atajos del mando los eliges tú: al principio no hay ninguno activado, la ap
 - [Enciende la TV y la cambia a la entrada del PC](docs/GUIDE.es-ES.md#control-de-la-tv) (Google TV / Android TV por la red), y puede ponerla en reposo después
 - Abre **Steam Big Picture**, **Playnite a pantalla completa** o el **modo Xbox**, y envía Steam a la bandeja al volver al PC
 - **Menú de la sesión** sobre el juego: cambia o cierra las ventanas abiertas, ajusta volumen, resolución, audio, FPS y HDR, oculta el puntero del ratón o muévelo con el mando, y explora tus archivos con [ControlFS](https://github.com/nextestudios/ControlFS)
-- Dos interfaces: **Escritorio** (ratón) y **Consola** (pantalla completa, mandos de Xbox y PlayStation, pestañas con LB/RB, tus portadas de Steam de fondo)
+- Dos interfaces: **Escritorio** (ratón) y **Consola** (pantalla completa, mandos de Xbox y PlayStation, pestañas con LB/RB, un fondo de pantalla propio o tus portadas de Steam de fondo)
 - Automatización con los enlaces `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) y una [API de control local](docs/GUIDE.es-ES.md#api-de-control-local)
 - Inglés, portugués, español, alemán, francés y ruso
 

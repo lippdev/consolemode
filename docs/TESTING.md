@@ -69,8 +69,12 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 
 ### Plano de fundo
 
-- [ ] Padrão ("Capas da Steam"): colagem de capas dos jogos instalados sob o gradiente, o texto continua legível; sem Steam ou sem capas, só o gradiente. Resultado: ______
-- [ ] Sistema → Plano de fundo alterna Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
+- [ ] Padrão ("Aurora"): fundo azul-escuro com brilhos suaves verde (alto, à direita), azul (embaixo, à direita) e roxo (no alto), e três linhas finas em arco à direita; o lado esquerdo fica escuro e o texto continua legível. Sem faixas nem serrilhado nos degradês, na TV e no monitor. Resultado: ______
+- [ ] Um `config.json` com `consoleBackground: "auto"` (o padrão das versões anteriores) abre com a Aurora; quem quiser as capas escolhe "Capas da Steam". Resultado: ______
+- [ ] "Capas da Steam": colagem de capas dos jogos instalados sob o gradiente, o texto continua legível; sem Steam ou sem capas, só o gradiente. Resultado: ______
+- [ ] Sistema → Plano de fundo alterna Aurora / Capas da Steam / Só gradiente / Minha imagem; "Minha imagem" abre o seletor de arquivo e usa a imagem escolhida; cancelar sem imagem volta ao modo anterior. Resultado: ______
+- [ ] Na aba Sistema o fundo (Aurora, capas ou imagem) escurece com transição, e as linhas de opções ficam legíveis por cima de qualquer capa; ao voltar para Início ou Sessão, o fundo clareia de novo. Resultado: ______
+- [ ] Aba Sistema numa TV larga (1920 px ou mais) e na janela pequena: a lista de opções começa logo ao lado das categorias, nenhuma linha passa da borda direita e o valor (em verde) fica todo visível; textos longos (alemão, russo) quebram em até duas linhas. A linha "Limpar" fica alinhada com as outras. Resultado: ______
 - [ ] A escolha fica salva ao reabrir (`consoleBackground` e `consoleBackgroundImage` no `config.json`). Resultado: ______
 
 ### Sons

@@ -87,7 +87,7 @@ public sealed class AppConfig
     /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
     public bool MinimizeToTray { get; set; }
 
-    /// <summary>Console background: "auto" (covers of the installed Steam games), "gradient" or "image".</summary>
+    /// <summary>Console background: "auto" (the built-in wallpaper), "covers" (of the installed Steam games), "gradient" or "image".</summary>
     public string ConsoleBackground { get; set; } = "auto";
 
     /// <summary>The picture used when the background is "image".</summary>
