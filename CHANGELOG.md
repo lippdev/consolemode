@@ -6,7 +6,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Fixed
 
-- Configurações do modo Console: botões das categorias e opções sem o cinza e o texto apagado do estilo padrão; passar o mouse e clicar agora têm transição suave, e a categoria escolhida acende com animação.
+- Configurações do modo Console: botões das categorias e opções sem o cinza e o texto apagado do estilo padrão; passar o mouse e clicar agora têm transição suave, e a categoria escolhida acende com animação. (#165)
 
 ## [1.7.0-alpha.1]
 ### Novidades

@@ -6,7 +6,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Fixed
 
-- Console settings: category and option buttons no longer show the stock grey fill and dimmed text; hover and press now animate smoothly, and the chosen category lights up with a fade.
+- Console settings: category and option buttons no longer show the stock grey fill and dimmed text; hover and press now animate smoothly, and the chosen category lights up with a fade. (#165)
 
 ## [1.7.0-alpha.1]
 ### What's new
