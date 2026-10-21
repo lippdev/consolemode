@@ -27,6 +27,8 @@ Abre la acción del atajo que quieras configurar, elige **Definir** o **Cambiar*
 
 Al volver de Big Picture, **Enviar Steam a la bandeja al volver al PC** cierra la ventana del cliente y deja Steam en marcha. Con la opción desactivada, el cliente de escritorio se queda abierto. Las ventanas de Steam no se tocan si hay un juego en marcha o si no se puede comprobar su estado.
 
+Cambiar la pantalla principal puede hacer que Windows reordene los iconos del escritorio. **Devolver los iconos del escritorio a su sitio** (activado por defecto) guarda su posición antes de la sesión y los vuelve a colocar después de restaurar el escritorio. No hace nada si **Organizar iconos automáticamente** está activado en el escritorio, porque entonces Windows los coloca por sí mismo.
+
 ## API de control local
 
 Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas que necesitan una respuesta (un agente de control remoto que funciona como servicio de Windows, un plugin de Stream Deck que muestra si el modo consola está activo) pueden usar la canalización con nombre (named pipe) `\\.\pipe\ConsoleMode.Control` mientras la aplicación está abierta: envía una línea JSON y recibe otra.

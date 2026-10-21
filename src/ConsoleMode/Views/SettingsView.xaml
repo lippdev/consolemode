@@ -118,6 +118,13 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.CloseSteamOnRestore, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.RestoreIconsCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.RestoreIconsDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE80A;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.RestoreDesktopIcons, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}" Description="{x:Bind ViewModel.HomeButtonHint, Mode=OneWay}"
                               IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
