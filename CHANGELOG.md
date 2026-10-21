@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- Os ícones da área de trabalho voltam ao lugar depois da sessão: trocar a tela principal podia fazer o Windows embaralhá-los. O Console Mode salva a posição antes de mexer nas telas e os recoloca alguns segundos depois de restaurar a mesa. Liga e desliga em Ajustes → **Devolver os ícones da área de trabalho ao lugar** (ligado por padrão); não faz nada com **Organizar ícones automaticamente** ligado. (#167)
 
 ## [1.7.0-alpha.2]
 ### Novidades
