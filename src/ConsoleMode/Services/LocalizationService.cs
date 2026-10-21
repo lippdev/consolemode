@@ -262,6 +262,9 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ControllerMouseRow => LocalizationService.Get(nameof(ControllerMouseRow));
     public string AutoStartControllerCard => LocalizationService.Get(nameof(AutoStartControllerCard));
     public string AutoStartControllerDescription => LocalizationService.Get(nameof(AutoStartControllerDescription));
+    public string ControllerWakeCard => LocalizationService.Get(nameof(ControllerWakeCard));
+    public string ControllerWakeDescription => LocalizationService.Get(nameof(ControllerWakeDescription));
+    public string ControllerWakeButton => LocalizationService.Get(nameof(ControllerWakeButton));
     public string NotifyUpdatesCard => LocalizationService.Get(nameof(NotifyUpdatesCard));
     public string NotifyUpdatesDescription => LocalizationService.Get(nameof(NotifyUpdatesDescription));
     public string BetaUpdatesCard => LocalizationService.Get(nameof(BetaUpdatesCard));

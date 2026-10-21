@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **Wake the PC with the controller**: in Settings (and in the Console System tab → Controller), Console Mode shows whether the Xbox Wireless Adapter, Bluetooth or a wired controller can wake the PC from sleep, and **Turn on** enables it for them (Windows asks for administrator permission). Together with **Enter when a controller connects**, pressing the controller's center button wakes the PC straight into console mode. It doesn't work when the PC is shut down or hibernating. (#168)
 
 ## [1.7.0-alpha.2]
 ### What's new

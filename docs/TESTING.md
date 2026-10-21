@@ -119,6 +119,17 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
 - [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
 
+## 1b2. Acordar o PC pelo controle (issue #155)
+
+Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; a suspensão (não hibernação) habilitada.
+
+- [ ] Ajustes → **Acordar o PC pelo controle**: a linha de status lista o adaptador/Bluetooth/controle e diz se já pode acordar o PC. Num PC sem nenhum deles, diz que nenhum dispositivo pode e a aba Sistema do modo Console mostra "Indisponível". Resultado: ______
+- [ ] **Ativar** abre o pedido de administrador (UAC); aceitando, aparece "Pronto…" e o Gerenciador de Dispositivos → (adaptador/rádio Bluetooth) → Gerenciamento de Energia mostra *Permitir que este dispositivo ative o computador* marcado. Resultado: ______
+- [ ] Recusar o UAC: aviso de que nada foi alterado; nenhum dispositivo muda. Resultado: ______
+- [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
+- [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
+- [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______
+
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
 ### Tela cheia estilo Steam (Shift+Tab), prévia e janelas

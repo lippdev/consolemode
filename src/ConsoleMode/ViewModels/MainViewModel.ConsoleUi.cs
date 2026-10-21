@@ -256,6 +256,7 @@ public partial class MainViewModel
             case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
+            case "controllerwake": _ = EnableControllerWakeAsync(); break;
             case "sounds": InterfaceSounds = !InterfaceSounds; break;
             case "background": CycleBackgroundMode(); break;
             case "backgroundimage": PickBackgroundImage(); break;

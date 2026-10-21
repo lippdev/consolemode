@@ -27,6 +27,8 @@ Die Registerkarte **System** bietet dieselben Einstellungen wie der Desktopmodus
 
 Bei der Rückkehr aus Big Picture schließt **Steam beim Zurückkehren zum PC in den Infobereich minimieren** das Client-Fenster, während Steam weiterläuft. Ist die Option aus, bleibt der Desktop-Client geöffnet. Steam-Fenster werden nicht angetastet, wenn ein Spiel läuft oder sich sein Zustand nicht prüfen lässt.
 
+**PC mit dem Controller aufwecken** erlaubt dem Xbox Wireless Adapter, Bluetooth oder einem Controller am Kabel, den PC mit der mittleren Taste des Controllers aus dem Energiesparmodus zu wecken. **Einschalten** fragt Windows nach Administratorrechten und aktiviert bei diesen Geräten *Gerät kann den Computer aus dem Ruhezustand aktivieren*. Ein ausgeschalteter PC oder einer im Ruhezustand wacht nicht auf, und manche PCs schalten Bluetooth im Energiesparmodus ab. Zusammen mit **Beim Verbinden eines Controllers starten** wacht der PC direkt im Konsolenmodus auf.
+
 ## Lokale Steuerungs-API
 
 `consolemode://`-Links werden abgeschickt, ohne auf eine Antwort zu warten. Werkzeuge, die eine Antwort brauchen, etwa ein Fernsteuerungs-Agent, der als Windows-Dienst läuft, oder ein Stream-Deck-Plugin, das anzeigt, ob der Konsolenmodus aktiv ist, können die Named Pipe `\\.\pipe\ConsoleMode.Control` nutzen, solange die App läuft: Eine JSON-Zeile senden, eine zurückbekommen.
