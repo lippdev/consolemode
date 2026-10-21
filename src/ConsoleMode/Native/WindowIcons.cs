@@ -29,10 +29,29 @@ public static class WindowIcons
         }
     }
 
-    private static IconBitmap? FromPackage(SwitchWindow window, int size)
+    /// <summary>
+    /// An app's own logo, for the console Home's launcher tiles: a Store app's by its AppUserModelID,
+    /// otherwise its exe's icon. Never throws: null means the tile keeps its glyph.
+    /// </summary>
+    public static IconBitmap? ForApp(string? exePath, string? appUserModelId, int size)
     {
-        var id = AppUserModelIdOf(window);
-        if (id is null) return null;
+        try
+        {
+            return (appUserModelId is null ? null : FromAppId(appUserModelId, size))
+                   ?? (File.Exists(exePath) ? FromExe(exePath, size) : null);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Início: ícone de \"{appUserModelId ?? exePath}\": {ex.Message}");
+            return null;
+        }
+    }
+
+    private static IconBitmap? FromPackage(SwitchWindow window, int size) =>
+        AppUserModelIdOf(window) is { } id ? FromAppId(id, size) : null;
+
+    private static IconBitmap? FromAppId(string id, int size)
+    {
         var factoryId = typeof(IShellItemImageFactory).GUID;
         if (SHCreateItemFromParsingName($@"shell:AppsFolder\{id}", 0, ref factoryId, out var factory) != 0 || factory is null) return null;
         try

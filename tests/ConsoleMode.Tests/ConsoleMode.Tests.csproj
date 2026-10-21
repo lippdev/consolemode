@@ -49,6 +49,7 @@
     <Compile Include="../../src/ConsoleMode/Services/SteamShutdown.cs" Link="SteamShutdown.cs" />
     <Compile Include="../../src/ConsoleMode/Services/LaunchArt.cs" Link="LaunchArt.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DiagnosticsReport.cs" Link="DiagnosticsReport.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/PackageLogo.cs" Link="PackageLogo.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbProtocol.cs" Link="Tv/AdbProtocol.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbShellOutput.cs" Link="Tv/AdbShellOutput.cs" />
