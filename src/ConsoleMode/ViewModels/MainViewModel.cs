@@ -134,6 +134,7 @@ public partial class MainViewModel : ObservableObject
         _ = RecheckControllerAsync();
         StartBatteryPolling();
         _ = RefreshBackgroundAsync();
+        _ = RefreshControllerWakeAsync();
         // The tour points at desktop controls; the console interface explains itself.
         if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
         else if (interactive) RequestShortcutOnboarding();
@@ -156,6 +157,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var monitor in Monitors) monitor.RefreshLocalizedText();
         UpdateSummary();
         RefreshUpdateStrings();
+        RefreshControllerWakeText();
         RefreshConsoleTexts();
     }
 

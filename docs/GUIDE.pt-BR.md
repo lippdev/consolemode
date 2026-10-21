@@ -33,6 +33,8 @@ Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar*
 
 Ao voltar do Big Picture, **Mandar a Steam para a bandeja ao voltar ao PC** fecha a janela do cliente e mantém a Steam em execução. Com a opção desligada, o cliente desktop fica aberto. As janelas da Steam são preservadas quando há jogo rodando ou não é possível verificar esse estado.
 
+**Acordar o PC pelo controle** deixa o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo acordarem o PC da suspensão pelo botão central do controle. **Ativar** pede permissão de administrador ao Windows e marca *Permitir que este dispositivo ative o computador* nesses dispositivos. Não acorda o PC desligado ou em hibernação, e alguns PCs cortam a energia do Bluetooth ao suspender. Junto com **Entrar ao conectar um controle**, o PC já acorda no modo console.
+
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
