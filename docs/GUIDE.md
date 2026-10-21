@@ -33,6 +33,8 @@ Open the shortcut action you want to configure, choose **Set** or **Change**, ho
 
 When returning from Big Picture, **Send Steam to the tray when going back to the PC** closes the client window while keeping Steam running. With the option off, the desktop client is left open. Steam windows are left alone when a game is running or its state cannot be checked.
 
+**Per-game profiles** give each Steam game its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings for…**: whatever the game screen uses at that moment is saved. Next time that game starts during a session, Console Mode applies it, and when the game closes the screen goes back to how it was. The game is detected from Steam, whether it was opened from Big Picture, Playnite or the Xbox app. The saved profiles are listed in Settings → **Per-game profiles**, where you can delete them (in the Console interface: System → When entering console mode).
+
 ## Local control API
 
 `consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.

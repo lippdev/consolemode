@@ -280,6 +280,19 @@
                             </Grid>
                         </Button>
 
+                        <!-- Per-game profile (issue #69): only while a Steam game runs -->
+                        <Button x:Name="GameProfileRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="profile"
+                                Visibility="{x:Bind ViewModel.IsSessionGameRunning, Mode=OneWay}">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE74E;" FontSize="19"/></Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.GameProfileRow, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionProfileText, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+
                         <!-- Hidden until turned off here or the session ends; nothing automatic. -->
                         <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleCursorHiddenCommand}"
                                 Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">

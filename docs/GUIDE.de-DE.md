@@ -27,6 +27,8 @@ Die Registerkarte **System** bietet dieselben Einstellungen wie der Desktopmodus
 
 Bei der Rückkehr aus Big Picture schließt **Steam beim Zurückkehren zum PC in den Infobereich minimieren** das Client-Fenster, während Steam weiterläuft. Ist die Option aus, bleibt der Desktop-Client geöffnet. Steam-Fenster werden nicht angetastet, wenn ein Spiel läuft oder sich sein Zustand nicht prüfen lässt.
 
+**Profile pro Spiel** geben jedem Steam-Spiel eine eigene Auflösung, HDR, ein FPS-Limit und eine Audioausgabe. Öffne bei laufendem Spiel das Sitzungsmenü und wähle **Spielprofil → Aktuelle Einstellungen für … speichern**: Gespeichert wird, was der Spielbildschirm in diesem Moment nutzt. Wenn das Spiel das nächste Mal während einer Sitzung startet, wendet Console Mode das Profil an, und beim Schließen kehrt der Bildschirm in den vorherigen Zustand zurück. Das Spiel wird über Steam erkannt, egal ob es aus Big Picture, Playnite oder der Xbox-App gestartet wurde. Die gespeicherten Profile stehen unter Einstellungen → **Profile pro Spiel** und lassen sich dort löschen (in der Konsolenoberfläche: System → Beim Starten des Konsolenmodus).
+
 ## Lokale Steuerungs-API
 
 `consolemode://`-Links werden abgeschickt, ohne auf eine Antwort zu warten. Werkzeuge, die eine Antwort brauchen, etwa ein Fernsteuerungs-Agent, der als Windows-Dienst läuft, oder ein Stream-Deck-Plugin, das anzeigt, ob der Konsolenmodus aktiv ist, können die Named Pipe `\\.\pipe\ConsoleMode.Control` nutzen, solange die App läuft: Eine JSON-Zeile senden, eine zurückbekommen.

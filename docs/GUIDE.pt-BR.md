@@ -33,6 +33,8 @@ Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar*
 
 Ao voltar do Big Picture, **Mandar a Steam para a bandeja ao voltar ao PC** fecha a janela do cliente e mantém a Steam em execução. Com a opção desligada, o cliente desktop fica aberto. As janelas da Steam são preservadas quando há jogo rodando ou não é possível verificar esse estado.
 
+**Perfis por jogo** dão a cada jogo da Steam sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais para…**: o que a tela de jogo usa naquele momento fica salvo. Da próxima vez que esse jogo abrir durante uma sessão, o Console Mode aplica o perfil e, quando o jogo fecha, a tela volta a ser como era. O jogo é detectado pela Steam, seja ele aberto pelo Big Picture, pelo Playnite ou pelo app Xbox. Os perfis salvos ficam em Ajustes → **Perfis por jogo**, onde dá para apagá-los (na interface Console: Sistema → Ao entrar no modo console).
+
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
