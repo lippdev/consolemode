@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Console interface: the Home tiles show the official Steam, Playnite and Xbox logos, read from the installed apps, and Custom app shows its `.exe` icon. When an app isn't installed, its tile keeps the generic icon. (#169)
 
 ## [1.7.0-alpha.2]
 ### What's new
