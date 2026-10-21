@@ -504,6 +504,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 
 ### Início
 - [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem o selo ✓ verde no canto e uma barra verde embaixo, e os outros ficam mais apagados.
+- [ ] Logos oficiais nos blocos: Steam Big Picture com o logo da Steam, Playnite com o do Playnite e modo Xbox com o do app Xbox, nítidos na TV 4K (sem serrilhado nem borrão). Aplicativo personalizado mostra o ícone do `.exe` escolhido e troca ao escolher outro; Playnite troca ao escolher outra pasta. Sem a Steam ou o app Xbox instalado, o bloco mostra o ícone genérico de antes, sem bloco vazio. Resultado: ______
 - [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
 - [ ] Andar pela fileira já troca o iniciador, sem apertar A: o selo, a barra e o título grande embaixo seguem o foco, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
 - [ ] A num iniciador (ou um clique) abre direto aquele iniciador, como o Jogar agora. Sem tela de jogo escolhida, A só escolhe e não abre nada.

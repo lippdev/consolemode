@@ -32,6 +32,7 @@ public partial class MainViewModel
         Engine.Launch.CustomPlaynitePath = value;
         OnPropertyChanged(nameof(HasPlaynitePath));
         OnPropertyChanged(nameof(PlaynitePathText));
+        RefreshLaunchLogo("playnite");
         if (_applying) return;
         // The launcher list only offers Playnite when it can be found.
         IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
