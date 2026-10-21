@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **Per-game profiles**: each Steam game can have its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings**; next time it starts in console mode, the profile is applied by itself and undone when the game closes. Also works for Steam games opened from Playnite or the Xbox app. Profiles are listed in Settings → **Per-game profiles**, where you can delete them. (#170)
 
 ## [1.7.0-alpha.2]
 ### What's new

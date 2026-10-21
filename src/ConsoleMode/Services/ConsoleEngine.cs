@@ -4,7 +4,7 @@ using ConsoleMode.Services.Tv;
 
 namespace ConsoleMode.Services;
 
-public sealed class ConsoleEngine
+public sealed partial class ConsoleEngine
 {
     public ConsoleRuntimeState State { get; } = new();
     public MonitorService Monitors { get; } = new();
@@ -71,6 +71,8 @@ public sealed class ConsoleEngine
         State.FpsLimit = config.FpsLimit;
         State.RtssBackup = null;
         State.RtssLimitApplied = false;
+        State.GameProfiles = [.. config.GameProfiles];
+        ResetGameProfileState();
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
@@ -225,6 +227,7 @@ public sealed class ConsoleEngine
         if (mode == "xboxMode")
         {
             TickAudio();
+            TickGameProfile();
             return "running";
         }
 
@@ -232,6 +235,7 @@ public sealed class ConsoleEngine
         {
             if (IsCustomAppExit()) return "exit";
             TickAudio();
+            TickGameProfile();
             return "running";
         }
 
@@ -288,6 +292,7 @@ public sealed class ConsoleEngine
         }
 
         TickAudio();
+        TickGameProfile();
         return "running";
     }
 
@@ -373,6 +378,8 @@ public sealed class ConsoleEngine
             State.HdrApplied = false;
             State.HdrMonitor = null;
             State.VrrApplied = false;
+            // The restore above already put the screen, HDR, FPS and audio back as before the session.
+            ResetGameProfileState();
             OnUi(NativeWindows.StopBigPictureExitWatch);
         }
     }

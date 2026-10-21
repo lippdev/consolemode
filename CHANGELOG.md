@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- **Perfis por jogo**: cada jogo da Steam pode ter sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais**; da próxima vez que ele abrir no modo console, o perfil é aplicado sozinho e desfeito quando o jogo fecha. Vale também para jogos da Steam abertos pelo Playnite ou pelo app Xbox. Os perfis ficam em Ajustes → **Perfis por jogo**, onde dá para apagá-los. (#170)
 
 ## [1.7.0-alpha.2]
 ### Novidades

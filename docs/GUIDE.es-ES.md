@@ -27,6 +27,8 @@ Abre la acción del atajo que quieras configurar, elige **Definir** o **Cambiar*
 
 Al volver de Big Picture, **Enviar Steam a la bandeja al volver al PC** cierra la ventana del cliente y deja Steam en marcha. Con la opción desactivada, el cliente de escritorio se queda abierto. Las ventanas de Steam no se tocan si hay un juego en marcha o si no se puede comprobar su estado.
 
+Los **perfiles por juego** dan a cada juego de Steam su propia resolución, HDR, límite de FPS y salida de audio. Con el juego en marcha, abre el menú de la sesión y elige **Perfil del juego → Guardar los ajustes actuales para…**: se guarda lo que usa la pantalla de juego en ese momento. La próxima vez que ese juego se abra durante una sesión, Console Mode aplica el perfil y, cuando el juego se cierra, la pantalla vuelve a estar como antes. El juego se detecta a través de Steam, tanto si se abre desde Big Picture como desde Playnite o la aplicación Xbox. Los perfiles guardados aparecen en Ajustes → **Perfiles por juego**, donde puedes borrarlos (en la interfaz Consola: Sistema → Al entrar en modo consola).
+
 ## API de control local
 
 Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas que necesitan una respuesta (un agente de control remoto que funciona como servicio de Windows, un plugin de Stream Deck que muestra si el modo consola está activo) pueden usar la canalización con nombre (named pipe) `\\.\pipe\ConsoleMode.Control` mientras la aplicación está abierta: envía una línea JSON y recibe otra.

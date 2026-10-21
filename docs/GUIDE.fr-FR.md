@@ -27,6 +27,8 @@ Ouvrez l'action de raccourci à configurer, choisissez **Définir** ou **Modifie
 
 Au retour de Big Picture, **Réduire Steam dans la zone de notification au retour au PC** ferme la fenêtre du client tout en laissant Steam en marche. Si l'option est désactivée, le client de bureau reste ouvert. Les fenêtres de Steam ne sont pas touchées quand un jeu est en cours ou quand son état ne peut pas être vérifié.
 
+Les **profils par jeu** donnent à chaque jeu Steam sa propre résolution, son HDR, sa limite de FPS et sa sortie audio. Pendant que le jeu tourne, ouvrez le menu de la session et choisissez **Profil du jeu → Enregistrer les réglages actuels pour…** : ce qu'utilise l'écran de jeu à ce moment-là est enregistré. La prochaine fois que ce jeu démarre pendant une session, Console Mode applique le profil et, quand le jeu se ferme, l'écran revient à son état précédent. Le jeu est détecté via Steam, qu'il soit lancé depuis Big Picture, Playnite ou l'application Xbox. Les profils enregistrés sont listés dans Paramètres → **Profils par jeu**, où vous pouvez les supprimer (dans l'interface Console : Système → À l'entrée en mode console).
+
 ## API de contrôle local
 
 Les liens `consolemode://` s'envoient sans attendre de réponse. Les outils qui ont besoin d'une réponse (un agent de contrôle à distance qui tourne comme service Windows, un plugin Stream Deck qui indique si le mode console est actif) peuvent utiliser le canal nommé `\\.\pipe\ConsoleMode.Control` tant que l'application tourne : envoyez une ligne JSON, recevez-en une en retour.
