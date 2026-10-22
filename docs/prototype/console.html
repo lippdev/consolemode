@@ -1,0 +1,430 @@
+<!doctype html>
+<!--
+  Protótipo da interface Console (1.7), espelhando src/ConsoleMode/Views/ConsoleHomeView.xaml e os estilos de App.xaml.
+  Serve para prototipar antes de mexer no XAML. Abra direto no navegador (no Windows os ícones usam a Segoe Fluent Icons).
+
+  Controles: ← ↑ → ↓ movem o foco · Enter = A · Esc / Backspace = B · Q / E = LB / RB (abas) · mouse também funciona.
+  Tudo que é texto e dado fica no objeto DATA, logo abaixo do <script>.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Console Mode · protótipo da interface Console</title>
+<style>
+@font-face { font-family: "Inter Variable"; src: url("../../src/ConsoleMode/Assets/Fonts/InterVariable.ttf") format("truetype"); font-weight: 100 900; }
+
+/* ───── Tokens (App.xaml) ─────
+   Atenção ao converter: aqui as cores estão em CSS (#RRGGBBAA); no XAML a ordem é #AARRGGBB. */
+:root {
+  --accent: #2FB88C;            /* SystemAccentColor; no tema escuro o Fluent usa Light1-3 para texto */
+  --accent-text: #6FDDB8;       /* AccentTextFillColorPrimary (Light2) */
+  --on-accent: #000000E6;       /* TextOnAccentFillColorPrimary */
+  --bg: #07090D;
+  --card: #131820D9;            /* ConsoleCard */
+  --row: #FFFFFF14;             /* ConsoleRow */
+  --veil: #0F0F0F0F;            /* hover: SubtleFillColorSecondary */
+  --text: #FFFFFF;
+  --text-2: #FFFFFFC9;          /* TextFillColorSecondary */
+  --chip-fill: #FFFFFF0F;       /* ControlFillColorSecondary */
+  --chip-stroke: #FFFFFF12;     /* ControlStrokeColorDefault */
+  --ease: cubic-bezier(.215,.61,.355,1); /* CubicEase EaseOut */
+  --font: "Inter Variable", "Inter", "Segoe UI Variable", "Segoe UI", sans-serif;
+  --icons: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body { font-family: var(--font); color: var(--text); }
+.ic { font-family: var(--icons); font-style: normal; line-height: 1; }
+
+/* A tela é desenhada em 1920×1080 (TV) e escalada para caber na janela */
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; background: var(--bg); overflow: hidden; }
+
+/* ───── Fundo: papel de parede "Aurora" + degradês ───── */
+.bg { position: absolute; inset: 0; pointer-events: none; }
+.aurora { background:
+  radial-gradient(ellipse 32% 55% at 66% -6%, #6A4FE066, #6A4FE000),
+  radial-gradient(ellipse 42% 70% at 104% 78%, #2F6FE0A6, #2F6FE038 50%, #2F6FE000),
+  radial-gradient(ellipse 50% 85% at 82% 12%, #2FB88CA6, #1E9C743D 45%, #1E9C7400),
+  linear-gradient(to bottom left, #0C1828, #080E17 50%, #07090D); }
+.orbit { position: absolute; border-radius: 50%; right: 0; top: 0;
+  -webkit-mask: linear-gradient(to bottom left, transparent 55%, #000 85%, #0004); mask: linear-gradient(to bottom left, transparent 55%, #000 85%, #0004); }
+.orbit.o1 { width: 1300px; height: 1300px; margin: -440px -460px 0 0; border: 1.5px solid #FFFFFF59; }
+.orbit.o2 { width: 1800px; height: 1800px; margin: -660px -700px 0 0; border: 1px solid #9BEACF47; }
+.orbit.o3 { width: 2400px; height: 2400px; margin: -940px -1000px 0 0; border: 1px solid #FFFFFF2E; }
+.fade-x { background: linear-gradient(90deg, #07090DF5, #07090DC7 40%, #07090D4D); }
+.fade-y { background: linear-gradient(0deg, #07090DF2, #07090D00 55%); }
+.dim { background: #07090DD2; opacity: 0; transition: opacity .18s; }
+body.tab-2 .dim { opacity: 1; }
+
+/* ───── Layout ───── */
+#app { position: absolute; inset: 0; padding: 16px 56px 32px; display: grid; grid-template-rows: 56px 1fr auto; row-gap: 14px; }
+
+/* ───── Superfície (ConsoleSurfaceTemplate): véu no hover, afunda no clique ───── */
+.surface { position: relative; border: 0; color: inherit; font: inherit; background: transparent; cursor: pointer; text-align: left; padding: 0;
+  transition: transform .2s var(--ease); outline: none; }
+.surface::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--veil); opacity: 0; pointer-events: none; transition: opacity .2s var(--ease); }
+.surface:hover::after, .surface.pressed::after { opacity: 1; }
+.surface.pressed { transform: scale(.97); transition-duration: .08s; }
+.surface[disabled] { opacity: .4; pointer-events: none; }
+/* Foco do controle: anel branco de 3 px, a 5 px do card */
+.surface:focus-visible, .surface.kfocus { outline: 3px solid #fff; outline-offset: 5px; }
+
+/* ───── Barra do topo ───── */
+.top { display: flex; align-items: center; justify-content: space-between; }
+.top .left, .top .right { display: flex; align-items: center; }
+.top .left { gap: 6px; }
+.top .right { gap: 16px; }
+.brand { width: 40px; height: 40px; border-radius: 20px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 20px; margin-right: 14px; }
+.hint { min-width: 32px; height: 32px; border-radius: 16px; padding: 0 10px; background: var(--chip-fill); border: 1px solid var(--chip-stroke); display: inline-grid; place-items: center; font-weight: 700; font-size: 13px; }
+.tab { padding: 8px 16px; border-radius: 22px; font-size: 22px; font-weight: 600; opacity: .55; transition: opacity .18s, transform .2s var(--ease); }
+.tab.on { opacity: 1; }
+.tab .ul { position: absolute; left: 16px; right: 16px; bottom: 0; height: 3px; border-radius: 2px; background: var(--accent); opacity: 0; transition: opacity .18s; }
+.tab.on .ul { opacity: 1; }
+.nav { width: 52px; height: 52px; border-radius: 26px; display: grid; place-items: center; font-size: 22px; }
+.nav:focus-visible, .nav.kfocus { outline-offset: 4px; }
+.sec { color: var(--text-2); }
+.clock { font-size: 22px; font-weight: 600; }
+
+/* ───── Páginas ───── */
+.page { display: none; min-height: 0; }
+body.tab-0 #home, body.tab-1 #session, body.tab-2 #system { display: grid; }
+
+/* Início */
+#home { grid-template-rows: auto 1fr; }
+.launch-row { display: flex; gap: 22px; margin: 28px 8px 0; }
+.lt-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; opacity: .6; transition: opacity .14s; }
+.lt-wrap.sel { opacity: 1; }
+.lt { width: 156px; height: 156px; border-radius: 22px; padding: 14px 12px; display: grid; place-items: center; }
+.lt:focus-visible, .lt.kfocus { outline-offset: 6px; }
+.lt .glyph { font-size: 48px; margin-bottom: 20px; }
+.lt .name { position: absolute; left: 12px; right: 12px; bottom: 14px; text-align: center; font-size: 15px; font-weight: 600; color: #FFFFFFE6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lt .check { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 13px; background: var(--accent); color: var(--on-accent); display: none; place-items: center; font-size: 13px; }
+.lt-wrap.sel .check { display: grid; }
+.lt-bar { width: 32px; height: 4px; border-radius: 2px; background: var(--accent); visibility: hidden; }
+.lt-wrap.sel .lt-bar { visibility: visible; }
+.hero { align-self: end; margin: 0 0 48px 4px; max-width: 1000px; display: flex; flex-direction: column; gap: 10px; }
+.hero h1 { margin: 0; font-size: 60px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero .sum { font-size: 24px; color: #FFFFFFE6; }
+.hero .meta { font-size: 19px; color: #FFFFFF99; }
+.hero .actions { display: flex; gap: 18px; margin-top: 18px; align-items: center; }
+.play { height: 64px; min-width: 300px; padding: 0 36px; border-radius: 32px; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 24px; font-weight: 700; }
+.play:focus-visible, .play.kfocus { outline-width: 4px; outline-offset: 6px; }
+.round { width: 64px; height: 64px; border-radius: 32px; background: #FFFFFF26; display: grid; place-items: center; font-size: 24px; }
+
+/* Sessão */
+#session { align-content: start; gap: 10px; overflow: hidden; }
+.heading { font-size: 22px; font-weight: 600; color: var(--text-2); margin: 0 0 0 4px; }
+.hrow { display: flex; gap: 16px; padding: 16px 8px; }
+.card { background: var(--card); border-radius: 18px; flex: none; }
+.screen { width: 300px; height: 204px; padding: 18px 22px 16px; display: grid; grid-template-rows: 1fr auto; }
+.mon { width: 124px; height: 90px; position: relative; }
+.mon .bezel { height: 72px; border: 3px solid #E6EBEF; border-radius: 9px; padding: 0; }
+.mon .panel { height: 100%; border-radius: 5px; display: grid; place-items: center; font-size: 22px; }
+.mon .stand { position: absolute; bottom: 4px; left: 39px; width: 46px; height: 6px; border-radius: 3px; background: #E6EBEF; }
+.screen .nm { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+.pill { display: inline-block; border-radius: 11px; padding: 3px 11px; font-size: 14px; font-weight: 600; }
+.screen .det { font-size: 14px; color: #FFFFFFB3; margin-left: 10px; }
+.quick { width: 208px; height: 208px; padding: 18px 22px; display: grid; grid-template-rows: auto 1fr; }
+.quick .ico { width: 42px; height: 42px; border-radius: 21px; background: #FFFFFF26; display: grid; place-items: center; font-size: 19px; }
+.quick .txt { align-self: end; min-width: 0; }
+.quick .lb { font-size: 14px; color: #FFFFFFB3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.quick .vl { font-size: 22px; font-weight: 600; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Sistema */
+#system { grid-template-columns: 340px minmax(0, 1100px); column-gap: 48px; min-height: 0; }
+.rail { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 0 14px; }
+.cat { height: 60px; padding: 0 20px; border-radius: 12px; display: flex; align-items: center; font-size: 20px; }
+.cat:focus-visible, .cat.kfocus { outline-offset: 3px; }
+.cat .bar { position: absolute; left: 6px; top: 16px; width: 4px; height: 28px; border-radius: 2px; background: var(--accent); opacity: 0; transition: opacity .18s; }
+.cat .lbl { opacity: .55; transition: opacity .18s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat.on .bar, .cat.on .lbl { opacity: 1; }
+.rows { display: flex; flex-direction: column; gap: 8px; padding: 4px 0 24px; overflow: hidden; }
+.row { height: 72px; padding: 0 24px; border-radius: 12px; background: var(--row); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex: none; }
+.row:focus-visible, .row.kfocus { outline-offset: 3px; }
+.row .lbl { font-size: 20px; }
+.row .val { font-size: 20px; font-weight: 600; color: var(--accent-text); max-width: 420px; text-align: right; }
+
+/* Dicas do controle (rodapé) */
+.hints { display: flex; justify-content: flex-end; gap: 22px; opacity: .8; font-size: 16px; }
+.hints span { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Seletor de opções (modal) */
+.modal { position: absolute; inset: 0; background: #07090DE6; display: none; place-items: center; }
+.modal.open { display: grid; }
+.modal .box { width: 820px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.modal h2 { margin: 0; font-size: 32px; font-weight: 600; }
+.modal .list { display: flex; flex-direction: column; gap: 10px; }
+.modal .row { width: 760px; justify-content: flex-start; gap: 16px; }
+.modal .tick { width: 24px; color: var(--accent-text); font-size: 20px; }
+.small { height: 44px; padding: 0 18px; border-radius: 12px; font-size: 17px; background: var(--chip-fill); display: flex; align-items: center; gap: 10px; }
+</style>
+</head>
+<body class="tab-0">
+<div id="stage">
+  <div class="bg aurora"></div>
+  <div class="bg"><div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit o3"></div></div>
+  <div class="bg fade-x"></div>
+  <div class="bg fade-y"></div>
+  <div class="bg dim"></div>
+
+  <div id="app">
+    <div class="top">
+      <div class="left">
+        <div class="brand ic">&#xE7FC;</div>
+        <span class="hint">LB</span>
+        <div id="tabs" style="display:flex;gap:6px"></div>
+        <span class="hint">RB</span>
+      </div>
+      <div class="right">
+        <button class="surface nav ic" data-f title="Modo desktop">&#xE7F4;</button>
+        <span class="ic sec" style="font-size:22px">&#xE7FC;</span>
+        <span class="sec" style="display:flex;gap:6px;align-items:center;font-size:18px"><span class="ic" style="font-size:20px">&#xE859;</span><span id="battery"></span></span>
+        <span class="clock" id="clock"></span>
+      </div>
+    </div>
+
+    <div style="min-height:0;display:grid">
+      <section class="page" id="home">
+        <div class="launch-row" id="launchRow"></div>
+        <div class="hero">
+          <h1 id="heroTitle"></h1>
+          <div class="sum" id="heroSum"></div>
+          <div class="meta" id="heroMeta"></div>
+          <div class="actions">
+            <button class="surface play" data-f id="playBtn"><span class="ic">&#xE768;</span><span id="playText"></span></button>
+            <button class="surface round ic" data-f data-act="tab:1" title="Sessão">&#xE712;</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="session">
+        <div><p class="heading" id="hScreens"></p><div class="hrow" id="screens"></div></div>
+        <div><p class="heading" id="hQuick"></p><div class="hrow" id="quick"></div></div>
+      </section>
+
+      <section class="page" id="system">
+        <div class="rail" id="rail"></div>
+        <div class="rows" id="rows"></div>
+      </section>
+    </div>
+
+    <div class="hints" id="hints"></div>
+  </div>
+
+  <div class="modal" id="picker"><div class="box">
+    <h2 id="pickerTitle"></h2>
+    <div class="list" id="pickerList"></div>
+    <button class="surface small" data-f data-act="close"><span class="hint">B</span><span>Voltar</span></button>
+  </div></div>
+</div>
+
+<script>
+// ───── Dados: edite aqui (textos de Strings.pt-BR.json, cores de LaunchArt.cs) ─────
+const DATA = {
+  tabs: ["Início", "Sessão", "Sistema"],
+  battery: "80%",
+  launchers: [
+    { name: "Steam Big Picture", glyph: "", from: "#2A475E", to: "#15202C" },
+    { name: "Playnite",          glyph: "", from: "#4A3470", to: "#1D1530" },
+    { name: "Modo Xbox",         glyph: "", from: "#178A17", to: "#0A440A" },
+    { name: "Aplicativo",        glyph: "", from: "#3A4250", to: "#1A1E25" },
+  ],
+  selected: 0,
+  summary: "TV LG OLED · Fone HyperX",
+  meta: "3840 × 2160 · 120 Hz · HDR ligado",
+  play: "Jogar agora",
+  screensHeading: "Telas",
+  // role: play | hide | keep
+  screens: [
+    { name: "LG OLED42C2", role: "play", details: "3840 × 2160 · 120 Hz" },
+    { name: "Dell U2723QE", role: "hide", details: "2560 × 1440 · 60 Hz" },
+    { name: "AOC 24G2",     role: "keep", details: "1920 × 1080 · 144 Hz" },
+  ],
+  // Cores de MonitorRowViewModel (ConsoleTileBackground, ScreenFill, RolePill*, TileOpacity)
+  roles: {
+    play: { label: "Jogar aqui", tile: "linear-gradient(135deg,#1F6B4A,#10362B)", fill: "linear-gradient(135deg,#7DF0CB,#23A67F)", icon: "\uE768", iconColor: "#0B1F18", pill: "#6FDDB9", pillText: "#0B1F18" },
+    hide: { label: "Desligar",   tile: "linear-gradient(135deg,#262D34,#151A1F)", fill: "#0A0D10", icon: "\uE7E8", iconColor: "#FFFFFF99", pill: "#FFFFFF26", pillText: "#DDE3E8", opacity: .55 },
+    keep: { label: "Manter ligada", tile: "linear-gradient(135deg,#262D34,#151A1F)", fill: "linear-gradient(135deg,#48698D,#22344A)", icon: "", iconColor: "#fff", pill: "#FFFFFF26", pillText: "#DDE3E8" },
+  },
+  quickHeading: "Ajustes rápidos",
+  quick: [
+    { icon: "", label: "Abrir", value: "Steam Big Picture", picker: "launch" },
+    { icon: "", label: "Saída de áudio", value: "Fone HyperX", picker: "audio" },
+    { icon: "", label: "Resolução e taxa de atualização", value: "3840 × 2160 · 120 Hz" },
+    { icon: "", label: "HDR na tela de jogo", value: "Ligado" },
+    { icon: "", label: "Taxa de atualização variável (VRR)", value: "Desligado" },
+    { icon: "", label: "Limite de FPS", value: "Sem limite" },
+  ],
+  categories: [
+    { name: "Tela de jogo", rows: [["Resolução e taxa de atualização", "3840 × 2160 · 120 Hz"], ["Como desligar as outras telas", "Desativar"]] },
+    { name: "Ao entrar no modo console", rows: [["Abrir", "Steam Big Picture", "launch"], ["Saída de áudio", "Fone HyperX", "audio"], ["Pasta do Playnite", "Não definida"], ["Limpar", "", null, true], ["Mandar a Steam para a bandeja ao voltar ao PC", "Ligado"]] },
+    { name: "Controle", rows: [["Layout dos botões", "Xbox"], ["Atalho do controle para abrir o Console Mode", "Guide"], ["Atalho do menu da sessão", "Select + Y"], ["Atalho do controle para voltar ao PC", "Não definido"], ["Entrar ao conectar um controle", "Desligado"], ["Toque curto no botão Xbox", "Desligado", null, true]] },
+    { name: "TV", rows: [["Ligar a TV e trocar a entrada", "Desligado"], ["Colocar a TV em espera ao restaurar", "Desligado", null, true]] },
+    { name: "Extras opcionais", rows: [["HDR na tela de jogo", "Ligado"], ["Taxa de atualização variável (VRR)", "Desligado"], ["Limite de FPS", "Sem limite"]] },
+    { name: "App", rows: [["Plano de fundo", "Aurora"], ["Sons da interface", "Ligado"], ["Interface", "Console"], ["Idioma", "Português (Brasil)"], ["Iniciar com o Windows", "Ligado"], ["Minimizar para a bandeja", "Ligado"], ["Avisar quando sair versão nova", "Ligado"], ["Receber versões de teste (alpha e beta)", "Ligado"]] },
+    { name: "Atalho, ajuda e dados", rows: [["Testar controle", ""], ["Tutorial", ""], ["Tour do menu da sessão", ""], ["Pasta de dados", ""], ["Enviar feedback", ""]] },
+    { name: "Outros apps do desenvolvedor", rows: [["Automação com Wake-on-LAN", ""], ["Otimização do Windows", ""]] },
+  ],
+  pickers: {
+    launch: { title: "Abrir", options: ["Steam Big Picture", "Playnite", "Modo Xbox", "Aplicativo personalizado"] },
+    audio: { title: "Saída de áudio", options: ["Não mudar", "TV LG OLED", "Fone HyperX", "Alto-falantes"] },
+  },
+  hints: [["A", "Selecionar"], ["B", "Voltar"], ["☰", "Jogar agora"], ["Y", "Ajustes"]],
+};
+
+// ───── Render ─────
+const $ = id => document.getElementById(id);
+const h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+let tab = 0, category = 0, pickerReturn = null;
+
+function render() {
+  $("tabs").replaceChildren(...DATA.tabs.map((t, i) => h(`<button class="surface tab ${i === tab ? "on" : ""}" tabindex="-1" data-act="tab:${i}">${t}<span class="ul"></span></button>`)));
+  $("battery").textContent = DATA.battery;
+
+  $("launchRow").replaceChildren(...DATA.launchers.map((l, i) => h(`
+    <div class="lt-wrap ${i === DATA.selected ? "sel" : ""}">
+      <button class="surface lt" data-f data-launch="${i}" style="background:linear-gradient(135deg,${l.from},${l.to})">
+        <span class="ic glyph">${l.glyph}</span><span class="name">${l.name}</span><span class="check ic">&#xE73E;</span>
+      </button>
+      <div class="lt-bar"></div>
+    </div>`)));
+  $("heroTitle").textContent = DATA.launchers[DATA.selected].name;
+  $("heroSum").textContent = DATA.summary;
+  $("heroMeta").textContent = DATA.meta;
+  $("playText").textContent = DATA.play;
+
+  $("hScreens").textContent = DATA.screensHeading;
+  $("screens").replaceChildren(...DATA.screens.map(s => { const r = DATA.roles[s.role]; return h(`
+    <button class="surface card screen" data-f style="background:${r.tile};opacity:${r.opacity ?? 1}">
+      <div class="mon"><div class="bezel"><div class="panel ic" style="background:${r.fill};color:${r.iconColor}">${r.icon}</div></div><div class="stand"></div></div>
+      <div><div class="nm">${s.name}</div><span class="pill" style="background:${r.pill};color:${r.pillText}">${r.label}</span><span class="det">${s.details}</span></div>
+    </button>`); }));
+  $("hQuick").textContent = DATA.quickHeading;
+  $("quick").replaceChildren(...DATA.quick.map(q => h(`
+    <button class="surface card quick" data-f ${q.picker ? `data-act="pick:${q.picker}"` : ""}>
+      <div class="ico ic">${q.icon}</div>
+      <div class="txt"><div class="lb">${q.label}</div><div class="vl">${q.value}</div></div>
+    </button>`)));
+
+  $("rail").replaceChildren(...DATA.categories.map((c, i) => h(`
+    <button class="surface cat ${i === category ? "on" : ""}" data-f data-cat="${i}"><span class="bar"></span><span class="lbl">${c.name}</span></button>`)));
+  renderRows();
+
+  $("hints").replaceChildren(...DATA.hints.map(([k, t]) => h(`<span><span class="hint">${k}</span>${t}</span>`)));
+  document.body.className = `tab-${tab}`;
+}
+
+function renderRows() {
+  $("rows").replaceChildren(...DATA.categories[category].rows.map(([label, value, picker, disabled]) => h(`
+    <button class="surface row" data-f data-row ${picker ? `data-act="pick:${picker}"` : ""} ${disabled ? "disabled" : ""}>
+      <span class="lbl">${label}</span><span class="val">${value}</span>
+    </button>`)));
+  document.querySelectorAll(".cat").forEach((el, i) => el.classList.toggle("on", i === category));
+}
+
+// ───── Ações ─────
+function setTab(i) { tab = (i + DATA.tabs.length) % DATA.tabs.length; render(); focusFirst(); }
+function focusFirst() {
+  const first = tab === 0 ? document.querySelector(`[data-launch="${DATA.selected}"]`)
+              : tab === 1 ? document.querySelector("#screens [data-f]")
+              : document.querySelector(`[data-cat="${category}"]`);
+  focus(first);
+}
+function pickLauncher(i) {
+  if (i === DATA.selected) return;
+  DATA.selected = i;
+  document.querySelectorAll(".lt-wrap").forEach((w, j) => w.classList.toggle("sel", j === i));
+  $("heroTitle").textContent = DATA.launchers[i].name;
+}
+function openPicker(key, from) {
+  const p = DATA.pickers[key]; if (!p) return;
+  pickerReturn = from;
+  $("pickerTitle").textContent = p.title;
+  const current = key === "launch" ? DATA.launchers[DATA.selected].name : null;
+  $("pickerList").replaceChildren(...p.options.map((o, i) => h(`
+    <button class="surface row" data-f data-act="choose:${key}:${i}"><span class="tick ic">${o === current || (!current && i === 0) ? "&#xE73E;" : ""}</span><span class="lbl">${o}</span></button>`)));
+  $("picker").classList.add("open");
+  focus($("pickerList").querySelector(".tick:not(:empty)")?.parentElement ?? $("pickerList").firstChild);
+}
+function closePicker() { $("picker").classList.remove("open"); focus(pickerReturn); }
+
+function activate(el) {
+  if (!el) return;
+  if (el.dataset.launch) { pickLauncher(+el.dataset.launch); return flash($("playBtn")); }
+  if (el.dataset.cat) { const r = document.querySelector("#rows [data-f]:not([disabled])"); return focus(r); }
+  const act = el.dataset.act || "";
+  if (act.startsWith("tab:")) return setTab(+act.slice(4));
+  if (act.startsWith("pick:")) return openPicker(act.slice(5), el);
+  if (act === "close") return closePicker();
+  if (act.startsWith("choose:")) {
+    const [, key, i] = act.split(":");
+    if (key === "launch") { const idx = Math.min(+i, DATA.launchers.length - 1); DATA.selected = idx; }
+    closePicker(); return render();
+  }
+}
+function flash(el) { el.classList.add("pressed"); setTimeout(() => el.classList.remove("pressed"), 120); }
+
+// ───── Foco: navegação espacial como o XYFocus do WinUI ─────
+let current = null;
+function focusables() {
+  const scope = $("picker").classList.contains("open") ? $("picker") : $("app");
+  return [...scope.querySelectorAll("[data-f]:not([disabled])")].filter(e => e.offsetParent !== null);
+}
+function focus(el) {
+  if (!el) return;
+  current?.classList.remove("kfocus");
+  current = el; el.classList.add("kfocus"); el.focus({ preventScroll: true });
+  if (el.dataset.launch) pickLauncher(+el.dataset.launch);          // foco = escolha
+  if (el.dataset.cat && +el.dataset.cat !== category) { category = +el.dataset.cat; renderRows(); } // mover mostra as opções
+}
+function move(dx, dy) {
+  if (!current || !document.contains(current)) return focusFirst();
+  // Voltando das opções para a esquerda, cai na categoria ativa (OnRailGettingFocus)
+  if (dx < 0 && current.dataset.row !== undefined) return focus(document.querySelector(`[data-cat="${category}"]`));
+  const a = current.getBoundingClientRect(), ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+  let best = null, bestScore = Infinity;
+  for (const el of focusables()) {
+    if (el === current) continue;
+    const b = el.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2;
+    const along = dx ? (bx - ax) * dx : (by - ay) * dy;
+    if (along <= 4) continue;
+    const across = dx ? Math.abs(by - ay) : Math.abs(bx - ax);
+    const score = along + across * 2;
+    if (score < bestScore) { bestScore = score; best = el; }
+  }
+  if (best) focus(best);
+}
+
+document.addEventListener("keydown", e => {
+  const k = e.key;
+  if (k === "ArrowLeft") move(-1, 0); else if (k === "ArrowRight") move(1, 0);
+  else if (k === "ArrowUp") move(0, -1); else if (k === "ArrowDown") move(0, 1);
+  else if (k === "Enter" || k === " ") { if (current) flash(current); activate(current); }
+  else if (k === "Escape" || k === "Backspace") {
+    if ($("picker").classList.contains("open")) closePicker();
+    else if (current?.dataset.row !== undefined) focus(document.querySelector(`[data-cat="${category}"]`));
+    else if (tab !== 0) setTab(0);
+  }
+  else if (k === "q" || k === "Q") setTab(tab - 1); else if (k === "e" || k === "E") setTab(tab + 1);
+  else return;
+  e.preventDefault();
+});
+// Mouse: hover é só o véu (CSS); clique afunda e aciona. O anel branco é só do controle/teclado.
+document.addEventListener("pointerdown", e => { const el = e.target.closest(".surface"); if (el) el.classList.add("pressed"); });
+document.addEventListener("pointerup", e => {
+  document.querySelectorAll(".pressed").forEach(el => el.classList.remove("pressed"));
+  const el = e.target.closest(".surface"); if (!el) return;
+  current?.classList.remove("kfocus"); current = el;
+  if (el.dataset.launch) { pickLauncher(+el.dataset.launch); return; }
+  if (el.dataset.cat) { category = +el.dataset.cat; return renderRows(); }
+  activate(el);
+});
+
+// ───── Escala e relógio ─────
+function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $("stage").style.transform = `translate(-50%,-50%) scale(${s})`; }
+function tick() { $("clock").textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); }
+addEventListener("resize", fit); fit(); tick(); setInterval(tick, 10000);
+render(); focusFirst();
+</script>
+</body>
+</html>
