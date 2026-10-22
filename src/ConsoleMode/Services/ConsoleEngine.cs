@@ -71,6 +71,10 @@ public sealed class ConsoleEngine
         State.FpsLimit = config.FpsLimit;
         State.RtssBackup = null;
         State.RtssLimitApplied = false;
+        State.StopScript = config.StopScript;
+        State.ParkPointer = config.ParkPointer;
+        State.PointerParks = 0;
+        State.LastPointerPark = null;
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
@@ -95,6 +99,10 @@ public sealed class ConsoleEngine
         });
 
         State.IsActive = true;
+
+        // The user's own start command. After IsActive so that any failure below ends in Stop(), which runs the
+        // matching stop command (a start command that undoes something is then always followed by its reverse).
+        UserHooks.Run("início", config.StartScript);
 
         State.BackupAudioId = Audio.GetDefaultId();
         if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
@@ -142,6 +150,11 @@ public sealed class ConsoleEngine
 
         if (config.HdrEnable) Video.EnableHdr(config.FocusMonitor, State);
         if (config.VrrEnable) Video.EnableVrr(State);
+
+        // Last of the mode changes: HDR and VRR can make Windows pick the timing again.
+        if (config.NtscRefresh)
+            Monitors.ApplyNtscRefresh(config.FocusMonitor,
+                config.MonitorModes.TryGetValue(config.FocusMonitor, out var savedMode) ? savedMode.Frequency : 0);
 
         Monitors.ClearCache();
         Audio.ClearCache();
@@ -224,6 +237,7 @@ public sealed class ConsoleEngine
         var mode = State.FullscreenMode;
         if (mode == "xboxMode")
         {
+            TickPointer();
             TickAudio();
             return "running";
         }
@@ -231,6 +245,7 @@ public sealed class ConsoleEngine
         if (mode == CustomApp.Mode)
         {
             if (IsCustomAppExit()) return "exit";
+            TickPointer();
             TickAudio();
             return "running";
         }
@@ -287,8 +302,33 @@ public sealed class ConsoleEngine
             }
         }
 
+        TickPointer();
         TickAudio();
         return "running";
+    }
+
+    /// <summary>
+    /// "Park the pointer": once the launcher is up, moves the mouse pointer to the bottom-right corner of the game
+    /// screen, twice (Steam and others recenter it while their window opens). Xbox mode has no window to watch, so
+    /// it goes by the time since the launch.
+    /// </summary>
+    private void TickPointer()
+    {
+        var now = DateTime.Now;
+        var ready = State.FullscreenMode == "xboxMode"
+            ? State.LaunchTime is { } launched && now - launched >= PointerParking.XboxDelay
+            : State.HasAppeared;
+        if (!PointerParking.IsDue(State.ParkPointer, State.PointerParks, ready, State.LastPointerPark, now)) return;
+
+        var rect = State.FocusMonitorRect
+                   ?? (State.FocusMonitor is { Length: > 0 } name ? Monitors.GetMonitorRect(name, State) : null);
+        if (rect is null) return;
+
+        var (x, y) = PointerParking.BottomRight(rect);
+        if (!NativeWindows.SetCursorPos(x, y)) AppLog.Write($"Ponteiro: não foi possível mover para {x},{y}");
+        else AppLog.Write($"Ponteiro: estacionado em {x},{y}");
+        State.PointerParks++;
+        State.LastPointerPark = now;
     }
 
     public int PollDelayMs()
@@ -340,6 +380,13 @@ public sealed class ConsoleEngine
         }
         finally
         {
+            // The user's own stop command, with the desk back (or as back as it got): it also runs when the
+            // restore had trouble, so what the start command took away is given back.
+            UserHooks.Run("fim", State.StopScript);
+            State.StopScript = "";
+            State.ParkPointer = false;
+            State.PointerParks = 0;
+            State.LastPointerPark = null;
             State.RestoreInProgress = false;
             State.IsActive = false;
             State.ShouldExit = false;

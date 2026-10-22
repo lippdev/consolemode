@@ -100,6 +100,21 @@ public sealed class AppConfig
     public TvControlConfig Tv { get; set; } = new();
 
     /// <summary>
+    /// The user's own command (a .bat, a PowerShell line, an exe with arguments) that runs when a session
+    /// starts, once the session is registered and before the screens change. Empty = none.
+    /// </summary>
+    public string StartScript { get; set; } = "";
+
+    /// <summary>The user's own command that runs after the desk is restored (also when the start was rolled back). Empty = none.</summary>
+    public string StopScript { get; set; } = "";
+
+    /// <summary>Ask for the 1000/1001 twin of the game screen's rate (119.88 Hz instead of 120, 59.94 instead of 60) once the mode is set.</summary>
+    public bool NtscRefresh { get; set; }
+
+    /// <summary>Move the mouse pointer to a corner of the game screen once the launcher is up.</summary>
+    public bool ParkPointer { get; set; }
+
+    /// <summary>
     /// A copy with other monitor fields and every other setting as it is here. A copy, not a field-by-field
     /// rebuild: a setting added later is carried along without anyone having to remember it.
     /// </summary>
@@ -363,6 +378,11 @@ public sealed class ConsoleRuntimeState
     public bool HdrTurnedOffByUser { get; set; }
     public DateTime? SessionStartedAt { get; set; }
     public string? BackupAudioId { get; set; }
+    /// <summary>The user's command to run after the desk is restored (taken from the config when the session starts).</summary>
+    public string StopScript { get; set; } = "";
+    public bool ParkPointer { get; set; }
+    public int PointerParks { get; set; }
+    public DateTime? LastPointerPark { get; set; }
 }
 
 public sealed class RtssBackup

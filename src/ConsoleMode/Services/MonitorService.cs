@@ -332,6 +332,43 @@ public sealed class MonitorService
         Thread.Sleep(300);
     }
 
+    /// <summary>
+    /// Moves the game screen from a whole-number rate to its 1000/1001 twin (120 → 119.88 Hz, 60 → 59.94 Hz), the
+    /// rate many TVs actually run those modes at. Windows' mode list can't say 119.88, so the exact rate is asked
+    /// for through CCD and read back. Best effort: when the screen does not take it, the whole-number rate stays.
+    /// </summary>
+    /// <param name="frequency">The rate the mode was set to; 0 = read the current one.</param>
+    /// <returns>Whether the screen now runs at the twin rate.</returns>
+    public bool ApplyNtscRefresh(string monitorName, int frequency)
+    {
+        var hertz = frequency > 0 ? frequency : NativeWindows.GetCurrentDisplayMode(monitorName)?.Frequency ?? 0;
+        if (!RefreshRate.TryNtsc(hertz, out var numerator, out var denominator))
+        {
+            AppLog.Write($"Taxa NTSC: {hertz} Hz não tem equivalente 1000/1001; mantida");
+            return false;
+        }
+
+        var wanted = RefreshRate.Label(RefreshRate.ToHertz(numerator, denominator));
+        for (var attempt = 1; attempt <= 2; attempt++)
+        {
+            var code = CcdHelper.SetRefreshRate(monitorName, numerator, denominator);
+            Thread.Sleep(600);
+            if (CcdHelper.GetRefreshRate(monitorName) is { } now &&
+                RefreshRate.Matches(now.Numerator, now.Denominator, numerator, denominator))
+            {
+                AppLog.Write($"Taxa NTSC: {monitorName} em {wanted} Hz");
+                return true;
+            }
+            AppLog.Write($"Taxa NTSC: tentativa {attempt} de {wanted} Hz em {monitorName} => {code}");
+        }
+
+        var current = CcdHelper.GetRefreshRate(monitorName);
+        AppLog.Write(current is { } c
+            ? $"Taxa NTSC: {monitorName} não aceitou {wanted} Hz; ficou em {RefreshRate.Label(RefreshRate.ToHertz(c.Numerator, c.Denominator))} Hz"
+            : $"Taxa NTSC: {monitorName} não aceitou {wanted} Hz");
+        return false;
+    }
+
     public List<DisplayModeOption> GetDisplayModes(string monitorName, MonitorInfo? monitor, bool forceRefresh = false)
     {
         lock (_modesCache) return ReadDisplayModes(monitorName, monitor, forceRefresh);

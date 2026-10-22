@@ -156,6 +156,15 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string CustomAppWatchCard => LocalizationService.Get(nameof(CustomAppWatchCard));
     public string CustomAppWatchDescription => LocalizationService.Get(nameof(CustomAppWatchDescription));
     public string AudioOutputCard => LocalizationService.Get(nameof(AudioOutputCard));
+    public string NtscRefreshCard => LocalizationService.Get(nameof(NtscRefreshCard));
+    public string NtscRefreshDescription => LocalizationService.Get(nameof(NtscRefreshDescription));
+    public string ParkPointerCard => LocalizationService.Get(nameof(ParkPointerCard));
+    public string ParkPointerDescription => LocalizationService.Get(nameof(ParkPointerDescription));
+    public string ScriptsSection => LocalizationService.Get(nameof(ScriptsSection));
+    public string StartScriptCard => LocalizationService.Get(nameof(StartScriptCard));
+    public string StartScriptDescription => LocalizationService.Get(nameof(StartScriptDescription));
+    public string StopScriptCard => LocalizationService.Get(nameof(StopScriptCard));
+    public string StopScriptDescription => LocalizationService.Get(nameof(StopScriptDescription));
     public string OptionalExtrasSection => LocalizationService.Get(nameof(OptionalExtrasSection));
     public string HdrCard => LocalizationService.Get(nameof(HdrCard));
     public string HdrDescription => LocalizationService.Get(nameof(HdrDescription));

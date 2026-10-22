@@ -307,6 +307,70 @@ public static class CcdHelper
             SDC_APPLY | SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_SAVE_TO_DATABASE | SDC_ALLOW_CHANGES);
     }
 
+    private const uint MODE_INFO_TYPE_TARGET = 2;
+    private const uint MODE_IDX_INVALID = 0xFFFFFFFF;
+    private const uint SDC_VALIDATE = 0x40;
+
+    /// <summary>
+    /// The refresh rate Windows reports for an active screen as a fraction (119.88 Hz reads 120000/1001), or null
+    /// when the screen is not active. The DEVMODE rate is a whole number, so it cannot tell 120 from 119.88.
+    /// </summary>
+    public static (uint Numerator, uint Denominator)? GetRefreshRate(string gdiDeviceName)
+    {
+        if (GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out var numPaths, out var numModes) != 0) return null;
+        var paths = new PATH_INFO[numPaths];
+        var modes = new MODE_INFO[numModes];
+        if (QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, 0) != 0) return null;
+
+        for (var i = 0; i < numPaths; i++)
+        {
+            var name = GetSourceGdiName(paths[i].sourceInfo.adapterId, paths[i].sourceInfo.id);
+            if (!string.Equals(name, gdiDeviceName, StringComparison.OrdinalIgnoreCase)) continue;
+
+            var rate = paths[i].targetInfo.refreshRate;
+            // The signal of the target mode is the most exact reading, when the path has one.
+            var index = paths[i].targetInfo.modeInfoIdx;
+            if (index < numModes && modes[index].infoType == MODE_INFO_TYPE_TARGET)
+                rate = modes[index].mode.targetMode.targetVideoSignalInfo.vSyncFreq;
+            return rate.Denominator == 0 ? null : (rate.Numerator, rate.Denominator);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Asks for an exact refresh rate (120000/1001 for 119.88 Hz) on an active screen, keeping its size and
+    /// position. Windows picks the timing for the new rate. Validated before it is applied, so a rate the screen
+    /// does not take changes nothing. 0 = applied; the caller reads the rate back to be sure it took.
+    /// </summary>
+    public static int SetRefreshRate(string gdiDeviceName, uint numerator, uint denominator)
+    {
+        if (numerator == 0 || denominator == 0) return -101;
+        var err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out var numPaths, out var numModes);
+        if (err != 0) return err;
+        var paths = new PATH_INFO[numPaths];
+        var modes = new MODE_INFO[numModes];
+        err = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, ref numPaths, paths, ref numModes, modes, 0);
+        if (err != 0) return err;
+
+        var found = false;
+        for (var i = 0; i < numPaths; i++)
+        {
+            var name = GetSourceGdiName(paths[i].sourceInfo.adapterId, paths[i].sourceInfo.id);
+            if (!string.Equals(name, gdiDeviceName, StringComparison.OrdinalIgnoreCase)) continue;
+            paths[i].targetInfo.refreshRate = new RATIONAL { Numerator = numerator, Denominator = denominator };
+            // No fixed target timing: Windows chooses one for the rate above. The source mode stays, so the
+            // resolution and the screen's place on the desktop do not change.
+            paths[i].targetInfo.modeInfoIdx = MODE_IDX_INVALID;
+            found = true;
+        }
+        if (!found) return -100;
+
+        var flags = SDC_USE_SUPPLIED_DISPLAY_CONFIG | SDC_ALLOW_CHANGES;
+        var check = SetDisplayConfig(numPaths, paths, numModes, modes, flags | SDC_VALIDATE);
+        if (check != 0) return check;
+        return SetDisplayConfig(numPaths, paths, numModes, modes, flags | SDC_APPLY | SDC_SAVE_TO_DATABASE);
+    }
+
     public static int SetPrimary(string gdiDeviceName)
     {
         var err = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, out var numPaths, out var numModes);

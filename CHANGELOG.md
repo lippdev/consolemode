@@ -3,6 +3,10 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- **Seus próprios scripts**: em Ajustes → Seus próprios scripts, informe um comando (um arquivo `.bat`, um programa com argumentos ou uma linha do PowerShell) que roda quando o modo console começa e outro que roda depois que a mesa volta. Eles rodam ocultos, o Console Mode espera até 60 segundos por cada um, e um script que falha ou trava nunca impede a sessão nem a restauração. O comando do fim também roda quando o início foi desfeito, então o que o comando do início tirou é devolvido.
+- **Taxa de atualização exata**: uma opção nova em Ajustes pede à tela de jogo a taxa de TV (119,88 Hz em vez de 120 Hz, 59,94 em vez de 60) depois de aplicar o modo, e confere o resultado. A lista de modos do Windows só tem números inteiros, então a taxa é pedida de forma exata; se a tela não aceitar, a taxa inteira continua e o log registra.
+- **Tirar o ponteiro do mouse do caminho**: uma opção nova em Ajustes leva o ponteiro para o canto inferior direito da tela de jogo assim que o iniciador aparece (Big Picture, Playnite, modo Xbox ou aplicativo personalizado), em vez de deixá-lo no meio da TV.
 
 ## [1.7.0-alpha.2]
 ### Novidades

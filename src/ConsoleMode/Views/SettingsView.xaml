@@ -27,6 +27,13 @@
                           SelectedItem="{x:Bind ViewModel.FocusRow.SelectedMode, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.NtscRefreshCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.NtscRefreshDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE823;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.NtscRefresh, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HideOtherScreensCard, Mode=OneWay}"
                               Description="{x:Bind ViewModel.Texts.HideOtherScreensDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
@@ -88,6 +95,13 @@
                           ItemsSource="{x:Bind ViewModel.AudioOptions, Mode=OneWay}"
                           SelectedItem="{x:Bind ViewModel.SelectedAudio, Mode=TwoWay}"
                           DisplayMemberPath="Text"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.ParkPointerCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.ParkPointerDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE962;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.ParkPointer, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
             <ctk:SettingsCard x:Name="HomeShortcutCard" Header="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.HomeButtonDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
@@ -173,6 +187,21 @@
                     </ctk:SettingsCard>
                 </ctk:SettingsExpander.Items>
             </ctk:SettingsExpander>
+
+            <!-- Your own scripts around a session -->
+            <TextBlock Text="{x:Bind ViewModel.Texts.ScriptsSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.StartScriptCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.StartScriptDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE768;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <TextBox MinWidth="320" PlaceholderText="C:\Scripts\couch-start.bat" Text="{x:Bind ViewModel.StartScript, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.StopScriptCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.StopScriptDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE71A;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <TextBox MinWidth="320" PlaceholderText="C:\Scripts\desk-back.bat" Text="{x:Bind ViewModel.StopScript, Mode=TwoWay}"/>
+            </ctk:SettingsCard>
 
             <!-- Optional extras -->
             <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" Style="{StaticResource SettingsSectionHeader}"/>

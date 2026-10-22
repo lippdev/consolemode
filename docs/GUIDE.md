@@ -67,6 +67,16 @@ Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignor
 
 "Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
+## Scripts, exact refresh rate and pointer
+
+These three options live in the desktop **Settings**.
+
+**Your own scripts.** *Settings → Your own scripts* takes one command that runs when a session starts and one that runs after the desk is back. A command is anything `cmd` can run: a `.bat` file, a program with arguments, or a PowerShell line such as `powershell -NoProfile -File "C:\Scripts\x.ps1"`. Put a path that has spaces in quotes. Both run hidden, and Console Mode waits up to 60 seconds for each; if one takes longer or fails, the session carries on and the log (`Script (início)` / `Script (fim)`) has the exit code. The start command runs once the session is registered, before the screens change. The stop command runs at the end of the restore, also when the start was rolled back or the restore had trouble, so what the start command took away (closing a browser, taking game mods out) can be given back. Nothing is shown on screen, so a script that waits for a key (`pause`) just runs into the 60-second limit.
+
+**Exact refresh rate.** Many TVs run their 120 Hz mode at 119.88 Hz and their 60 Hz mode at 59.94 Hz. Windows' mode list only has whole numbers (and may list 119.88 as 119), so it can't be picked from the resolution list. With this option on, Console Mode sets the mode as usual and then asks for the same rate × 1000/1001 and reads it back. Only rates that have such a twin (24, 30, 48, 60, 120 and 240 Hz) are changed, and when the screen doesn't take it the whole-number rate stays and the log says so (`Taxa NTSC`).
+
+**Move the mouse pointer out of the way.** Once the launcher is up, the pointer is moved to the bottom-right corner of the game screen, twice (Steam and others recenter it while their window opens). Xbox mode has no window to watch, so it goes by the time since the launch.
+
 ## Optional extras
 
 ### HDR
