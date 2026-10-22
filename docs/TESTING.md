@@ -545,3 +545,42 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Nenhum caminho mostra o nome do usuário do Windows (`C:\Users\…\`), nem com Playnite instalado em `%LOCALAPPDATA%`.
 - [ ] **Copiar relatório** mostra o aviso de copiado e o texto colado no Bloco de Notas é igual ao da tela.
 - [ ] Com uma seção falhando (ex.: sem permissão de leitura do log), ela mostra "unavailable" e o resto do relatório continua aparecendo.
+
+## Scripts próprios, taxa exata (119,88 Hz) e ponteiro
+
+Pré-condições: TV como tela de jogo; no Windows, a TV aceita 119,88 Hz (Ajustes → Sistema → Tela → Taxa de atualização avançada). Nada disso é coberto pelos testes automáticos (só a lógica pura: `UserCommand`, `RefreshRate`, `PointerParking`).
+
+### Scripts próprios (Ajustes → Seus próprios scripts)
+
+- [ ] Com os dois campos vazios, nada muda e o log não tem linhas `Script (...)`. Resultado: ______
+- [ ] Início: `cmd /c echo ok > %TEMP%\cm-start.txt`. Ao iniciar, o arquivo existe **antes** de as telas mudarem e o log mostra `Script (início): ...` e `terminou com código 0`. Resultado: ______
+- [ ] Fim: o mesmo com `cm-stop.txt`. O arquivo aparece ao voltar ao PC, depois da mesa restaurada. Resultado: ______
+- [ ] Caminho com espaço entre aspas e argumento (`"C:\Meus Scripts\mods.bat" off`) funciona. Resultado: ______
+- [ ] Um `.bat` com `timeout /t 3 /nobreak >nul` termina normalmente (não falha na hora). Resultado: ______
+- [ ] Nenhuma janela de console aparece, nem pisca. Resultado: ______
+- [ ] Comando que não existe: o log registra o código de saída diferente de zero e a sessão começa mesmo assim. Resultado: ______
+- [ ] Script que demora mais de 60 s (`timeout /t 100`): o log diz `passou de 60 s` e a sessão segue. Resultado: ______
+- [ ] Início desfeito (recusar a confirmação "Você vê esta tela?" ou deixar o tempo acabar): o comando do fim também roda. Resultado: ______
+- [ ] Encerrar pela bandeja, pelo menu da sessão e fechando o launcher: o comando do fim roda em todos. Resultado: ______
+
+### Taxa de atualização exata
+
+- [ ] Ligar "Taxa de atualização exata", escolher 3840 x 2160 @ 120 Hz e iniciar: Ajustes do Windows → Tela avançada mostra **119,88 Hz** e o log traz `Taxa NTSC: ... em 119,88 Hz`. Resultado: ______
+- [ ] O mesmo com 60 Hz: 59,94 Hz. Resultado: ______
+- [ ] Com o modo da lista em "119 Hz" (como o Windows pode listar 119,88), o resultado também é 119,88 Hz, não 118,88. Resultado: ______
+- [ ] Sem modo salvo para a tela (opção "Não alterar"): usa a taxa atual da tela. Resultado: ______
+- [ ] Taxa sem par (144 ou 165 Hz): nada muda e o log diz `não tem equivalente 1000/1001`. Resultado: ______
+- [ ] Tela que não aceita 119,88: a taxa inteira continua e o log diz `não aceitou`. Resultado: ______
+- [ ] A resolução e a posição da tela de jogo **não** mudam, e ela continua como tela principal. Resultado: ______
+- [ ] Com HDR e VRR ligados no app, a taxa continua 119,88 Hz depois que eles são ativados. Resultado: ______
+- [ ] Ao voltar ao PC, a mesa volta como estava (resolução, taxa, posições). Resultado: ______
+- [ ] A tela de teste "Você vê esta tela?" ainda aparece e reverte quando a configuração da tela de jogo muda. Resultado: ______
+
+### Tirar o ponteiro do caminho
+
+- [ ] Big Picture: com o ponteiro no meio da TV, ele vai para o canto inferior direito logo que o Big Picture aparece, e de novo cerca de 3 s depois se a Steam o recentralizar; o log tem duas linhas `Ponteiro: estacionado em ...`. Resultado: ______
+- [ ] Playnite fullscreen, modo Xbox (cerca de 4-9 s depois de abrir) e aplicativo personalizado: o mesmo. Resultado: ______
+- [ ] O ponteiro cai dentro da tela de jogo (com a TV não sendo a primeira da esquerda e com escala de 150-200 %). Resultado: ______
+- [ ] Com a opção desligada, o ponteiro não é movido. Resultado: ______
+- [ ] Com "Controlar o mouse" ou "Ocultar o ponteiro" ligados no menu da sessão, mover o ponteiro duas vezes no começo não atrapalha. Resultado: ______
+- [ ] A segunda sessão (iniciar de novo sem fechar o app) também estaciona duas vezes. Resultado: ______

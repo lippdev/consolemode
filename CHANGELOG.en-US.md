@@ -3,6 +3,10 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **Your own scripts**: in Settings → Your own scripts, type a command (a `.bat` file, a program with arguments or a PowerShell line) that runs when console mode starts and another that runs after the desk is back. They run hidden, Console Mode waits up to 60 seconds for each, and a script that fails or hangs never stops the session or the restore. The stop command also runs when the start was rolled back, so whatever the start command took away is given back.
+- **Exact refresh rate**: a new Settings option asks the game screen for the TV-style rate (119.88 Hz instead of 120 Hz, 59.94 instead of 60) once the mode is set, and reads it back. Windows' mode list only has whole numbers, so the rate is requested exactly; when the screen doesn't accept it, the whole-number rate stays and the log says so.
+- **Move the mouse pointer out of the way**: a new Settings option moves the pointer to the bottom-right corner of the game screen once the launcher is up (Big Picture, Playnite, Xbox mode or a custom app), instead of leaving it in the middle of the TV.
 
 ## [1.7.0-alpha.2]
 ### What's new

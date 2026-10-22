@@ -309,6 +309,10 @@ public partial class MainViewModel : ObservableObject
             CustomAppPath = config.CustomAppPath ?? "";
             CustomAppArguments = config.CustomAppArguments ?? "";
             CustomAppWatchProcess = config.CustomAppWatchProcess ?? "";
+            StartScript = config.StartScript ?? "";
+            StopScript = config.StopScript ?? "";
+            NtscRefresh = config.NtscRefresh;
+            ParkPointer = config.ParkPointer;
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
@@ -926,6 +930,10 @@ public partial class MainViewModel : ObservableObject
             CustomAppPath = CustomApp.CleanPath(CustomAppPath),
             CustomAppArguments = CustomAppArguments.Trim(),
             CustomAppWatchProcess = CustomAppWatchProcess.Trim(),
+            StartScript = UserCommand.Clean(StartScript),
+            StopScript = UserCommand.Clean(StopScript),
+            NtscRefresh = NtscRefresh,
+            ParkPointer = ParkPointer,
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
