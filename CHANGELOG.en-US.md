@@ -23,6 +23,9 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### Fixes
 - If the app closes or the PC shuts down in the middle of a session, the next time Console Mode opens it restores everything the session changed (displays, audio, RTSS, desktop icons and pointer) and says so. Before, the displays stayed as the session left them until you fixed them by hand. (#178)
 - Custom app: Console Mode moves only the program's largest window to the game screen, instead of every window Windows reports as its main one; a tooltip is no longer stretched over the TV. (#175)
+- Audio output **The one that shows up when connecting**: when the TV's own output was already on before the session (so it never "showed up"), the audio stayed on the desk; now, if no new output shows up within about 10 s, Console Mode uses the game screen's output that was already on. A soundbar or receiver that wakes up later still wins. (issue #149, #180)
+- Controllers: a stick that reads off-centre from the start (an axis that isn't really a stick, or a misread report) no longer makes the menu "keep going up". The stick only counts once it has been seen centred; the D-pad and buttons keep working. (issue #149, #180)
+- Console interface, Session tab: the quick setting captions wrap onto two lines instead of being cut with an ellipsis ("Resolución y frecuencia…" in Spanish, for example). (#180)
 
 ### Updating from 1.6.2
 - The app shows the notice: click **Update now**. Your settings, saved screens and audio output are kept.
