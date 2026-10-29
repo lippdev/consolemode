@@ -20,6 +20,8 @@ public sealed partial class LaunchTile : ObservableObject
     /// <summary>The launcher's own logo (Steam's, Playnite's, the Xbox app's, the custom app's); until then, or without it, the glyph.</summary>
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasLogo), nameof(ShowGlyph))] private ImageSource? _logo;
     public bool HasLogo => Logo is not null;
+    /// <summary>The app whose logo this tile is waiting for (exe path or Store app id).</summary>
+    public string? LogoKey { get; set; }
     public bool ShowGlyph => Logo is null;
     [ObservableProperty, NotifyPropertyChangedFor(nameof(Opacity))] private bool _isSelected;
     /// <summary>The other launchers fade back, so the one that opens stands out.</summary>
@@ -80,6 +82,8 @@ public partial class MainViewModel
             _ => (null, null)
         };
         var key = appId ?? exe;
+        // The app this tile now waits for: a slower load for a previous path must not land after this one.
+        tile.LogoKey = key;
         if (string.IsNullOrWhiteSpace(key)) return;
         if (!_launchLogos.TryGetValue(key, out var logo))
         {
@@ -90,6 +94,7 @@ public partial class MainViewModel
             });
             _launchLogos[key] = logo;
         }
+        if (!string.Equals(tile.LogoKey, key, StringComparison.OrdinalIgnoreCase)) return;
         try
         {
             if (logo.File is not null)
