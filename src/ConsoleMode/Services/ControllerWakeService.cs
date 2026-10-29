@@ -28,7 +28,7 @@ public static class ControllerWakeService
         }
     }
 
-    public enum EnableResult { Done, Canceled, Failed }
+    public enum EnableResult { Done, Canceled, Failed, NotFound }
 
     /// <summary>Lets the given devices wake the PC. Shows the UAC prompt; blocks until PowerShell exits.</summary>
     public static EnableResult Enable(IReadOnlyCollection<WakeDevice> devices)
@@ -52,7 +52,12 @@ public static class ControllerWakeService
                 return EnableResult.Failed;
             }
             AppLog.Write($"Acordar pelo controle: {string.Join(", ", devices.Select(d => d.Name))} => {process.ExitCode}");
-            return process.ExitCode == 0 ? EnableResult.Done : EnableResult.Failed;
+            return process.ExitCode switch
+            {
+                0 => EnableResult.Done,
+                ControllerWake.NotFoundExitCode => EnableResult.NotFound,
+                _ => EnableResult.Failed
+            };
         }
         catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
         {

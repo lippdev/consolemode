@@ -67,6 +67,28 @@ public class ControllerWakeTests
     }
 
     [Fact]
+    public void The_enable_script_fails_when_no_device_matches()
+    {
+        // Unplugged while the UAC prompt was open: it must not exit 0 with nothing changed.
+        var script = ControllerWake.EnableScript([@"USB\VID_045E&PID_02FE\6_0"]);
+        Assert.Contains($"if ($found.Count -eq 0) {{ exit {ControllerWake.NotFoundExitCode} }}", script);
+        Assert.True(script.IndexOf("exit", StringComparison.Ordinal) < script.IndexOf("Set-CimInstance", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Devices_still_off_after_turning_on_are_reported()
+    {
+        var adapter = new WakeDevice(@"USB\VID_045E&PID_02FE\6_0", "Xbox Wireless Adapter", "XboxWirelessAdapter", false);
+        var radio = new WakeDevice(@"USB\VID_8087&PID_0033\5_0", "Intel Bluetooth", "Bluetooth", false);
+
+        Assert.Empty(ControllerWake.StillOff([adapter, radio], [adapter with { Armed = true }, radio with { Armed = true }]));
+        Assert.Equal([radio], ControllerWake.StillOff([adapter, radio], [adapter with { Armed = true }, radio]));
+        // Gone from the list (unplugged), or the list couldn't be read: not confirmed.
+        Assert.Equal([radio], ControllerWake.StillOff([adapter, radio], [adapter with { Armed = true }]));
+        Assert.Equal([adapter, radio], ControllerWake.StillOff([adapter, radio], null));
+    }
+
+    [Fact]
     public void Scripts_are_encoded_for_powershell_as_utf16() =>
         Assert.Equal("dwBoAG8AYQBtAGkA", ControllerWake.Encode("whoami"));
 }

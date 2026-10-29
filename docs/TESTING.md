@@ -126,6 +126,7 @@ Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; 
 - [ ] Ajustes → **Acordar o PC pelo controle**: a linha de status lista o adaptador/Bluetooth/controle e diz se já pode acordar o PC. Num PC sem nenhum deles, diz que nenhum dispositivo pode e a aba Sistema do modo Console mostra "Indisponível". Resultado: ______
 - [ ] **Ativar** abre o pedido de administrador (UAC); aceitando, aparece "Pronto…" e o Gerenciador de Dispositivos → (adaptador/rádio Bluetooth) → Gerenciamento de Energia mostra *Permitir que este dispositivo ative o computador* marcado. Resultado: ______
 - [ ] Recusar o UAC: aviso de que nada foi alterado; nenhum dispositivo muda. Resultado: ______
+- [ ] Clicar em **Ativar**, desconectar o adaptador ou o controle com o UAC aberto e depois aceitar: aparece o aviso de que o dispositivo não foi encontrado (não "Pronto…"), e o log mostra o código 2. Resultado: ______
 - [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
 - [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
 - [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______

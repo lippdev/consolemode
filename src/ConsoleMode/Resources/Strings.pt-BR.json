@@ -150,6 +150,7 @@
   "ControllerWakeEnabled": "Pronto. Suspenda o PC e aperte o botão central do controle para testar.",
   "ControllerWakeCanceled": "O Windows não recebeu a permissão; nada foi alterado.",
   "ControllerWakeFailed": "Não foi possível ativar. Os detalhes estão no log.",
+  "ControllerWakeGone": "O dispositivo não foi encontrado na hora de ativar (foi desconectado?). Conecte-o de novo e tente outra vez.",
   "ControllerWakeUnavailable": "Indisponível",
   "HomeButtonShortPressCard": "Toque curto no botão Xbox",
   "HomeButtonShortPressDescription": "Basta apertar, sem segurar. Desliga o atalho do controle para a Game Bar no Windows (Win+G continua funcionando).",

@@ -96,13 +96,32 @@ public static class ControllerWake
         ConvertTo-Json -InputObject $rows -Compress
         """;
 
-    /// <summary>Turns on "may wake the computer" for the given WMI entries (needs an elevated PowerShell).</summary>
+    /// <summary>Exit code of <see cref="EnableScript"/> when none of the devices is there any more (unplugged meanwhile).</summary>
+    public const int NotFoundExitCode = 2;
+
+    /// <summary>
+    /// Turns on "may wake the computer" for the given WMI entries (needs an elevated PowerShell). Exits with
+    /// <see cref="NotFoundExitCode"/> when none of them is found, instead of succeeding without changing anything.
+    /// </summary>
     public static string EnableScript(IEnumerable<string> instanceNames)
     {
         var quoted = string.Join(",", instanceNames.Select(n => "'" + n.Replace("'", "''") + "'"));
         return "$ErrorActionPreference = 'Stop'\n"
              + $"$ids = @({quoted})\n"
-             + "Get-CimInstance -Namespace root\\wmi -ClassName MSPower_DeviceWakeEnable | Where-Object { $ids -contains $_.InstanceName } | Set-CimInstance -Property @{ Enable = $true }\n";
+             + "$found = @(Get-CimInstance -Namespace root\\wmi -ClassName MSPower_DeviceWakeEnable | Where-Object { $ids -contains $_.InstanceName })\n"
+             + $"if ($found.Count -eq 0) {{ exit {NotFoundExitCode} }}\n"
+             + "$found | Set-CimInstance -Property @{ Enable = $true }\n";
+    }
+
+    /// <summary>
+    /// The devices that were meant to be turned on and, read again afterwards, still can't wake the PC
+    /// (or are gone). Empty means the change really took.
+    /// </summary>
+    public static List<WakeDevice> StillOff(IEnumerable<WakeDevice> attempted, IReadOnlyCollection<WakeDevice>? after)
+    {
+        if (after is null) return [.. attempted];
+        var armed = after.Where(d => d.Armed).Select(d => d.InstanceName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return [.. attempted.Where(d => !armed.Contains(d.InstanceName))];
     }
 
     /// <summary>The argument for powershell -EncodedCommand (UTF-16LE in Base64).</summary>

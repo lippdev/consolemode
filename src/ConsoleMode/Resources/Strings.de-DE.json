@@ -150,6 +150,7 @@
   "ControllerWakeEnabled": "Fertig. Versetze den PC in den Energiesparmodus und drücke die mittlere Taste des Controllers, um es zu testen.",
   "ControllerWakeCanceled": "Windows hat keine Berechtigung erhalten; nichts wurde geändert.",
   "ControllerWakeFailed": "Konnte nicht eingeschaltet werden. Details stehen im Protokoll.",
+  "ControllerWakeGone": "Das Gerät war beim Einschalten nicht mehr da (wurde es getrennt?). Schließe es wieder an und versuche es erneut.",
   "ControllerWakeUnavailable": "Nicht verfügbar",
   "HomeButtonShortPressCard": "Kurzer Druck auf die Xbox-Taste",
   "HomeButtonShortPressDescription": "Einfach drücken, nicht gedrückt halten. Deaktiviert die Controller-Tastenkombination für die Game Bar in Windows (Win+G funktioniert weiterhin).",

@@ -150,6 +150,7 @@
   "ControllerWakeEnabled": "Done. Put the PC to sleep and press the controller's center button to try it.",
   "ControllerWakeCanceled": "Windows didn't get permission; nothing changed.",
   "ControllerWakeFailed": "Couldn't turn it on. The details are in the log.",
+  "ControllerWakeGone": "The device wasn't there when turning it on (was it unplugged?). Plug it back in and try again.",
   "ControllerWakeUnavailable": "Unavailable",
   "HomeButtonShortPressCard": "Short press of the Xbox button",
   "HomeButtonShortPressDescription": "Just press it, no holding. Turns off the controller shortcut for Game Bar in Windows (Win+G keeps working).",

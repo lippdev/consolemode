@@ -150,6 +150,7 @@
   "ControllerWakeEnabled": "C'est fait. Mettez le PC en veille et appuyez sur le bouton central de la manette pour essayer.",
   "ControllerWakeCanceled": "Windows n'a pas reçu l'autorisation ; rien n'a été modifié.",
   "ControllerWakeFailed": "Impossible d'activer. Les détails sont dans le journal.",
+  "ControllerWakeGone": "L'appareil était introuvable au moment de l'activer (a-t-il été débranché ?). Rebranchez-le et réessayez.",
   "ControllerWakeUnavailable": "Indisponible",
   "HomeButtonShortPressCard": "Appui court sur le bouton Xbox",
   "HomeButtonShortPressDescription": "Un simple appui, sans maintenir. Désactive le raccourci manette de la Game Bar dans Windows (Win+G continue de fonctionner).",

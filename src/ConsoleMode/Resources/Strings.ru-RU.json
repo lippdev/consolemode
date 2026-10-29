@@ -150,6 +150,7 @@
   "ControllerWakeEnabled": "Готово. Переведите ПК в спящий режим и нажмите центральную кнопку геймпада, чтобы проверить.",
   "ControllerWakeCanceled": "Windows не получила разрешения; ничего не изменено.",
   "ControllerWakeFailed": "Не удалось включить. Подробности в журнале.",
+  "ControllerWakeGone": "Устройство не найдено в момент включения (его отключили?). Подключите его снова и повторите попытку.",
   "ControllerWakeUnavailable": "Недоступно",
   "HomeButtonShortPressCard": "Короткое нажатие кнопки Xbox",
   "HomeButtonShortPressDescription": "Достаточно нажать, удерживать не нужно. Отключает открытие Game Bar с геймпада в Windows (Win+G продолжает работать).",

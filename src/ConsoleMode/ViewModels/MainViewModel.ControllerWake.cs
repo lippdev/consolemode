@@ -69,6 +69,16 @@ public partial class MainViewModel
 
         CanEnableControllerWake = false;
         var result = await Task.Run(() => ControllerWakeService.Enable(off));
+        CanEnableControllerWake = true;
+        await RefreshControllerWakeAsync();
+
+        // PowerShell saying it's done isn't proof: read the devices again and check they really can wake the PC.
+        if (result == ControllerWakeService.EnableResult.Done && ControllerWake.StillOff(off, _wakeDevices) is { Count: > 0 } stillOff)
+        {
+            AppLog.Write($"Acordar pelo controle: ainda desligado depois de ativar: {Names(stillOff)}");
+            result = _wakeDevices is null ? ControllerWakeService.EnableResult.Failed : ControllerWakeService.EnableResult.NotFound;
+        }
+
         switch (result)
         {
             case ControllerWakeService.EnableResult.Done:
@@ -77,11 +87,12 @@ public partial class MainViewModel
             case ControllerWakeService.EnableResult.Canceled:
                 SetStatus(LocalizationService.Get("ControllerWakeCanceled"), InfoBarSeverity.Warning);
                 break;
+            case ControllerWakeService.EnableResult.NotFound:
+                SetStatus(LocalizationService.Get("ControllerWakeGone"), InfoBarSeverity.Warning);
+                break;
             default:
                 SetStatus(LocalizationService.Get("ControllerWakeFailed"), InfoBarSeverity.Error);
                 break;
         }
-        CanEnableControllerWake = true;
-        await RefreshControllerWakeAsync();
     }
 }
