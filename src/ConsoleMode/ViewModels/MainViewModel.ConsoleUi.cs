@@ -26,6 +26,8 @@ public partial class MainViewModel
 
     public bool IsDesktopHome => !IsConsoleUi && IsHomePage;
     public bool IsDesktopSettings => !IsConsoleUi && IsSettingsPage;
+    /// <summary>The desktop interface: the title bar shows the app's name there (the console one has its own brand mark).</summary>
+    public bool IsDesktopUi => !IsConsoleUi;
     public string FocusScreenName => FocusRow?.Name ?? "";
     public string RolePanelTitle => LocalizationService.Get("ChooseRoleFor", RolePanelMonitor?.Name ?? "");
     public string HdrText => LocalizationService.Get(HdrEnable ? "ToggleOn" : "ToggleOff");
@@ -47,6 +49,7 @@ public partial class MainViewModel
     partial void OnIsConsoleUiChanged(bool value)
     {
         OnPropertyChanged(nameof(IsDesktopHome));
+        OnPropertyChanged(nameof(IsDesktopUi));
         OnPropertyChanged(nameof(IsDesktopSettings));
         OnPropertyChanged(nameof(IsTourMap));
         OnPropertyChanged(nameof(IsTourRole));
