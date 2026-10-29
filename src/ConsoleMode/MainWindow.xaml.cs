@@ -28,6 +28,9 @@ public sealed partial class MainWindow : Window
         appWindow.Resize(new Windows.Graphics.SizeInt32((int)(960 * scale), (int)(760 * scale)));
         appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
         appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        // Tall caption buttons: as high as the 48 px bar, instead of 32 px ones floating at the top.
+        appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        StyleCaptionButtons(appWindow.TitleBar, ViewModel.IsConsoleUi);
 
         if (File.Exists(AppPaths.IconPath))
         {
@@ -59,6 +62,7 @@ public sealed partial class MainWindow : Window
         // The console interface fills the screen, like a console; the desktop one gets its size back.
         ViewModel.PropertyChanged += (_, e) =>
         {
+            if (e.PropertyName == nameof(MainViewModel.IsConsoleUi)) StyleCaptionButtons(appWindow.TitleBar, ViewModel.IsConsoleUi);
             if (e.PropertyName == nameof(MainViewModel.IsConsoleUi) && appWindow.Presenter is OverlappedPresenter p)
             {
                 if (ViewModel.IsConsoleUi) p.Maximize();
@@ -68,6 +72,21 @@ public sealed partial class MainWindow : Window
                 RefreshDesktopNavigator();
         };
         WatchDesktopPad(hwnd);
+    }
+
+    /// <summary>
+    /// Minimize, maximize and close over the console interface's dark background: white, with the same soft veil on hover
+    /// and press as its own buttons. The desktop interface keeps Windows' colours for its theme.
+    /// </summary>
+    private static void StyleCaptionButtons(AppWindowTitleBar bar, bool console)
+    {
+        Windows.UI.Color? Argb(byte a, byte r, byte g, byte b) => console ? Windows.UI.Color.FromArgb(a, r, g, b) : null;
+        bar.ButtonForegroundColor = Argb(0xFF, 0xFF, 0xFF, 0xFF);
+        bar.ButtonInactiveForegroundColor = Argb(0x80, 0xFF, 0xFF, 0xFF);
+        bar.ButtonHoverForegroundColor = Argb(0xFF, 0xFF, 0xFF, 0xFF);
+        bar.ButtonHoverBackgroundColor = Argb(0x1F, 0xFF, 0xFF, 0xFF);
+        bar.ButtonPressedForegroundColor = Argb(0xFF, 0xFF, 0xFF, 0xFF);
+        bar.ButtonPressedBackgroundColor = Argb(0x33, 0xFF, 0xFF, 0xFF);
     }
 
     // The desktop interface, driven by the pad like a console menu (ported from PR #17):

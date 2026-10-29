@@ -12,41 +12,48 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title bar: the back button sits outside the drag region so it stays clickable. -->
+        <!-- The pages take the whole window: the console interface paints its background under the title bar (it leaves
+             the top 48 px free itself), so there is no separate strip above it; the desktop pages start below the bar. -->
+        <Grid Grid.RowSpan="2">
+            <views:ConsoleHomeView Visibility="{x:Bind ViewModel.IsConsoleUi, Mode=OneWay}"/>
+            <Grid Margin="0,48,0,0">
+                <views:HomeView Visibility="{x:Bind ViewModel.IsDesktopHome, Mode=OneWay}">
+                    <views:HomeView.Transitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
+                        </TransitionCollection>
+                    </views:HomeView.Transitions>
+                </views:HomeView>
+                <views:SettingsView Visibility="{x:Bind ViewModel.IsDesktopSettings, Mode=OneWay}">
+                    <views:SettingsView.Transitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>
+                        </TransitionCollection>
+                    </views:SettingsView.Transitions>
+                </views:SettingsView>
+            </Grid>
+        </Grid>
+
+        <!-- Title bar, drawn over the pages: the back button sits outside the drag region so it stays clickable.
+             The app's name shows on the desktop interface only; the console one has its own brand mark in its top bar. -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Style="{StaticResource NavigationBackButtonNormalStyle}" Margin="4,0,0,0"
+            <Button Style="{StaticResource NavigationBackButtonNormalStyle}" Margin="6,0,0,0"
                     VerticalAlignment="Center" Width="40" Height="36"
                     Visibility="{x:Bind ViewModel.IsDesktopSettings, Mode=OneWay}"
                     Command="{x:Bind ViewModel.GoHomeCommand}"
                     ToolTipService.ToolTip="{x:Bind ViewModel.Texts.Back, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.Texts.Back, Mode=OneWay}"/>
             <Grid x:Name="AppTitleBar" Grid.Column="1" Background="Transparent">
-                <StackPanel Orientation="Horizontal" Spacing="12" Margin="12,0,0,0" VerticalAlignment="Center">
-                    <Image x:Name="TitleIcon" Width="16" Height="16"/>
-                    <TextBlock Text="{x:Bind ViewModel.Texts.Brand, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="14,0,0,0" VerticalAlignment="Center"
+                            Visibility="{x:Bind ViewModel.IsDesktopUi, Mode=OneWay}">
+                    <Image x:Name="TitleIcon" Width="20" Height="20"/>
+                    <TextBlock Text="{x:Bind ViewModel.Texts.Brand, Mode=OneWay}" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
-        </Grid>
-
-        <Grid Grid.Row="1">
-            <views:ConsoleHomeView Visibility="{x:Bind ViewModel.IsConsoleUi, Mode=OneWay}"/>
-            <views:HomeView Visibility="{x:Bind ViewModel.IsDesktopHome, Mode=OneWay}">
-                <views:HomeView.Transitions>
-                    <TransitionCollection>
-                        <EntranceThemeTransition FromHorizontalOffset="-24" FromVerticalOffset="0"/>
-                    </TransitionCollection>
-                </views:HomeView.Transitions>
-            </views:HomeView>
-            <views:SettingsView Visibility="{x:Bind ViewModel.IsDesktopSettings, Mode=OneWay}">
-                <views:SettingsView.Transitions>
-                    <TransitionCollection>
-                        <EntranceThemeTransition FromHorizontalOffset="24" FromVerticalOffset="0"/>
-                    </TransitionCollection>
-                </views:SettingsView.Transitions>
-            </views:SettingsView>
         </Grid>
     </Grid>
 </Window>

@@ -619,3 +619,10 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Controle que fazia o menu "subir sozinho": o menu fica parado; se o log mostrar `analógico fora do centro desde o início`, o direcional e os botões continuam navegando. Anote o modelo do controle. Resultado: ______
 - [ ] Controle normal: o analógico navega como antes (na primeira leitura ele está no centro). Resultado: ______
 - [ ] Aba Sessão em espanhol, francês e russo: as legendas dos ajustes rápidos aparecem inteiras, em até duas linhas. Resultado: ______
+
+## Barra de título (#182)
+
+- [ ] Interface Console: nenhuma faixa cinza no topo; o fundo (Aurora, capas ou imagem) vai até a borda da janela, e minimizar, maximizar e fechar aparecem brancos, com realce suave ao passar o mouse e mais forte ao clicar. Resultado: ______
+- [ ] Interface Console: arrastar a janela pela área de cima (fora das abas e dos botões) funciona; as abas, o relógio e os botões redondos continuam clicáveis. Resultado: ______
+- [ ] Interface Desktop: ícone e "Console Mode" à esquerda, botões de janela altos; em Ajustes, o botão de voltar aparece e funciona. Tema claro e escuro do Windows: os botões seguem o tema. Resultado: ______
+- [ ] Trocar entre Desktop e Console (botão ou Y): a barra muda junto, sem sobrar faixa nem botões brancos no tema claro. Resultado: ______

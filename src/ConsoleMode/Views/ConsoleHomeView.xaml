@@ -17,8 +17,9 @@
         <ScalarTransition x:Key="ConsoleFade" Duration="0:0:0.18"/>
     </UserControl.Resources>
 
-    <!-- 10-foot layout: big cards, thick focus ring, no mouse needed. Solid background instead of Mica. -->
-    <Grid x:Name="Root" Background="#07090D" Padding="56,0,56,32">
+    <!-- 10-foot layout: big cards, thick focus ring, no mouse needed. Solid background instead of Mica. The view also
+         fills the title bar (the top padding leaves its 48 px free), so the background runs up to the window edge. -->
+    <Grid x:Name="Root" Background="#07090D" Padding="56,48,56,32">
         <Grid.Resources>
             <!-- Containers of cards are not focus stops: the focus lands on the cards themselves. -->
             <Style TargetType="ItemsControl">
@@ -43,7 +44,7 @@
         </Grid.Resources>
 
         <!-- Background: the built-in wallpaper, covers of your installed Steam games or your picture, under a solid-colour gradient -->
-        <Grid x:Name="BackgroundLayer" IsHitTestVisible="False" Margin="-56,0,-56,-32">
+        <Grid x:Name="BackgroundLayer" IsHitTestVisible="False" Margin="-56,-48,-56,-32">
             <!-- Built-in wallpaper ("Aurora"): soft green and blue glows over a deep blue-black with a few faint
                  orbit lines, all on the right, where the gradients below leave the art visible -->
             <Grid Visibility="{x:Bind ViewModel.ShowBackgroundWallpaper, Mode=OneWay}">
