@@ -83,6 +83,10 @@ public static class NativeWindows
 
     public const uint WmClose = 0x0010;
 
+    /// <summary>Moves the mouse pointer to a place on the virtual desktop (physical pixels; the app is per-monitor DPI aware).</summary>
+    [DllImport("user32.dll")]
+    public static extern bool SetCursorPos(int x, int y);
+
     [DllImport("user32.dll")]
     public static extern nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 

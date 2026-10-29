@@ -67,6 +67,16 @@ Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 
 
 A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
+## Scripts, taxa de atualização exata e ponteiro
+
+Estas três opções ficam em **Ajustes**, na interface desktop.
+
+**Seus próprios scripts.** *Ajustes → Seus próprios scripts* recebe um comando que roda quando a sessão começa e outro que roda depois que a mesa volta. Um comando é qualquer coisa que o `cmd` execute: um arquivo `.bat`, um programa com argumentos ou uma linha do PowerShell como `powershell -NoProfile -File "C:\Scripts\x.ps1"`. Caminhos com espaço vão entre aspas. Os dois rodam ocultos, e o Console Mode espera até 60 segundos por cada um; se um demorar mais ou falhar, a sessão segue e o log (`Script (início)` / `Script (fim)`) traz o código de saída. O comando do início roda assim que a sessão é registrada, antes de as telas mudarem. O comando do fim roda no final da restauração, também quando o início foi desfeito ou a restauração teve problemas, então o que o comando do início tirou (fechar um navegador, retirar mods de jogos) pode ser devolvido. Nada aparece na tela, então um script que espera uma tecla (`pause`) só termina no limite de 60 segundos.
+
+**Taxa de atualização exata.** Muitas TVs rodam o modo de 120 Hz a 119,88 Hz e o de 60 Hz a 59,94 Hz. A lista de modos do Windows só tem números inteiros (e pode listar 119,88 como 119), então não dá para escolher isso na lista de resoluções. Com a opção ligada, o Console Mode aplica o modo normalmente e depois pede a mesma taxa × 1000/1001 e confere o resultado. Só são alteradas as taxas que têm esse par (24, 30, 48, 60, 120 e 240 Hz), e, se a tela não aceitar, a taxa inteira continua e o log registra (`Taxa NTSC`).
+
+**Tirar o ponteiro do mouse do caminho.** Quando o iniciador aparece, o ponteiro vai para o canto inferior direito da tela de jogo, duas vezes (a Steam e outros o recentralizam enquanto abrem a janela). O modo Xbox não tem uma janela para acompanhar, então vale o tempo desde a abertura.
+
 ## Extras opcionais
 
 ### HDR
