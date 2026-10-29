@@ -133,6 +133,8 @@
   "ShortcutsOnboardingDone": "Listo",
   "CloseSteamCard": "Enviar Steam a la bandeja al volver al PC",
   "CloseSteamDescription": "Al salir de Big Picture, Steam recibe una solicitud normal para cerrar la ventana y pasar a la bandeja sin finalizar el proceso. Si hay un juego en ejecución o no se puede comprobar su estado, la ventana no se modifica.",
+  "RestoreIconsCard": "Devolver los iconos del escritorio a su sitio",
+  "RestoreIconsDescription": "Guarda la posición de los iconos del escritorio antes de la sesión y los vuelve a colocar al volver al PC, por si Windows los reordena al cambiar la pantalla principal. No hace nada si la organización automática está activada.",
   "HideCursorCard": "Ocultar el cursor del ratón",
   "HideCursorDescription": "Queda oculto hasta que lo desactives aquí o vuelvas al PC. Útil en emuladores y juegos que lo dejan en el centro de la pantalla.",
   "ControllerMouseRow": "Controlar el ratón con el mando",

@@ -385,6 +385,17 @@ Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas t
 - [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
 - [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
 
+## Ícones da área de trabalho (issue #30)
+
+Pré-condições: área de trabalho com **Organizar ícones automaticamente** desligado (clique direito → Exibir) e ícones espalhados em lugares fáceis de reconhecer (alguns no meio da tela, um no canto direito); de preferência a TV não sendo a tela principal na mesa normal.
+
+- [ ] Ajustes → **Devolver os ícones da área de trabalho ao lugar** ligado (padrão): **Jogar agora** e **Voltar ao PC**: os ícones voltam exatamente onde estavam, mesmo que o Windows os tenha embaralhado durante a sessão. O log mostra `Ícones da área de trabalho: N posições salvas` e depois `… M reposicionados`. Resultado: ______
+- [ ] O retorno ao PC não fica mais lento: os ícones voltam alguns segundos depois da mesa, sem travar a janela. Resultado: ______
+- [ ] Um atalho criado na área de trabalho durante a sessão fica onde o Windows o pôs; um apagado durante a sessão não causa erro. Resultado: ______
+- [ ] Com a opção desligada (Ajustes e aba Sistema do modo Console): o log não mostra nada sobre ícones e nada é movido. Resultado: ______
+- [ ] Com **Organizar ícones automaticamente** ligado: o log mostra `organização automática ligada; posições não salvas` e o Windows arruma os ícones sozinho. Resultado: ______
+- [ ] Explorer reiniciado durante a sessão (Gerenciador de Tarefas → Reiniciar): voltar ao PC não trava nem dá erro. Resultado: ______
+
 ## Telas com código próprio (issue #91)
 
 Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.

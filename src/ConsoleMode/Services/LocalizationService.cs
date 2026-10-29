@@ -257,6 +257,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string HomeButtonShortPressCard => LocalizationService.Get(nameof(HomeButtonShortPressCard));
     public string CloseSteamCard => LocalizationService.Get(nameof(CloseSteamCard));
     public string CloseSteamDescription => LocalizationService.Get(nameof(CloseSteamDescription));
+    public string RestoreIconsCard => LocalizationService.Get(nameof(RestoreIconsCard));
+    public string RestoreIconsDescription => LocalizationService.Get(nameof(RestoreIconsDescription));
     public string HideCursorCard => LocalizationService.Get(nameof(HideCursorCard));
     public string HideCursorDescription => LocalizationService.Get(nameof(HideCursorDescription));
     public string ControllerMouseRow => LocalizationService.Get(nameof(ControllerMouseRow));

@@ -33,6 +33,8 @@ Open the shortcut action you want to configure, choose **Set** or **Change**, ho
 
 When returning from Big Picture, **Send Steam to the tray when going back to the PC** closes the client window while keeping Steam running. With the option off, the desktop client is left open. Steam windows are left alone when a game is running or its state cannot be checked.
 
+Changing the main display can make Windows reshuffle the desktop icons. **Put desktop icons back in place** (on by default) saves where they are before the session and puts them back after the desk is restored. It does nothing when the desktop's **Auto arrange icons** is on, since Windows lays them out itself then.
+
 **Wake the PC with the controller** lets the Xbox Wireless Adapter, the Bluetooth radio or a wired controller wake the PC from sleep with the controller's center button. **Turn on** asks Windows for administrator permission and ticks *Allow this device to wake the computer* on those devices. It can't wake a PC that is shut down or hibernating, and some PCs cut power to Bluetooth while asleep. Together with **Enter when a controller connects**, the PC wakes straight into console mode.
 
 ## Local control API

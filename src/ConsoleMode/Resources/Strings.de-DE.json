@@ -133,6 +133,8 @@
   "ShortcutsOnboardingDone": "Fertig",
   "CloseSteamCard": "Steam beim Zurückkehren zum PC in den Infobereich minimieren",
   "CloseSteamDescription": "Wenn du Big Picture verlässt, erhält Steam eine normale Aufforderung zum Schließen des Fensters und kann so in den Infobereich wechseln, ohne den Prozess zu beenden. Wenn ein Spiel läuft oder sein Status nicht ermittelt werden kann, bleibt das Fenster unverändert.",
+  "RestoreIconsCard": "Desktopsymbole wieder an ihren Platz setzen",
+  "RestoreIconsDescription": "Speichert vor der Sitzung, wo die Desktopsymbole liegen, und setzt sie bei der Rückkehr zum PC wieder dorthin, falls Windows sie beim Wechsel des Hauptbildschirms durcheinanderbringt. Bei aktivierter automatischer Anordnung passiert nichts.",
   "HideCursorCard": "Mauszeiger ausblenden",
   "HideCursorDescription": "Bleibt ausgeblendet, bis du diese Option deaktivierst oder zum PC zurückkehrst. Praktisch für Emulatoren und Spiele, bei denen der Zeiger mitten auf dem Bildschirm stehen bleibt.",
   "ControllerMouseRow": "Maus mit dem Controller steuern",

@@ -27,6 +27,8 @@ Ouvrez l'action de raccourci à configurer, choisissez **Définir** ou **Modifie
 
 Au retour de Big Picture, **Réduire Steam dans la zone de notification au retour au PC** ferme la fenêtre du client tout en laissant Steam en marche. Si l'option est désactivée, le client de bureau reste ouvert. Les fenêtres de Steam ne sont pas touchées quand un jeu est en cours ou quand son état ne peut pas être vérifié.
 
+Changer d'écran principal peut amener Windows à mélanger les icônes du bureau. **Remettre les icônes du bureau à leur place** (activé par défaut) enregistre leur position avant la session et les remet en place une fois le bureau restauré. Sans effet si **Réorganiser automatiquement les icônes** est activé sur le bureau, car Windows les place alors lui-même.
+
 **Réveiller le PC avec la manette** permet à l'adaptateur sans fil Xbox, au Bluetooth ou à une manette filaire de sortir le PC de la veille avec le bouton central de la manette. **Activer** demande l'autorisation d'administrateur à Windows et coche *Autoriser ce périphérique à sortir l'ordinateur du mode veille* sur ces périphériques. Un PC éteint ou en veille prolongée ne se réveille pas, et certains PC coupent le Bluetooth pendant la veille. Avec **Entrer à la connexion d'une manette**, le PC se réveille directement en mode console.
 
 ## API de contrôle local

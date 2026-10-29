@@ -27,6 +27,8 @@ Die Registerkarte **System** bietet dieselben Einstellungen wie der Desktopmodus
 
 Bei der Rückkehr aus Big Picture schließt **Steam beim Zurückkehren zum PC in den Infobereich minimieren** das Client-Fenster, während Steam weiterläuft. Ist die Option aus, bleibt der Desktop-Client geöffnet. Steam-Fenster werden nicht angetastet, wenn ein Spiel läuft oder sich sein Zustand nicht prüfen lässt.
 
+Ein Wechsel des Hauptbildschirms kann Windows dazu bringen, die Desktopsymbole neu anzuordnen. **Desktopsymbole wieder an ihren Platz setzen** (standardmäßig an) speichert vor der Sitzung, wo sie liegen, und setzt sie nach der Wiederherstellung wieder dorthin. Ist auf dem Desktop **Symbole automatisch anordnen** aktiv, passiert nichts, weil Windows sie dann selbst anordnet.
+
 **PC mit dem Controller aufwecken** erlaubt dem Xbox Wireless Adapter, Bluetooth oder einem Controller am Kabel, den PC mit der mittleren Taste des Controllers aus dem Energiesparmodus zu wecken. **Einschalten** fragt Windows nach Administratorrechten und aktiviert bei diesen Geräten *Gerät kann den Computer aus dem Ruhezustand aktivieren*. Ein ausgeschalteter PC oder einer im Ruhezustand wacht nicht auf, und manche PCs schalten Bluetooth im Energiesparmodus ab. Zusammen mit **Beim Verbinden eines Controllers starten** wacht der PC direkt im Konsolenmodus auf.
 
 ## Lokale Steuerungs-API

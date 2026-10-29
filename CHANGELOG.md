@@ -4,6 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Os ícones da área de trabalho voltam ao lugar depois da sessão: trocar a tela principal podia fazer o Windows embaralhá-los. O Console Mode salva a posição antes de mexer nas telas e os recoloca alguns segundos depois de restaurar a mesa. Liga e desliga em Ajustes → **Devolver os ícones da área de trabalho ao lugar** (ligado por padrão); não faz nada com **Organizar ícones automaticamente** ligado. (#167)
 - **Acordar o PC pelo controle**: em Ajustes (e na aba Sistema → Controle do modo Console), o Console Mode mostra se o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo podem acordar o PC da suspensão e, em **Ativar**, liga isso para eles (o Windows pede permissão de administrador). Junto com **Entrar ao conectar um controle**, apertar o botão central do controle acorda o PC direto no modo console. Não funciona com o PC desligado ou em hibernação. (#168)
 
 ## [1.7.0-alpha.2]
