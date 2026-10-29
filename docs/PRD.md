@@ -82,9 +82,9 @@ Prioridade: **P1** próxima versão, **P2** depois, **P3** explorar. Tamanho: **
 | Item | Prioridade | Tam. | Descrição e critério de aceite |
 |---|---|---|---|
 | **JoyChromium** | P1 | L | A web com controle, direto do Console Mode: tile na Início, abre na tela de jogo, volta ao PC ao fechar. Critério: navegar, clicar e digitar só com o controle; sessão restaurada ao sair. |
-| **Tako Launcher** | P2 | M | Integração completa: aparecer como lançador na Início, abrir em tela cheia na tela de jogo, restaurar ao fechar, logo oficial. *A definir: como detectar a instalação, se há modo tela cheia e qual processo vigiar.* |
-| **Hydra Launcher** | P2 | M | Mesmo contrato do item acima. *A definir: caminho de instalação e processo real; launchers que só iniciam outro programa e saem pedem o "Processo a vigiar" do modo personalizado.* |
-| **AnyFSE** | P2 | M | Integrar para que o modo Xbox em tela cheia abra o launcher que o usuário escolher. *A definir: onde o Console Mode entra (detectar, configurar ou só conviver) e como fica a restauração.* |
+| **Tako Launcher** | P1 | M | É o launcher de jogos do próprio dono, então os dois lados são nossos e dá para combinar um contrato em vez de adivinhar: o Tako abre em tela cheia, avisa o Console Mode quando um jogo inicia e fecha (links `consolemode://` e a API de controle já existem), e o Console Mode o mostra como lançador na Início com logo oficial, abre na tela de jogo e restaura a mesa ao fechar. Critério: sessão completa (entrar, jogar, voltar) sem tocar no mouse. *A definir: nome do processo, se o jogo roda como filho do Tako e o que o Tako expõe (protocolo, linha de comando).* |
+| **Hydra Launcher** | P2 | M | Launcher de jogos de código aberto, bem conhecido. Entra como lançador na Início: detectar a instalação, abrir em tela cheia na tela de jogo, restaurar ao fechar, logo oficial. O Console Mode só abre e acompanha o aplicativo; não mexe no catálogo, nos downloads nem no conteúdo dele. *A definir: caminho de instalação, processo real e se há modo tela cheia ou Big Picture próprio; se o Hydra só iniciar outro programa e sair, usar o "Processo a vigiar" do modo personalizado.* |
+| **AnyFSE** | P2 | M | Ferramenta que faz o Full Screen Experience do modo Xbox abrir qualquer outro aplicativo. Para nós, é um caminho a mais para o modo Xbox (já experimental) abrir o Tako, o Hydra ou outro launcher. Decidir o nível: (a) só detectar e conviver, sem briga entre os dois; (b) mostrar o estado e abrir a configuração dele pelo Console Mode; (c) configurar o app de destino. Critério mínimo: com o AnyFSE ativo, entrar e sair da sessão restaura a mesa. *A definir: como ele se instala e se configura, e o que muda no processo vigiado.* |
 | **Jogos nativos, sem launcher externo** | P3 | XL | Biblioteca própria: listar jogos instalados (Steam, Epic, GOG, Xbox, pastas), abrir direto pela interface Console, com capas e perfis por jogo (#170). Critério: iniciar e acompanhar um jogo sem abrir nenhum launcher visível. É o maior salto de escopo do produto: decidir antes se queremos ser launcher ou orquestrador. |
 
 ### 5.2 Apoio ao projeto
@@ -145,7 +145,7 @@ Prioridade: **P1** próxima versão, **P2** depois, **P3** explorar. Tamanho: **
 
 **Perguntas para o dono**
 1. Ko-fi ou BuyMeACoffee? Já existe conta criada?
-2. Tako Launcher, Hydra e AnyFSE: qual é o link oficial de cada um e o que precisam para abrir em tela cheia? (Não verifiquei os três; as linhas acima são pontos de partida.)
+2. Tako Launcher: o que ele já expõe (protocolo, linha de comando, processo) e onde fica o código? Hydra e AnyFSE: links oficiais e como cada um abre em tela cheia. (Descrevi os dois a partir do que você disse, sem verificar nos sites.)
 3. "Jogos nativos": queremos ser um launcher ou continuar orquestrando os que existem?
 4. Linux e macOS entram em 2027 ou ficam como "explorando"?
 5. O ponteiro estacionado (#172) entra na 1.7.0?
