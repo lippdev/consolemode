@@ -12,13 +12,13 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 
 ## Download
 
-Baixe a **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**, a versão estável mais recente:
+Baixe a **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
 - Ou pelo winget: `winget install lippdev.ConsoleMode`
 
-Está na 1.5? O app oferece a atualização e mantém as configurações; os atalhos do controle você escolhe de novo na primeira abertura.
+Está na 1.6? O app oferece a atualização e mantém suas configurações.
 
 Quer testar o que vem aí antes de todo mundo? Ligue Ajustes → "Receber versões de teste (alpha e beta)".
 
@@ -50,21 +50,21 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - Abre **Steam Big Picture**, **Playnite em tela cheia**, o **Modo Xbox** ou o [JoyChromium](https://github.com/lippdev/joychromium) (a web pelo controle), e manda a Steam para a bandeja ao voltar ao PC
 - **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS)
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo)
+- **Perfis por jogo** para os jogos da Steam (resolução, HDR, limite de FPS e áudio), o modo **Aplicativo personalizado** para qualquer `.exe` e a bateria do controle na tela
+- Devolve os **ícones da área de trabalho** e o **ponteiro do mouse** ao lugar, pode deixar o controle **acordar o PC** e restaura a mesa na próxima abertura se uma sessão for interrompida
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês, espanhol, alemão, francês e russo
 
-## Novidades da 1.6.2
+## Novidades da 1.7.0
 
-- **Alemão, francês e russo:** a interface, o instalador e a lista de idiomas agora falam Deutsch (tradução de [u/Skinner99](https://www.reddit.com/user/Skinner99/) no Reddit), Français e Русский, e o app segue o Windows se ele estiver num desses idiomas
-- **Minimizar para a bandeja:** uma nova opção em Ajustes (e na interface Console, em Sistema) deixa o Console Mode nos ícones ocultos em vez da barra de tarefas quando você minimiza
+- **Interface Console com cara de console de mesa:** seus iniciadores numa fileira com os logos oficiais (o foco escolhe o que abre, como num PS5), a fonte Inter, o fundo Aurora e a aba Sistema com categorias
+- **JoyChromium integrado:** o navegador para a TV que se usa com o controle abre em tela cheia na tela de jogo e volta a ser janela quando você volta ao PC
+- **Perfis por jogo:** cada jogo da Steam lembra a própria resolução, HDR, limite de FPS e áudio, salvos pelo menu da sessão
+- **Aplicativo personalizado:** qualquer `.exe` (RetroArch, outro launcher…) como o que abre na TV
+- **A mesa volta inteira:** os ícones da área de trabalho e o ponteiro do mouse voltam ao lugar e, se o app ou o PC cair no meio da sessão, a próxima abertura restaura tudo
+- **Acordar o PC pelo controle**, a bateria do controle na tela e um card de Diagnóstico com relatório para copiar
 
-## Novidades da 1.6.1
-
-- **Contador de FPS num card:** três tamanhos, o canto da tela que você quiser e os novos estilos Apenas FPS, Compacto (uso de CPU, GPU e RAM) e Detalhado (clocks, temperatura da GPU, VRAM e RAM), tudo ajustado pelo próprio menu da sessão
-- **Cursor do mouse pelo menu da sessão:** esconda até ligar de novo, ou mova com o controle (o analógico move, A clica)
-- **Tour do menu da sessão:** na primeira vez que o menu abre, ele oferece um tour rápido por cada opção
-
-## Novidades da 1.6.0
+## Novidades da 1.6
 
 - **Interface Console redesenhada:** abas Início, Sessão e Sistema no LB/RB, blocos das telas, as capas da sua Steam como plano de fundo e sons da interface
 - **Menu da sessão como o overlay do Steam:** tela cheia sobre o jogo, com as janelas abertas no meio (um Alt+Tab para o controle)
@@ -75,11 +75,11 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - **Só código do projeto:** telas e áudio pelas APIs do Windows, sem as ferramentas da NirSoft
 - A Steam vai para a bandeja ao voltar ao PC, o layout da mesa volta idêntico (monitores em retrato também) e o Playnite demorando para abrir não encerra mais a sessão
 
-Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.6.2) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
+Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
 ## Roadmap
 
-**Próximos:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), posição dos ícones da área de trabalho ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Depois:** perfis por jogo ([#69](https://github.com/lippdev/consolemode/issues/69)) · **Explorando:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
+**Próximos:** o [Tako](https://github.com/lippdev/tako-launcher) como iniciador e uma API local para ele, Hydra e AnyFSE, um link de apoio ao projeto · **Depois:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), mais TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Explorando:** Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). O plano completo está no [PRD](docs/PRD.md).
 
 ## Mais
 
