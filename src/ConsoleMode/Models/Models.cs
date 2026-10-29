@@ -399,6 +399,8 @@ public sealed class ConsoleRuntimeState
     public string? BackupAudioId { get; set; }
     /// <summary>The desktop icons read before the session; null when they aren't restored.</summary>
     public List<DesktopIcon>? DesktopIcons { get; set; }
+    /// <summary>JoyChromium was opened from the session menu this session (it goes back to a window with the desk).</summary>
+    public bool JoyChromiumOpened { get; set; }
     /// <summary>Park the pointer this session; how many times it was parked, when, and where it was before.</summary>
     public bool ParkPointer { get; set; }
     public int PointerParks { get; set; }

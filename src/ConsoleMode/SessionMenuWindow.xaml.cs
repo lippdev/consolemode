@@ -479,7 +479,7 @@ public sealed partial class SessionMenuWindow : Window
     private FrameworkElement[] TourTargets(SessionTourStop stop) => stop switch
     {
         SessionTourStop.BackToGame => [FirstRow],
-        SessionTourStop.ControlFs => [ControlFsRow],
+        SessionTourStop.ControlFs => [ControlFsRow, JoyChromiumRow],
         SessionTourStop.Volume => [VolumeRow],
         SessionTourStop.Display => [ModeRow, AudioRow, HdrRow],
         SessionTourStop.Fps => [FpsRow, FpsOverlayRow],

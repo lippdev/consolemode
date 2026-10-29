@@ -35,9 +35,6 @@ public sealed class LaunchService
         })?.Dispose();
     }
 
-    /// <summary>"joyChromium": full screen on the TV for this run (<see cref="JoyChromium.TvArgument"/>).</summary>
-    public void StartJoyChromium(string exePath) => StartCustomApp(exePath, JoyChromium.TvArgument);
-
     /// <summary>
     /// Asks the open JoyChromium to leave full screen: a second run hands its arguments to the open
     /// instance and exits at once, so this doesn't open another browser.
@@ -47,8 +44,6 @@ public sealed class LaunchService
         if (GetJoyChromiumPath() is not { } exe) return;
         StartCustomApp(exe, JoyChromium.WindowArgument);
     }
-
-    public bool IsJoyChromiumAvailable() => GetJoyChromiumPath() is not null;
 
     /// <summary>The installed JoyChromium.exe: the per-user install folder, else the uninstall key's icon path.</summary>
     public static string? GetJoyChromiumPath()

@@ -12,7 +12,6 @@ Les détails qui ne tiennent pas dans le [README](../README.fr-FR.md).
 | **Playnite en plein écran** | Restauration automatique (l'application reste dans la zone de notification) |
 | **Mode Xbox** | Manuelle : utilisez *Restaurer maintenant*, le menu de la zone de notification, ou rouvrez la fenêtre |
 | **Application personnalisée** | Restauration automatique quand l'application (ou le processus choisi à surveiller) se ferme |
-| **JoyChromium** | Restauration automatique à la fermeture de JoyChromium ; si vous revenez au PC avant, il reste ouvert en fenêtre |
 
 Si l'application se ferme ou si le PC s'éteint en pleine session, Console Mode restaure à sa prochaine ouverture (aussi à l'ouverture de session Windows, s'il démarre avec Windows) tout ce que la session a changé : écrans, son, RTSS, icônes du bureau et pointeur, et vous le signale.
 
