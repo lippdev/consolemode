@@ -388,7 +388,7 @@
                                             <FontIcon Glyph="&#xE768;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.LaunchCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.LaunchCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.SelectedLaunch.Text, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>
@@ -404,7 +404,7 @@
                                             <FontIcon Glyph="&#xE767;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.SelectedAudio.Text, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>
@@ -421,7 +421,7 @@
                                             <FontIcon Glyph="&#xE7F4;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.ResolutionRefreshCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.FocusRow.SelectedMode.Text, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>
@@ -437,7 +437,7 @@
                                             <FontIcon Glyph="&#xE706;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.HdrText, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>
@@ -453,7 +453,7 @@
                                             <FontIcon Glyph="&#xE895;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.VrrCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.VrrCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.VrrText, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>
@@ -470,7 +470,7 @@
                                             <FontIcon Glyph="&#xE916;" FontSize="19"/>
                                         </Border>
                                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" MaxLines="1"/>
+                                            <TextBlock Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
                                             <TextBlock Text="{x:Bind ViewModel.SelectedFps.Text, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
                                         </StackPanel>
                                     </Grid>

@@ -14,6 +14,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Correções
 - Aplicativo personalizado: o Console Mode leva para a tela de jogo só a maior janela do programa, em vez de todas as que o Windows aponta como principal; uma dica de ferramenta não é mais esticada sobre a TV. (#175)
 - Se o app fechar ou o PC desligar no meio de uma sessão, a próxima abertura do Console Mode restaura tudo o que a sessão mudou (telas, áudio, RTSS, ícones da área de trabalho e ponteiro) e avisa. Antes, as telas ficavam como a sessão deixou até você arrumar à mão. (#178)
+- Saída de áudio **A que aparecer ao conectar**: quando a saída da própria TV já estava ligada antes da sessão (e por isso nunca "aparecia"), o áudio ficava na mesa; agora, se nenhuma saída nova surgir em uns 10 s, o Console Mode usa a saída da tela de jogo que já estava ativa. Uma soundbar ou receiver que acorde depois continua tendo prioridade. (issue #149, #180)
+- Controles: um analógico que aparece fora do centro desde o início (um eixo que não é analógico de verdade, ou uma leitura errada) não deixa mais o menu "subindo sozinho". O analógico só passa a valer depois de ser visto no centro; o direcional e os botões continuam funcionando. (issue #149, #180)
+- Interface Console, aba Sessão: as legendas dos ajustes rápidos quebram em duas linhas em vez de serem cortadas com reticências ("Resolución y frecuencia…" em espanhol, por exemplo). (#180)
 
 ## [1.7.0-alpha.2]
 ### Novidades

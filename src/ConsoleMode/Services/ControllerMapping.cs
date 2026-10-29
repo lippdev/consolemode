@@ -138,6 +138,12 @@ public static class ControllerMapping
         return noisyStreak >= DistrustAfterPolls;
     }
 
+    /// <summary>
+    /// Both stick axes inside the dead zone. A HID stick only counts once it has been seen here (issue #149): an axis
+    /// that isn't really a stick, or a misread report, can rest at 0 and would otherwise hold Up forever.
+    /// </summary>
+    public static bool StickCentered(double x, double y) => x is >= 0.25 and <= 0.75 && y is >= 0.25 and <= 0.75;
+
     /// <summary>Stick axis from 0..1 (0.5 centred) to a direction; ±0.25 dead zone.</summary>
     public static (bool Left, bool Right, bool Up, bool Down) StickDirections(double x, double y) =>
         (x < 0.25, x > 0.75, y < 0.25, y > 0.75);

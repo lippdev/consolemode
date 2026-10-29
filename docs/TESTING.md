@@ -610,3 +610,12 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Com a TV como tela de jogo e os monitores da mesa desligados pela sessão, fechar o Console Mode à força no Gerenciador de Tarefas (Finalizar tarefa) no meio da sessão. Abrir o Console Mode de novo: as telas da mesa voltam como estavam, o áudio volta, o ponteiro volta para onde estava e aparece o aviso de que a última sessão não terminou direito. Resultado: ______
 - [ ] O mesmo, desligando o PC no botão (ou tirando da tomada) no meio da sessão e ligando de novo com o Console Mode iniciando com o Windows: a mesa volta ao entrar no Windows. Resultado: ______
 - [ ] Uma sessão normal (voltar ao PC pelo atalho ou pelo menu) não deixa o arquivo `session.json` na pasta de dados, e abrir o app depois não mostra o aviso. Resultado: ______
+
+## Correções da issue #149 (#180)
+
+- [ ] Saída de áudio **A que aparecer ao conectar**, com a TV **já ligada** e o áudio HDMI dela já aparecendo no Windows antes de começar: uns 10 s depois de entrar no modo console, o áudio vai para a TV (log: `Áudio: nenhuma saída nova; usando a saída já ativa da tela de jogo`). Resultado: ______
+- [ ] O mesmo com a TV **desligada** antes de começar: o áudio vai para a TV assim que ela liga, como antes. Resultado: ______
+- [ ] Com uma soundbar ou receiver que liga junto com a TV: o áudio vai para a soundbar, não para a TV. Resultado: ______
+- [ ] Controle que fazia o menu "subir sozinho": o menu fica parado; se o log mostrar `analógico fora do centro desde o início`, o direcional e os botões continuam navegando. Anote o modelo do controle. Resultado: ______
+- [ ] Controle normal: o analógico navega como antes (na primeira leitura ele está no centro). Resultado: ______
+- [ ] Aba Sessão em espanhol, francês e russo: as legendas dos ajustes rápidos aparecem inteiras, em até duas linhas. Resultado: ______

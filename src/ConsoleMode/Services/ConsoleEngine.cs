@@ -766,13 +766,13 @@ public sealed partial class ConsoleEngine
 
         var devices = Audio.GetDevices(true);
         var newly = devices.Where(d => d.IsActive && !State.AudioBaselineActiveIds.Contains(d.FriendlyId)).ToList();
-        if (newly.Count == 0) return;
+        if (newly.Count == 0)
+        {
+            UseGameScreenOutputAlreadyOn(devices, now);
+            return;
+        }
 
-        MonitorInfo? focus = null;
-        if (!string.IsNullOrWhiteSpace(State.FocusMonitor))
-            focus = Monitors.GetMonitors().FirstOrDefault(m => m.Name == State.FocusMonitor)
-                    ?? Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == State.FocusMonitor);
-
+        var focus = FocusMonitorInfo();
         var pick = Audio.PickNewDevice(newly, State.AudioDeviceHint, focus);
         if (pick is null) return;
         if (TrySetOutput(pick.FriendlyId))
@@ -780,6 +780,38 @@ public sealed partial class ConsoleEngine
             State.AudioDeviceId = pick.FriendlyId;
             State.LastAudioSwitchName = pick.Name;
         }
+        CompleteAudioWatch();
+    }
+
+    private MonitorInfo? FocusMonitorInfo()
+    {
+        if (string.IsNullOrWhiteSpace(State.FocusMonitor)) return null;
+        return Monitors.GetMonitors().FirstOrDefault(m => m.Name == State.FocusMonitor)
+               ?? Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == State.FocusMonitor);
+    }
+
+    /// <summary>
+    /// "The one that shows up when connecting" with nothing new showing up: the TV's own output was already on
+    /// before the session (issue #149), so it never "appeared". After a while, that one is used.
+    /// </summary>
+    private void UseGameScreenOutputAlreadyOn(IReadOnlyList<AudioDevice> devices, DateTime now)
+    {
+        if (State.LaunchTime is not { } launched || now - launched < AudioNaming.ActiveOutputFallbackAfter) return;
+        var focus = FocusMonitorInfo();
+        var own = devices.FirstOrDefault(d => d.IsActive && AudioNaming.BelongsToScreen(d.Name, focus?.MonitorName));
+        if (own is null) return;
+
+        if (own.IsDefault)
+        {
+            AppLog.Write($"Áudio: a saída da tela de jogo já é a padrão: {own.Name}");
+        }
+        else
+        {
+            AppLog.Write($"Áudio: nenhuma saída nova; usando a saída já ativa da tela de jogo: {own.Name}");
+            if (!TrySetOutput(own.FriendlyId)) return;
+        }
+        State.AudioDeviceId = own.FriendlyId;
+        State.LastAudioSwitchName = own.Name;
         CompleteAudioWatch();
     }
 

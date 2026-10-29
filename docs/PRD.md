@@ -323,6 +323,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [ ] **REL-020 — Validar no hardware** os PRs #167 a #170 pelo `TESTING.md` e corrigir o que falhar. _Estado: a branch local `local/1.7-teste` junta os quatro._
 - [ ] **INPUT-013 — Ajuste do #168:** se o script de ativação não encontrar nenhum dispositivo (por exemplo, desconectado com o UAC aberto), mostrar erro em vez de "Feito", ou conferir o estado depois.
 - [ ] **REL-021 — Mesclar** #167 a #170 e o #175.
+- [x] **REL-025 — Correções de uso diário (issue #149):** BUG-001, BUG-002 e BUG-003 entram na 1.7. (#180)
 - [ ] **REL-022 — Preparar a 1.7.0:** `[Unreleased]` vira `## [1.7.0]` nos dois changelogs; README, GUIDE e traduções enxutas; roadmap do README revisado.
 - [ ] **REL-023 — Sincronizar o fork do winget** (`lippdev/winget-pkgs`) antes da estável; sem isso o job falha com `CreateRef`.
 - [ ] **REL-024 — Publicar a 1.7.0**, só com pedido do mantenedor (D-06).
@@ -508,9 +509,9 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 ### Épico BUG — Problemas conhecidos sem correção
 
-- [ ] **BUG-001 (P1) — Menu "fica subindo".** Relato de usuário (feedback do #150): no menu, o Cima se repete sozinho. Diagnóstico de 17/10: o `ControllerInput` junta todas as fontes com OU, e um eixo HID que não é de gamepad parado em 0 (ou um relatório Sony mal lido) vira um Cima permanente com repetição. Falta o modelo do controle e a saída do "Testar controle".
-- [ ] **BUG-002 (P1) — Áudio "Ao conectar" não pega a TV já ativa.** Issue #149: a troca automática só reage a saídas que ficam ativas depois do início da sessão (linha de base em `ConsoleEngine.InitializeAudioWatch`), então uma saída da TV já ativa nunca é escolhida. Correção provável: escolhê-la também quando já está ativa no início. Falta o `consolemode.log` do usuário.
-- [ ] **BUG-003 (P2) —** Na aba Sessão da interface Console, os tiles de ajuste rápido cortam legendas longas ("Resolução e taxa de atualização", "VRR") com reticências em es, fr e ru (visto na 1.6.2; conferir na interface da 1.7). É limite de layout, não de tradução.
+- [x] **BUG-001 — Menu "fica subindo".** Relato de usuário (feedback do #150): no menu, o Cima se repete sozinho. Diagnóstico de 17/10: o `ControllerInput` junta todas as fontes com OU, e um eixo HID que não é de gamepad parado em 0 (ou um relatório Sony mal lido) vira um Cima permanente com repetição. Falta o modelo do controle e a saída do "Testar controle". _Corrigido: o analógico HID só vale depois de ser visto no centro; a confirmar com o controle do usuário._ (#180, 1.7.0)
+- [x] **BUG-002 — Áudio "Ao conectar" não pega a TV já ativa.** Issue #149: a troca automática só reage a saídas que ficam ativas depois do início da sessão (linha de base em `ConsoleEngine.InitializeAudioWatch`), então uma saída da TV já ativa nunca é escolhida. Correção provável: escolhê-la também quando já está ativa no início. Falta o `consolemode.log` do usuário. _Corrigido: depois de ~10 s sem saída nova, usa a saída já ativa com o nome da tela de jogo._ (#180, 1.7.0)
+- [x] **BUG-003 —** Na aba Sessão da interface Console, os tiles de ajuste rápido cortam legendas longas ("Resolução e taxa de atualização", "VRR") com reticências em es, fr e ru (visto na 1.6.2; conferir na interface da 1.7). É limite de layout, não de tradução. _Confirmado na 1.7 e corrigido: as legendas quebram em duas linhas._ (#180, 1.7.0)
 - [ ] **INPUT-016 (P3) —** Controle Switch Pro: hoje é ignorado por mandar leituras impossíveis pelo HID genérico (#115). Suporte exige ler o protocolo dele.
 
 ### Épico DATA (P3)
