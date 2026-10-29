@@ -4,6 +4,9 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
+- Os ícones da área de trabalho voltam ao lugar depois da sessão: trocar a tela principal podia fazer o Windows embaralhá-los. O Console Mode salva a posição antes de mexer nas telas e os recoloca alguns segundos depois de restaurar a mesa. Liga e desliga em Ajustes → **Devolver os ícones da área de trabalho ao lugar** (ligado por padrão); não faz nada com **Organizar ícones automaticamente** ligado. (#167)
+- **Acordar o PC pelo controle**: em Ajustes (e na aba Sistema → Controle do modo Console), o Console Mode mostra se o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo podem acordar o PC da suspensão e, em **Ativar**, liga isso para eles (o Windows pede permissão de administrador). Junto com **Entrar ao conectar um controle**, apertar o botão central do controle acorda o PC direto no modo console. Não funciona com o PC desligado ou em hibernação. (#168)
+- Interface Console: os blocos do Início mostram os logos oficiais da Steam, do Playnite e do Xbox, lidos dos apps instalados, e o Aplicativo personalizado mostra o ícone do seu `.exe`. Sem o app instalado, o bloco mantém o ícone genérico. (#169)
 - **Perfis por jogo**: cada jogo da Steam pode ter sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais**; da próxima vez que ele abrir no modo console, o perfil é aplicado sozinho e desfeito quando o jogo fecha. Vale também para jogos da Steam abertos pelo Playnite ou pelo app Xbox. Os perfis ficam em Ajustes → **Perfis por jogo**, onde dá para apagá-los. (#170)
 
 ## [1.7.0-alpha.2]

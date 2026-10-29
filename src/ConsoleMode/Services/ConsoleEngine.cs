@@ -75,6 +75,10 @@ public sealed partial class ConsoleEngine
         ResetGameProfileState();
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
+        // Before any screen changes: Windows may reshuffle the icons once the primary moves.
+        State.DesktopIcons = config.RestoreDesktopIcons ? DesktopIcons.Read() : null;
+        if (State.DesktopIcons is not null) AppLog.Write($"Ícones da área de trabalho: {State.DesktopIcons.Count} posições salvas");
+
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
         // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
         State.Tv = config.Tv;
@@ -331,6 +335,7 @@ public sealed partial class ConsoleEngine
                     AppLog.Write($"Restauração do setup: {issue}");
             }
             Audio.Restore(State.BackupAudioId);
+            if (State.DesktopIcons is { Count: > 0 } icons) RestoreDesktopIconsLater(icons);
             Rtss.Restore(State);
             Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
@@ -378,11 +383,33 @@ public sealed partial class ConsoleEngine
             State.HdrApplied = false;
             State.HdrMonitor = null;
             State.VrrApplied = false;
+            State.DesktopIcons = null;
             // The restore above already put the screen, HDR, FPS and audio back as before the session.
             ResetGameProfileState();
             OnUi(NativeWindows.StopBigPictureExitWatch);
         }
     }
+
+    /// <summary>
+    /// Explorer rearranges the icons a moment after the screens come back, sometimes more than once,
+    /// so they are put back in the background a few times instead of holding up the restore.
+    /// </summary>
+    private static void RestoreDesktopIconsLater(List<DesktopIcon> saved) => Task.Run(async () =>
+    {
+        var total = 0;
+        foreach (var delay in new[] { 1500, 2500, 4000 })
+        {
+            await Task.Delay(delay);
+            var current = DesktopIcons.Read();
+            if (current is null) break;
+            var moves = DesktopIconLayout.Moves(saved, current);
+            if (moves.Count == 0) continue;
+            var moved = DesktopIcons.Move(moves);
+            if (moved < 0) break;
+            total += moved;
+        }
+        AppLog.Write($"Ícones da área de trabalho: {total} reposicionados");
+    });
 
     /// <summary>
     /// Going back to the PC closes Big Picture and Steam's client window to the tray; the process remains running.

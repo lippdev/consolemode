@@ -78,6 +78,9 @@ public sealed class AppConfig
     /// </summary>
     public bool CloseSteamOnRestore { get; set; } = true;
 
+    /// <summary>Put the desktop icons back where they were after the session (issue #30).</summary>
+    public bool RestoreDesktopIcons { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 
@@ -391,6 +394,8 @@ public sealed class ConsoleRuntimeState
     public bool HdrTurnedOffByUser { get; set; }
     public DateTime? SessionStartedAt { get; set; }
     public string? BackupAudioId { get; set; }
+    /// <summary>The desktop icons read before the session; null when they aren't restored.</summary>
+    public List<DesktopIcon>? DesktopIcons { get; set; }
     /// <summary>Per-game profiles for this session; the session menu updates them as they are saved.</summary>
     public List<GameProfile> GameProfiles { get; set; } = [];
     /// <summary>The Steam game running now (0 = none), and the screen as it was when it started.</summary>

@@ -33,6 +33,10 @@ Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar*
 
 Ao voltar do Big Picture, **Mandar a Steam para a bandeja ao voltar ao PC** fecha a janela do cliente e mantém a Steam em execução. Com a opção desligada, o cliente desktop fica aberto. As janelas da Steam são preservadas quando há jogo rodando ou não é possível verificar esse estado.
 
+Trocar a tela principal pode fazer o Windows embaralhar os ícones da área de trabalho. **Devolver os ícones da área de trabalho ao lugar** (ligado por padrão) salva a posição deles antes da sessão e os coloca de volta depois que a mesa é restaurada. Não faz nada quando **Organizar ícones automaticamente** está ligado na área de trabalho, porque aí o próprio Windows os arruma.
+
+**Acordar o PC pelo controle** deixa o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo acordarem o PC da suspensão pelo botão central do controle. **Ativar** pede permissão de administrador ao Windows e marca *Permitir que este dispositivo ative o computador* nesses dispositivos. Não acorda o PC desligado ou em hibernação, e alguns PCs cortam a energia do Bluetooth ao suspender. Junto com **Entrar ao conectar um controle**, o PC já acorda no modo console.
+
 **Perfis por jogo** dão a cada jogo da Steam sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais para…**: o que a tela de jogo usa naquele momento fica salvo. Da próxima vez que esse jogo abrir durante uma sessão, o Console Mode aplica o perfil e, quando o jogo fecha, a tela volta a ser como era. O jogo é detectado pela Steam, seja ele aberto pelo Big Picture, pelo Playnite ou pelo app Xbox. Os perfis salvos ficam em Ajustes → **Perfis por jogo**, onde dá para apagá-los (na interface Console: Sistema → Ao entrar no modo console).
 
 ## API de controle local
