@@ -48,7 +48,14 @@ public partial class MainViewModel
     private async Task LoadJoyChromiumLogoAsync()
     {
         var exe = JoyChromiumService.FindExe();
-        if (exe is null || string.Equals(exe, _joyChromiumLogoExe, StringComparison.OrdinalIgnoreCase)) return;
+        if (exe is null)
+        {
+            // Uninstalled since: back to the globe.
+            _joyChromiumLogoExe = null;
+            JoyChromiumLogo = null;
+            return;
+        }
+        if (string.Equals(exe, _joyChromiumLogoExe, StringComparison.OrdinalIgnoreCase)) return;
         _joyChromiumLogoExe = exe;
         var bitmap = await Task.Run(() => WindowIcons.ForApp(exe, null, 128));
         if (bitmap is null || !string.Equals(exe, _joyChromiumLogoExe, StringComparison.OrdinalIgnoreCase)) return;
