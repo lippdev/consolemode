@@ -135,6 +135,8 @@
   "CloseSteamDescription": "When you leave Big Picture, Steam receives a normal window-close request so it can move to the tray without exiting the process. If a game is running or its state cannot be checked, the window is left unchanged.",
   "RestoreIconsCard": "Put desktop icons back in place",
   "RestoreIconsDescription": "Saves where the desktop icons are before the session and puts them back when you return to the PC, in case Windows reshuffles them while the main display changes. Does nothing when auto arrange is on.",
+  "ParkPointerCard": "Move the mouse pointer out of the way",
+  "ParkPointerDescription": "When the launcher shows up on the TV, moves the pointer to the bottom-right corner of the game screen so it doesn't sit in the middle of the picture. Going back to the PC puts it back where it was.",
   "GameProfilesCard": "Per-game profiles",
   "GameProfilesDescription": "Each Steam game's own resolution, HDR, FPS limit and audio output. To create one, open the session menu while the game runs and pick Game profile → Save the current settings. The profile applies when the game starts and is undone when it closes.",
   "GameProfilesEmpty": "No saved profiles",

@@ -82,6 +82,12 @@ public sealed partial class ConsoleEngine
         State.DesktopIcons = config.RestoreDesktopIcons ? DesktopIcons.Read() : null;
         if (State.DesktopIcons is not null) AppLog.Write($"Ícones da área de trabalho: {State.DesktopIcons.Count} posições salvas");
 
+        // Also before the screens change: where the pointer goes back to (issue #172).
+        State.ParkPointer = config.ParkPointer;
+        State.PointerParks = 0;
+        State.LastPointerPark = null;
+        State.PointerBefore = config.ParkPointer ? MousePointer.Position() : null;
+
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
         // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
         State.Tv = config.Tv;
@@ -244,6 +250,7 @@ public sealed partial class ConsoleEngine
         {
             TickAudio();
             TickGameProfile();
+            TickPointer();
             return "running";
         }
 
@@ -252,6 +259,7 @@ public sealed partial class ConsoleEngine
             if (IsCustomAppExit()) return "exit";
             TickAudio();
             TickGameProfile();
+            TickPointer();
             return "running";
         }
 
@@ -309,6 +317,7 @@ public sealed partial class ConsoleEngine
 
         TickAudio();
         TickGameProfile();
+        TickPointer();
         return "running";
     }
 
@@ -349,6 +358,7 @@ public sealed partial class ConsoleEngine
             }
             Audio.Restore(State.BackupAudioId);
             if (State.DesktopIcons is { Count: > 0 } icons) RestoreDesktopIconsLater(icons);
+            ReturnPointer();
             Rtss.Restore(State);
             Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
@@ -397,6 +407,10 @@ public sealed partial class ConsoleEngine
             State.HdrMonitor = null;
             State.VrrApplied = false;
             State.DesktopIcons = null;
+            State.ParkPointer = false;
+            State.PointerParks = 0;
+            State.LastPointerPark = null;
+            State.PointerBefore = null;
             // The restore above already put the screen, HDR, FPS and audio back as before the session.
             ResetGameProfileState();
             OnUi(NativeWindows.StopBigPictureExitWatch);
@@ -407,6 +421,38 @@ public sealed partial class ConsoleEngine
     /// Explorer rearranges the icons a moment after the screens come back, sometimes more than once,
     /// so they are put back in the background a few times instead of holding up the restore.
     /// </summary>
+    /// <summary>
+    /// "Park the pointer" (issue #172): once the launcher is up, moves the mouse pointer to the bottom-right corner of
+    /// the game screen, twice (Steam and others recenter it while their window opens). Xbox mode has no window to
+    /// watch, so it goes by the time since the launch. Based on @JarJarShinks' version in #173.
+    /// </summary>
+    private void TickPointer()
+    {
+        var now = DateTime.Now;
+        var ready = State.FullscreenMode == "xboxMode"
+            ? State.LaunchTime is { } launched && now - launched >= PointerParking.XboxDelay
+            : State.HasAppeared;
+        if (!PointerParking.IsDue(State.ParkPointer, State.PointerParks, ready, State.LastPointerPark, now)) return;
+
+        var rect = State.FocusMonitorRect
+                   ?? (State.FocusMonitor is { Length: > 0 } name ? Monitors.GetMonitorRect(name, State) : null);
+        if (rect is null) return;
+
+        var (x, y) = PointerParking.BottomRight(rect);
+        if (MousePointer.MoveTo(x, y)) AppLog.Write($"Ponteiro: estacionado em {x},{y}");
+        else AppLog.Write($"Ponteiro: não foi possível mover para {x},{y}");
+        State.PointerParks++;
+        State.LastPointerPark = now;
+    }
+
+    /// <summary>Going back to the PC: the pointer returns to where it was before the session, once the desk is back.</summary>
+    private void ReturnPointer()
+    {
+        if (State.PointerBefore is not { } before) return;
+        if (!PointerParking.ShouldReturn(before, State.PointerParks, MousePointer.IsOnScreen(before.X, before.Y))) return;
+        if (MousePointer.MoveTo(before.X, before.Y)) AppLog.Write($"Ponteiro: de volta a {before.X},{before.Y}");
+    }
+
     private static void RestoreDesktopIconsLater(List<DesktopIcon> saved) => Task.Run(async () =>
     {
         var total = 0;

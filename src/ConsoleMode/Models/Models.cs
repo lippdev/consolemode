@@ -81,6 +81,9 @@ public sealed class AppConfig
     /// <summary>Put the desktop icons back where they were after the session (issue #30).</summary>
     public bool RestoreDesktopIcons { get; set; } = true;
 
+    /// <summary>Move the mouse pointer to a corner of the game screen once the launcher is up, and back afterwards (issue #172).</summary>
+    public bool ParkPointer { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 
@@ -396,6 +399,11 @@ public sealed class ConsoleRuntimeState
     public string? BackupAudioId { get; set; }
     /// <summary>The desktop icons read before the session; null when they aren't restored.</summary>
     public List<DesktopIcon>? DesktopIcons { get; set; }
+    /// <summary>Park the pointer this session; how many times it was parked, when, and where it was before.</summary>
+    public bool ParkPointer { get; set; }
+    public int PointerParks { get; set; }
+    public DateTime? LastPointerPark { get; set; }
+    public (int X, int Y)? PointerBefore { get; set; }
     /// <summary>Per-game profiles for this session; the session menu updates them as they are saved.</summary>
     public List<GameProfile> GameProfiles { get; set; } = [];
     /// <summary>The Steam game running now (0 = none), and the screen as it was when it started.</summary>

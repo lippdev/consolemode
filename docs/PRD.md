@@ -314,7 +314,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 | | Itens | Por quê |
 |---|---|---|
 | **Must** | DESK-001 (#167), INPUT-013 (#168), LAUNCH-007 (#169), PROF-001 (#170), LAUNCH-011 (#175), REL-020 | já estão em PR com CI verde; fecham a versão |
-| **Should** | INPUT-014 (ponteiro, #172), DOC-010 (este PRD), DOC-011 (#171) | pedido de usuário com resposta prometida; documentação |
+| **Should** | INPUT-014 (ponteiro, #172, #177), DOC-010 (este PRD), DOC-011 (#171) | pedido de usuário com resposta prometida; documentação |
 | **Could** | CORE-012 (restauração durável), LAUNCH-012 (scripts de início e fim) | ajudam a recuperação; dependem da divisão do #173 |
 | **Won't (agora)** | CORE-013 (taxa NTSC), tudo de P2 e P3 | precisa de hardware para validar e de PR separado |
 
@@ -376,7 +376,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **INPUT-011 —** Esconder o ponteiro e mouse pelo controle no menu da sessão (D-12). (#145, 1.6.1)
 - [x] **INPUT-012 —** Bateria do controle no menu e na interface Console, com avisos em 15 % e 5 %. (#160, 1.7.0-alpha.1)
 - [ ] **INPUT-013 (P0) —** Acordar o PC pelo controle (adaptador Xbox, Bluetooth, cabo). (#168; ajuste na Fase 1.7)
-- [ ] **INPUT-014 (P1) —** Estacionar o ponteiro no canto da tela de jogo quando o launcher aparece, ligado por padrão, devolvendo a posição ao voltar (D-21). Issue #172; base no #173.
+- [x] **INPUT-014 —** Estacionar o ponteiro no canto da tela de jogo quando o launcher aparece, ligado por padrão, devolvendo a posição ao voltar (D-21). Issue #172; base de @JarJarShinks no #173. (#177, 1.7.0)
 - [ ] **INPUT-015 (P3) —** Atalhos por voz e assistente (Alexa, MCP). Issue #12.
 
 ### Épico UI — Interface Console e Desktop

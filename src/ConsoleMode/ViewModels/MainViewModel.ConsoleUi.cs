@@ -266,6 +266,7 @@ public partial class MainViewModel
             case "betas": BetaUpdates = !BetaUpdates; break;
             case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;
             case "desktopicons": RestoreDesktopIcons = !RestoreDesktopIcons; break;
+            case "parkpointer": ParkPointer = !ParkPointer; break;
             case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
         }
     }

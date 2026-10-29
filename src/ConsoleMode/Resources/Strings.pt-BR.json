@@ -135,6 +135,8 @@
   "CloseSteamDescription": "Ao sair do Big Picture, envia o fechamento normal da janela da Steam para ela ir à bandeja, sem encerrar o processo. Se houver um jogo em execução ou não for possível verificar, a janela não é alterada.",
   "RestoreIconsCard": "Devolver os ícones da área de trabalho ao lugar",
   "RestoreIconsDescription": "Salva a posição dos ícones antes da sessão e os coloca de volta ao voltar ao PC, caso o Windows os embaralhe ao trocar a tela principal. Não faz nada quando a organização automática dos ícones está ligada.",
+  "ParkPointerCard": "Tirar o ponteiro do mouse do caminho",
+  "ParkPointerDescription": "Quando o iniciador aparece na TV, leva o ponteiro para o canto inferior direito da tela de jogo, para ele não ficar no meio da imagem. Ao voltar ao PC, o ponteiro volta para onde estava.",
   "GameProfilesCard": "Perfis por jogo",
   "GameProfilesDescription": "Resolução, HDR, limite de FPS e saída de áudio próprios de cada jogo da Steam. Para criar, abra o menu da sessão com o jogo rodando e escolha Perfil do jogo → Salvar os ajustes atuais. O perfil vale quando o jogo abre e é desfeito quando ele fecha.",
   "GameProfilesEmpty": "Nenhum perfil salvo",
