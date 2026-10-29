@@ -1,8 +1,8 @@
 # Console Mode — PRD e backlog
 
-**Versão:** 0.2 (reescrita no formato do PRD do Tako, com o inventário de tudo o que já foi entregue)  
-**Data:** 29/10/2026 (v0.1 de 29/10/2026)  
-**Status:** em vigor. Primeiro PRD do projeto: até a 1.7.0-alpha.2 o escopo vivia no roadmap do README, nas issues e nos changelogs. A v0.2 registra as decisões que já valiam na prática (§2), a fronteira com o Tako (§3), tudo o que foi entregue desde 07/07/2026 (§9, itens `[x]`) e o que vem depois da 1.7.0.  
+**Versão:** 0.3 (inventário completo, inclusive o que ficou pelo caminho)  
+**Data:** 29/10/2026 (v0.2 e v0.1 do mesmo dia)  
+**Status:** em vigor. Primeiro PRD do projeto: até a 1.7.0-alpha.2 o escopo vivia no roadmap do README, nas issues e nos changelogs. A v0.2 registra as decisões que já valiam na prática (§2), a fronteira com o Tako (§3), tudo o que foi entregue desde 07/07/2026 (§9, itens `[x]`) e o que vem depois da 1.7.0. A v0.3 acrescenta o que foi descartado ou revertido (§2.3) e os bugs conhecidos sem correção (épico BUG).  
 **Plataformas:** Windows 10 (19041 ou mais novo) e Windows 11, x64. Linux e macOS só no backlog (PLAT, D-18).  
 **Licença:** AGPL-3.0-only ([LICENSE](../LICENSE))
 
@@ -118,6 +118,33 @@ Na `main` e nas alphas: tudo da tabela acima até a alpha.2. Abertos com CI verd
 área de trabalho), #168 (acordar o PC pelo controle), #169 (logos oficiais), #170 (perfis por jogo), #171
 (protótipo HTML), #174 (este PRD). Em discussão: #173, de um colaborador, que pedimos para dividir em três PRs
 (ponteiro, scripts de início e fim, taxa NTSC). Ordem para fechar a 1.7.0 na §9, "Fase 1.7".
+
+### 2.3 O que ficou pelo caminho
+
+Ideias, PRs e comportamentos que entraram e saíram, ou nunca entraram. Ficam aqui para não serem refeitos sem
+saber por quê, e para que o código guardado possa ser reaproveitado. "Onde está" aponta para o que o git ou o
+GitHub ainda guardam.
+
+| Item | O que era | O que aconteceu | Onde está |
+|---|---|---|---|
+| App em PowerShell / WinForms | Protótipo de julho, chamando ferramentas externas | Substituído pelo app WinUI 3 na 1.3.0 (D-01) | Branch `legacy`; #8, #9 |
+| MultiMonitorTool e SoundVolumeView (NirSoft) | Troca de telas e áudio até a 1.5.x | Trocados por código próprio na 1.6.0, sem opção de voltar (D-02). Motivo: abrir caminho para assinar o executável e reduzir falsos positivos | #91, #97 a #101, #119 |
+| Notas de release só em português | Changelog da release em pt-BR | Viraram notas só em inglês com links de PR (#50); o destaque da atualização voltou a sair no idioma do app na 1.7.0 (#158) | #4, #50, #158; branch local `docs/pt-br-release-notes` |
+| README só em inglês | Um README em inglês | Virou par en / pt-BR e depois seis idiomas | #55, #157 |
+| Controle da TV do colaborador (@nextestudios) | Android TV por ADB e Wake-on-LAN | Mesclado em 30/09 e **revertido** no mesmo dia; o motivo não ficou registrado no PR. A função voltou com implementação nossa | #93, revert #125, refeito em #126 |
+| `stop` fecha o launcher (@nextestudios) | `consolemode://stop` e Start + Select fechavam Big Picture e Playnite | Revertido junto do #93; o comportamento voltou pelo #121 | #45, #125, #121 |
+| **TV LG webOS** (@nextestudios) | Wake-on-LAN + SSAP por WebSocket, chave guardada com DPAPI | Fechado sem merge em 06/10, depois que o #93 (base dele) foi revertido. Código completo e revisado no PR | #94 → base para o TV-002 |
+| **Home Assistant** (@nextestudios) | Rodar um script, cena ou `media_player` por REST para ligar a TV | Fechado sem merge em 06/10, mesmo motivo | #95 → TV-005 |
+| **HDMI-CEC por USB** (@nextestudios) | Adaptador Pulse-Eight pelo `cec-client` da libCEC, opcional e não embutido | Fechado sem merge em 06/10, mesmo motivo | #96 → base para o TV-004 |
+| Fechar a Steam inteira ao voltar | `steam.exe -shutdown` ao voltar ao PC | Trocado por mandar só a janela para a bandeja, com a Steam rodando (D-11) | #121 → #131, #140 |
+| Esconder o ponteiro sozinho | Ponteiro some depois de 3 s parado, ligado por padrão | O mantenedor decidiu que nunca é automático: só pela linha do menu (D-12) | #145 |
+| Linha "Gravar" no menu da sessão | Linha provisória sem função | Removida; a ideia segue no MENU-008 (#77) | #147 |
+| Tiles que crescem e brilham | Lançadores da Início crescendo e acendendo no lugar do anel de foco | Revertido para contorno, selo ✓ e barra | commit `5b61315`, revert `79e66a3` |
+| Sons e arte do Xbox | Usar os sons e a arte da Microsoft na interface Console | Descartado: repositório público com AGPL. Sons gerados pelo próprio app; layout só inspirado no Xbox | Decisão de 30/09 (#117) |
+| Contribuições substituídas | Navegação por controle (#17), `--stop` (#23), API por pipe (#24), interface Console (#31) | Portadas ou refeitas em PRs nossos, com crédito no changelog | #47, #51, #32 |
+| Três ideias da 1.6.1 | O mantenedor planejou quatro funções; só o cartão de FPS foi especificado antes de lançar | As outras três não chegaram a ser escritas | _Pergunta ao mantenedor_ |
+| Controle Switch Pro por HID genérico | Suporte "de graça" pelo HID | Manda leituras impossíveis e passou a ser ignorado (#115). Sem suporte hoje | INPUT-016 |
+| Branches paradas | `fix/steam-tray-and-focus-on-restore` (03/10, coberta pelo #131), `test/1.6.1-preview`, `pr23`, `pr24`, worktrees antigas | Sobras locais, sem nada que não esteja na `main` (conferir antes de apagar) | Repositório local |
 
 ---
 
@@ -322,7 +349,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **LAUNCH-001 —** Steam Big Picture, com volta automática ao fechar. (#3, #20, 1.3.0 e 1.5.0)
 - [x] **LAUNCH-002 —** Playnite em tela cheia, com pasta manual para a versão portátil e início lento tolerado. (#36, #83, 1.5.0 e 1.6.0)
 - [x] **LAUNCH-003 —** Modo Xbox (experimental, volta manual). (1.3.0)
-- [x] **LAUNCH-004 —** `stop` e Start + Select fecham o Big Picture e o Playnite antes de restaurar. (#45, 1.6.0)
+- [x] **LAUNCH-004 —** `stop` e Start + Select fecham o Big Picture e o Playnite antes de restaurar. (#121, 1.6.0; a primeira versão, #45, foi revertida no #125, §2.3)
 - [x] **LAUNCH-005 —** Steam: fechar o Big Picture e mandar a Steam para a bandeja, só nas janelas da Steam e nunca com jogo aberto. (#121, #131, #140, 1.6.0)
 - [x] **LAUNCH-006 —** Aplicativo personalizado: qualquer `.exe` com argumentos e processo a vigiar. (#161, 1.7.0-alpha.1; issue #111)
 - [ ] **LAUNCH-007 (P0) —** Logos oficiais dos lançadores nos tiles da Início, lidos dos apps instalados. (#169)
@@ -391,10 +418,11 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 ### Épico TV — Controle da TV
 
-- [x] **TV-001 —** Google TV / Android TV pela rede (ADB): ligar, trocar a entrada HDMI, standby ao voltar. (#93, #125, #126, 1.6.0)
-- [ ] **TV-002 (P2) —** LG webOS (porte do código C# do Tako, §3).
-- [ ] **TV-003 (P2) —** Samsung Tizen (idem).
-- [ ] **TV-004 (P3) —** HDMI-CEC com adaptador USB, para TVs sem rede. Issue #75.
+- [x] **TV-001 —** Google TV / Android TV pela rede (ADB): ligar, trocar a entrada HDMI, standby ao voltar. (#126, 1.6.0; a primeira versão, #93, foi revertida no #125, §2.3)
+- [ ] **TV-002 (P2) —** LG webOS. Partir do #94 (fechado, já revisado) e do código C# antigo do Tako (§3).
+- [ ] **TV-003 (P2) —** Samsung Tizen, a partir do código C# antigo do Tako.
+- [ ] **TV-004 (P3) —** HDMI-CEC com adaptador USB, para TVs sem rede. Issue #75; partir do #96.
+- [ ] **TV-005 (P3) —** Home Assistant: ligar a TV por um script, cena ou `media_player`. Partir do #95.
 
 ### Épico DESK — Mesa
 
@@ -477,6 +505,13 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [ ] **PLAT-001 —** Separar o núcleo (sessão, perfis, API, protocolo) numa biblioteca sem WinUI, testável.
 - [ ] **PLAT-002 —** Linux (KDE Wayland, gamescope): telas pelo compositor, áudio pelo PipeWire. Issue #74.
 - [ ] **PLAT-003 —** macOS. Issue #74.
+
+### Épico BUG — Problemas conhecidos sem correção
+
+- [ ] **BUG-001 (P1) — Menu "fica subindo".** Relato de usuário (feedback do #150): no menu, o Cima se repete sozinho. Diagnóstico de 17/10: o `ControllerInput` junta todas as fontes com OU, e um eixo HID que não é de gamepad parado em 0 (ou um relatório Sony mal lido) vira um Cima permanente com repetição. Falta o modelo do controle e a saída do "Testar controle".
+- [ ] **BUG-002 (P1) — Áudio "Ao conectar" não pega a TV já ativa.** Issue #149: a troca automática só reage a saídas que ficam ativas depois do início da sessão (linha de base em `ConsoleEngine.InitializeAudioWatch`), então uma saída da TV já ativa nunca é escolhida. Correção provável: escolhê-la também quando já está ativa no início. Falta o `consolemode.log` do usuário.
+- [ ] **BUG-003 (P2) —** Na aba Sessão da interface Console, os tiles de ajuste rápido cortam legendas longas ("Resolução e taxa de atualização", "VRR") com reticências em es, fr e ru (visto na 1.6.2; conferir na interface da 1.7). É limite de layout, não de tradução.
+- [ ] **INPUT-016 (P3) —** Controle Switch Pro: hoje é ignorado por mandar leituras impossíveis pelo HID genérico (#115). Suporte exige ler o protocolo dele.
 
 ### Épico DATA (P3)
 
