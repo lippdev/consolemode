@@ -366,6 +366,7 @@
   "TourMapGeneric": "Estas son tus pantallas en su posición del escritorio. Selecciona la pantalla en la que quieres jugar.",
   "TourMapWithFocus": "Estas son tus pantallas en su posición del escritorio. Elegimos {0} porque ahora está apagada; selecciona otra si lo prefieres.",
   "RestoreSuccess": "Tus pantallas han vuelto a la normalidad.",
+  "SessionRecovered": "La última sesión no terminó bien (la aplicación se cerró o el PC se apagó a mitad). Se restauraron tus pantallas, el audio, los iconos y el puntero.",
   "RestoreFailure": "No se pudieron restaurar las pantallas: {0}",
   "ConfigSaveFailure": "No se pudieron guardar los ajustes: {0}",
   "SummaryChooseScreen": "Elige la pantalla en la que quieres jugar",

@@ -366,6 +366,7 @@
   "TourMapGeneric": "Aqui estão as suas telas, na posição em que estão na mesa. Clique na tela onde você quer jogar.",
   "TourMapWithFocus": "Aqui estão as suas telas, na posição em que estão na mesa. Escolhemos {0} para jogar porque ela está desligada agora; clique em outra se preferir.",
   "RestoreSuccess": "Suas telas voltaram ao normal.",
+  "SessionRecovered": "A última sessão não terminou direito (o app fechou ou o PC desligou no meio). Suas telas, o áudio, os ícones e o ponteiro foram restaurados.",
   "RestoreFailure": "Falha ao restaurar: {0}",
   "ConfigSaveFailure": "Não foi possível salvar a configuração: {0}",
   "SummaryChooseScreen": "Escolha a tela onde você quer jogar",

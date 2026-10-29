@@ -130,7 +130,12 @@ public partial class MainViewModel : ObservableObject
         BuildLocalizedOptions();
 
         var firstRun = !ConfigService.Exists;
+        // A session that never got to its restore (the app died, the PC lost power): undo it before anything else.
+        var recovered = false;
+        try { recovered = await Task.Run(Engine.RecoverInterruptedSession); }
+        catch (Exception ex) { AppLog.Write($"Recuperação: {ex.Message}"); }
         await ReloadAsync();
+        if (recovered) SetStatus(LocalizationService.Get("SessionRecovered"), InfoBarSeverity.Warning);
         // Save the detected defaults so the tray/shortcut work right away.
         if (firstRun && HasMonitors) TrySave(BuildConfig());
         InitializeAppSettings();

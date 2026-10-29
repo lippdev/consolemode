@@ -115,6 +115,24 @@ public sealed partial class ConsoleEngine
         if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
             File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
 
+        // From here on the desk changes: if the app dies before the restore, the next start undoes it from this file.
+        try
+        {
+            SessionJournal.Write(AppPaths.SessionJournalFile, new SessionJournal
+            {
+                StartedAt = DateTime.Now,
+                FullscreenMode = config.FullscreenMode,
+                BackupAudioId = State.BackupAudioId,
+                DesktopIcons = State.DesktopIcons,
+                PointerX = State.PointerBefore?.X,
+                PointerY = State.PointerBefore?.Y
+            });
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Diário da sessão: não foi possível gravar: {ex.Message}");
+        }
+
         if (focusInfo is null || !focusInfo.IsActive)
         {
             Monitors.EnableMonitors([config.FocusMonitor], windowsEnable: true);
@@ -365,6 +383,9 @@ public sealed partial class ConsoleEngine
             Audio.ClearCache();
             if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
+            // Only once the restore went through: a restore that threw is tried again on the next start.
+            try { SessionJournal.Delete(AppPaths.SessionJournalFile); }
+            catch (Exception ex) { AppLog.Write($"Diário da sessão: não foi possível apagar: {ex.Message}"); }
         }
         catch (Exception ex)
         {
@@ -504,6 +525,43 @@ public sealed partial class ConsoleEngine
         {
             AppLog.Write($"JoyChromium: sair da tela cheia: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// At startup: the journal of a session that never got to its restore (the app died or the PC lost power) is
+    /// still on disk. The session is rebuilt from it and from the backup files, and restored like a normal one.
+    /// Returns whether there was one.
+    /// </summary>
+    public bool RecoverInterruptedSession()
+    {
+        if (State.IsActive || State.RestoreInProgress) return false;
+        var journal = SessionJournal.Read(AppPaths.SessionJournalFile);
+        if (journal is null)
+        {
+            // A file that can't be read can't be used either: drop it so it doesn't come back every start.
+            try { SessionJournal.Delete(AppPaths.SessionJournalFile); } catch { /* not there */ }
+            return false;
+        }
+
+        AppLog.Write($"Recuperação: a sessão de {journal.StartedAt:dd/MM HH:mm} não terminou; restaurando a mesa");
+        var meta = Monitors.GetRestoreContext(State);
+        State.FullscreenMode = journal.FullscreenMode;
+        State.FocusMonitor = meta.FocusMonitor ?? "";
+        State.HideMonitors = [.. meta.HideMonitors];
+        State.HideStrategy = meta.HideStrategy;
+        State.OriginalPrimary = meta.OriginalPrimary;
+        State.FocusWasInactive = meta.FocusWasInactive;
+        State.BackupAudioId = journal.BackupAudioId
+                              ?? (File.Exists(AppPaths.BackupAudioFile) ? File.ReadAllText(AppPaths.BackupAudioFile).Trim() : null);
+        State.DesktopIcons = journal.DesktopIcons;
+        State.PointerBefore = journal.PointerBefore;
+        // It was parked before the crash, or may have been: put it back if its old spot is on a screen again.
+        State.PointerParks = journal.PointerBefore is null ? 0 : 1;
+        // Steam is left as it is; only Big Picture (if still open) is closed with the screens coming back.
+        State.CloseSteamOnRestore = false;
+        State.IsActive = true;
+        Stop();
+        return true;
     }
 
     public void RequestExit() => State.ShouldExit = true;
