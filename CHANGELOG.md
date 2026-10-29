@@ -13,6 +13,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ### Correções
 - Aplicativo personalizado: o Console Mode leva para a tela de jogo só a maior janela do programa, em vez de todas as que o Windows aponta como principal; uma dica de ferramenta não é mais esticada sobre a TV. (#175)
+- Se o app fechar ou o PC desligar no meio de uma sessão, a próxima abertura do Console Mode restaura tudo o que a sessão mudou (telas, áudio, RTSS, ícones da área de trabalho e ponteiro) e avisa. Antes, as telas ficavam como a sessão deixou até você arrumar à mão. (#178)
 
 ## [1.7.0-alpha.2]
 ### Novidades

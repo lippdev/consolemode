@@ -55,6 +55,8 @@ public static class AppPaths
     public static string BackupMonitorConfig { get; private set; } = "";
     public static string BackupMonitorMeta { get; private set; } = "";
     public static string BackupAudioFile { get; private set; } = "";
+    /// <summary>What the running console session changed; left behind only when it never got to its restore.</summary>
+    public static string SessionJournalFile { get; private set; } = "";
     public static string BackupRtssFpsFile { get; private set; } = "";
     public static string MonitorModesCacheFile { get; private set; } = "";
     public static string IconPath { get; private set; } = "";
@@ -104,6 +106,7 @@ public static class AppPaths
         BackupMonitorConfig = Path.Combine(DataDir, "backup_monitores.cfg");
         BackupMonitorMeta = Path.Combine(DataDir, "backup_monitores_meta.json");
         BackupAudioFile = Path.Combine(DataDir, "backup_audio.txt");
+        SessionJournalFile = Path.Combine(DataDir, "session.json");
         BackupRtssFpsFile = Path.Combine(DataDir, "backup_rtss_fps.json");
         MonitorModesCacheFile = Path.Combine(DataDir, "monitor_modes_cache.json");
 

@@ -14,6 +14,8 @@ Les détails qui ne tiennent pas dans le [README](../README.fr-FR.md).
 | **Application personnalisée** | Restauration automatique quand l'application (ou le processus choisi à surveiller) se ferme |
 | **JoyChromium** | Restauration automatique à la fermeture de JoyChromium ; si vous revenez au PC avant, il reste ouvert en fenêtre |
 
+Si l'application se ferme ou si le PC s'éteint en pleine session, Console Mode restaure à sa prochaine ouverture (aussi à l'ouverture de session Windows, s'il démarre avec Windows) tout ce que la session a changé : écrans, son, RTSS, icônes du bureau et pointeur, et vous le signale.
+
 Vous pouvez aussi restaurer à tout moment depuis la zone de notification (*Restaurer la configuration* / *Afficher la fenêtre*). Avec les écrans noirs, **Échap** retire les rideaux.
 
 Le menu de session propose deux sorties. **Retour au PC** termine la session et remet les écrans, la résolution, le HDR, le son et la limite de FPS comme avant ; l'application reste dans la zone de notification. **Quitter Console Mode** fait la même chose puis ferme l'application : les raccourcis manette ne fonctionnent plus jusqu'à ce que vous la rouvriez. À la première ouverture, le menu propose une visite qui explique chaque option ; pour la revoir plus tard, appuyez sur **Y** (△ sur PlayStation) ou **F1** dans le menu, ou utilisez **Paramètres → Visite du menu de session**.

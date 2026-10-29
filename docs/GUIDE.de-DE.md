@@ -14,6 +14,8 @@ Details, die nicht ins [README](../README.de-DE.md) passen.
 | **Eigene App** | Automatische Wiederherstellung, wenn die App (oder der gewählte überwachte Prozess) geschlossen wird |
 | **JoyChromium** | Automatische Wiederherstellung, wenn du JoyChromium schließt; gehst du vorher zum PC zurück, bleibt es als Fenster offen |
 
+Wird die App mitten in einer Sitzung geschlossen oder geht der PC aus, stellt Console Mode beim nächsten Öffnen (auch bei der Windows-Anmeldung, wenn es mit Windows startet) alles wieder her, was die Sitzung geändert hat: Bildschirme, Ton, RTSS, Desktopsymbole und Zeiger, und sagt Bescheid.
+
 Du kannst auch jederzeit über den Infobereich wiederherstellen (*Konfiguration wiederherstellen* / *Fenster anzeigen*). Bei schwarzen Bildschirmen blendest du die Abdeckungen mit **ESC** aus.
 
 Das Sitzungsmenü bietet zwei Wege hinaus. **Zurück zum PC** beendet die Sitzung und setzt Bildschirme, Auflösung, HDR, Ton und die FPS-Begrenzung auf den vorherigen Stand zurück; die App bleibt im Infobereich. **Console Mode beenden** macht dasselbe und schließt danach die App, sodass die Controller-Tastenkombinationen nicht mehr reagieren, bis du sie wieder öffnest. Beim ersten Öffnen bietet das Menü eine Führung an, die jede Option erklärt. Um sie später anzusehen, drücke im Menü **Y** (△ bei PlayStation) oder **F1**, oder verwende **Einstellungen → Führung durch das Sitzungsmenü**.

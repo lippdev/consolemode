@@ -13,6 +13,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ### Fixes
 - Custom app: Console Mode moves only the program's largest window to the game screen, instead of every window Windows reports as its main one; a tooltip is no longer stretched over the TV. (#175)
+- If the app closes or the PC shuts down in the middle of a session, the next time Console Mode opens it restores everything the session changed (displays, audio, RTSS, desktop icons and pointer) and says so. Before, the displays stayed as the session left them until you fixed them by hand. (#178)
 
 ## [1.7.0-alpha.2]
 ### What's new

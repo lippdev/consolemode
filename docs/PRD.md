@@ -92,7 +92,7 @@ refeita e sem caminho de volta perdido.
 | D-19 | **Lançadores de terceiros** (Hydra e outros): o Console Mode só abre, acompanha e fecha o aplicativo. Não lê nem mexe em catálogo, downloads ou conteúdo dele. | Proposta |
 | D-20 | **Perfis por jogo com o Tako:** quando a sessão vem do Tako, quem aplica resolução e áudio do jogo é o Tako (D-16); os perfis do Console Mode (#170) valem só nas sessões que não vêm dele. | A decidir com o Tako (CMI) |
 | D-21 | **Estacionar o ponteiro** no canto da tela de jogo quando o launcher aparece vem **ligado por padrão** e devolve o ponteiro para onde estava ao voltar. | Decidido (resposta à issue #172; implementação no INPUT-014) |
-| D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido como meta; telas e áudio já cumprem, o resto está no CORE-012 |
+| D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido e implementado no CORE-012 (#178). Antes dele, depois de uma queda nada era restaurado sozinho: os backups ficavam no disco, mas o "Restaurar agora" não os usava sem uma sessão ativa. |
 
 ### 2.1 Como chegamos aqui
 
@@ -340,7 +340,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **CORE-009 —** Restaurar a mesa exata, com a TV desligada primeiro e conferência contra o backup. (#134, 1.6.0)
 - [x] **CORE-010 —** Identidade estável das telas, que sobrevive à renumeração `\\.\DISPLAYn`. (1.6.0)
 - [x] **CORE-011 —** Cache dos modos de cada tela (resolução e taxa) para listar sem ligar a tela. (até a 1.4.0)
-- [ ] **CORE-012 (P1) —** Restauração durável (D-22): gravar em disco ícones, ponteiro e comandos de fim, e desfazer no próximo início após uma queda. Aceite: matar o processo no meio da sessão e reabrir restaura tudo.
+- [x] **CORE-012 —** Restauração durável (D-22): diário da sessão em disco (`session.json`, com áudio, ícones e ponteiro; telas e RTSS pelos próprios backups) e restauração completa na próxima abertura depois de uma queda, com aviso. Testado matando o processo no meio da sessão. Comandos de fim entram quando o LAUNCH-012 existir. (#178, 1.7.0)
 - [ ] **CORE-013 (P2) —** Taxa exata NTSC (119,88 / 59,94 Hz), opcional, aplicada antes da confirmação. Vem do #173, em PR próprio; não tratar 59 Hz reais como 59,94.
 - [ ] **CORE-014 (P2) —** Pré-checagem antes de começar: TV ligada, entrada certa, launcher instalado; aponta o problema em vez de falhar no meio.
 
@@ -528,8 +528,8 @@ bandeja; a TV vira a tela de jogo, o monitor apaga, o áudio vai para a TV e o l
 **CA-02 — Sem imagem, sem susto.** Se uma tela de jogo nova não mostrar imagem, a confirmação reverte sozinha e o usuário
 volta à mesa sem tocar em nada.
 
-**CA-03 — Queda.** Matar o processo no meio da sessão e abrir o app de novo restaura telas e áudio (hoje) e, depois
-do CORE-012, ícones, ponteiro e comandos de fim.
+**CA-03 — Queda.** Matar o processo no meio da sessão e abrir o app de novo restaura telas, áudio,
+RTSS, ícones e ponteiro, e avisa (CORE-012). Comandos de fim entram com o LAUNCH-012.
 
 **CA-04 — Controle.** Com um controle Xbox ou PlayStation, o usuário entra, configura, usa o menu da sessão e volta
 ao PC sem mouse e sem teclado.

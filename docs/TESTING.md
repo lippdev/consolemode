@@ -604,3 +604,9 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Voltar ao PC: o ponteiro volta exatamente para onde estava no monitor da mesa (log: `Ponteiro: de volta a`). Resultado: ______
 - [ ] Desligar a opção (Ajustes ou Sistema → Ao entrar no modo console): o ponteiro não é movido nem ao começar nem ao voltar. Resultado: ______
 - [ ] Com **Esconder o ponteiro do mouse** ligado no menu da sessão, nada muda: o ponteiro some e reaparece no canto quando a opção é desligada. Resultado: ______
+
+## Restauração depois de uma queda (CORE-012, #178)
+
+- [ ] Com a TV como tela de jogo e os monitores da mesa desligados pela sessão, fechar o Console Mode à força no Gerenciador de Tarefas (Finalizar tarefa) no meio da sessão. Abrir o Console Mode de novo: as telas da mesa voltam como estavam, o áudio volta, o ponteiro volta para onde estava e aparece o aviso de que a última sessão não terminou direito. Resultado: ______
+- [ ] O mesmo, desligando o PC no botão (ou tirando da tomada) no meio da sessão e ligando de novo com o Console Mode iniciando com o Windows: a mesa volta ao entrar no Windows. Resultado: ______
+- [ ] Uma sessão normal (voltar ao PC pelo atalho ou pelo menu) não deixa o arquivo `session.json` na pasta de dados, e abrir o app depois não mostra o aviso. Resultado: ______

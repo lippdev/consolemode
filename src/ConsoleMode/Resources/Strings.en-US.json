@@ -366,6 +366,8 @@
   "TourMapGeneric": "These are your displays in their desktop positions. Select the display you want to play on.",
   "TourMapWithFocus": "These are your displays in their desktop positions. We chose {0} because it is currently turned off; select another if you prefer.",
   "RestoreSuccess": "Your displays are back to normal.",
+  "SessionRecovered": "The last session didn't end properly (the app closed or the PC shut down halfway). Your displays, audio, icons and pointer were restored.",
+  "SessionJournalFailed": "Couldn't write the session journal to the data folder ({0}). Without it there would be no way back after a crash, so nothing was changed.",
   "RestoreFailure": "Could not restore displays: {0}",
   "ConfigSaveFailure": "Could not save settings: {0}",
   "SummaryChooseScreen": "Choose the display you want to play on",
