@@ -325,6 +325,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
+            RestoreDesktopIcons = config.RestoreDesktopIcons;
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
             SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
@@ -950,6 +951,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
+            RestoreDesktopIcons = RestoreDesktopIcons,
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,

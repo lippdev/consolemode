@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Desktop icons go back where they were after a session: changing the main display could make Windows reshuffle them. Console Mode saves their positions before touching the screens and puts them back a few seconds after the desk is restored. Toggle it in Settings → **Put desktop icons back in place** (on by default); it does nothing while **Auto arrange icons** is on. (#167)
 
 ## [1.7.0-alpha.2]
 ### What's new

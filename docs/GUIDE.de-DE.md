@@ -27,6 +27,8 @@ Die Registerkarte **System** bietet dieselben Einstellungen wie der Desktopmodus
 
 Bei der Rückkehr aus Big Picture schließt **Steam beim Zurückkehren zum PC in den Infobereich minimieren** das Client-Fenster, während Steam weiterläuft. Ist die Option aus, bleibt der Desktop-Client geöffnet. Steam-Fenster werden nicht angetastet, wenn ein Spiel läuft oder sich sein Zustand nicht prüfen lässt.
 
+Ein Wechsel des Hauptbildschirms kann Windows dazu bringen, die Desktopsymbole neu anzuordnen. **Desktopsymbole wieder an ihren Platz setzen** (standardmäßig an) speichert vor der Sitzung, wo sie liegen, und setzt sie nach der Wiederherstellung wieder dorthin. Ist auf dem Desktop **Symbole automatisch anordnen** aktiv, passiert nichts, weil Windows sie dann selbst anordnet.
+
 ## Lokale Steuerungs-API
 
 `consolemode://`-Links werden abgeschickt, ohne auf eine Antwort zu warten. Werkzeuge, die eine Antwort brauchen, etwa ein Fernsteuerungs-Agent, der als Windows-Dienst läuft, oder ein Stream-Deck-Plugin, das anzeigt, ob der Konsolenmodus aktiv ist, können die Named Pipe `\\.\pipe\ConsoleMode.Control` nutzen, solange die App läuft: Eine JSON-Zeile senden, eine zurückbekommen.

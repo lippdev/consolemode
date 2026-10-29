@@ -27,6 +27,8 @@ Ouvrez l'action de raccourci à configurer, choisissez **Définir** ou **Modifie
 
 Au retour de Big Picture, **Réduire Steam dans la zone de notification au retour au PC** ferme la fenêtre du client tout en laissant Steam en marche. Si l'option est désactivée, le client de bureau reste ouvert. Les fenêtres de Steam ne sont pas touchées quand un jeu est en cours ou quand son état ne peut pas être vérifié.
 
+Changer d'écran principal peut amener Windows à mélanger les icônes du bureau. **Remettre les icônes du bureau à leur place** (activé par défaut) enregistre leur position avant la session et les remet en place une fois le bureau restauré. Sans effet si **Réorganiser automatiquement les icônes** est activé sur le bureau, car Windows les place alors lui-même.
+
 ## API de contrôle local
 
 Les liens `consolemode://` s'envoient sans attendre de réponse. Les outils qui ont besoin d'une réponse (un agent de contrôle à distance qui tourne comme service Windows, un plugin Stream Deck qui indique si le mode console est actif) peuvent utiliser le canal nommé `\\.\pipe\ConsoleMode.Control` tant que l'application tourne : envoyez une ligne JSON, recevez-en une en retour.
