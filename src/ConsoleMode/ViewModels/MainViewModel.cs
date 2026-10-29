@@ -55,8 +55,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _summaryTitle = "";
     [ObservableProperty] private string _activeDescText = "";
     [ObservableProperty] private bool _isPlayniteAvailable = true;
-    /// <summary>JoyChromium is only offered as a launcher when it's installed.</summary>
-    private bool _isJoyChromiumAvailable;
     [ObservableProperty] private string _fpsStatusText = "";
     [ObservableProperty] private string _audioHintText = LocalizationService.Get("AudioHint");
     [ObservableProperty] private ComboOption? _selectedHideStrategy;
@@ -85,7 +83,6 @@ public partial class MainViewModel : ObservableObject
     {
         "playnite" => LocalizationService.Get("LaunchPlayniteDescription"),
         "xboxMode" => LocalizationService.Get("LaunchXboxDescription"),
-        JoyChromium.Mode => LocalizationService.Get("LaunchJoyChromiumDescription"),
         CustomApp.Mode => LocalizationService.Get("LaunchCustomAppDescription"),
         _ => LocalizationService.Get("LaunchSteamDescription")
     };
@@ -125,7 +122,6 @@ public partial class MainViewModel : ObservableObject
         Engine.UiInvoker = RunOnUi;
 
         IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
-        _isJoyChromiumAvailable = Engine.Launch.IsJoyChromiumAvailable();
         IsFpsAvailable = Engine.Rtss.IsReady;
         BuildLocalizedOptions();
 
@@ -192,8 +188,6 @@ public partial class MainViewModel : ObservableObject
             if (IsPlayniteAvailable)
                 LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchPlaynite"), Value = "playnite" });
             LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
-            if (_isJoyChromiumAvailable)
-                LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchJoyChromium"), Value = JoyChromium.Mode });
             LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchCustomApp"), Value = CustomApp.Mode });
             SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == launchValue) ?? LaunchOptions[0];
             RebuildLaunchTiles();
@@ -324,7 +318,6 @@ public partial class MainViewModel : ObservableObject
             CustomAppArguments = config.CustomAppArguments ?? "";
             CustomAppWatchProcess = config.CustomAppWatchProcess ?? "";
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
-            _isJoyChromiumAvailable = Engine.Launch.IsJoyChromiumAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
             ApplyTv(config.Tv);
@@ -1064,7 +1057,6 @@ public partial class MainViewModel : ObservableObject
     {
         "playnite" => LocalizationService.Get("ActivePlaynite"),
         "xboxMode" => LocalizationService.Get("ActiveXbox"),
-        JoyChromium.Mode => LocalizationService.Get("ActiveJoyChromium"),
         CustomApp.Mode => LocalizationService.Get("ActiveCustomApp", LaunchService.GetCustomAppName(config.CustomAppPath)),
         _ => LocalizationService.Get("ActiveSteam")
     };

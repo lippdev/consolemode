@@ -96,6 +96,7 @@ public partial class MainViewModel
         // A failed install is offered again each time the menu opens (the connection may be back).
         if (!ControlFsInstalling) ControlFsInstallFailed = false;
         ControlFsJustInstalled = false;
+        RefreshJoyChromiumRow();
         RefreshSessionHeader();
         StartSessionClock();
         _ = RefreshBatteryAsync();

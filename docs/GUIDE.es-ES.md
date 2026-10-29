@@ -12,7 +12,6 @@ Detalles que no caben en el [README](../README.es-ES.md).
 | **Playnite a pantalla completa** | Restauración automática (la aplicación sigue en la bandeja) |
 | **Modo Xbox** | Manual: usa *Restaurar ahora*, el menú de la bandeja o vuelve a abrir la ventana |
 | **Aplicación personalizada** | Restauración automática cuando se cierra la aplicación (o el proceso que elegiste vigilar) |
-| **JoyChromium** | Restauración automática al cerrar JoyChromium; si vuelves al PC antes, queda abierto como ventana |
 
 Si la aplicación se cierra o el PC se apaga en medio de una sesión, la próxima vez que Console Mode se abra (también al iniciar sesión en Windows, si arranca con Windows) restaura todo lo que la sesión cambió: pantallas, audio, RTSS, iconos del escritorio y el puntero, y lo avisa.
 

@@ -171,6 +171,19 @@ public static partial class UpdateService
         return ControlFsRelease.Pick(doc.RootElement);
     }
 
+    internal static async Task<JoyChromiumSetup?> FindJoyChromiumSetupAsync(bool arm64, CancellationToken ct = default)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(CheckTimeout);
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{JoyChromium.Repository}/releases?per_page=10");
+        request.Headers.Accept.ParseAdd("application/vnd.github+json");
+        using var response = await Http.SendAsync(request, timeout.Token);
+        response.EnsureSuccessStatusCode();
+        await using var stream = await response.Content.ReadAsStreamAsync(timeout.Token);
+        using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: timeout.Token);
+        return JoyChromium.PickSetup(doc.RootElement, arm64);
+    }
+
     internal static async Task DownloadAsync(string url, string file, IProgress<double>? progress, CancellationToken ct)
     {
         // Cancelled only when no bytes arrive for StallTimeout, not after a fixed total time.

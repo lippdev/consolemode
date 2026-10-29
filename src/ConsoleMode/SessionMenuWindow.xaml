@@ -159,6 +159,7 @@
               <Grid RowSpacing="10">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 
+                <StackPanel Spacing="8">
                 <!-- Pinned, not part of the scrolling list: ControlFS, the controller-first file explorer (a separate,
                      open-source app from the same team). -->
                 <Button x:Name="ControlFsRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenControlFsCommand}"
@@ -185,6 +186,34 @@
                         </StackPanel>
                     </Grid>
                 </Button>
+                <!-- Pinned with it: JoyChromium, the controller-first browser for the TV (another app from the team). -->
+                <Button x:Name="JoyChromiumRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenJoyChromiumCommand}"
+                        AutomationProperties.Name="{x:Bind ViewModel.Texts.JoyChromiumCard, Mode=OneWay}">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF1E6FD0" Offset="0"/>
+                            <GradientStop Color="#FF0B2A52" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Border Width="72" Height="48" CornerRadius="8">
+                            <Grid>
+                                <Image Source="{x:Bind ViewModel.JoyChromiumLogo, Mode=OneWay}" Stretch="Uniform" Height="44"/>
+                                <FontIcon Glyph="&#xE774;" FontSize="26" Visibility="{x:Bind ViewModel.ShowJoyChromiumGlobe, Mode=OneWay}"/>
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Style="{StaticResource TileValue}" FontSize="18" Text="{x:Bind ViewModel.Texts.JoyChromiumCard, Mode=OneWay}"/>
+                            <TextBlock Style="{StaticResource TileLabel}" FontSize="14" Text="{x:Bind ViewModel.JoyChromiumRowText, Mode=OneWay}"/>
+                            <ProgressBar Minimum="0" Maximum="100" Height="4" CornerRadius="2" Margin="0,3,0,0"
+                                         Value="{x:Bind ViewModel.JoyChromiumProgress, Mode=OneWay}"
+                                         IsIndeterminate="{x:Bind ViewModel.JoyChromiumSetupRunning, Mode=OneWay}"
+                                         Visibility="{x:Bind ViewModel.JoyChromiumInstalling, Mode=OneWay}"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
+                </StackPanel>
 
                 <ScrollViewer x:Name="RowsScroller" Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">

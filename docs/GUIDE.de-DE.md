@@ -12,7 +12,6 @@ Details, die nicht ins [README](../README.de-DE.md) passen.
 | **Playnite (Vollbild)** | Automatische Wiederherstellung (die App bleibt im Infobereich) |
 | **Xbox-Modus** | Manuell: Verwende *Jetzt wiederherstellen*, das Menü im Infobereich oder öffne das Fenster erneut |
 | **Eigene App** | Automatische Wiederherstellung, wenn die App (oder der gewählte überwachte Prozess) geschlossen wird |
-| **JoyChromium** | Automatische Wiederherstellung, wenn du JoyChromium schließt; gehst du vorher zum PC zurück, bleibt es als Fenster offen |
 
 Wird die App mitten in einer Sitzung geschlossen oder geht der PC aus, stellt Console Mode beim nächsten Öffnen (auch bei der Windows-Anmeldung, wenn es mit Windows startet) alles wieder her, was die Sitzung geändert hat: Bildschirme, Ton, RTSS, Desktopsymbole und Zeiger, und sagt Bescheid.
 

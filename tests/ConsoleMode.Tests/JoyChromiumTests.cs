@@ -33,12 +33,50 @@ public class JoyChromiumTests
     }
 
     [Theory]
-    [InlineData("joyChromium", true, true)]
-    [InlineData("joyChromium", false, false)]  // it closed itself: that's what ended the session
-    [InlineData("bigPicture", true, false)]    // open on its own, outside our session: left alone
-    [InlineData(null, true, false)]
-    public void Going_back_to_the_pc_only_unfullscreens_our_open_session(string? mode, bool running, bool expected) =>
-        Assert.Equal(expected, JoyChromium.ShouldReturnToWindow(mode, running));
+    [InlineData(true, true, true)]
+    [InlineData(true, false, false)]   // it was closed: nothing to take out of full screen
+    [InlineData(false, true, false)]   // open on the desk on its own, not from the menu: left alone
+    public void Going_back_to_the_pc_only_unfullscreens_the_one_opened_from_the_menu(bool openedFromMenu, bool running, bool expected) =>
+        Assert.Equal(expected, JoyChromium.ShouldReturnToWindow(openedFromMenu, running));
+
+    private const string Releases = """
+        [
+          { "tag_name": "v0.1.4-alpha", "draft": true, "prerelease": true, "assets": [] },
+          { "tag_name": "v0.1.3-alpha", "draft": false, "prerelease": true, "assets": [
+            { "name": "JoyChromium-0.1.3-alpha-win-arm64.exe", "size": 116896155,
+              "browser_download_url": "https://github.com/lippdev/joychromium/releases/download/v0.1.3-alpha/JoyChromium-0.1.3-alpha-win-arm64.exe",
+              "digest": "sha256:8f6c97c71438f6aaefeadbcbf62070da968cac1f2370934b88e5e42f153884f1" },
+            { "name": "JoyChromium-0.1.3-alpha-win-x64.exe", "size": 122413381,
+              "browser_download_url": "https://github.com/lippdev/joychromium/releases/download/v0.1.3-alpha/JoyChromium-0.1.3-alpha-win-x64.exe",
+              "digest": "sha256:c29c5663fa8fbf75528dfe6fa1a43e6fd602c872762f5026b749f3dcd139a148" },
+            { "name": "JoyChromium-0.1.3-alpha-win.exe", "size": 238365764,
+              "browser_download_url": "https://github.com/lippdev/joychromium/releases/download/v0.1.3-alpha/JoyChromium-0.1.3-alpha-win.exe",
+              "digest": "sha256:8ad9395bbcf7dffeaa6bc365525d4b500f0e7a77885383e68ef8838bcf32018f" }
+          ] }
+        ]
+        """;
+
+    [Fact]
+    public void The_newest_published_release_gives_the_installer_for_this_processor()
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(Releases);
+        var x64 = JoyChromium.PickSetup(doc.RootElement, arm64: false)!;
+        Assert.Equal("0.1.3-alpha", x64.Version);   // the draft above it is skipped, the pre-release counts
+        Assert.Equal("JoyChromium-0.1.3-alpha-win-x64.exe", x64.Name);
+        Assert.Equal("sha256:c29c5663fa8fbf75528dfe6fa1a43e6fd602c872762f5026b749f3dcd139a148", x64.Digest);
+        Assert.Equal("JoyChromium-0.1.3-alpha-win-arm64.exe", JoyChromium.PickSetup(doc.RootElement, arm64: true)!.Name);
+    }
+
+    [Theory]
+    [InlineData("https://example.com/JoyChromium-0.1.3-alpha-win-x64.exe", "sha256:c29c5663fa8fbf75528dfe6fa1a43e6fd602c872762f5026b749f3dcd139a148")]
+    [InlineData("https://github.com/someone/fork/releases/download/v1/JoyChromium-0.1.3-alpha-win-x64.exe", "sha256:c29c5663fa8fbf75528dfe6fa1a43e6fd602c872762f5026b749f3dcd139a148")]
+    [InlineData("https://github.com/lippdev/joychromium/releases/download/v0.1.3-alpha/JoyChromium-0.1.3-alpha-win-x64.exe", "")]
+    public void Nothing_is_installed_from_elsewhere_or_without_a_digest(string url, string digest)
+    {
+        var json = $$"""[{ "tag_name": "v0.1.3-alpha", "assets": [{ "name": "JoyChromium-0.1.3-alpha-win-x64.exe", "browser_download_url": "{{url}}", "digest": "{{digest}}" }] }]""";
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        Assert.Null(JoyChromium.PickSetup(doc.RootElement, arm64: false));
+    }
 
     [Fact]
     public void The_watched_process_is_what_the_launcher_guide_names() =>
