@@ -8,7 +8,6 @@ public sealed class LaunchArtTests
     [InlineData("bigPicture")]
     [InlineData("playnite")]
     [InlineData("xboxMode")]
-    [InlineData("joyChromium")]
     [InlineData("customApp")]
     public void Every_launcher_has_its_own_tile(string mode)
     {
@@ -22,7 +21,7 @@ public sealed class LaunchArtTests
     [Fact]
     public void Launchers_look_different_from_each_other()
     {
-        var tiles = new[] { "bigPicture", "playnite", "xboxMode", "joyChromium", "customApp" }.Select(LaunchArt.For).ToList();
+        var tiles = new[] { "bigPicture", "playnite", "xboxMode", "customApp" }.Select(LaunchArt.For).ToList();
         Assert.Equal(tiles.Count, tiles.Select(t => t.From).Distinct().Count());
     }
 

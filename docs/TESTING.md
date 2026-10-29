@@ -583,16 +583,16 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] **Copiar relatório** mostra o aviso de copiado e o texto colado no Bloco de Notas é igual ao da tela.
 - [ ] Com uma seção falhando (ex.: sem permissão de leitura do log), ela mostra "unavailable" e o resto do relatório continua aparecendo.
 
-## JoyChromium como iniciador (1.7.0, #175)
+## JoyChromium no menu da sessão (1.7.0, #175, #181)
 
-Pré-condições: [JoyChromium](https://github.com/lippdev/joychromium) instalado pelo instalador oficial; um controle conectado; a tela de jogo configurada.
+Pré-condições: um controle conectado; uma sessão em andamento (o menu também abre fora de sessão, como prévia).
 
-- [ ] Com o JoyChromium instalado, a fileira da Início mostra o tile **JoyChromium** (azul, globo) entre Modo Xbox e Aplicativo personalizado, e Ajustes → Ao entrar no modo console → Abrir lista **JoyChromium**. Desinstalado (ou renomeando a pasta), a opção some e quem estava nela volta para a primeira opção. Resultado: ______
-- [ ] **Jogar agora** com o JoyChromium: as telas mudam, o JoyChromium abre em tela cheia **na tela de jogo** (não no monitor da mesa), sem barra de título, e o controle já navega nele. Resultado: ______
-- [ ] Fechar pelo controle (Start → *Fechar o JoyChromium*): a mesa volta sozinha em até ~10 s. Resultado: ______
-- [ ] Com o JoyChromium aberto, voltar ao PC (atalho de volta ou menu da sessão → Voltar ao PC): a mesa volta e o JoyChromium continua aberto **em janela**, com as mesmas abas. Resultado: ______
-- [ ] Com o JoyChromium já aberto em janela antes de começar: **Jogar agora** leva a janela aberta para a tela de jogo em tela cheia (não abre um segundo navegador). Resultado: ______
-- [ ] Passar o mouse sobre um link no JoyChromium durante a sessão (aparece a dica do endereço): a dica não é esticada nem levada para a TV. Resultado: ______
+- [ ] A Início e Ajustes → Ao entrar no modo console **não** mostram o JoyChromium como iniciador. Resultado: ______
+- [ ] Menu da sessão: a linha **Navegador (JoyChromium)** fica fixa logo abaixo do ControlFS, com o ícone do JoyChromium (ou um globo, se ele não estiver instalado). O tour do menu destaca as duas linhas juntas. Resultado: ______
+- [ ] Com o JoyChromium instalado, A na linha: o menu fecha e o JoyChromium abre em tela cheia **na tela de jogo** (não no monitor da mesa), e o controle navega nele. Resultado: ______
+- [ ] Com o JoyChromium já aberto: A na linha traz o mesmo para a frente em tela cheia, sem abrir outro. Resultado: ______
+- [ ] Com o JoyChromium aberto pelo menu, voltar ao PC: a mesa volta e o JoyChromium continua aberto **em janela**, com as mesmas abas. Um JoyChromium que você abriu sozinho na mesa, fora do menu, não é mexido. Resultado: ______
+- [ ] Sem o JoyChromium instalado (desinstale antes): A na linha mostra "Baixando… N%", depois "Instalando…" e "Instalado · aperte para abrir"; o próximo A o abre. Sem internet: a linha diz que não deu para instalar e o próximo A abre a página de releases. Resultado: ______
 - [ ] Menu da sessão (Select + Y) por cima do JoyChromium: abre, e **Voltar ao jogo** devolve o foco ao navegador. Resultado: ______
 
 ## Tirar o ponteiro do mouse do caminho (issue #172, #177)
@@ -600,7 +600,7 @@ Pré-condições: [JoyChromium](https://github.com/lippdev/joychromium) instalad
 Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é o padrão); mouse conectado.
 
 - [ ] Deixar o ponteiro no meio do monitor da mesa e **Jogar agora** com o Steam Big Picture: quando o Big Picture aparece na TV, o ponteiro vai para o canto inferior direito da TV e continua lá depois que o Big Picture termina de abrir (o log mostra `Ponteiro: estacionado` duas vezes). Resultado: ______
-- [ ] O mesmo com Playnite, JoyChromium e Aplicativo personalizado. Com o modo Xbox, o ponteiro vai para o canto uns 4 s depois de abrir. Resultado: ______
+- [ ] O mesmo com Playnite e Aplicativo personalizado. Com o modo Xbox, o ponteiro vai para o canto uns 4 s depois de abrir. Resultado: ______
 - [ ] Voltar ao PC: o ponteiro volta exatamente para onde estava no monitor da mesa (log: `Ponteiro: de volta a`). Resultado: ______
 - [ ] Desligar a opção (Ajustes ou Sistema → Ao entrar no modo console): o ponteiro não é movido nem ao começar nem ao voltar. Resultado: ______
 - [ ] Com **Esconder o ponteiro do mouse** ligado no menu da sessão, nada muda: o ponteiro some e reaparece no canto quando a opção é desligada. Resultado: ______

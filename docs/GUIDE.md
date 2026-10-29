@@ -12,13 +12,12 @@ English · [Português (Brasil)](GUIDE.pt-BR.md) · [Español](GUIDE.es-ES.md) �
 | **Playnite fullscreen** | Automatic restore (app stays in the tray) |
 | **Xbox mode** | Manual — use *Restore now*, the tray menu, or reopen the window |
 | **Custom app** | Automatic restore when the app (or the process you chose to watch) closes |
-| **JoyChromium** | Automatic restore when you close JoyChromium; going back to the PC first leaves it open as a window |
 
 If the app closes or the PC shuts down in the middle of a session, the next time Console Mode opens (also at Windows sign-in, if it starts with Windows) it restores everything the session changed: displays, audio, RTSS, desktop icons and the pointer, and says so.
 
 **Custom app** opens any `.exe` you pick (RetroArch, another launcher…) from its own folder, with optional arguments, and moves its window to the game screen. The session ends a few seconds after that process closes. If the exe only starts another program and exits (a launcher stub), type the real program's process name in **Process to watch**. If the watched process never shows up, the session stays until you end it (hold Start + Select, the session menu or the tray).
 
-**JoyChromium** shows up as a launcher when [JoyChromium](https://github.com/lippdev/joychromium), the team's TV browser driven with a controller, is installed (found in its per-user install folder or through its uninstaller entry). It opens full screen on the game screen with `--tv`, which doesn't change its own saved preference, and the session ends a few seconds after you close it (Start → *Close JoyChromium*). Going back to the PC while it's still open takes it out of full screen and leaves it as a window, tabs and all.
+**Browser (JoyChromium)** is pinned in the session menu, right under the ControlFS file explorer: [JoyChromium](https://github.com/lippdev/joychromium), the team's TV browser driven with a controller, opens full screen over the game on the session screen. If it isn't installed, the first press downloads its newest release (checked against GitHub's SHA-256) and installs it, and the next press opens it. Going back to the PC while it's still open takes it out of full screen and leaves it as a window, tabs and all.
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 

@@ -47,8 +47,8 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - **Contador de FPS** sobre o jogo (RTSS) num card em três tamanhos: apenas FPS, compacto (uso de CPU, GPU e RAM), detalhado (clocks, temperatura da GPU e memória) ou do seu jeito
 - O áudio vai para a TV (ou qualquer saída) e volta depois
 - [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
-- Abre **Steam Big Picture**, **Playnite em tela cheia**, o **Modo Xbox** ou o [JoyChromium](https://github.com/lippdev/joychromium) (a web pelo controle), e manda a Steam para a bandeja ao voltar ao PC
-- **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS)
+- Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
+- **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS) e pela web com o [JoyChromium](https://github.com/lippdev/joychromium)
 - Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo)
 - **Perfis por jogo** para os jogos da Steam (resolução, HDR, limite de FPS e áudio), o modo **Aplicativo personalizado** para qualquer `.exe` e a bateria do controle na tela
 - Devolve os **ícones da área de trabalho** e o **ponteiro do mouse** ao lugar, pode deixar o controle **acordar o PC** e restaura a mesa na próxima abertura se uma sessão for interrompida
@@ -58,7 +58,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 ## Novidades da 1.7.0
 
 - **Interface Console com cara de console de mesa:** seus iniciadores numa fileira com os logos oficiais (o foco escolhe o que abre, como num PS5), a fonte Inter, o fundo Aurora e a aba Sistema com categorias
-- **JoyChromium integrado:** o navegador para a TV que se usa com o controle abre em tela cheia na tela de jogo e volta a ser janela quando você volta ao PC
+- **JoyChromium no menu da sessão:** o navegador para a TV que se usa com o controle abre por cima do jogo, logo abaixo do explorador de arquivos ControlFS, e se instala por ali mesmo se faltar
 - **Perfis por jogo:** cada jogo da Steam lembra a própria resolução, HDR, limite de FPS e áudio, salvos pelo menu da sessão
 - **Aplicativo personalizado:** qualquer `.exe` (RetroArch, outro launcher…) como o que abre na TV
 - **A mesa volta inteira:** os ícones da área de trabalho e o ponteiro do mouse voltam ao lugar e, se o app ou o PC cair no meio da sessão, a próxima abertura restaura tudo
