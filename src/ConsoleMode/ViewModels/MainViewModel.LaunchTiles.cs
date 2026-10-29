@@ -78,6 +78,7 @@ public partial class MainViewModel
             "bigPicture" => (SteamSession.FindSteamExe(), (string?)null),
             "playnite" => (Engine.Launch.GetPlaynitePath(), null),
             "xboxMode" => (null, LaunchArt.XboxAppId),
+            JoyChromium.Mode => (LaunchService.GetJoyChromiumPath(), null),
             CustomApp.Mode => (CustomApp.CleanPath(CustomAppPath), null),
             _ => (null, null)
         };

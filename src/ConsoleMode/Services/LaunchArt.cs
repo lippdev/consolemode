@@ -18,6 +18,7 @@ public static class LaunchArt
         "bigPicture" => new("", 0xFF2A475E, 0xFF15202C),
         "playnite" => new("", 0xFF4A3470, 0xFF1D1530),
         "xboxMode" => new("", 0xFF178A17, 0xFF0A440A),
+        "joyChromium" => new("", 0xFF1E6FD0, 0xFF0B2A52),
         "customApp" => new("", 0xFF3A4250, 0xFF1A1E25),
         _ => Neutral
     };

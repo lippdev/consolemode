@@ -35,6 +35,35 @@ public sealed class LaunchService
         })?.Dispose();
     }
 
+    /// <summary>"joyChromium": full screen on the TV for this run (<see cref="JoyChromium.TvArgument"/>).</summary>
+    public void StartJoyChromium(string exePath) => StartCustomApp(exePath, JoyChromium.TvArgument);
+
+    /// <summary>
+    /// Asks the open JoyChromium to leave full screen: a second run hands its arguments to the open
+    /// instance and exits at once, so this doesn't open another browser.
+    /// </summary>
+    public void ReturnJoyChromiumToWindow()
+    {
+        if (GetJoyChromiumPath() is not { } exe) return;
+        StartCustomApp(exe, JoyChromium.WindowArgument);
+    }
+
+    public bool IsJoyChromiumAvailable() => GetJoyChromiumPath() is not null;
+
+    /// <summary>The installed JoyChromium.exe: the per-user install folder, else the uninstall key's icon path.</summary>
+    public static string? GetJoyChromiumPath()
+    {
+        var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string? displayIcon = null;
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(JoyChromium.UninstallKey);
+            displayIcon = key?.GetValue("DisplayIcon") as string;
+        }
+        catch { /* registry optional */ }
+        return JoyChromium.Resolve(string.IsNullOrWhiteSpace(local) ? null : JoyChromium.DefaultPath(local), displayIcon, File.Exists);
+    }
+
     /// <summary>The exe's FileDescription ("RetroArch"), else its file name.</summary>
     public static string GetCustomAppName(string exePath)
     {
@@ -56,6 +85,10 @@ public sealed class LaunchService
         return processes.Length > 0;
     }
 
+    /// <summary>
+    /// The processes' main windows, largest first. Windows may report a tooltip as an app's "main" window
+    /// (seen with JoyChromium), so the first one is the one most likely to be the app itself.
+    /// </summary>
     public static nint[] GetProcessWindows(string processName)
     {
         if (string.IsNullOrWhiteSpace(processName)) return [];
@@ -67,7 +100,7 @@ public sealed class LaunchService
                 if (p.MainWindowHandle != 0) handles.Add(p.MainWindowHandle);
             }
         }
-        return [.. handles];
+        return [.. handles.OrderByDescending(NativeWindows.GetWindowArea)];
     }
 
     public bool IsPlayniteAvailable() => GetPlaynitePath() is not null;

@@ -45,7 +45,7 @@ Die Controller-Tastenkombinationen wählst du selbst: Anfangs ist keine aktiv, d
 - **FPS-Anzeige** über dem Spiel (RTSS) als Kachel in drei Größen: Nur FPS, Kompakt (CPU-, GPU- und RAM-Auslastung), Detailliert (Taktraten, GPU-Temperatur und Speicher) oder dein eigenes Layout
 - Der Ton geht an den Fernseher (oder einen beliebigen Ausgang) und kommt danach zurück
 - [Schaltet den Fernseher ein und wechselt auf den Eingang des PCs](docs/GUIDE.de-DE.md#fernsehersteuerung) (Google TV / Android TV über das Netzwerk) und kann ihn danach in den Standby versetzen
-- Startet **Steam Big Picture**, **Playnite im Vollbild** oder den **Xbox-Modus** und minimiert Steam in den Infobereich, wenn du zum PC zurückkehrst
+- Startet **Steam Big Picture**, **Playnite im Vollbild**, den **Xbox-Modus** oder [JoyChromium](https://github.com/lippdev/joychromium) (das Web mit dem Controller) und minimiert Steam in den Infobereich, wenn du zum PC zurückkehrst
 - **Sitzungsmenü** über dem Spiel: geöffnete Fenster wechseln oder schließen, Lautstärke, Auflösung, Audio, FPS und HDR ändern, den Mauszeiger ausblenden oder mit dem Controller steuern und deine Dateien mit [ControlFS](https://github.com/nextestudios/ControlFS) durchsuchen
 - Zwei Oberflächen: **Desktop** (Maus) und **Konsole** (Vollbild, Xbox- und PlayStation-Controller, Registerkarten mit LB/RB, ein eigenes Hintergrundbild oder deine Steam-Cover als Hintergrund)
 - Automatisierung mit den Links `consolemode://start` / `stop` / `menu` (Stream Deck, Skripte) und einer [lokalen Steuerungs-API](docs/GUIDE.de-DE.md#lokale-steuerungs-api)

@@ -306,14 +306,14 @@ com DPAPI. Nada vai para servidor próprio; a única rede é o GitHub (atualiza�
 Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = depois; **P3** = explorar.
 `[x]` = na `main` (com o PR e a versão). Itens sem ID antigo receberam um agora.
 
-**Ordem atual (29/10/2026):** Fase 1.7 → épicos CMI e API (Tako) → LAUNCH (JoyChromium, Hydra, AnyFSE) → FUND → UX
+**Ordem atual (29/10/2026):** Fase 1.7 → épicos CMI e API (Tako) → LAUNCH (Hydra, AnyFSE) → FUND → UX
 → resto por prioridade.
 
 ### Prioridade MoSCoW da 1.7.0
 
 | | Itens | Por quê |
 |---|---|---|
-| **Must** | DESK-001 (#167), INPUT-013 (#168), LAUNCH-007 (#169), PROF-001 (#170), REL-020 | já estão em PR com CI verde; fecham a versão |
+| **Must** | DESK-001 (#167), INPUT-013 (#168), LAUNCH-007 (#169), PROF-001 (#170), LAUNCH-011 (#175), REL-020 | já estão em PR com CI verde; fecham a versão |
 | **Should** | INPUT-014 (ponteiro, #172), DOC-010 (este PRD), DOC-011 (#171) | pedido de usuário com resposta prometida; documentação |
 | **Could** | CORE-012 (restauração durável), LAUNCH-012 (scripts de início e fim) | ajudam a recuperação; dependem da divisão do #173 |
 | **Won't (agora)** | CORE-013 (taxa NTSC), tudo de P2 e P3 | precisa de hardware para validar e de PR separado |
@@ -322,7 +322,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 - [ ] **REL-020 — Validar no hardware** os PRs #167 a #170 pelo `TESTING.md` e corrigir o que falhar. _Estado: a branch local `local/1.7-teste` junta os quatro._
 - [ ] **INPUT-013 — Ajuste do #168:** se o script de ativação não encontrar nenhum dispositivo (por exemplo, desconectado com o UAC aberto), mostrar erro em vez de "Feito", ou conferir o estado depois.
-- [ ] **REL-021 — Mesclar** #167 a #170 e o #174.
+- [ ] **REL-021 — Mesclar** #167 a #170 e o #175.
 - [ ] **REL-022 — Preparar a 1.7.0:** `[Unreleased]` vira `## [1.7.0]` nos dois changelogs; README, GUIDE e traduções enxutas; roadmap do README revisado.
 - [ ] **REL-023 — Sincronizar o fork do winget** (`lippdev/winget-pkgs`) antes da estável; sem isso o job falha com `CreateRef`.
 - [ ] **REL-024 — Publicar a 1.7.0**, só com pedido do mantenedor (D-06).
@@ -354,7 +354,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **LAUNCH-006 —** Aplicativo personalizado: qualquer `.exe` com argumentos e processo a vigiar. (#161, 1.7.0-alpha.1; issue #111)
 - [ ] **LAUNCH-007 (P0) —** Logos oficiais dos lançadores nos tiles da Início, lidos dos apps instalados. (#169)
 - [ ] **LAUNCH-010 (P1) — Tako Launcher.** Tile na Início com logo, abrir o Tako em tela cheia na tela de jogo (`tako --console-session`), restaurar quando o Tako avisar o fim pela API (API-002), detectar a instalação. Aceite: entrar, jogar e voltar ao PC sem mouse, com o Tako. Depende de CMI-004 do Tako.
-- [ ] **LAUNCH-011 (P1) — JoyChromium.** A web com controle, direto do Console Mode: tile, abre na tela de jogo, volta ao fechar. Aceite: navegar, clicar e digitar só com o controle.
+- [x] **LAUNCH-011 — JoyChromium.** Tile na Início quando instalado, abre em tela cheia (`--tv`) na tela de jogo, restaura ao fechar e, ao voltar ao PC com ele aberto, o deixa em janela (`--window`). Segue o `docs/INTEGRATIONS.md` do JoyChromium. (#175, 1.7.0)
 - [ ] **LAUNCH-012 (P2) —** Scripts próprios ao entrar e ao voltar (comando, `.bat` ou PowerShell), com tempo-limite e o comando de fim gravado em disco (CORE-012). Vem do #173, em PR próprio.
 - [ ] **LAUNCH-013 (P2) — Hydra Launcher.** Detectar a instalação, abrir em tela cheia na tela de jogo, restaurar ao fechar, logo oficial (D-19). _A definir: caminho, processo real e modo tela cheia._
 - [ ] **LAUNCH-014 (P2) — AnyFSE.** Ferramenta que põe qualquer app como tela inicial da experiência de tela cheia do modo Xbox. Níveis: (a) detectar e conviver, sem briga com o modo Xbox do Console Mode; (b) mostrar o estado e abrir a configuração; (c) configurar o app de destino (Tako, Hydra, Playnite). Aceite mínimo: com o AnyFSE ativo, entrar e sair restaura a mesa. O Tako já tem o lado dele (PLAT-007 do Tako).

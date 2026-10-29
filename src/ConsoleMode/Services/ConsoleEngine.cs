@@ -39,6 +39,9 @@ public sealed partial class ConsoleEngine
         // Before anything changes on screen: a custom app that can't be launched blocks the start.
         if (config.FullscreenMode == CustomApp.Mode && CustomApp.ProblemText(config.CustomAppPath) is { } problem)
             throw new InvalidOperationException(problem);
+        string? joyChromiumPath = null;
+        if (config.FullscreenMode == JoyChromium.Mode && (joyChromiumPath = LaunchService.GetJoyChromiumPath()) is null)
+            throw new InvalidOperationException(LocalizationService.Get("JoyChromiumNotFound"));
         config = ResolveMonitorNames(config);
         AppLog.Write($"Start: foco={config.FocusMonitor}, esconder={string.Join('+', config.HideMonitors)}, estratégia={config.HideStrategy}, modo={config.FullscreenMode}");
 
@@ -215,6 +218,15 @@ public sealed partial class ConsoleEngine
                 AppLog.Write($"Start: aplicativo personalizado {CustomApp.CleanPath(config.CustomAppPath)}, acompanhando o processo {State.CustomAppWatchName}");
                 Launch.StartCustomApp(config.CustomAppPath, config.CustomAppArguments);
                 break;
+            case JoyChromium.Mode:
+                Thread.Sleep(400);
+                Monitors.UpdateFocusRect(config.FocusMonitor, State, true);
+                // Same watch as a custom app: the session lasts while JoyChromium runs, and its window
+                // (only the main process has one) is moved to the game screen.
+                State.CustomAppWatchName = JoyChromium.ProcessName;
+                AppLog.Write($"Start: JoyChromium {joyChromiumPath}");
+                Launch.StartJoyChromium(joyChromiumPath!);
+                break;
         }
 
         State.ModeLaunched = true;
@@ -235,7 +247,7 @@ public sealed partial class ConsoleEngine
             return "running";
         }
 
-        if (mode == CustomApp.Mode)
+        if (mode is CustomApp.Mode or JoyChromium.Mode)
         {
             if (IsCustomAppExit()) return "exit";
             TickAudio();
@@ -324,6 +336,7 @@ public sealed partial class ConsoleEngine
         try
         {
             CloseSteamForRestore();
+            ReturnJoyChromiumToWindow();
             OnUi(BlackCurtain.Close);
             Video.RestoreHdr(State);
             Video.RestoreVrr(State);
@@ -429,6 +442,21 @@ public sealed partial class ConsoleEngine
         catch (Exception ex)
         {
             AppLog.Write($"Steam: fechar ao voltar: {ex.Message}");
+        }
+    }
+
+    /// <summary>Going back to the PC with JoyChromium still open: it leaves full screen and stays as a window, tabs and all.</summary>
+    private void ReturnJoyChromiumToWindow()
+    {
+        if (!JoyChromium.ShouldReturnToWindow(State.FullscreenMode, LaunchService.IsProcessRunning(JoyChromium.ProcessName))) return;
+        try
+        {
+            Launch.ReturnJoyChromiumToWindow();
+            AppLog.Write("JoyChromium: pedido para sair da tela cheia ao voltar ao PC");
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"JoyChromium: sair da tela cheia: {ex.Message}");
         }
     }
 
@@ -563,7 +591,8 @@ public sealed partial class ConsoleEngine
         {
             if (State.MoveCount < 8)
             {
-                Monitors.MoveProcessWindows(State.FocusMonitor, rect, name);
+                // Only the app's own window (the largest): a tooltip reported as "main" must not be stretched over the TV.
+                NativeWindows.MoveWindowToRect(handle, rect.X, rect.Y, rect.Width, rect.Height);
                 State.MoveCount++;
                 return;
             }

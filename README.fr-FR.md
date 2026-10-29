@@ -45,7 +45,7 @@ C'est vous qui choisissez les raccourcis manette : aucun n'est actif au départ,
 - **Compteur de FPS** par-dessus le jeu (RTSS) sur une carte en trois tailles : FPS seulement, compact (utilisation CPU, GPU et RAM), détaillé (fréquences, température et mémoire du GPU) ou votre propre disposition
 - Le son passe sur la TV (ou n'importe quelle sortie) et revient ensuite
 - [Allume la TV et la bascule sur l'entrée du PC](docs/GUIDE.fr-FR.md#contrôle-de-la-tv) (Google TV / Android TV par le réseau), et peut la mettre en veille ensuite
-- Lance **Steam Big Picture**, **Playnite en plein écran** ou le mode **Xbox**, et réduit Steam dans la zone de notification quand vous revenez au PC
+- Lance **Steam Big Picture**, **Playnite en plein écran**, le mode **Xbox** ou [JoyChromium](https://github.com/lippdev/joychromium) (le Web à la manette), et réduit Steam dans la zone de notification quand vous revenez au PC
 - **Menu de session** par-dessus le jeu : changer de fenêtre ou fermer les fenêtres ouvertes, régler le volume, la résolution, le son, les FPS et le HDR, masquer le pointeur de la souris ou le piloter à la manette, et parcourir vos fichiers avec [ControlFS](https://github.com/nextestudios/ControlFS)
 - Deux interfaces : **Bureau** (souris) et **Console** (plein écran, manettes Xbox et PlayStation, onglets sur LB/RB, un fond d’écran maison ou vos jaquettes Steam en fond)
 - Automatisation avec les liens `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) et une [API de contrôle local](docs/GUIDE.fr-FR.md#api-de-contrôle-local)

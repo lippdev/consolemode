@@ -12,6 +12,7 @@ Details, die nicht ins [README](../README.de-DE.md) passen.
 | **Playnite (Vollbild)** | Automatische Wiederherstellung (die App bleibt im Infobereich) |
 | **Xbox-Modus** | Manuell: Verwende *Jetzt wiederherstellen*, das Menü im Infobereich oder öffne das Fenster erneut |
 | **Eigene App** | Automatische Wiederherstellung, wenn die App (oder der gewählte überwachte Prozess) geschlossen wird |
+| **JoyChromium** | Automatische Wiederherstellung, wenn du JoyChromium schließt; gehst du vorher zum PC zurück, bleibt es als Fenster offen |
 
 Du kannst auch jederzeit über den Infobereich wiederherstellen (*Konfiguration wiederherstellen* / *Fenster anzeigen*). Bei schwarzen Bildschirmen blendest du die Abdeckungen mit **ESC** aus.
 
