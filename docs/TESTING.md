@@ -119,6 +119,18 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
 - [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
 
+## 1b2. Acordar o PC pelo controle (issue #155)
+
+Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; a suspensão (não hibernação) habilitada.
+
+- [ ] Ajustes → **Acordar o PC pelo controle**: a linha de status lista o adaptador/Bluetooth/controle e diz se já pode acordar o PC. Num PC sem nenhum deles, diz que nenhum dispositivo pode e a aba Sistema do modo Console mostra "Indisponível". Resultado: ______
+- [ ] **Ativar** abre o pedido de administrador (UAC); aceitando, aparece "Pronto…" e o Gerenciador de Dispositivos → (adaptador/rádio Bluetooth) → Gerenciamento de Energia mostra *Permitir que este dispositivo ative o computador* marcado. Resultado: ______
+- [ ] Recusar o UAC: aviso de que nada foi alterado; nenhum dispositivo muda. Resultado: ______
+- [ ] Clicar em **Ativar**, desconectar o adaptador ou o controle com o UAC aberto e depois aceitar: aparece o aviso de que o dispositivo não foi encontrado (não "Pronto…"), e o log mostra o código 2. Resultado: ______
+- [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
+- [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
+- [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______
+
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
 ### Tela cheia estilo Steam (Shift+Tab), prévia e janelas
@@ -372,6 +384,17 @@ Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas t
 - [ ] Repetir 3 vezes seguidas: o layout não deriva a cada ciclo. Resultado: ______
 - [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
 - [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
+
+## Ícones da área de trabalho (issue #30)
+
+Pré-condições: área de trabalho com **Organizar ícones automaticamente** desligado (clique direito → Exibir) e ícones espalhados em lugares fáceis de reconhecer (alguns no meio da tela, um no canto direito); de preferência a TV não sendo a tela principal na mesa normal.
+
+- [ ] Ajustes → **Devolver os ícones da área de trabalho ao lugar** ligado (padrão): **Jogar agora** e **Voltar ao PC**: os ícones voltam exatamente onde estavam, mesmo que o Windows os tenha embaralhado durante a sessão. O log mostra `Ícones da área de trabalho: N posições salvas` e depois `… M reposicionados`. Resultado: ______
+- [ ] O retorno ao PC não fica mais lento: os ícones voltam alguns segundos depois da mesa, sem travar a janela. Resultado: ______
+- [ ] Um atalho criado na área de trabalho durante a sessão fica onde o Windows o pôs; um apagado durante a sessão não causa erro. Resultado: ______
+- [ ] Com a opção desligada (Ajustes e aba Sistema do modo Console): o log não mostra nada sobre ícones e nada é movido. Resultado: ______
+- [ ] Com **Organizar ícones automaticamente** ligado: o log mostra `organização automática ligada; posições não salvas` e o Windows arruma os ícones sozinho. Resultado: ______
+- [ ] Explorer reiniciado durante a sessão (Gerenciador de Tarefas → Reiniciar): voltar ao PC não trava nem dá erro. Resultado: ______
 
 ## Telas com código próprio (issue #91)
 

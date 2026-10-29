@@ -27,6 +27,10 @@ Abre la acción del atajo que quieras configurar, elige **Definir** o **Cambiar*
 
 Al volver de Big Picture, **Enviar Steam a la bandeja al volver al PC** cierra la ventana del cliente y deja Steam en marcha. Con la opción desactivada, el cliente de escritorio se queda abierto. Las ventanas de Steam no se tocan si hay un juego en marcha o si no se puede comprobar su estado.
 
+Cambiar la pantalla principal puede hacer que Windows reordene los iconos del escritorio. **Devolver los iconos del escritorio a su sitio** (activado por defecto) guarda su posición antes de la sesión y los vuelve a colocar después de restaurar el escritorio. No hace nada si **Organizar iconos automáticamente** está activado en el escritorio, porque entonces Windows los coloca por sí mismo.
+
+**Despertar el PC con el mando** permite que el adaptador inalámbrico Xbox, el Bluetooth o un mando con cable despierten el PC de la suspensión con el botón central del mando. **Activar** pide permiso de administrador a Windows y marca *Permitir que este dispositivo reactive el equipo* en esos dispositivos. No despierta un PC apagado o en hibernación, y algunos PC cortan la energía del Bluetooth al suspender. Junto con **Entrar al conectar un mando**, el PC despierta directamente en modo consola.
+
 ## API de control local
 
 Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas que necesitan una respuesta (un agente de control remoto que funciona como servicio de Windows, un plugin de Stream Deck que muestra si el modo consola está activo) pueden usar la canalización con nombre (named pipe) `\\.\pipe\ConsoleMode.Control` mientras la aplicación está abierta: envía una línea JSON y recibe otra.
