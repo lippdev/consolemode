@@ -111,6 +111,19 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStartOnController, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.ControllerWakeCard, Mode=OneWay}">
+                <ctk:SettingsCard.Description>
+                    <StackPanel Spacing="4">
+                        <TextBlock TextWrapping="Wrap" Text="{x:Bind ViewModel.Texts.ControllerWakeDescription, Mode=OneWay}"/>
+                        <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Text="{x:Bind ViewModel.ControllerWakeStatus, Mode=OneWay}"/>
+                    </StackPanel>
+                </ctk:SettingsCard.Description>
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Texts.ControllerWakeButton, Mode=OneWay}" Command="{x:Bind ViewModel.EnableControllerWakeCommand}"
+                        IsEnabled="{x:Bind ViewModel.CanEnableControllerWake, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CloseSteamCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CloseSteamDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7E8;"/>

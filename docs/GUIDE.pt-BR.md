@@ -35,6 +35,8 @@ Ao voltar do Big Picture, **Mandar a Steam para a bandeja ao voltar ao PC** fech
 
 Trocar a tela principal pode fazer o Windows embaralhar os ícones da área de trabalho. **Devolver os ícones da área de trabalho ao lugar** (ligado por padrão) salva a posição deles antes da sessão e os coloca de volta depois que a mesa é restaurada. Não faz nada quando **Organizar ícones automaticamente** está ligado na área de trabalho, porque aí o próprio Windows os arruma.
 
+**Acordar o PC pelo controle** deixa o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo acordarem o PC da suspensão pelo botão central do controle. **Ativar** pede permissão de administrador ao Windows e marca *Permitir que este dispositivo ative o computador* nesses dispositivos. Não acorda o PC desligado ou em hibernação, e alguns PCs cortam a energia do Bluetooth ao suspender. Junto com **Entrar ao conectar um controle**, o PC já acorda no modo console.
+
 ## API de controle local
 
 Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma — um agente de controle remoto rodando como serviço do Windows, um plugin de Stream Deck que mostra se o modo console está ligado — podem usar o named pipe `\\.\pipe\ConsoleMode.Control` com o app aberto: envie uma linha JSON e receba outra.
