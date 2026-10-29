@@ -50,13 +50,19 @@ public sealed class SessionJournal
     public static SessionJournal? Read(string path) => File.Exists(path) ? Parse(File.ReadAllText(path)) : null;
 
     /// <summary>
-    /// Atomic: written next to it, then swapped in. A crash halfway through leaves the previous journal whole
-    /// (or none), never a cut-short file that would read as no journal at all.
+    /// Written next to it and flushed to the disk, then renamed over it, so the journal is never truncated in place:
+    /// an app crash halfway through leaves the previous journal whole. On a power cut Windows doesn't promise the
+    /// rename itself, but the worst left behind is the old journal or none, and a broken one is dropped at startup.
     /// </summary>
     public static void Write(string path, SessionJournal journal)
     {
         var temp = path + ".tmp";
-        File.WriteAllText(temp, Serialize(journal));
+        using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(Serialize(journal));
+            stream.Write(bytes);
+            stream.Flush(flushToDisk: true);
+        }
         File.Move(temp, path, overwrite: true);
     }
 
