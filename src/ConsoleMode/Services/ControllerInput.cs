@@ -290,9 +290,13 @@ public sealed class ControllerInput : IDisposable
     private static HashSet<Gamepad> ReadRaw(bool[] held, int xinputPads, StringBuilder? diag)
     {
         var invalidGamepads = new HashSet<Gamepad>();
+        var present = new HashSet<string>();
         foreach (var raw in RawGameController.RawGameControllers)
         {
             var name = SafeName(raw);
+            // The physical device, not its model: two identical pads must not share the stick state.
+            var device = DeviceKey(raw, name);
+            present.Add(device);
             try
             {
                 var gamepad = Gamepad.FromGameController(raw);
@@ -354,9 +358,9 @@ public sealed class ControllerInput : IDisposable
                     bool counts, firstMiss = false;
                     lock (CenteredSticks)
                     {
-                        if (ControllerMapping.StickCentered(axes[0], axes[1])) CenteredSticks.Add(name);
-                        counts = CenteredSticks.Contains(name);
-                        if (!counts) firstMiss = UncenteredLogged.Add(name);
+                        if (ControllerMapping.StickCentered(axes[0], axes[1])) CenteredSticks.Add(device);
+                        counts = CenteredSticks.Contains(device);
+                        if (!counts) firstMiss = UncenteredLogged.Add(device);
                     }
                     if (counts)
                     {
@@ -386,12 +390,24 @@ public sealed class ControllerInput : IDisposable
                 diag?.AppendLine($"HID {name}: erro {ex.Message}");
             }
         }
+        // A pad that left (unplugged, asleep) has to be seen centred again when it comes back.
+        lock (CenteredSticks)
+        {
+            CenteredSticks.IntersectWith(present);
+            UncenteredLogged.IntersectWith(present);
+        }
         return invalidGamepads;
     }
 
     private static void Set(bool[] held, ControllerAction action, bool[] buttons, int index)
     {
         if (index >= 0 && index < buttons.Length) held[(int)action] |= buttons[index];
+    }
+
+    private static string DeviceKey(RawGameController raw, string name)
+    {
+        try { return string.IsNullOrEmpty(raw.NonRoamableId) ? name : raw.NonRoamableId; }
+        catch { return name; }
     }
 
     private static string SafeName(RawGameController raw)
