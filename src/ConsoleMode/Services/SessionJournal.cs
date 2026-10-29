@@ -49,7 +49,16 @@ public sealed class SessionJournal
 
     public static SessionJournal? Read(string path) => File.Exists(path) ? Parse(File.ReadAllText(path)) : null;
 
-    public static void Write(string path, SessionJournal journal) => File.WriteAllText(path, Serialize(journal));
+    /// <summary>
+    /// Atomic: written next to it, then swapped in. A crash halfway through leaves the previous journal whole
+    /// (or none), never a cut-short file that would read as no journal at all.
+    /// </summary>
+    public static void Write(string path, SessionJournal journal)
+    {
+        var temp = path + ".tmp";
+        File.WriteAllText(temp, Serialize(journal));
+        File.Move(temp, path, overwrite: true);
+    }
 
     public static void Delete(string path)
     {

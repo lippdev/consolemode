@@ -24,6 +24,7 @@ public class SessionJournalTests : IDisposable
             PointerY = 300
         };
         SessionJournal.Write(path, written);
+        Assert.False(File.Exists(path + ".tmp"));   // swapped in whole, nothing left behind
 
         var read = SessionJournal.Read(path)!;
         Assert.Equal(written.StartedAt, read.StartedAt);
@@ -62,6 +63,16 @@ public class SessionJournalTests : IDisposable
         var read = SessionJournal.Parse(SessionJournal.Serialize(new SessionJournal { RecoveryAttempts = 1 }))!;
         Assert.Equal(1, read.RecoveryAttempts);
         Assert.DoesNotContain("pointerBefore", SessionJournal.Serialize(new SessionJournal { PointerX = 1, PointerY = 2 }));
+    }
+
+    [Fact]
+    public void Rewriting_replaces_the_journal_whole()
+    {
+        var path = Path.Combine(_dir, "session.json");
+        SessionJournal.Write(path, new SessionJournal { FullscreenMode = "playnite" });
+        SessionJournal.Write(path, new SessionJournal { FullscreenMode = "playnite", RecoveryAttempts = 1 });
+        Assert.Equal(1, SessionJournal.Read(path)!.RecoveryAttempts);
+        Assert.False(File.Exists(path + ".tmp"));
     }
 
     [Fact]
