@@ -31,6 +31,7 @@ public partial class MainViewModel
     {
         OnPropertyChanged(nameof(CustomAppName));
         OnPropertyChanged(nameof(CustomAppPathText));
+        RefreshLaunchLogo(CustomApp.Mode);
         SettingChanged();
     }
 

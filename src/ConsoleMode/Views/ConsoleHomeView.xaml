@@ -267,7 +267,10 @@
                                             Command="{Binding ViewModel.PlayLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
                                             AutomationProperties.Name="{x:Bind Text}">
                                         <Grid>
-                                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Margin="0,0,0,20"/>
+                                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Margin="0,0,0,20" Visibility="{x:Bind ShowGlyph, Mode=OneWay}"/>
+                                            <!-- The launcher's own logo, from the installed app -->
+                                            <Image Source="{x:Bind Logo, Mode=OneWay}" Width="64" Height="64" Margin="0,0,0,24" Stretch="Uniform"
+                                                   Visibility="{x:Bind HasLogo, Mode=OneWay}"/>
                                             <TextBlock Text="{x:Bind Text}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis" MaxLines="1" Foreground="#E6FFFFFF"/>
                                             <!-- What opens: a check in the corner -->

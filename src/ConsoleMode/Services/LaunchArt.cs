@@ -10,6 +10,9 @@ public static class LaunchArt
 
     public static readonly Art Neutral = new("", 0xFF2A3038, 0xFF161A20);
 
+    /// <summary>The Xbox app, whose logo stands for the Xbox mode (the glyph shows if it is not installed).</summary>
+    public const string XboxAppId = "Microsoft.GamingApp_8wekyb3d8bbwe!Microsoft.Xbox.App";
+
     public static Art For(string? mode) => mode switch
     {
         "bigPicture" => new("", 0xFF2A475E, 0xFF15202C),
