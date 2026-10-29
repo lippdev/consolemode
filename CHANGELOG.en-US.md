@@ -3,6 +3,11 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **JoyChromium** as a launcher: with [JoyChromium](https://github.com/lippdev/joychromium) installed (the TV browser you drive with the controller), it shows up in the Home row and under When entering console mode. Console Mode opens it full screen on the game screen and restores the desk when you close it. Going back to the PC while it's still open takes it out of full screen and leaves it as a window, tabs and all. (#175)
+
+### Fixes
+- Custom app: Console Mode moves only the program's largest window to the game screen, instead of every window Windows reports as its main one; a tooltip is no longer stretched over the TV. (#175)
 
 ## [1.7.0-alpha.2]
 ### What's new

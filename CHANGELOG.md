@@ -3,6 +3,11 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- **JoyChromium** como iniciador: com o [JoyChromium](https://github.com/lippdev/joychromium) instalado (o navegador para a TV que se usa com o controle), ele aparece na fileira da Início e em Ao entrar no modo console. O Console Mode o abre em tela cheia na tela de jogo e devolve a mesa quando você o fecha. Voltar ao PC com ele ainda aberto o tira da tela cheia e o deixa como janela, sem perder as abas. (#175)
+
+### Correções
+- Aplicativo personalizado: o Console Mode leva para a tela de jogo só a maior janela do programa, em vez de todas as que o Windows aponta como principal; uma dica de ferramenta não é mais esticada sobre a TV. (#175)
 
 ## [1.7.0-alpha.2]
 ### Novidades

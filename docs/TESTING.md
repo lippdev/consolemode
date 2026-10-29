@@ -545,3 +545,15 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Nenhum caminho mostra o nome do usuário do Windows (`C:\Users\…\`), nem com Playnite instalado em `%LOCALAPPDATA%`.
 - [ ] **Copiar relatório** mostra o aviso de copiado e o texto colado no Bloco de Notas é igual ao da tela.
 - [ ] Com uma seção falhando (ex.: sem permissão de leitura do log), ela mostra "unavailable" e o resto do relatório continua aparecendo.
+
+## JoyChromium como iniciador (1.7.0, #175)
+
+Pré-condições: [JoyChromium](https://github.com/lippdev/joychromium) instalado pelo instalador oficial; um controle conectado; a tela de jogo configurada.
+
+- [ ] Com o JoyChromium instalado, a fileira da Início mostra o tile **JoyChromium** (azul, globo) entre Modo Xbox e Aplicativo personalizado, e Ajustes → Ao entrar no modo console → Abrir lista **JoyChromium**. Desinstalado (ou renomeando a pasta), a opção some e quem estava nela volta para a primeira opção. Resultado: ______
+- [ ] **Jogar agora** com o JoyChromium: as telas mudam, o JoyChromium abre em tela cheia **na tela de jogo** (não no monitor da mesa), sem barra de título, e o controle já navega nele. Resultado: ______
+- [ ] Fechar pelo controle (Start → *Fechar o JoyChromium*): a mesa volta sozinha em até ~10 s. Resultado: ______
+- [ ] Com o JoyChromium aberto, voltar ao PC (atalho de volta ou menu da sessão → Voltar ao PC): a mesa volta e o JoyChromium continua aberto **em janela**, com as mesmas abas. Resultado: ______
+- [ ] Com o JoyChromium já aberto em janela antes de começar: **Jogar agora** leva a janela aberta para a tela de jogo em tela cheia (não abre um segundo navegador). Resultado: ______
+- [ ] Passar o mouse sobre um link no JoyChromium durante a sessão (aparece a dica do endereço): a dica não é esticada nem levada para a TV. Resultado: ______
+- [ ] Menu da sessão (Select + Y) por cima do JoyChromium: abre, e **Voltar ao jogo** devolve o foco ao navegador. Resultado: ______

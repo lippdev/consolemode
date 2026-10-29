@@ -12,6 +12,7 @@ Les détails qui ne tiennent pas dans le [README](../README.fr-FR.md).
 | **Playnite en plein écran** | Restauration automatique (l'application reste dans la zone de notification) |
 | **Mode Xbox** | Manuelle : utilisez *Restaurer maintenant*, le menu de la zone de notification, ou rouvrez la fenêtre |
 | **Application personnalisée** | Restauration automatique quand l'application (ou le processus choisi à surveiller) se ferme |
+| **JoyChromium** | Restauration automatique à la fermeture de JoyChromium ; si vous revenez au PC avant, il reste ouvert en fenêtre |
 
 Vous pouvez aussi restaurer à tout moment depuis la zone de notification (*Restaurer la configuration* / *Afficher la fenêtre*). Avec les écrans noirs, **Échap** retire les rideaux.
 
