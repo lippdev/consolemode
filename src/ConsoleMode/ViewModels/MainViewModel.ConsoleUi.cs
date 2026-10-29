@@ -322,6 +322,8 @@ public partial class MainViewModel
             "controllerlayout" => (LocalizationService.Get("ControllerLayoutCard"), ControllerLayoutOptions.Select(o => (o.Text, o.Value)), SelectedControllerLayout?.Value),
             "tvprovider" => (LocalizationService.Get("TvControlCard"), TvProviders.Select(o => (o.Text, o.Value)), SelectedTvProvider?.Value),
             "tvhdmi" => (LocalizationService.Get("TvHdmiCard"), TvHdmiInputs.Select(o => (o.Text, o.Value)), SelectedTvHdmiInput?.Value),
+            "profiles" when _gameProfiles.Count > 0 => (LocalizationService.Get("GameProfilesPickerTitle"),
+                _gameProfiles.Select(p => (LocalizationService.Get("GameProfileRemove", p.Name), p.SteamAppId.ToString())), null),
             "mode" when FocusRow is not null => (LocalizationService.Get("ResolutionRefreshCard"), FocusRow.Modes.Select(m => (m.Text, m.Key)), FocusRow.SelectedMode?.Key),
             _ => (null, null, null)
         };
@@ -351,6 +353,10 @@ public partial class MainViewModel
             case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
             case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
             case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
+            case "profiles":
+                if (int.TryParse(item.Value, out var appId))
+                    RemoveGameProfile(GameProfileItems.FirstOrDefault(p => p.AppId == appId));
+                break;
             case "mode":
                 if (FocusRow?.Modes.FirstOrDefault(m => m.Key == item.Value) is { } mode)
                 {

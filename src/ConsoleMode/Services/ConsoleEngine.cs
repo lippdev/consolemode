@@ -4,7 +4,7 @@ using ConsoleMode.Services.Tv;
 
 namespace ConsoleMode.Services;
 
-public sealed class ConsoleEngine
+public sealed partial class ConsoleEngine
 {
     public ConsoleRuntimeState State { get; } = new();
     public MonitorService Monitors { get; } = new();
@@ -71,6 +71,8 @@ public sealed class ConsoleEngine
         State.FpsLimit = config.FpsLimit;
         State.RtssBackup = null;
         State.RtssLimitApplied = false;
+        State.GameProfiles = [.. config.GameProfiles];
+        ResetGameProfileState();
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
         // Before any screen changes: Windows may reshuffle the icons once the primary moves.
@@ -229,6 +231,7 @@ public sealed class ConsoleEngine
         if (mode == "xboxMode")
         {
             TickAudio();
+            TickGameProfile();
             return "running";
         }
 
@@ -236,6 +239,7 @@ public sealed class ConsoleEngine
         {
             if (IsCustomAppExit()) return "exit";
             TickAudio();
+            TickGameProfile();
             return "running";
         }
 
@@ -292,6 +296,7 @@ public sealed class ConsoleEngine
         }
 
         TickAudio();
+        TickGameProfile();
         return "running";
     }
 
@@ -379,6 +384,8 @@ public sealed class ConsoleEngine
             State.HdrMonitor = null;
             State.VrrApplied = false;
             State.DesktopIcons = null;
+            // The restore above already put the screen, HDR, FPS and audio back as before the session.
+            ResetGameProfileState();
             OnUi(NativeWindows.StopBigPictureExitWatch);
         }
     }

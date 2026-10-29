@@ -259,6 +259,9 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string CloseSteamDescription => LocalizationService.Get(nameof(CloseSteamDescription));
     public string RestoreIconsCard => LocalizationService.Get(nameof(RestoreIconsCard));
     public string RestoreIconsDescription => LocalizationService.Get(nameof(RestoreIconsDescription));
+    public string GameProfilesCard => LocalizationService.Get(nameof(GameProfilesCard));
+    public string GameProfilesDescription => LocalizationService.Get(nameof(GameProfilesDescription));
+    public string GameProfileRow => LocalizationService.Get(nameof(GameProfileRow));
     public string HideCursorCard => LocalizationService.Get(nameof(HideCursorCard));
     public string HideCursorDescription => LocalizationService.Get(nameof(HideCursorDescription));
     public string ControllerMouseRow => LocalizationService.Get(nameof(ControllerMouseRow));

@@ -37,6 +37,8 @@ Changing the main display can make Windows reshuffle the desktop icons. **Put de
 
 **Wake the PC with the controller** lets the Xbox Wireless Adapter, the Bluetooth radio or a wired controller wake the PC from sleep with the controller's center button. **Turn on** asks Windows for administrator permission and ticks *Allow this device to wake the computer* on those devices. It can't wake a PC that is shut down or hibernating, and some PCs cut power to Bluetooth while asleep. Together with **Enter when a controller connects**, the PC wakes straight into console mode.
 
+**Per-game profiles** give each Steam game its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings for…**: whatever the game screen uses at that moment is saved. Next time that game starts during a session, Console Mode applies it, and when the game closes the screen goes back to how it was. The game is detected from Steam, whether it was opened from Big Picture, Playnite or the Xbox app. The saved profiles are listed in Settings → **Per-game profiles**, where you can delete them (in the Console interface: System → When entering console mode).
+
 ## Local control API
 
 `consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.

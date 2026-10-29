@@ -158,6 +158,7 @@ public partial class MainViewModel : ObservableObject
         UpdateSummary();
         RefreshUpdateStrings();
         RefreshControllerWakeText();
+        RefreshGameProfileTexts();
         RefreshConsoleTexts();
     }
 
@@ -328,6 +329,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
             RestoreDesktopIcons = config.RestoreDesktopIcons;
+            LoadGameProfiles(config.GameProfiles);
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
             SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
@@ -954,6 +956,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
             RestoreDesktopIcons = RestoreDesktopIcons,
+            GameProfiles = [.. _gameProfiles],
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,

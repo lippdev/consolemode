@@ -31,6 +31,8 @@ Cambiar la pantalla principal puede hacer que Windows reordene los iconos del es
 
 **Despertar el PC con el mando** permite que el adaptador inalámbrico Xbox, el Bluetooth o un mando con cable despierten el PC de la suspensión con el botón central del mando. **Activar** pide permiso de administrador a Windows y marca *Permitir que este dispositivo reactive el equipo* en esos dispositivos. No despierta un PC apagado o en hibernación, y algunos PC cortan la energía del Bluetooth al suspender. Junto con **Entrar al conectar un mando**, el PC despierta directamente en modo consola.
 
+Los **perfiles por juego** dan a cada juego de Steam su propia resolución, HDR, límite de FPS y salida de audio. Con el juego en marcha, abre el menú de la sesión y elige **Perfil del juego → Guardar los ajustes actuales para…**: se guarda lo que usa la pantalla de juego en ese momento. La próxima vez que ese juego se abra durante una sesión, Console Mode aplica el perfil y, cuando el juego se cierra, la pantalla vuelve a estar como antes. El juego se detecta a través de Steam, tanto si se abre desde Big Picture como desde Playnite o la aplicación Xbox. Los perfiles guardados aparecen en Ajustes → **Perfiles por juego**, donde puedes borrarlos (en la interfaz Consola: Sistema → Al entrar en modo consola).
+
 ## API de control local
 
 Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas que necesitan una respuesta (un agente de control remoto que funciona como servicio de Windows, un plugin de Stream Deck que muestra si el modo consola está activo) pueden usar la canalización con nombre (named pipe) `\\.\pipe\ConsoleMode.Control` mientras la aplicación está abierta: envía una línea JSON y recibe otra.

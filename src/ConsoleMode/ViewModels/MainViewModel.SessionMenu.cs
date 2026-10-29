@@ -201,6 +201,7 @@ public partial class MainViewModel
         SessionOverlayText = FpsOverlayShortName;
         OnPropertyChanged(nameof(IsFpsMenuAvailable));
         OnPropertyChanged(nameof(IsFpsOverlayAvailable));
+        await LoadSessionGameAsync();
     }
 
     /// <summary>Left/Right on the volume row.</summary>
@@ -261,6 +262,10 @@ public partial class MainViewModel
                 options = new[] { (LocalizationService.Get("FpsNoLimit"), "0", state.FpsLimit == 0) }
                     .Concat(FpsPresets.Select(f => ($"{f} FPS", f.ToString(), state.FpsLimit == f)));
                 break;
+            case "profile" when _sessionGameId > 0:
+                title = LocalizationService.Get("GameProfileRow");
+                options = SessionProfileOptions();
+                break;
             default:
                 return;
         }
@@ -279,6 +284,12 @@ public partial class MainViewModel
         if (_sessionPickerKey == "overlay")
         {
             ChangeOverlaySetting(item.Value);   // the counter picker stays open
+            return;
+        }
+        if (_sessionPickerKey == "profile")
+        {
+            IsSessionPickerOpen = false;
+            await PickSessionProfileAsync(item.Value);
             return;
         }
         IsSessionPickerOpen = false;

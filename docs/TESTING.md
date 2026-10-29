@@ -130,6 +130,19 @@ Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; 
 - [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
 - [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
 - [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______
+## 1b3. Perfis por jogo (issue #69)
+
+Pré-condições: dois jogos da Steam instalados (de preferência um que aceite outra resolução sem reiniciar); RTSS instalado para o limite de FPS; sessão ativa.
+
+- [ ] Sem jogo rodando, o menu da sessão **não** mostra a linha "Perfil do jogo". Com um jogo aberto (pelo Big Picture), em até ~5 s a linha aparece com "<jogo>: sem perfil". Resultado: ______
+- [ ] No menu, trocar resolução, HDR, FPS e saída de áudio; depois **Perfil do jogo → Salvar os ajustes atuais**: a linha passa a "<jogo>: perfil salvo" e Ajustes → **Perfis por jogo** lista o jogo com o resumo certo. Resultado: ______
+- [ ] Fechar o jogo: a resolução, o HDR, o FPS e o áudio voltam ao que eram quando o jogo abriu. O log mostra `Perfil por jogo: … fechou; voltando a tela de antes`. Resultado: ______
+- [ ] Abrir o mesmo jogo de novo: o perfil é aplicado sozinho (log `aplicando o perfil de …`) e desfeito ao fechar. Resultado: ______
+- [ ] Abrir **outro** jogo sem perfil: nada muda. Trocar direto de um jogo com perfil para outro: o primeiro é desfeito antes. Resultado: ______
+- [ ] Jogo aberto pelo **Playnite** ou pelo **app Xbox** (jogo da Steam): o perfil também vale. Resultado: ______
+- [ ] **Voltar ao PC** com o jogo ainda aberto e perfil aplicado: a mesa volta exatamente como antes da sessão (resolução, HDR, FPS, áudio). Resultado: ______
+- [ ] A saída de áudio do perfil desconectada (fone desligado): o resto do perfil é aplicado e o log diz que a saída não está ativa. Resultado: ______
+- [ ] Apagar: pelo menu da sessão (Perfil do jogo → Apagar), em Ajustes (botão **Apagar**) e na aba Sistema → Ao entrar no modo console → Perfis por jogo. Sem perfis, a linha da aba Sistema fica desativada. Resultado: ______
 
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 

@@ -52,6 +52,7 @@
     <Compile Include="../../src/ConsoleMode/Services/DesktopIconLayout.cs" Link="DesktopIconLayout.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerWake.cs" Link="ControllerWake.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PackageLogo.cs" Link="PackageLogo.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/GameProfiles.cs" Link="GameProfiles.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbProtocol.cs" Link="Tv/AdbProtocol.cs" />
     <Compile Include="../../src/ConsoleMode/Services/Tv/AdbShellOutput.cs" Link="Tv/AdbShellOutput.cs" />
