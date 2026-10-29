@@ -119,6 +119,31 @@ Pré-condições: Ajustes → "Entrar ao conectar um controle" **ligado**; app n
 - [ ] O log mostra `Controle conectado: <nome>; auto-start sim/não` a cada conexão. Resultado: ______
 - [ ] Com a opção **desligada** (padrão), nada disso acontece. Resultado: ______
 
+## 1b2. Acordar o PC pelo controle (issue #155)
+
+Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; a suspensão (não hibernação) habilitada.
+
+- [ ] Ajustes → **Acordar o PC pelo controle**: a linha de status lista o adaptador/Bluetooth/controle e diz se já pode acordar o PC. Num PC sem nenhum deles, diz que nenhum dispositivo pode e a aba Sistema do modo Console mostra "Indisponível". Resultado: ______
+- [ ] **Ativar** abre o pedido de administrador (UAC); aceitando, aparece "Pronto…" e o Gerenciador de Dispositivos → (adaptador/rádio Bluetooth) → Gerenciamento de Energia mostra *Permitir que este dispositivo ative o computador* marcado. Resultado: ______
+- [ ] Recusar o UAC: aviso de que nada foi alterado; nenhum dispositivo muda. Resultado: ______
+- [ ] Clicar em **Ativar**, desconectar o adaptador ou o controle com o UAC aberto e depois aceitar: aparece o aviso de que o dispositivo não foi encontrado (não "Pronto…"), e o log mostra o código 2. Resultado: ______
+- [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
+- [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
+- [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______
+## 1b3. Perfis por jogo (issue #69)
+
+Pré-condições: dois jogos da Steam instalados (de preferência um que aceite outra resolução sem reiniciar); RTSS instalado para o limite de FPS; sessão ativa.
+
+- [ ] Sem jogo rodando, o menu da sessão **não** mostra a linha "Perfil do jogo". Com um jogo aberto (pelo Big Picture), em até ~5 s a linha aparece com "<jogo>: sem perfil". Resultado: ______
+- [ ] No menu, trocar resolução, HDR, FPS e saída de áudio; depois **Perfil do jogo → Salvar os ajustes atuais**: a linha passa a "<jogo>: perfil salvo" e Ajustes → **Perfis por jogo** lista o jogo com o resumo certo. Resultado: ______
+- [ ] Fechar o jogo: a resolução, o HDR, o FPS e o áudio voltam ao que eram quando o jogo abriu. O log mostra `Perfil por jogo: … fechou; voltando a tela de antes`. Resultado: ______
+- [ ] Abrir o mesmo jogo de novo: o perfil é aplicado sozinho (log `aplicando o perfil de …`) e desfeito ao fechar. Resultado: ______
+- [ ] Abrir **outro** jogo sem perfil: nada muda. Trocar direto de um jogo com perfil para outro: o primeiro é desfeito antes. Resultado: ______
+- [ ] Jogo aberto pelo **Playnite** ou pelo **app Xbox** (jogo da Steam): o perfil também vale. Resultado: ______
+- [ ] **Voltar ao PC** com o jogo ainda aberto e perfil aplicado: a mesa volta exatamente como antes da sessão (resolução, HDR, FPS, áudio). Resultado: ______
+- [ ] A saída de áudio do perfil desconectada (fone desligado): o resto do perfil é aplicado e o log diz que a saída não está ativa. Resultado: ______
+- [ ] Apagar: pelo menu da sessão (Perfil do jogo → Apagar), em Ajustes (botão **Apagar**) e na aba Sistema → Ao entrar no modo console → Perfis por jogo. Sem perfis, a linha da aba Sistema fica desativada. Resultado: ______
+
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
 ### Tela cheia estilo Steam (Shift+Tab), prévia e janelas
@@ -373,6 +398,17 @@ Pré-condições: pelo menos 3 telas (a TV desligada na mesa normal, mais duas t
 - [ ] TV que já estava ligada (como tela estendida) antes da sessão: depois de voltar, ela continua ligada no mesmo lugar. Resultado: ______
 - [ ] Se uma das telas originais não voltar (cabo solto): o log diz que a tela de jogo ficou ligada e o PC não fica sem imagem. Resultado: ______
 
+## Ícones da área de trabalho (issue #30)
+
+Pré-condições: área de trabalho com **Organizar ícones automaticamente** desligado (clique direito → Exibir) e ícones espalhados em lugares fáceis de reconhecer (alguns no meio da tela, um no canto direito); de preferência a TV não sendo a tela principal na mesa normal.
+
+- [ ] Ajustes → **Devolver os ícones da área de trabalho ao lugar** ligado (padrão): **Jogar agora** e **Voltar ao PC**: os ícones voltam exatamente onde estavam, mesmo que o Windows os tenha embaralhado durante a sessão. O log mostra `Ícones da área de trabalho: N posições salvas` e depois `… M reposicionados`. Resultado: ______
+- [ ] O retorno ao PC não fica mais lento: os ícones voltam alguns segundos depois da mesa, sem travar a janela. Resultado: ______
+- [ ] Um atalho criado na área de trabalho durante a sessão fica onde o Windows o pôs; um apagado durante a sessão não causa erro. Resultado: ______
+- [ ] Com a opção desligada (Ajustes e aba Sistema do modo Console): o log não mostra nada sobre ícones e nada é movido. Resultado: ______
+- [ ] Com **Organizar ícones automaticamente** ligado: o log mostra `organização automática ligada; posições não salvas` e o Windows arruma os ícones sozinho. Resultado: ______
+- [ ] Explorer reiniciado durante a sessão (Gerenciador de Tarefas → Reiniciar): voltar ao PC não trava nem dá erro. Resultado: ______
+
 ## Telas com código próprio (issue #91)
 
 Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (tela de jogo e telas a esconder escolhidas). Anote antes, na 1.5, como o mapa de telas aparece, para comparar.
@@ -504,6 +540,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 
 ### Início
 - [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem o selo ✓ verde no canto e uma barra verde embaixo, e os outros ficam mais apagados.
+- [ ] Logos oficiais nos blocos: Steam Big Picture com o logo da Steam, Playnite com o do Playnite e modo Xbox com o do app Xbox, nítidos na TV 4K (sem serrilhado nem borrão). Aplicativo personalizado mostra o ícone do `.exe` escolhido e troca ao escolher outro; Playnite troca ao escolher outra pasta. Sem a Steam ou o app Xbox instalado, o bloco mostra o ícone genérico de antes, sem bloco vazio. Resultado: ______
 - [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
 - [ ] Andar pela fileira já troca o iniciador, sem apertar A: o selo, a barra e o título grande embaixo seguem o foco, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
 - [ ] A num iniciador (ou um clique) abre direto aquele iniciador, como o Jogar agora. Sem tela de jogo escolhida, A só escolhe e não abre nada.

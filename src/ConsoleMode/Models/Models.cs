@@ -78,6 +78,9 @@ public sealed class AppConfig
     /// </summary>
     public bool CloseSteamOnRestore { get; set; } = true;
 
+    /// <summary>Put the desktop icons back where they were after the session (issue #30).</summary>
+    public bool RestoreDesktopIcons { get; set; } = true;
+
     /// <summary>Enter console mode when a controller connects while the app is in the tray.</summary>
     public bool AutoStartOnController { get; set; }
 
@@ -98,6 +101,9 @@ public sealed class AppConfig
 
     /// <summary>Turning the TV on / to the PC's input when console mode starts (issue #75).</summary>
     public TvControlConfig Tv { get; set; } = new();
+
+    /// <summary>Settings applied while a given Steam game runs during a session (issue #69).</summary>
+    public List<GameProfile> GameProfiles { get; set; } = [];
 
     /// <summary>
     /// A copy with other monitor fields and every other setting as it is here. A copy, not a field-by-field
@@ -142,6 +148,31 @@ public sealed class TvControlConfig
 
     [JsonIgnore]
     public bool IsEnabled => !string.IsNullOrWhiteSpace(Provider) && Provider != None;
+}
+
+/// <summary>
+/// One game's own settings, saved from the session menu while it runs. Every field left empty keeps
+/// the session's value. Applied when the game starts, undone when it closes.
+/// </summary>
+public sealed class GameProfile
+{
+    public int SteamAppId { get; set; }
+    public string Name { get; set; } = "";
+    public SavedDisplayMode? Mode { get; set; }
+    public bool? Hdr { get; set; }
+    /// <summary>0 = no limit; null = leave the session's.</summary>
+    public int? FpsLimit { get; set; }
+    public string? AudioDeviceId { get; set; }
+    public string? AudioDeviceName { get; set; }
+}
+
+/// <summary>What the game screen looked like when a game started, to go back to when it closes.</summary>
+public sealed class GameBaseline
+{
+    public SavedDisplayMode? Mode { get; set; }
+    public bool Hdr { get; set; }
+    public int FpsLimit { get; set; }
+    public string? AudioDeviceId { get; set; }
 }
 
 public sealed class SavedDisplayMode
@@ -363,6 +394,15 @@ public sealed class ConsoleRuntimeState
     public bool HdrTurnedOffByUser { get; set; }
     public DateTime? SessionStartedAt { get; set; }
     public string? BackupAudioId { get; set; }
+    /// <summary>The desktop icons read before the session; null when they aren't restored.</summary>
+    public List<DesktopIcon>? DesktopIcons { get; set; }
+    /// <summary>Per-game profiles for this session; the session menu updates them as they are saved.</summary>
+    public List<GameProfile> GameProfiles { get; set; } = [];
+    /// <summary>The Steam game running now (0 = none), and the screen as it was when it started.</summary>
+    public int RunningGameId { get; set; }
+    public GameBaseline? GameBaseline { get; set; }
+    /// <summary>A profile changed the screen for the running game; it is undone when the game closes.</summary>
+    public bool GameProfileApplied { get; set; }
 }
 
 public sealed class RtssBackup

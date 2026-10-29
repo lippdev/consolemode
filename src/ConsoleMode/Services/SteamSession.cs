@@ -32,6 +32,33 @@ public static class SteamSession
         }
     }
 
+    /// <summary>
+    /// A game's name: Steam keeps it in the registry for most games, and always in the
+    /// appmanifest of the library it is installed in. Falls back to "Steam app ID".
+    /// </summary>
+    public static string GameName(int appId)
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey($@"{SteamKey}\Apps\{appId}");
+            if (key?.GetValue("Name") is string name && !string.IsNullOrWhiteSpace(name)) return name.Trim();
+
+            var steam = Path.GetDirectoryName(FindSteamExe() ?? "");
+            if (!string.IsNullOrWhiteSpace(steam))
+            {
+                var vdf = Path.Combine(steam, "steamapps", "libraryfolders.vdf");
+                var libraries = File.Exists(vdf) ? GameProfiles.ParseLibraryPaths(File.ReadAllText(vdf)) : [];
+                foreach (var library in libraries.Prepend(steam))
+                {
+                    var manifest = Path.Combine(library, "steamapps", $"appmanifest_{appId}.acf");
+                    if (File.Exists(manifest) && GameProfiles.ParseManifestName(File.ReadAllText(manifest)) is { } found) return found;
+                }
+            }
+        }
+        catch (Exception ex) { AppLog.Write($"Steam: nome do jogo {appId}: {ex.Message}"); }
+        return $"Steam app {appId}";
+    }
+
     public static string? FindSteamExe()
     {
         try

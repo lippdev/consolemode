@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl
     x:Class="ConsoleMode.Views.SettingsView"
+    x:Name="Page"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ctk="using:CommunityToolkit.WinUI.Controls">
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:vm="using:ConsoleMode.ViewModels">
 
     <ScrollViewer>
         <StackPanel MaxWidth="{StaticResource PageMaxWidth}" Padding="36,4,36,36" Spacing="4">
@@ -111,6 +113,19 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStartOnController, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.ControllerWakeCard, Mode=OneWay}">
+                <ctk:SettingsCard.Description>
+                    <StackPanel Spacing="4">
+                        <TextBlock TextWrapping="Wrap" Text="{x:Bind ViewModel.Texts.ControllerWakeDescription, Mode=OneWay}"/>
+                        <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Text="{x:Bind ViewModel.ControllerWakeStatus, Mode=OneWay}"/>
+                    </StackPanel>
+                </ctk:SettingsCard.Description>
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE7E8;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Texts.ControllerWakeButton, Mode=OneWay}" Command="{x:Bind ViewModel.EnableControllerWakeCommand}"
+                        IsEnabled="{x:Bind ViewModel.CanEnableControllerWake, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.CloseSteamCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.CloseSteamDescription, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE7E8;"/>
@@ -118,6 +133,29 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.CloseSteamOnRestore, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.RestoreIconsCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.RestoreIconsDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE80A;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.RestoreDesktopIcons, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
+            <!-- Per-game profiles (issue #69): created from the session menu, listed and deleted here -->
+            <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.GameProfilesCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.GameProfilesDescription, Mode=OneWay}"
+                                  ItemsSource="{x:Bind ViewModel.GameProfileItems, Mode=OneWay}">
+                <ctk:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE7FC;"/>
+                </ctk:SettingsExpander.HeaderIcon>
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.GameProfilesCountText, Mode=OneWay}"/>
+                <ctk:SettingsExpander.ItemTemplate>
+                    <DataTemplate x:DataType="vm:GameProfileItem">
+                        <ctk:SettingsCard Header="{x:Bind Name}" Description="{x:Bind Summary}">
+                            <Button Content="{x:Bind DeleteText}"
+                                    Command="{Binding ViewModel.RemoveGameProfileCommand, ElementName=Page}" CommandParameter="{x:Bind}"/>
+                        </ctk:SettingsCard>
+                    </DataTemplate>
+                </ctk:SettingsExpander.ItemTemplate>
+            </ctk:SettingsExpander>
             <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.HomeButtonShortPressCard, Mode=OneWay}" Description="{x:Bind ViewModel.HomeButtonHint, Mode=OneWay}"
                               IsEnabled="{x:Bind ViewModel.HomeShortcutSet, Mode=OneWay}">
                 <ctk:SettingsCard.HeaderIcon>
