@@ -367,6 +367,7 @@
   "TourMapWithFocus": "Estas son tus pantallas en su posición del escritorio. Elegimos {0} porque ahora está apagada; selecciona otra si lo prefieres.",
   "RestoreSuccess": "Tus pantallas han vuelto a la normalidad.",
   "SessionRecovered": "La última sesión no terminó bien (la aplicación se cerró o el PC se apagó a mitad). Se restauraron tus pantallas, el audio, los iconos y el puntero.",
+  "SessionJournalFailed": "No se pudo guardar el diario de la sesión en la carpeta de datos ({0}). Sin él no habría forma de volver tras un cierre inesperado, así que no se cambió nada.",
   "RestoreFailure": "No se pudieron restaurar las pantallas: {0}",
   "ConfigSaveFailure": "No se pudieron guardar los ajustes: {0}",
   "SummaryChooseScreen": "Elige la pantalla en la que quieres jugar",

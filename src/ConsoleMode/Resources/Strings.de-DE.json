@@ -367,6 +367,7 @@
   "TourMapWithFocus": "Hier siehst du deine Bildschirme an ihren Desktop-Positionen. Wir haben {0} ausgewählt, weil er derzeit ausgeschaltet ist. Wähle bei Bedarf einen anderen aus.",
   "RestoreSuccess": "Deine Bildschirme sind wieder im Normalzustand.",
   "SessionRecovered": "Die letzte Sitzung wurde nicht richtig beendet (die App wurde geschlossen oder der PC ging mittendrin aus). Bildschirme, Ton, Symbole und Zeiger wurden wiederhergestellt.",
+  "SessionJournalFailed": "Das Sitzungsprotokoll konnte nicht im Datenordner gespeichert werden ({0}). Ohne es gäbe es nach einem Absturz keinen Weg zurück, deshalb wurde nichts geändert.",
   "RestoreFailure": "Bildschirme konnten nicht wiederhergestellt werden: {0}",
   "ConfigSaveFailure": "Einstellungen konnten nicht gespeichert werden: {0}",
   "SummaryChooseScreen": "Wähle den Bildschirm aus, auf dem du spielen möchtest",

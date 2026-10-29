@@ -19,6 +19,14 @@ public sealed class SessionJournal
     public int? PointerX { get; set; }
     public int? PointerY { get; set; }
 
+    /// <summary>How many starts already tried to undo this session (a restore that leaves the screens wrong keeps the file).</summary>
+    public int RecoveryAttempts { get; set; }
+
+    /// <summary>Starts that try to undo an interrupted session before giving up on it.</summary>
+    public const int MaxRecoveryAttempts = 2;
+
+    public static bool ShouldRecover(SessionJournal journal) => journal.RecoveryAttempts < MaxRecoveryAttempts;
+
     [System.Text.Json.Serialization.JsonIgnore]
     public (int X, int Y)? PointerBefore => PointerX is { } x && PointerY is { } y ? (x, y) : null;
 

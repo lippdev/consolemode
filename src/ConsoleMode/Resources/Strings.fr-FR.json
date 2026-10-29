@@ -367,6 +367,7 @@
   "TourMapWithFocus": "Voici vos écrans, à leur position sur le Bureau. Nous avons choisi {0} car il est actuellement éteint ; sélectionnez-en un autre si vous préférez.",
   "RestoreSuccess": "Vos écrans sont revenus à la normale.",
   "SessionRecovered": "La dernière session ne s'est pas terminée correctement (l'application s'est fermée ou le PC s'est éteint en cours de route). Vos écrans, le son, les icônes et le pointeur ont été restaurés.",
+  "SessionJournalFailed": "Impossible d'écrire le journal de session dans le dossier de données ({0}). Sans lui, il n'y aurait aucun retour possible après un plantage ; rien n'a donc été modifié.",
   "RestoreFailure": "Impossible de restaurer les écrans : {0}",
   "ConfigSaveFailure": "Impossible d'enregistrer les paramètres : {0}",
   "SummaryChooseScreen": "Choisissez l'écran sur lequel vous voulez jouer",

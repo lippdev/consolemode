@@ -109,20 +109,17 @@ public sealed partial class ConsoleEngine
             HideStrategy = config.HideStrategy
         });
 
-        State.IsActive = true;
+        var audioBefore = Audio.GetDefaultId();
 
-        State.BackupAudioId = Audio.GetDefaultId();
-        if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
-            File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
-
-        // From here on the desk changes: if the app dies before the restore, the next start undoes it from this file.
+        // Before the desk changes: if the app dies before the restore, the next start undoes the session from this
+        // file. Without it there would be no way back after a crash, so the session doesn't start at all.
         try
         {
             SessionJournal.Write(AppPaths.SessionJournalFile, new SessionJournal
             {
                 StartedAt = DateTime.Now,
                 FullscreenMode = config.FullscreenMode,
-                BackupAudioId = State.BackupAudioId,
+                BackupAudioId = audioBefore,
                 DesktopIcons = State.DesktopIcons,
                 PointerX = State.PointerBefore?.X,
                 PointerY = State.PointerBefore?.Y
@@ -130,8 +127,15 @@ public sealed partial class ConsoleEngine
         }
         catch (Exception ex)
         {
-            AppLog.Write($"Diário da sessão: não foi possível gravar: {ex.Message}");
+            AppLog.Write($"Diário da sessão: não foi possível gravar: {ex.Message}; a sessão não começa");
+            throw new InvalidOperationException(LocalizationService.Get("SessionJournalFailed", ex.Message));
         }
+
+        State.IsActive = true;
+
+        State.BackupAudioId = audioBefore;
+        if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
+            File.WriteAllText(AppPaths.BackupAudioFile, State.BackupAudioId);
 
         if (focusInfo is null || !focusInfo.IsActive)
         {
@@ -383,9 +387,16 @@ public sealed partial class ConsoleEngine
             Audio.ClearCache();
             if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
-            // Only once the restore went through: a restore that threw is tried again on the next start.
-            try { SessionJournal.Delete(AppPaths.SessionJournalFile); }
-            catch (Exception ex) { AppLog.Write($"Diário da sessão: não foi possível apagar: {ex.Message}"); }
+            // Only once the screens are back: a restore that threw or left them wrong is tried again on the next start.
+            if (!restore.Success)
+            {
+                AppLog.Write("Diário da sessão: mantido, as telas não voltaram por completo; nova tentativa na próxima abertura");
+            }
+            else
+            {
+                try { SessionJournal.Delete(AppPaths.SessionJournalFile); }
+                catch (Exception ex) { AppLog.Write($"Diário da sessão: não foi possível apagar: {ex.Message}"); }
+            }
         }
         catch (Exception ex)
         {
@@ -543,7 +554,17 @@ public sealed partial class ConsoleEngine
             return false;
         }
 
-        AppLog.Write($"Recuperação: a sessão de {journal.StartedAt:dd/MM HH:mm} não terminou; restaurando a mesa");
+        if (!SessionJournal.ShouldRecover(journal))
+        {
+            // A screen that never comes back (a TV unplugged for good) must not restore the desk on every start.
+            AppLog.Write($"Recuperação: desistindo depois de {journal.RecoveryAttempts} tentativas; diário apagado");
+            try { SessionJournal.Delete(AppPaths.SessionJournalFile); } catch { /* not there */ }
+            return false;
+        }
+        journal.RecoveryAttempts++;
+        try { SessionJournal.Write(AppPaths.SessionJournalFile, journal); } catch { /* the count is a safety net only */ }
+
+        AppLog.Write($"Recuperação: a sessão de {journal.StartedAt:dd/MM HH:mm} não terminou; restaurando a mesa (tentativa {journal.RecoveryAttempts})");
         var meta = Monitors.GetRestoreContext(State);
         State.FullscreenMode = journal.FullscreenMode;
         State.FocusMonitor = meta.FocusMonitor ?? "";

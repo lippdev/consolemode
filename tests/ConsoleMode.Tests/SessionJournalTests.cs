@@ -50,6 +50,21 @@ public class SessionJournalTests : IDisposable
     public void A_broken_journal_reads_as_none(string? json) => Assert.Null(SessionJournal.Parse(json));
 
     [Fact]
+    public void An_interrupted_session_is_retried_a_limited_number_of_times()
+    {
+        var journal = new SessionJournal { FullscreenMode = "bigPicture" };
+        Assert.True(SessionJournal.ShouldRecover(journal));
+        journal.RecoveryAttempts = 1;
+        Assert.True(SessionJournal.ShouldRecover(journal));
+        journal.RecoveryAttempts = SessionJournal.MaxRecoveryAttempts;
+        Assert.False(SessionJournal.ShouldRecover(journal));   // a TV gone for good must not restore on every start
+
+        var read = SessionJournal.Parse(SessionJournal.Serialize(new SessionJournal { RecoveryAttempts = 1 }))!;
+        Assert.Equal(1, read.RecoveryAttempts);
+        Assert.DoesNotContain("pointerBefore", SessionJournal.Serialize(new SessionJournal { PointerX = 1, PointerY = 2 }));
+    }
+
+    [Fact]
     public void No_file_means_no_interrupted_session_and_deleting_twice_is_fine()
     {
         var path = Path.Combine(_dir, "session.json");

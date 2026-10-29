@@ -367,6 +367,7 @@
   "TourMapWithFocus": "Aqui estão as suas telas, na posição em que estão na mesa. Escolhemos {0} para jogar porque ela está desligada agora; clique em outra se preferir.",
   "RestoreSuccess": "Suas telas voltaram ao normal.",
   "SessionRecovered": "A última sessão não terminou direito (o app fechou ou o PC desligou no meio). Suas telas, o áudio, os ícones e o ponteiro foram restaurados.",
+  "SessionJournalFailed": "Não foi possível gravar o diário da sessão na pasta de dados ({0}). Sem ele não haveria como voltar depois de uma queda, então nada foi alterado.",
   "RestoreFailure": "Falha ao restaurar: {0}",
   "ConfigSaveFailure": "Não foi possível salvar a configuração: {0}",
   "SummaryChooseScreen": "Escolha a tela onde você quer jogar",
