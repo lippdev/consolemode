@@ -284,13 +284,19 @@ public sealed class ControllerInput : IDisposable
 
     private static readonly Dictionary<string, int> NoisyStreaks = [];
     private static readonly HashSet<string> DistrustedPads = [];
+    private static readonly HashSet<string> CenteredSticks = [];
+    private static readonly HashSet<string> UncenteredLogged = [];
 
     private static HashSet<Gamepad> ReadRaw(bool[] held, int xinputPads, StringBuilder? diag)
     {
         var invalidGamepads = new HashSet<Gamepad>();
+        var present = new HashSet<string>();
         foreach (var raw in RawGameController.RawGameControllers)
         {
             var name = SafeName(raw);
+            // The physical device, not its model: two identical pads must not share the stick state.
+            var device = DeviceKey(raw, name);
+            present.Add(device);
             try
             {
                 var gamepad = Gamepad.FromGameController(raw);
@@ -348,11 +354,26 @@ public sealed class ControllerInput : IDisposable
                 }
                 if (axes.Length > 1)
                 {
-                    var (l, r, u, d) = ControllerMapping.StickDirections(axes[0], axes[1]);
-                    held[(int)ControllerAction.Left] |= l;
-                    held[(int)ControllerAction.Right] |= r;
-                    held[(int)ControllerAction.Up] |= u;
-                    held[(int)ControllerAction.Down] |= d;
+                    // The stick counts only once it has been seen centred: one stuck at 0 would hold Up forever.
+                    bool counts, firstMiss = false;
+                    lock (CenteredSticks)
+                    {
+                        if (ControllerMapping.StickCentered(axes[0], axes[1])) CenteredSticks.Add(device);
+                        counts = CenteredSticks.Contains(device);
+                        if (!counts) firstMiss = UncenteredLogged.Add(device);
+                    }
+                    if (counts)
+                    {
+                        var (l, r, u, d) = ControllerMapping.StickDirections(axes[0], axes[1]);
+                        held[(int)ControllerAction.Left] |= l;
+                        held[(int)ControllerAction.Right] |= r;
+                        held[(int)ControllerAction.Up] |= u;
+                        held[(int)ControllerAction.Down] |= d;
+                    }
+                    else if (firstMiss)
+                    {
+                        AppLog.Write($"Controles: {name}: analógico fora do centro desde o início (x={axes[0]:F2}, y={axes[1]:F2}); ignorado até voltar ao centro, o direcional e os botões continuam valendo");
+                    }
                 }
 
                 if (diag is not null)
@@ -369,12 +390,24 @@ public sealed class ControllerInput : IDisposable
                 diag?.AppendLine($"HID {name}: erro {ex.Message}");
             }
         }
+        // A pad that left (unplugged, asleep) has to be seen centred again when it comes back.
+        lock (CenteredSticks)
+        {
+            CenteredSticks.IntersectWith(present);
+            UncenteredLogged.IntersectWith(present);
+        }
         return invalidGamepads;
     }
 
     private static void Set(bool[] held, ControllerAction action, bool[] buttons, int index)
     {
         if (index >= 0 && index < buttons.Length) held[(int)action] |= buttons[index];
+    }
+
+    private static string DeviceKey(RawGameController raw, string name)
+    {
+        try { return string.IsNullOrEmpty(raw.NonRoamableId) ? name : raw.NonRoamableId; }
+        catch { return name; }
     }
 
     private static string SafeName(RawGameController raw)
