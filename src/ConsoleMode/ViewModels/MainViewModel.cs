@@ -336,6 +336,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
             RestoreDesktopIcons = config.RestoreDesktopIcons;
+            ParkPointer = config.ParkPointer;
             LoadGameProfiles(config.GameProfiles);
             RefreshHomeButtonHint();
             SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
@@ -963,6 +964,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
             RestoreDesktopIcons = RestoreDesktopIcons,
+            ParkPointer = ParkPointer,
             GameProfiles = [.. _gameProfiles],
             UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,

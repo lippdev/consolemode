@@ -140,6 +140,13 @@
                 <ToggleSwitch IsOn="{x:Bind ViewModel.RestoreDesktopIcons, Mode=TwoWay}"
                               OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
             </ctk:SettingsCard>
+            <ctk:SettingsCard Header="{x:Bind ViewModel.Texts.ParkPointerCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.ParkPointerDescription, Mode=OneWay}">
+                <ctk:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8B0;"/>
+                </ctk:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind ViewModel.ParkPointer, Mode=TwoWay}"
+                              OnContent="{x:Bind ViewModel.Texts.ToggleOn, Mode=OneWay}" OffContent="{x:Bind ViewModel.Texts.ToggleOff, Mode=OneWay}"/>
+            </ctk:SettingsCard>
             <!-- Per-game profiles (issue #69): created from the session menu, listed and deleted here -->
             <ctk:SettingsExpander Header="{x:Bind ViewModel.Texts.GameProfilesCard, Mode=OneWay}" Description="{x:Bind ViewModel.Texts.GameProfilesDescription, Mode=OneWay}"
                                   ItemsSource="{x:Bind ViewModel.GameProfileItems, Mode=OneWay}">

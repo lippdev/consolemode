@@ -135,6 +135,8 @@
   "CloseSteamDescription": "Wenn du Big Picture verlässt, erhält Steam eine normale Aufforderung zum Schließen des Fensters und kann so in den Infobereich wechseln, ohne den Prozess zu beenden. Wenn ein Spiel läuft oder sein Status nicht ermittelt werden kann, bleibt das Fenster unverändert.",
   "RestoreIconsCard": "Desktopsymbole wieder an ihren Platz setzen",
   "RestoreIconsDescription": "Speichert vor der Sitzung, wo die Desktopsymbole liegen, und setzt sie bei der Rückkehr zum PC wieder dorthin, falls Windows sie beim Wechsel des Hauptbildschirms durcheinanderbringt. Bei aktivierter automatischer Anordnung passiert nichts.",
+  "ParkPointerCard": "Mauszeiger aus dem Weg räumen",
+  "ParkPointerDescription": "Sobald der Launcher auf dem Fernseher erscheint, wird der Zeiger in die untere rechte Ecke des Spielbildschirms bewegt, damit er nicht mitten im Bild steht. Beim Zurückkehren zum PC kommt er an seine alte Stelle zurück.",
   "GameProfilesCard": "Profile pro Spiel",
   "GameProfilesDescription": "Eigene Auflösung, HDR, FPS-Limit und Audioausgabe für jedes Steam-Spiel. Zum Anlegen öffnest du das Sitzungsmenü, während das Spiel läuft, und wählst Spielprofil → Aktuelle Einstellungen speichern. Das Profil gilt, wenn das Spiel startet, und wird beim Schließen rückgängig gemacht.",
   "GameProfilesEmpty": "Keine gespeicherten Profile",

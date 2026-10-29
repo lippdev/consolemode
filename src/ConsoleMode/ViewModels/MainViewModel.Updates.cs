@@ -22,6 +22,7 @@ public partial class MainViewModel
     [ObservableProperty] private bool _interfaceSounds = true;
     [ObservableProperty] private bool _closeSteamOnRestore = true;
     [ObservableProperty] private bool _restoreDesktopIcons = true;
+    [ObservableProperty] private bool _parkPointer = true;
     [ObservableProperty] private string _homeButtonHint = "";
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _minimizeToTray;
@@ -103,6 +104,7 @@ public partial class MainViewModel
     }
     partial void OnCloseSteamOnRestoreChanged(bool value) => SaveQuietly();
     partial void OnRestoreDesktopIconsChanged(bool value) => SaveQuietly();
+    partial void OnParkPointerChanged(bool value) => SaveQuietly();
 
     partial void OnHomeButtonShortPressChanged(bool value)
     {
