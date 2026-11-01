@@ -646,6 +646,9 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] Sistema → Atalho, ajuda e dados: "Diagnóstico → Copiar relatório" põe o relatório na área de transferência e mostra o aviso; a versão do app aparece no fim da lista. Resultado: ______
 - [ ] Sistema: com o foco numa linha, a descrição dela aparece embaixo da lista (até 3 linhas); no trilho das categorias, some. Em alemão, francês e russo o texto não estoura. Resultado: ______
 
+- [ ] Aba Sessão: as telas aparecem como em Configurações → Sistema → Tela do Windows: na mesma posição relativa, na proporção real (um monitor girado aparece em pé) e com um espaço entre elas; uma tela desligada no Windows aparece tracejada à direita. Os textos encolhem para caber nas telas pequenas. Resultado: ______
+- [ ] O direcional anda entre as telas pela posição delas no mapa (direita vai para a tela à direita etc.) e A abre o painel de papel da tela. Resultado: ______
+
 ### Tour guiado
 
 - [ ] Primeira abertura: o tour abre sozinho em "Bem-vindo ao Console Mode", 1 de 9, com o cartão no meio da tela e o fundo escurecido. Resultado: ______

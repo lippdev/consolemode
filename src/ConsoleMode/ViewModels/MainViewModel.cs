@@ -27,9 +27,9 @@ public partial class MainViewModel : ObservableObject
 
     private static readonly int[] FpsPresets = [30, 48, 50, 59, 60, 72, 75, 90, 120, 144];
     private const int FpsCustomValue = -1;
-    private const double LayoutMaxWidth = 720;
-    private const double LayoutMaxHeight = 220;
-    private const double TileInset = 3;
+    private const double LayoutMaxWidth = 1100;
+    private const double LayoutMaxHeight = 300;
+    private const double TileInset = 6;
 
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private CancellationTokenSource? _loopCts;

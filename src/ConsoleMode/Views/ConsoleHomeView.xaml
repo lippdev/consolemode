@@ -318,50 +318,43 @@
                         <StackPanel>
                             <TextBlock Text="{x:Bind ViewModel.Texts.ConsoleScreensHeading, Mode=OneWay}" Style="{StaticResource ConsoleHeading}"/>
                             <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled">
-                                <ItemsControl x:Name="ScreenCards" Margin="8,16,8,16" ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}">
+                                <!-- The screens laid out as in Windows' display settings: where each one sits on the desk, at its real
+                                     proportions (a screen standing up shows standing up), lit by what will happen to it -->
+                                <ItemsControl x:Name="ScreenCards" Margin="8,16,8,16" HorizontalAlignment="Left" ItemsSource="{x:Bind ViewModel.Monitors, Mode=OneWay}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="16"/>
+                                            <controls:MonitorLayoutPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:MonitorRowViewModel">
-                                            <Button Style="{StaticResource ConsoleCard}" Width="300" Height="204" Padding="0"
+                                            <Button Style="{StaticResource ConsoleCard}" Width="{x:Bind TileWidth, Mode=OneWay}" Height="{x:Bind TileHeight, Mode=OneWay}" MinWidth="0" MinHeight="0" Padding="0"
                                                     Background="{x:Bind ConsoleTileBackground, Mode=OneWay}" Opacity="{x:Bind TileOpacity, Mode=OneWay}"
                                                     Command="{Binding ViewModel.OpenRolePanelCommand, ElementName=Page}" CommandParameter="{x:Bind}"
                                                     AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
-                                                <Grid Padding="22,18,22,16">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="*"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <!-- The screen drawn as art: bezel, lit panel (by what will happen to it) and stand -->
-                                                    <Grid Width="124" Height="90" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                                        <Border Height="72" VerticalAlignment="Top" CornerRadius="9" BorderThickness="3" BorderBrush="#FFE6EBEF">
-                                                            <Border Background="{x:Bind ScreenFill, Mode=OneWay}" CornerRadius="5">
-                                                                <Grid>
-                                                                    <FontIcon Glyph="&#xE768;" FontSize="24" Foreground="#FF0B1F18" Visibility="{x:Bind IsFocus, Mode=OneWay}"/>
-                                                                    <FontIcon Glyph="&#xE7E8;" FontSize="22" Foreground="#99FFFFFF" Visibility="{x:Bind IsHide, Mode=OneWay}"/>
-                                                                </Grid>
-                                                            </Border>
-                                                        </Border>
-                                                        <Border Width="46" Height="6" CornerRadius="3" Background="#FFE6EBEF" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                                    </Grid>
-                                                    <StackPanel Grid.Row="1" Spacing="6">
-                                                        <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                                        <Grid ColumnSpacing="10">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                            </Grid.ColumnDefinitions>
-                                                            <Border CornerRadius="11" Padding="11,3" Background="{x:Bind RolePillBackground, Mode=OneWay}">
-                                                                <TextBlock Text="{x:Bind RoleLabel, Mode=OneWay}" FontSize="14" FontWeight="SemiBold"
+                                                <Grid>
+                                                    <!-- The bezel; dashed while the screen is off in Windows right now -->
+                                                    <Border CornerRadius="12" BorderThickness="3" BorderBrush="#D9E6EBEF" Visibility="{x:Bind IsOn}"/>
+                                                    <Rectangle RadiusX="12" RadiusY="12" StrokeThickness="2.5" StrokeDashArray="3,2" Stroke="#99E6EBEF" Visibility="{x:Bind IsOff}"/>
+                                                    <!-- Shrinks to fit small and standing screens, never grows past its size -->
+                                                    <Viewbox StretchDirection="DownOnly" Margin="14,10">
+                                                        <StackPanel Spacing="8" HorizontalAlignment="Center" MaxWidth="320">
+                                                            <Grid Width="48" Height="48" HorizontalAlignment="Center">
+                                                                <Ellipse Fill="{x:Bind ScreenFill, Mode=OneWay}"/>
+                                                                <FontIcon Glyph="&#xE768;" FontSize="22" Foreground="#FF0B1F18" Visibility="{x:Bind IsFocus, Mode=OneWay}"/>
+                                                                <FontIcon Glyph="&#xE7E8;" FontSize="20" Foreground="#99FFFFFF" Visibility="{x:Bind IsHide, Mode=OneWay}"/>
+                                                                <FontIcon Glyph="&#xE7F4;" FontSize="20" Foreground="#E6FFFFFF" Visibility="{x:Bind IsKeep, Mode=OneWay}"/>
+                                                            </Grid>
+                                                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextAlignment="Center"
+                                                                       TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                                            <Border CornerRadius="11" Padding="11,3" HorizontalAlignment="Center" Background="{x:Bind RolePillBackground, Mode=OneWay}">
+                                                                <TextBlock Text="{x:Bind RoleLabel, Mode=OneWay}" FontSize="15" FontWeight="SemiBold"
                                                                            Foreground="{x:Bind RolePillForeground, Mode=OneWay}"/>
                                                             </Border>
-                                                            <TextBlock Grid.Column="1" Text="{x:Bind Details, Mode=OneWay}" FontSize="14" VerticalAlignment="Center"
-                                                                       Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis"/>
-                                                        </Grid>
-                                                    </StackPanel>
+                                                            <TextBlock Text="{x:Bind Details, Mode=OneWay}" FontSize="15" TextAlignment="Center" Foreground="#B3FFFFFF"
+                                                                       TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                                        </StackPanel>
+                                                    </Viewbox>
                                                 </Grid>
                                             </Button>
                                         </DataTemplate>
