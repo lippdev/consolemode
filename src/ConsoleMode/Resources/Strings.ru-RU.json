@@ -159,8 +159,6 @@
   "BetaUpdatesWarning": "Тестовые версии могут не работать на некоторых конфигурациях. Если что-то сломалось, скачайте стабильную версию со страницы релизов и сообщите нам через кнопку отзыва.",
   "HelpDataSection": "Ярлык, справка и данные",
   "OtherAppsSection": "Другие приложения разработчика",
-  "WakeOnDescription": "Автоматизация с Wake-on-LAN",
-  "NextBoostDescription": "Оптимизация Windows",
   "TvConfirmationCard": "Подтверждение на телевизоре",
   "TvConfirmationDescription": "При первом использовании нового игрового экрана телевизор просит подтвердить, что изображение видно. Ответьте мышью, клавиатурой или геймпадом (Xbox: A/B · PlayStation: ✕/○). Проверьте здесь, не меняя настройки экранов.",
   "TvSection": "Телевизор",
@@ -430,5 +428,11 @@
   "AddCustomAppCard": "Добавить своё приложение",
   "AddCustomAppDescription": "Выберите .exe: он станет плиткой на Главной со значком и названием программы.",
   "RemoveCustomAppCard": "Удалить это приложение",
-  "RemoveCustomAppDescription": "Убирает плитку этого приложения с Главной; вместо него откроется Steam Big Picture."
+  "RemoveCustomAppDescription": "Убирает плитку этого приложения с Главной; вместо него откроется Steam Big Picture.",
+  "OtherAppsControlFsDescription": "Файловый менеджер для геймпада с безопасной распаковкой ZIP.",
+  "OtherAppsTakoDescription": "Ваша библиотека игр в лаунчере для телевизора и геймпада.",
+  "OtherAppsJoyChromiumDescription": "Браузер для телевизора, которым управляют геймпадом с дивана.",
+  "OtherAppsStageAlpha": "Альфа",
+  "OtherAppsStageClosedAlpha": "Закрытая альфа",
+  "OtherAppsStageBeta": "Бета"
 }

@@ -159,8 +159,6 @@
   "BetaUpdatesWarning": "Las versiones de prueba pueden fallar en algunas configuraciones. Si algo sale mal, descarga la versión estable en la página de versiones y cuéntanoslo con el botón de comentarios.",
   "HelpDataSection": "Acceso directo, ayuda y datos",
   "OtherAppsSection": "Más apps del desarrollador",
-  "WakeOnDescription": "Automatización con Wake-on-LAN",
-  "NextBoostDescription": "Optimización de Windows",
   "TvConfirmationCard": "Confirmación en la TV",
   "TvConfirmationDescription": "La primera vez con una pantalla de juego nueva, la TV pide que confirmes que ves la imagen. Responde con ratón, teclado o mando (Xbox: A/B · PlayStation: ✕/○). Pruébalo aquí sin cambiar tus pantallas.",
   "TvSection": "TV",
@@ -430,5 +428,11 @@
   "AddCustomAppCard": "Añadir una aplicación personalizada",
   "AddCustomAppDescription": "Elige un .exe: se convierte en un bloque en Inicio, con el icono y el nombre del programa.",
   "RemoveCustomAppCard": "Quitar esta aplicación",
-  "RemoveCustomAppDescription": "Quita el bloque de esta aplicación de Inicio; en su lugar se abre Steam Big Picture."
+  "RemoveCustomAppDescription": "Quita el bloque de esta aplicación de Inicio; en su lugar se abre Steam Big Picture.",
+  "OtherAppsControlFsDescription": "Explorador de archivos pensado para el mando, con extractor de ZIP seguro.",
+  "OtherAppsTakoDescription": "Tu biblioteca de juegos en un lanzador hecho para la TV y el mando.",
+  "OtherAppsJoyChromiumDescription": "Navegador para la TV que se usa con el mando, desde el sofá.",
+  "OtherAppsStageAlpha": "Alfa",
+  "OtherAppsStageClosedAlpha": "Alfa cerrada",
+  "OtherAppsStageBeta": "Beta"
 }

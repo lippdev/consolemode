@@ -660,6 +660,11 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] "Ver a abertura" toca o estilo escolhido na hora, por cima da interface, e some sozinha (ou com qualquer botão). Resultado: ______
 - [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
 
+### Lista de Sistema e outros apps
+
+- [ ] Sistema, numa categoria longa (App, Extras opcionais): a borda de baixo esmaece no fundo enquanto há linhas abaixo, e a de cima quando já rolou; no fim e no começo da lista, a borda fica limpa. A barra fina à direita aparece só quando a lista rola e acompanha a posição (controle, roda do mouse e teclado). Resultado: ______
+- [ ] Sistema → Outros apps do desenvolvedor: ControlFS (Alpha), Tako Launcher (Alpha fechado) e JoyChromium (Beta), cada um com ícone, fase e descrição embaixo do nome; A abre a página do GitHub de cada um. Não há mais WakeOn nem Next Boost. Resultado: ______
+
 ### Vários aplicativos personalizados
 
 - [ ] Início: depois dos lançadores aparece o bloco **+ Adicionar app**; A (ou clique) nele abre o seletor de arquivo; escolher um `.exe` cria um bloco com o ícone e o nome do programa (a descrição do exe), já selecionado. Passar o foco pelo "+" não troca o lançador. Resultado: ______

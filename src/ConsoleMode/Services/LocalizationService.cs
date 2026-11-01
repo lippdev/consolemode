@@ -263,8 +263,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string BetaUpdatesDescription => LocalizationService.Get(nameof(BetaUpdatesDescription));
     public string HelpDataSection => LocalizationService.Get(nameof(HelpDataSection));
     public string OtherAppsSection => LocalizationService.Get(nameof(OtherAppsSection));
-    public string WakeOnDescription => LocalizationService.Get(nameof(WakeOnDescription));
-    public string NextBoostDescription => LocalizationService.Get(nameof(NextBoostDescription));
+    public string OtherAppsControlFsDescription => LocalizationService.Get(nameof(OtherAppsControlFsDescription));
+    public string OtherAppsTakoDescription => LocalizationService.Get(nameof(OtherAppsTakoDescription));
+    public string OtherAppsJoyChromiumDescription => LocalizationService.Get(nameof(OtherAppsJoyChromiumDescription));
+    public string OtherAppsStageAlpha => LocalizationService.Get(nameof(OtherAppsStageAlpha));
+    public string OtherAppsStageClosedAlpha => LocalizationService.Get(nameof(OtherAppsStageClosedAlpha));
+    public string OtherAppsStageBeta => LocalizationService.Get(nameof(OtherAppsStageBeta));
     public string TvConfirmationCard => LocalizationService.Get(nameof(TvConfirmationCard));
     public string TvConfirmationDescription => LocalizationService.Get(nameof(TvConfirmationDescription));
     public string TvSection => LocalizationService.Get(nameof(TvSection));

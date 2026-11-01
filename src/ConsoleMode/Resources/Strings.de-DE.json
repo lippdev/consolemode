@@ -159,8 +159,6 @@
   "BetaUpdatesWarning": "Testversionen können auf manchen Systemen Probleme verursachen. Wenn etwas nicht mehr funktioniert, lade die stabile Version von der Releases-Seite herunter und sende uns über die Feedback-Schaltfläche eine Rückmeldung.",
   "HelpDataSection": "Tastenkombination, Hilfe und Daten",
   "OtherAppsSection": "Weitere Apps des Entwicklers",
-  "WakeOnDescription": "Automatisierung mit Wake-on-LAN",
-  "NextBoostDescription": "Windows-Optimierung",
   "TvConfirmationCard": "TV-Bestätigung",
   "TvConfirmationDescription": "Wenn du einen neuen Gaming-Bildschirm zum ersten Mal verwendest, bittet dich der Fernseher zu bestätigen, dass du das Bild sehen kannst. Bestätige mit Maus, Tastatur oder Controller (Xbox: A/B · PlayStation: ✕/○). Du kannst dies hier testen, ohne deine Bildschirme zu ändern.",
   "TvSection": "Fernseher",
@@ -430,5 +428,11 @@
   "AddCustomAppCard": "Eigene App hinzufügen",
   "AddCustomAppDescription": "Wähle eine .exe: Sie wird zur Kachel auf der Startseite, mit Symbol und Namen des Programms.",
   "RemoveCustomAppCard": "Diese App entfernen",
-  "RemoveCustomAppDescription": "Entfernt die Kachel dieser App von der Startseite; stattdessen öffnet sich Steam Big Picture."
+  "RemoveCustomAppDescription": "Entfernt die Kachel dieser App von der Startseite; stattdessen öffnet sich Steam Big Picture.",
+  "OtherAppsControlFsDescription": "Ein Dateimanager für den Controller, mit sicherem ZIP-Entpacker.",
+  "OtherAppsTakoDescription": "Deine Spielebibliothek in einem Launcher für Fernseher und Controller.",
+  "OtherAppsJoyChromiumDescription": "Ein Webbrowser für den Fernseher, mit dem Controller vom Sofa aus bedient.",
+  "OtherAppsStageAlpha": "Alpha",
+  "OtherAppsStageClosedAlpha": "Geschlossene Alpha",
+  "OtherAppsStageBeta": "Beta"
 }

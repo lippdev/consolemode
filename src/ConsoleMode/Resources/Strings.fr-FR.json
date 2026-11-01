@@ -159,8 +159,6 @@
   "BetaUpdatesWarning": "Les versions de test peuvent échouer sur certaines configurations. En cas de problème, téléchargez la version stable sur la page des versions et signalez-le-nous avec le bouton de commentaires.",
   "HelpDataSection": "Raccourci, aide et données",
   "OtherAppsSection": "Autres applications du développeur",
-  "WakeOnDescription": "Automatisation avec Wake-on-LAN",
-  "NextBoostDescription": "Optimisation de Windows",
   "TvConfirmationCard": "Confirmation sur la TV",
   "TvConfirmationDescription": "La première fois que vous utilisez un nouvel écran de jeu, la TV vous demande de confirmer que vous voyez l'image. Répondez avec la souris, le clavier ou la manette (Xbox : A/B · PlayStation : ✕/○). Testez-la ici sans modifier vos écrans.",
   "TvSection": "TV",
@@ -430,5 +428,11 @@
   "AddCustomAppCard": "Ajouter une application personnalisée",
   "AddCustomAppDescription": "Choisissez un .exe : il devient une tuile de l'Accueil, avec l'icône et le nom du programme.",
   "RemoveCustomAppCard": "Retirer cette application",
-  "RemoveCustomAppDescription": "Retire la tuile de cette application de l'Accueil ; Steam Big Picture s'ouvre à la place."
+  "RemoveCustomAppDescription": "Retire la tuile de cette application de l'Accueil ; Steam Big Picture s'ouvre à la place.",
+  "OtherAppsControlFsDescription": "Un gestionnaire de fichiers pensé pour la manette, avec un extracteur ZIP sûr.",
+  "OtherAppsTakoDescription": "Votre bibliothèque de jeux dans un lanceur fait pour la TV et la manette.",
+  "OtherAppsJoyChromiumDescription": "Un navigateur pour la TV, piloté à la manette depuis le canapé.",
+  "OtherAppsStageAlpha": "Alpha",
+  "OtherAppsStageClosedAlpha": "Alpha fermée",
+  "OtherAppsStageBeta": "Bêta"
 }

@@ -51,6 +51,10 @@ public sealed partial class ConsoleHomeView : UserControl
             RowHelp.Text = Microsoft.UI.Xaml.Automation.AutomationProperties.GetHelpText(row);
         };
         CategoryRail.GotFocus += (_, _) => RowHelp.Text = "";
+        // The list's edges and its scroll thumb follow the scrolling, the window's size and the category shown.
+        SettingsRows.ViewChanged += (_, _) => UpdateRowsScroll();
+        SettingsRows.SizeChanged += (_, _) => UpdateRowsScroll();
+        if (SettingsRows.Content is FrameworkElement rows) rows.SizeChanged += (_, _) => UpdateRowsScroll();
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
@@ -363,6 +367,25 @@ public sealed partial class ConsoleHomeView : UserControl
         // The tour opens the System tab under itself: the focus stays on its card.
         if (ViewModel.IsConsoleTourOpen) { ConsoleTourNextButton.Focus(FocusState.Keyboard); return; }
         CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
+    }
+
+    /// <summary>
+    /// The System list: an edge fades into the background while there are rows past it (instead of a hard cut), and the
+    /// thumb on the right shows where the list is, only when it is longer than the screen.
+    /// </summary>
+    private void UpdateRowsScroll()
+    {
+        var scrollable = SettingsRows.ScrollableHeight > 1;
+        var offset = SettingsRows.VerticalOffset;
+        RowsFadeTop.Opacity = scrollable && offset > 1 ? 1 : 0;
+        RowsFadeBottom.Opacity = scrollable && offset < SettingsRows.ScrollableHeight - 1 ? 1 : 0;
+        RowsScrollTrack.Opacity = scrollable ? 1 : 0;
+        if (!scrollable || SettingsRows.ExtentHeight <= 0) return;
+        var track = RowsScrollTrack.ActualHeight;
+        if (track <= 0) return;
+        var thumb = Math.Max(36, track * SettingsRows.ViewportHeight / SettingsRows.ExtentHeight);
+        RowsScrollThumb.Height = thumb;
+        RowsScrollThumb.Margin = new Thickness(0, (track - thumb) * Math.Clamp(offset / SettingsRows.ScrollableHeight, 0, 1), 0, 0);
     }
 
     // ───────────── Opening ─────────────

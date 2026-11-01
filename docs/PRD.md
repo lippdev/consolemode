@@ -485,7 +485,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 ### Épico DIAG — Diagnóstico e suporte
 
 - [x] **DIAG-001 —** Botão de feedback com issue pré-preenchida. (#25, 1.5.0)
-- [x] **DIAG-002 —** "Mais apps do desenvolvedor" (WakeOn, Next Boost). (#63, 1.5.0)
+- [x] **DIAG-002 —** "Mais apps do desenvolvedor": WakeOn e Next Boost (#63, 1.5.0); na 1.7, ControlFS (alpha), Tako Launcher (alpha fechado) e JoyChromium (beta), com fase e descrição (#185).
 - [x] **DIAG-003 —** Diagnóstico com relatório copiável, sem dados pessoais. (#159, 1.7.0-alpha.1)
 - [ ] **DIAG-004 (contínuo) —** Coletar setups que funcionam ou quebram (issue #15) e levar os casos ao Diagnóstico.
 

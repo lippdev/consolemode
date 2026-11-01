@@ -159,8 +159,6 @@
   "BetaUpdatesWarning": "Versões de teste podem falhar em alguns setups. Se algo der errado, baixe a versão estável na página de releases e conte pelo botão de feedback.",
   "HelpDataSection": "Atalho, ajuda e dados",
   "OtherAppsSection": "Outros apps do desenvolvedor",
-  "WakeOnDescription": "Automação com Wake-on-LAN",
-  "NextBoostDescription": "Otimização do Windows",
   "TvConfirmationCard": "Confirmação na TV",
   "TvConfirmationDescription": "Na primeira vez com uma tela de jogo nova, a TV pergunta se você está vendo a imagem. Responda com mouse, teclado ou controle (Xbox: A/B · PlayStation: ✕/○). Teste aqui sem mexer nas telas.",
   "TvSection": "TV",
@@ -430,5 +428,11 @@
   "AddCustomAppCard": "Adicionar aplicativo personalizado",
   "AddCustomAppDescription": "Escolha um .exe: ele vira um bloco no Início, com o ícone e o nome do programa.",
   "RemoveCustomAppCard": "Remover este aplicativo",
-  "RemoveCustomAppDescription": "Tira o bloco deste aplicativo do Início; o Steam Big Picture passa a abrir no lugar."
+  "RemoveCustomAppDescription": "Tira o bloco deste aplicativo do Início; o Steam Big Picture passa a abrir no lugar.",
+  "OtherAppsControlFsDescription": "Explorador de arquivos feito para o controle, com extrator de ZIP seguro.",
+  "OtherAppsTakoDescription": "Sua biblioteca de jogos num launcher feito para a TV e o controle.",
+  "OtherAppsJoyChromiumDescription": "Navegador para a TV que se usa com o controle, do sofá.",
+  "OtherAppsStageAlpha": "Alpha",
+  "OtherAppsStageClosedAlpha": "Alpha fechado",
+  "OtherAppsStageBeta": "Beta"
 }
