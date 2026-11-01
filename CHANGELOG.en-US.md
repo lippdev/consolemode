@@ -5,6 +5,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### Changes
 - Home: clicking a launcher (or pressing A on it) only picks what will open; **Play now** is what starts. Before, the click went straight into console mode, so picking looked like opening. With a controller or the keyboard, the focus moves down to **Play now** after the pick, so a second A plays. (#193)
+### Fixes
+- System and Session: picking an option from a list (resolution, audio output, how to turn the other screens off...) or closing it with B leaves the focus on the same row. Before, it went back to the category or the first screen, and you had to scroll down all over again. (#196)
 
 ## [1.7.0-beta.2]
 ### Fixes

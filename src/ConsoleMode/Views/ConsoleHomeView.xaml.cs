@@ -23,6 +23,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private static Style? _cardStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
+    /// <summary>The row whose picker is open (or was, until the focus goes back to it).</summary>
+    private Control? _pickerOpener;
     private readonly ScrollEdges _rowsEdges;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
     private long _railPointerPressedAt = long.MinValue / 2;
@@ -166,10 +168,15 @@ public sealed partial class ConsoleHomeView : UserControl
                 });
                 break;
             case nameof(MainViewModel.IsPickerOpen):
+                // The row that opened it still has the focus here: closing the picker lands back on that row (the
+                // resolution, an audio output...), not on the first one of the page.
+                if (ViewModel.IsPickerOpen && !IsFocusInside(PickerPanel))
+                    _pickerOpener = Root.XamlRoot is { } root ? FocusManager.GetFocusedElement(root) as Control : null;
                 DispatcherQueue.TryEnqueue(() =>
                 {
                     if (ViewModel.IsPickerOpen) FocusPickerSelection();
-                    else if (ViewModel.IsConsoleSettingsOpen) FocusSystemRow();
+                    else if (BackToPickerOpener()) { }
+                    else if (ViewModel.IsConsoleSettingsOpen || ViewModel.IsSystemTab && _lastSettingsRow is not null) FocusSystemRow();
                     else FocusDefault();
                 });
                 break;
@@ -254,6 +261,19 @@ public sealed partial class ConsoleHomeView : UserControl
         if (ViewModel.IsSessionTab) { (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard); return; }
         if (ViewModel.CanStart) { PlayButton.Focus(FocusState.Keyboard); return; }
         (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard);
+    }
+
+    /// <summary>
+    /// The picker closed (a value picked or B): back to the row that opened it, if it is still on screen. A choice can
+    /// rebuild the page under it (another resolution list, say); then the caller falls back to the usual spot.
+    /// </summary>
+    private bool BackToPickerOpener()
+    {
+        var opener = _pickerOpener;
+        _pickerOpener = null;
+        if (opener is null || opener.XamlRoot is null || opener.Visibility != Visibility.Visible || !opener.IsEnabled) return false;
+        if (!IsInside(opener, Root) || IsInside(opener, PickerPanel)) return false;
+        return opener.Focus(FocusState.Keyboard);
     }
 
     /// <summary>Land on the current value so A confirms it and the stick moves from there.</summary>

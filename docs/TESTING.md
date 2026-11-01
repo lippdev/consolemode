@@ -636,6 +636,12 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Fechar o Playnite depois disso encerra a sessão e a mesa volta como estava ("Restore: concluído com sucesso", sem "Não foi possível desconectar"). Resultado: ______
 - [ ] Com a TV como tela de jogo e os dois monitores da mesa desligados pela sessão, abrir e encerrar várias sessões seguidas. Se o log mostrar "Telas: a tela de jogo passou de … para …", a resolução da TV é aplicada, o jogo abre na TV e a volta religa os monitores da mesa nas posições certas (o log da volta mostra "telas com outro nome desde o backup"). Resultado: ______
 
+## Foco volta para a linha depois de uma lista (#196)
+
+- [ ] Sistema, com o controle: descer até uma opção que não seja a primeira (ex.: Como desligar as outras telas), abrir com A, escolher outro valor com A. O foco fica nessa mesma opção. Fechar outra lista com B também volta para a linha dela. Resultado: ______
+- [ ] Sessão: Saída de áudio e Resolução, escolhendo um valor ou fechando com B: o foco volta para o ajuste, não para a primeira tela. Resultado: ______
+- [ ] Com o mouse: clicar numa opção, escolher um valor; a lista fecha e a página não pula. Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.
