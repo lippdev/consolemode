@@ -25,7 +25,7 @@ No menu da sessão há duas saídas. **Voltar ao PC** encerra a sessão e devolv
 
 ## A interface
 
-O Console Mode tem uma interface só, feita como a de um console: ocupa a tela toda e funciona com controle Xbox ou PlayStation, mouse ou teclado (clique numa aba ou use Page Up / Page Down; Enter e Esc fazem o papel de A e B). Na primeira vez que você abre, um tour guiado passa pelas abas, pelos iniciadores, pelo botão de jogar, pelas telas, pelos ajustes rápidos e pelos atalhos do controle; **A** avança e **B** pula. Para ver de novo: **Sistema → App → Tutorial**.
+O Console Mode tem uma interface só, feita como a de um console: ocupa a tela toda e funciona com controle Xbox ou PlayStation, mouse ou teclado (clique numa aba ou use Page Up / Page Down; Enter e Esc fazem o papel de A e B). Na primeira vez que você abre, um tour guiado passa pelas abas, pelos iniciadores, pelo botão de jogar, pelas telas, pelos ajustes rápidos e pelos atalhos do controle; **A** avança e **B** pula. Para ver de novo: **Sistema → App → Tutorial**. Enquanto carrega, o app mostra uma abertura com o logo e um som de entrada; qualquer botão pula, e **Sistema → App** desliga a abertura ou só o som.
 
 O **Início** mostra os seus iniciadores numa fileira no topo (Steam Big Picture, Playnite, modo Xbox): **A** num deles escolhe o que abre, e **Jogar agora** logo abaixo começa. A linha embaixo do nome diz onde você vai jogar e o que muda (áudio, resolução, FPS, HDR, VRR); o botão redondo ao lado de Jogar agora abre a **Sessão**, com as telas e os ajustes rápidos.
 

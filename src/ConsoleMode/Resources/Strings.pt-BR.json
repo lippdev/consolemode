@@ -415,5 +415,9 @@
   "ConsoleTourShortcutsBody": "Escolha aqui os atalhos que funcionam mesmo com esta janela fechada: um para entrar no modo console, um para abrir o menu da sessão por cima do jogo e um para voltar ao PC. Atalho sem combinação definida não faz nada.",
   "ConsoleTourDoneTitle": "Tudo pronto",
   "ConsoleTourDoneBody": "Confira a tela de jogo na aba Sessão e aperte Jogar agora. Para ver este tour de novo: Sistema → {0} → {1}.",
-  "ConsoleTourFinish": "Começar"
+  "ConsoleTourFinish": "Começar",
+  "IntroAnimationCard": "Abertura ao abrir o app",
+  "IntroAnimationDescription": "Mostra o logo do Console Mode com um carregamento enquanto o app abre.",
+  "IntroSoundCard": "Som da abertura",
+  "IntroSoundDescription": "Toca um som de entrada junto com a abertura."
 }

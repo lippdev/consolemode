@@ -649,6 +649,14 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] Aba Sessão: as telas aparecem como em Configurações → Sistema → Tela do Windows: na mesma posição relativa, na proporção real (um monitor girado aparece em pé) e com um espaço entre elas; uma tela desligada no Windows aparece tracejada à direita. Os textos encolhem para caber nas telas pequenas. Resultado: ______
 - [ ] O direcional anda entre as telas pela posição delas no mapa (direita vai para a tela à direita etc.) e A abre o painel de papel da tela. Resultado: ______
 
+### Abertura
+
+- [ ] Ao abrir o app: tela escura com o logo crescendo e acendendo, o nome e uma barrinha de carregamento, e o som de entrada; some com um fade em uns 2 s (ou quando o app termina de carregar, se demorar mais) e o Início aparece pronto (o tour, na primeira vez). Resultado: ______
+- [ ] Um botão do controle, um clique ou uma tecla durante a abertura pula para a interface e não faz mais nada (não começa sessão, não troca de aba). Resultado: ______
+- [ ] Sistema → App → "Abertura ao abrir o app" desligada: reabrir o app vai direto para a interface, sem som; "Som da abertura" fica desabilitada. Ligada com o som desligado: abertura muda. Ligar o som toca o som. Resultado: ______
+- [ ] "Sons da interface" desligado não silencia a abertura (ela tem o próprio ajuste). Resultado: ______
+- [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
+
 ### Tour guiado
 
 - [ ] Primeira abertura: o tour abre sozinho em "Bem-vindo ao Console Mode", 1 de 9, com o cartão no meio da tela e o fundo escurecido. Resultado: ______

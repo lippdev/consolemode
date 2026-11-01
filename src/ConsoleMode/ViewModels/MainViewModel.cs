@@ -324,6 +324,8 @@ public partial class MainViewModel : ObservableObject
             HomeButtonShortPress = config.HomeButtonShortPress;
             AutoStartOnController = config.AutoStartOnController;
             InterfaceSounds = config.InterfaceSounds;
+            IntroAnimation = config.IntroAnimation;
+            IntroSound = config.IntroSound;
             MinimizeToTray = config.MinimizeToTray;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
@@ -876,6 +878,8 @@ public partial class MainViewModel : ObservableObject
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,
             InterfaceSounds = InterfaceSounds,
+            IntroAnimation = IntroAnimation,
+            IntroSound = IntroSound,
             MinimizeToTray = MinimizeToTray,
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,

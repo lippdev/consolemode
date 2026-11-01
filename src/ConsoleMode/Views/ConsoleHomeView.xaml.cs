@@ -55,6 +55,8 @@ public sealed partial class ConsoleHomeView : UserControl
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
         ViewModel.PropertyChanged += OnViewModelChanged;
+        if (File.Exists(AppPaths.IconPath)) IntroLogo.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(AppPaths.IconPath));
+        if (ViewModel.IsIntroShowing) ShowIntro();
         ViewModel.PickBackgroundImageRequested += () => _ = PickBackgroundImageAsync();
     }
 
@@ -94,6 +96,8 @@ public sealed partial class ConsoleHomeView : UserControl
         _navigator.BackRequested += GoBack;
         _navigator.Intercept = action =>
         {
+            // Any press on the opening skips it, and does nothing else.
+            if (ViewModel.IsIntroShowing) { ViewModel.SkipIntro(); return true; }
             if (!ViewModel.IsCapturingShortcut) return false;
             return true;
         };
@@ -174,6 +178,10 @@ public sealed partial class ConsoleHomeView : UserControl
                     }
                     RefreshNavigator();
                 });
+                break;
+            case nameof(MainViewModel.IsIntroShowing):
+                if (ViewModel.IsIntroShowing) ShowIntro();
+                else HideIntro();
                 break;
             case nameof(MainViewModel.IsConsoleTourOpen):
                 if (!ViewModel.IsConsoleTourOpen) DispatcherQueue.TryEnqueue(FocusDefault);
@@ -356,6 +364,78 @@ public sealed partial class ConsoleHomeView : UserControl
         // The tour opens the System tab under itself: the focus stays on its card.
         if (ViewModel.IsConsoleTourOpen) { ConsoleTourNextButton.Focus(FocusState.Keyboard); return; }
         CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
+    }
+
+    // ───────────── Opening ─────────────
+
+    private void OnIntroTapped(object sender, TappedRoutedEventArgs e) => ViewModel.SkipIntro();
+
+    /// <summary>The logo grows in and lights up, then the name, then the loading bar.</summary>
+    private void ShowIntro()
+    {
+        IntroPanel.Visibility = Visibility.Visible;
+        if (!Ui.AnimationsEnabled) return;
+        try
+        {
+            var panel = ElementCompositionPreview.GetElementVisual(IntroPanel);
+            panel.Opacity = 1f;
+            var logo = ElementCompositionPreview.GetElementVisual(IntroLogo);
+            var compositor = logo.Compositor;
+            var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f));
+            logo.CenterPoint = new Vector3((float)IntroLogo.Width / 2, (float)IntroLogo.Height / 2, 0);
+            var grow = compositor.CreateVector3KeyFrameAnimation();
+            grow.InsertKeyFrame(0f, new Vector3(0.86f, 0.86f, 1f));
+            grow.InsertKeyFrame(1f, Vector3.One, easing);
+            grow.Duration = TimeSpan.FromMilliseconds(700);
+            logo.StartAnimation("Scale", grow);
+            FadeIn(logo, 0, 600);
+            FadeIn(ElementCompositionPreview.GetElementVisual(IntroName), 180, 600);
+            FadeIn(ElementCompositionPreview.GetElementVisual(IntroBar), 480, 400);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Abertura: animação: {ex.Message}");
+        }
+
+        static void FadeIn(Microsoft.UI.Composition.Visual visual, int delayMs, int ms)
+        {
+            var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
+            fade.InsertKeyFrame(0f, 0f);
+            fade.InsertKeyFrame(1f, 1f);
+            fade.DelayTime = TimeSpan.FromMilliseconds(delayMs);
+            fade.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+            fade.Duration = TimeSpan.FromMilliseconds(ms);
+            visual.StartAnimation("Opacity", fade);
+        }
+    }
+
+    /// <summary>The opening fades out over the interface, which is ready underneath (the tour too, the first time).</summary>
+    private void HideIntro()
+    {
+        if (IntroPanel.Visibility == Visibility.Collapsed) return;
+        void Done()
+        {
+            IntroPanel.Visibility = Visibility.Collapsed;
+            FocusDefault();
+        }
+        if (!Ui.AnimationsEnabled) { Done(); return; }
+        try
+        {
+            var panel = ElementCompositionPreview.GetElementVisual(IntroPanel);
+            var batch = panel.Compositor.CreateScopedBatch(Microsoft.UI.Composition.CompositionBatchTypes.Animation);
+            var fade = panel.Compositor.CreateScalarKeyFrameAnimation();
+            fade.InsertKeyFrame(0f, 1f);
+            fade.InsertKeyFrame(1f, 0f);
+            fade.Duration = TimeSpan.FromMilliseconds(380);
+            panel.StartAnimation("Opacity", fade);
+            batch.End();
+            batch.Completed += (_, _) => DispatcherQueue.TryEnqueue(Done);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Abertura: animação: {ex.Message}");
+            Done();
+        }
     }
 
     // ───────────── First-run tour ─────────────
@@ -622,6 +702,12 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
     {
+        if (ViewModel.IsIntroShowing)
+        {
+            ViewModel.SkipIntro();
+            e.Handled = true;
+            return;
+        }
         // The pad is read by the navigator (polling), never through these key events, or every press
         // would count twice. The keyboard goes through the same navigator, so both move the same way.
         if (e.Key is VirtualKey.Escape)

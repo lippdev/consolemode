@@ -21,7 +21,7 @@ El menú de la sesión tiene dos salidas. **Volver al PC** termina la sesión y 
 
 ## La interfaz
 
-Console Mode tiene una sola interfaz, hecha como la de una consola: ocupa toda la pantalla y funciona con un mando de Xbox o PlayStation, el ratón o el teclado (haz clic en una pestaña o usa Re Pág / Av Pág; Intro y Esc hacen de A y B). La primera vez que la abres, un recorrido guiado pasa por las pestañas, los lanzadores, el botón de jugar, las pantallas, los ajustes rápidos y los atajos del mando; **A** avanza y **B** lo salta. Para volver a verlo: **Sistema → Aplicación → Tutorial**.
+Console Mode tiene una sola interfaz, hecha como la de una consola: ocupa toda la pantalla y funciona con un mando de Xbox o PlayStation, el ratón o el teclado (haz clic en una pestaña o usa Re Pág / Av Pág; Intro y Esc hacen de A y B). La primera vez que la abres, un recorrido guiado pasa por las pestañas, los lanzadores, el botón de jugar, las pantallas, los ajustes rápidos y los atajos del mando; **A** avanza y **B** lo salta. Para volver a verlo: **Sistema → Aplicación → Tutorial**. Mientras carga, la aplicación muestra una apertura con el logotipo y un sonido de entrada; cualquier botón la salta, y **Sistema → Aplicación** desactiva la apertura o solo su sonido.
 
 En **Sistema → Mando**, elige el diseño de botones: **Automático**, **Xbox** o **PlayStation**. La vista previa y las etiquetas de los atajos siguen esa elección, que se guarda al cerrar la aplicación. Esto solo cambia los símbolos que se muestran; las entradas del mando mantienen su asignación.
 

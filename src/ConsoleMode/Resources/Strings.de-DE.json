@@ -415,5 +415,9 @@
   "ConsoleTourShortcutsBody": "Wähle hier die Kürzel, die auch bei geschlossenem Fenster funktionieren: eines für den Konsolenmodus, eines für das Sitzungsmenü über dem Spiel und eines für die Rückkehr zum PC. Ein Kürzel ohne Kombination bewirkt nichts.",
   "ConsoleTourDoneTitle": "Alles bereit",
   "ConsoleTourDoneBody": "Prüfe den Spielbildschirm im Tab Sitzung und drücke Jetzt spielen. Um diese Tour noch einmal zu sehen: System → {0} → {1}.",
-  "ConsoleTourFinish": "Los geht's"
+  "ConsoleTourFinish": "Los geht's",
+  "IntroAnimationCard": "Intro beim Start der App",
+  "IntroAnimationDescription": "Zeigt das Console-Mode-Logo mit einem Ladebalken, während die App startet.",
+  "IntroSoundCard": "Intro-Sound",
+  "IntroSoundDescription": "Spielt zum Intro einen Startsound ab."
 }

@@ -393,6 +393,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [ ] **UI-009 (P1) —** Primeira execução guiada: escolher a tela de jogo, testar, configurar o atalho. O tour (UI-013) mostra onde fica cada coisa; falta o passo a passo que faz junto com a pessoa.
 - [x] **UI-012 —** Uma interface só (D-23): a interface Desktop e a opção Interface saem; contador de FPS, argumentos do aplicativo personalizado, relatório de diagnóstico e versão passam para a aba Sistema. (1.7.0)
 - [x] **UI-013 —** Tour guiado na primeira abertura da interface: 9 paradas com recorte no que cada uma explica (abas, iniciadores, jogar, telas, ajustes rápidos, Sistema, atalhos do controle), A avança e B pula; de novo em Sistema → App → Tutorial. (1.7.0)
+- [x] **UI-015 —** Abertura ao abrir o app: logo, carregamento e som de entrada enquanto carrega, com fade para a interface; pula com qualquer botão; desligável (abertura e som) em Sistema → App. (1.7.0)
 - [x] **UI-014 —** A aba Sistema mostra, embaixo da lista, o que faz a linha em foco: as descrições que a interface Desktop tinha. (1.7.0)
 - [ ] **UI-010 (P2) —** Acessibilidade: leitor de tela, alto contraste na interface Console, tamanho do texto, redução de animações própria.
 - [ ] **UI-011 (P2) —** Polimento contínuo: legibilidade em TV com sobrevarredura, escala do texto, consistência de foco e hover entre a interface e o menu.

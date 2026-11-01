@@ -415,5 +415,9 @@
   "ConsoleTourShortcutsBody": "Elige aquí los atajos que funcionan incluso con esta ventana cerrada: uno para entrar en el modo consola, otro para abrir el menú de la sesión sobre el juego y otro para volver al PC. Un atajo sin combinación no hace nada.",
   "ConsoleTourDoneTitle": "Todo listo",
   "ConsoleTourDoneBody": "Comprueba la pantalla de juego en la pestaña Sesión y pulsa Jugar ahora. Para volver a ver este recorrido: Sistema → {0} → {1}.",
-  "ConsoleTourFinish": "Empezar"
+  "ConsoleTourFinish": "Empezar",
+  "IntroAnimationCard": "Apertura al abrir la aplicación",
+  "IntroAnimationDescription": "Muestra el logotipo de Console Mode con una carga mientras se abre la aplicación.",
+  "IntroSoundCard": "Sonido de apertura",
+  "IntroSoundDescription": "Reproduce un sonido de entrada con la apertura."
 }

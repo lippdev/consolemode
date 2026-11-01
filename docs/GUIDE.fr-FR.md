@@ -21,7 +21,7 @@ Le menu de session propose deux sorties. **Retour au PC** termine la session et 
 
 ## L'interface
 
-Console Mode a une seule interface, conçue comme celle d'une console : elle occupe tout l'écran et marche avec une manette Xbox ou PlayStation, la souris ou le clavier (cliquez sur un onglet ou utilisez Page précédente / Page suivante ; Entrée et Échap font office de A et B). À la première ouverture, une visite guidée passe par les onglets, les lanceurs, le bouton Jouer, les écrans, les réglages rapides et les raccourcis manette ; **A** avance, **B** la passe. Pour la revoir : **Système → Application → Tutoriel**.
+Console Mode a une seule interface, conçue comme celle d'une console : elle occupe tout l'écran et marche avec une manette Xbox ou PlayStation, la souris ou le clavier (cliquez sur un onglet ou utilisez Page précédente / Page suivante ; Entrée et Échap font office de A et B). À la première ouverture, une visite guidée passe par les onglets, les lanceurs, le bouton Jouer, les écrans, les réglages rapides et les raccourcis manette ; **A** avance, **B** la passe. Pour la revoir : **Système → Application → Tutoriel**. Pendant le chargement, l'application affiche une ouverture avec son logo et un son d'entrée ; n'importe quel bouton la passe, et **Système → Application** désactive l'ouverture ou seulement son son.
 
 Dans **Système → Manette**, choisissez la disposition des boutons : **Automatique**, **Xbox** ou **PlayStation**. L'aperçu et les libellés des raccourcis suivent ce choix, qui est enregistré à la fermeture de l'application. Seuls les symboles affichés changent ; les entrées de la manette gardent leur correspondance actuelle.
 

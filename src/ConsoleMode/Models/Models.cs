@@ -90,6 +90,12 @@ public sealed class AppConfig
     /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
     public bool InterfaceSounds { get; set; } = true;
 
+    /// <summary>The opening with the logo and a loading bar when the app opens (BootIntro).</summary>
+    public bool IntroAnimation { get; set; } = true;
+
+    /// <summary>The opening's sound; has its own switch, apart from the interface sounds.</summary>
+    public bool IntroSound { get; set; } = true;
+
     /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
     public bool MinimizeToTray { get; set; }
 

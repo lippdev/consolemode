@@ -25,7 +25,7 @@ The session menu has two ways out. **Back to the PC** ends the session and puts 
 
 ## The interface
 
-Console Mode has one interface, made like a console's: it fills the screen and works with an Xbox or PlayStation controller, the mouse or the keyboard (click a tab or use Page Up / Page Down; Enter and Esc work as A and B). The first time you open it, a guided tour walks through the tabs, the launchers, the play button, the screens, the quick settings and the controller shortcuts; **A** goes on, **B** skips it. To see it again: **System → App → Tutorial**.
+Console Mode has one interface, made like a console's: it fills the screen and works with an Xbox or PlayStation controller, the mouse or the keyboard (click a tab or use Page Up / Page Down; Enter and Esc work as A and B). The first time you open it, a guided tour walks through the tabs, the launchers, the play button, the screens, the quick settings and the controller shortcuts; **A** goes on, **B** skips it. To see it again: **System → App → Tutorial**. While the app loads it shows an opening with its logo and an entrance sound; any button skips it, and **System → App** turns it off, or just its sound.
 
 **Home** puts your launchers in a row at the top (Steam Big Picture, Playnite, Xbox mode): **A** on one picks what opens, and **Play now** below starts it. The line under the name says where you will play and what changes (audio, resolution, FPS, HDR, VRR); the round button next to Play now opens **Session**, with the screens and quick settings.
 

@@ -415,5 +415,9 @@
   "ConsoleTourShortcutsBody": "Pick the shortcuts that work even with this window closed here: one to enter console mode, one to open the session menu over the game and one to go back to the PC. A shortcut with no combination does nothing.",
   "ConsoleTourDoneTitle": "All set",
   "ConsoleTourDoneBody": "Check the game display on the Session tab and press Play now. To see this tour again: System → {0} → {1}.",
-  "ConsoleTourFinish": "Get started"
+  "ConsoleTourFinish": "Get started",
+  "IntroAnimationCard": "Opening when the app starts",
+  "IntroAnimationDescription": "Shows the Console Mode logo with a loading bar while the app opens.",
+  "IntroSoundCard": "Opening sound",
+  "IntroSoundDescription": "Plays an entrance sound with the opening."
 }

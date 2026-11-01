@@ -93,8 +93,20 @@ public partial class App : Application
             WatchGuideButton();
 
             // A stop request with nothing running just opens the window.
-            if (!autoStart && !trayOnly) _window.Activate();
-            await ViewModel.InitializeAsync(interactive: !autoStart && !trayOnly);
+            if (!autoStart && !trayOnly)
+            {
+                // The opening covers the loading; it fades out once InitializeAsync is done.
+                ViewModel.BeginIntro();
+                _window.Activate();
+            }
+            try
+            {
+                await ViewModel.InitializeAsync(interactive: !autoStart && !trayOnly);
+            }
+            finally
+            {
+                _ = ViewModel.FinishIntroAsync();
+            }
 
             if (autoStart && !await ViewModel.TryAutoStartAsync())
                 _window.Activate();

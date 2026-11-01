@@ -415,5 +415,9 @@
   "ConsoleTourShortcutsBody": "Choisissez ici les raccourcis qui marchent même fenêtre fermée : un pour entrer en mode console, un pour ouvrir le menu de session par-dessus le jeu et un pour revenir au PC. Un raccourci sans combinaison ne fait rien.",
   "ConsoleTourDoneTitle": "Tout est prêt",
   "ConsoleTourDoneBody": "Vérifiez l'écran de jeu dans l'onglet Session et appuyez sur Jouer. Pour revoir cette visite : Système → {0} → {1}.",
-  "ConsoleTourFinish": "C'est parti"
+  "ConsoleTourFinish": "C'est parti",
+  "IntroAnimationCard": "Ouverture au lancement de l'application",
+  "IntroAnimationDescription": "Affiche le logo de Console Mode avec un chargement pendant l'ouverture de l'application.",
+  "IntroSoundCard": "Son d'ouverture",
+  "IntroSoundDescription": "Joue un son d'entrée avec l'ouverture."
 }

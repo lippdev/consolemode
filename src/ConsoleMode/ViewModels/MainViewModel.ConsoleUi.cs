@@ -170,6 +170,8 @@ public partial class MainViewModel
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "controllerwake": _ = EnableControllerWakeAsync(); break;
             case "sounds": InterfaceSounds = !InterfaceSounds; break;
+            case "intro": IntroAnimation = !IntroAnimation; break;
+            case "introsound": IntroSound = !IntroSound; break;
             case "background": CycleBackgroundMode(); break;
             case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;

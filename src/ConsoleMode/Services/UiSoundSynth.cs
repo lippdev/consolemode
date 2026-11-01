@@ -9,8 +9,10 @@ public enum UiSound
     Confirm,
     /// <summary>Went back or closed a panel.</summary>
     Back,
-    /// <summary>Switched to another tab of the console interface (LB / RB, or a click on a tab).</summary>
-    Tab
+    /// <summary>Switched to another tab of the console interface (LB / RB).</summary>
+    Tab,
+    /// <summary>The opening of the app, under the logo.</summary>
+    Boot
 }
 
 /// <summary>
@@ -30,6 +32,8 @@ public static class UiSoundSynth
         UiSound.Move => [new(1150, 1000, 45, 0.30)],
         UiSound.Tab => [new(980, 1180, 55, 0.30)],
         UiSound.Confirm => [new(740, 740, 55, 0.32), new(1110, 1110, 95, 0.34)],
+        // Only if AssetsSoundsoot.wav were missing: a short rising arpeggio.
+        UiSound.Boot => [new(523, 523, 110, 0.26), new(659, 659, 110, 0.28), new(784, 784, 140, 0.30), new(1047, 1047, 420, 0.30)],
         _ => [new(820, 820, 50, 0.30), new(560, 540, 85, 0.30)]
     };
 

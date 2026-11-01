@@ -21,7 +21,7 @@ Das Sitzungsmenü bietet zwei Wege hinaus. **Zurück zum PC** beendet die Sitzun
 
 ## Die Oberfläche
 
-Console Mode hat eine einzige Oberfläche, gestaltet wie die einer Konsole: Sie füllt den Bildschirm und funktioniert mit einem Xbox- oder PlayStation-Controller, der Maus oder der Tastatur (klicke auf eine Registerkarte oder nutze Bild auf / Bild ab; Eingabe und Esc wirken wie A und B). Beim ersten Öffnen führt dich eine Tour durch die Registerkarten, die Launcher, die Spielen-Schaltfläche, die Bildschirme, die Schnelleinstellungen und die Controller-Tastenkombinationen; **A** geht weiter, **B** überspringt sie. Um sie erneut zu sehen: **System → App → Tutorial**.
+Console Mode hat eine einzige Oberfläche, gestaltet wie die einer Konsole: Sie füllt den Bildschirm und funktioniert mit einem Xbox- oder PlayStation-Controller, der Maus oder der Tastatur (klicke auf eine Registerkarte oder nutze Bild auf / Bild ab; Eingabe und Esc wirken wie A und B). Beim ersten Öffnen führt dich eine Tour durch die Registerkarten, die Launcher, die Spielen-Schaltfläche, die Bildschirme, die Schnelleinstellungen und die Controller-Tastenkombinationen; **A** geht weiter, **B** überspringt sie. Um sie erneut zu sehen: **System → App → Tutorial**. Während die App lädt, zeigt sie ein Intro mit dem Logo und einem Startsound; jede Taste überspringt es, und unter **System → App** lässt sich das Intro oder nur sein Sound ausschalten.
 
 Unter **System → Controller** wählst du das Tastenlayout: **Automatisch**, **Xbox** oder **PlayStation**. Vorschau und Tastenbeschriftungen richten sich nach dieser Wahl, die beim Schließen der App gespeichert wird. Das ändert nur die angezeigten Symbole; die Eingaben des Controllers behalten ihre bisherige Belegung.
 
