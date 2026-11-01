@@ -12,6 +12,15 @@ Até a versão 1.5, o Console Mode embutia o [MultiMonitorTool](https://www.nirs
 |-------|------|----------------|
 | [Inter](https://rsms.me/inter/) 4.1 | GitHub (SIL Open Font License 1.1) | Embarcada (`src/ConsoleMode/Assets/Fonts/InterVariable.ttf`) como fonte da interface Console. A licença vai junto, em `Inter-OFL.txt` |
 
+## Sons da interface
+
+Embarcados no executável (`src/ConsoleMode/Assets/Sounds`), convertidos para WAV mono de 44,1 kHz com o volume igualado.
+
+| Som | Origem | Licença |
+|-----|--------|---------|
+| `move.wav` (`glass_002`), `confirm.wav` (`confirmation_001`), `back.wav` (`minimize_008`) | [Interface Sounds](https://kenney.nl/assets/interface-sounds), da Kenney | CC0 1.0 (domínio público; crédito opcional) |
+| `tab.wav` (`cursor_c`) | Gerado pelo [`tools/make_sounds.py`](https://github.com/mattxslv/Selene/blob/main/tools/make_sounds.py) do [Selene](https://github.com/mattxslv/Selene), de Matthew Silva (mattxslv): síntese pura, sem amostras | MIT, Copyright (c) 2026 Matthew Silva |
+
 ## Limite de FPS (opcional)
 
 | Ferramenta | Site | Uso no projeto |
