@@ -30,6 +30,13 @@ public sealed class TvControlService
     /// <summary>Settings → Test: time to press "Allow" on the TV the first time.</summary>
     public static readonly TimeSpan PairingTimeout = TimeSpan.FromSeconds(60);
 
+    /// <summary>
+    /// Off for 1.7: the owner left TV control (Google TV / Android TV) out of the release. The System → TV category is
+    /// hidden and sessions don't wake the TV or put it in standby; the code and the saved settings stay, so turning
+    /// this back on brings the feature back as it was.
+    /// </summary>
+    public static bool IsAvailable => false;
+
     public static ITvController? Create(string provider) => provider switch
     {
         TvControlConfig.AndroidTv => new AndroidTvController(),

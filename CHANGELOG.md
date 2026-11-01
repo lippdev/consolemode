@@ -6,6 +6,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 ### Mudanças
 - Início: clicar num iniciador (ou apertar A nele) só escolhe o que vai abrir; quem começa é **Jogar agora**. Antes o clique já entrava no modo console, e escolher parecia abrir sozinho. No controle e no teclado, o foco desce para **Jogar agora** depois da escolha, então um segundo A joga. (#193)
 - Tour guiado: cada parada avança sozinha depois do tempo de ler o texto (de 7 a 16 s), com uma barra embaixo do cartão mostrando quanto falta, e a última fecha o tour. Ninguém fica preso numa parada se o controle não responder (houve relato com controle de PS5). **A** avança na hora e **B** pula, como antes. (#194)
+- Controle da TV (Google TV / Android TV pela rede) sai da 1.7: a categoria **TV** some da aba Sistema e a sessão não liga mais a TV nem a coloca em espera na volta. Os ajustes de quem já configurou ficam guardados para quando ele voltar. (#195)
 ### Correções
 - Sistema e Sessão: escolher uma opção numa lista (resolução, saída de áudio, como desligar as outras telas...) ou fechá-la com B deixa o foco na mesma linha. Antes ele voltava para a categoria ou para a primeira tela, e era preciso descer tudo de novo. (#196)
 

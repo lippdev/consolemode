@@ -6,6 +6,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ### Changes
 - Home: clicking a launcher (or pressing A on it) only picks what will open; **Play now** is what starts. Before, the click went straight into console mode, so picking looked like opening. With a controller or the keyboard, the focus moves down to **Play now** after the pick, so a second A plays. (#193)
 - Guided tour: each stop moves on by itself once there has been time to read it (7 to 16 s), with a bar under the card showing how long is left, and the last one closes the tour. Nobody is stuck on a stop if the controller doesn't answer (reported with a PS5 controller). **A** goes on at once and **B** skips, as before. (#194)
+- TV control (Google TV / Android TV over the network) is out of 1.7: the **TV** category leaves the System tab and sessions no longer turn the TV on or put it in standby on the way back. The settings of anyone who set it up are kept for when it returns. (#195)
 ### Fixes
 - System and Session: picking an option from a list (resolution, audio output, how to turn the other screens off...) or closing it with B leaves the focus on the same row. Before, it went back to the category or the first screen, and you had to scroll down all over again. (#196)
 

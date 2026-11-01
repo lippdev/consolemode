@@ -29,7 +29,7 @@ Console Mode tiene una sola interfaz, hecha como la de una consola: ocupa toda l
 
 En **Sistema → Mando**, elige el diseño de botones: **Automático**, **Xbox** o **PlayStation**. La vista previa y las etiquetas de los atajos siguen esa elección, que se guarda al cerrar la aplicación. Esto solo cambia los símbolos que se muestran; las entradas del mando mantienen su asignación.
 
-La pestaña **Sistema** reúne todos los ajustes, incluidos los atajos del mando, Playnite, Android TV, el FPS personalizado, el diseño del contador de FPS, los argumentos de la aplicación personalizada, el informe de diagnóstico y la carpeta de datos. Los valores se mantienen al reiniciar la aplicación.
+La pestaña **Sistema** reúne todos los ajustes, incluidos los atajos del mando, Playnite, el FPS personalizado, el diseño del contador de FPS, los argumentos de la aplicación personalizada, el informe de diagnóstico y la carpeta de datos. Los valores se mantienen al reiniciar la aplicación.
 
 Abre la acción del atajo que quieras configurar, elige **Definir** o **Cambiar**, mantén la combinación deseada en un mando y suelta los botones. **Quitar** desactiva ese atajo. Durante la captura, los botones del mando no navegan por la interfaz; usa **Cancelar** o **Esc** para detener la captura. Fuera de la captura, **B** sale del editor. Los campos de dirección y de FPS personalizado aceptan el teclado.
 
@@ -53,29 +53,6 @@ Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas q
 ```
 
 `start`, `stop` y `show` hacen exactamente lo mismo que el enlace `consolemode://` correspondiente y responden cuando la aplicación termina (`ok:false` con un `error` si el modo consola no se inició o la restauración no terminó). `status` solo lee. Solo pueden conectarse el usuario que ha iniciado sesión y LocalSystem; nada se expone a la red.
-
-## Control de la TV
-
-Sistema → **TV** puede encender la TV y cambiarla a la entrada HDMI del PC cuando empieza el modo consola, y, si quieres, volver a ponerla en reposo cuando se restaura el escritorio. Una TV que no responde nunca bloquea el modo consola: la aplicación lo anota en el registro y espera a la pantalla de juego como siempre.
-
-Con la opción predeterminada, **No controlarla**, no se envía nada y no se añade nada al inicio ni a la restauración. Con una ruta elegida, el paso de la TV va primero cuando empieza el modo consola y dura como máximo **30 segundos** (el peor caso, cuando la TV no responde y se prueba Wake-on-LAN); el reposo opcional al restaurar dura como máximo **15 segundos**. Una TV que ya está encendida suele responder en uno o dos segundos.
-
-La mayoría de las tarjetas gráficas de PC no pueden enviar HDMI-CEC, así que la aplicación habla con la TV por la red:
-
-### Google TV / Android TV
-
-TCL, Sony, Hisense, Philips y otras TV con Google TV o Android TV, mediante ADB (el protocolo de depuración de Android). No hay que instalar nada en el PC.
-
-1. En la TV: **Ajustes → Sistema → Información**, pulsa 7 veces **Compilación del SO de Android TV** (Android TV OS build) para desbloquear las Opciones de desarrollador.
-2. **Ajustes → Sistema → Opciones de desarrollador**: activa **Depuración USB** (en algunas TV, **Depuración por red** / **ADB por red**).
-3. En Console Mode, elige *Google TV / Android TV (red)*, escribe la IP de la TV (Ajustes → Red en la TV; resérvala en el router) y la entrada HDMI que usa el PC.
-4. Pulsa **Probar ahora**. La TV pregunta "¿Permitir depuración desde este ordenador?": marca **Permitir siempre** y pulsa **Permitir**.
-
-La clave ADB del PC se guarda cifrada para tu usuario de Windows (DPAPI), así que la TV solo pregunta una vez. Si copias la carpeta de datos a otro usuario de Windows o a otro PC, la clave no se puede leer allí: la aplicación crea una nueva y la TV vuelve a preguntar "¿Permitir depuración?".
-
-Para encenderla se usa la tecla de activación de Android y después la tecla **HDMI 1-4**. Si tu TV ignora esa tecla, rellena **Comando de la entrada (avanzado)** con cualquier comando de shell de Android que abra la entrada del PC. Si la TV se desconecta de la red en reposo, rellena su **Dirección MAC** para que la aplicación envíe antes Wake-on-LAN (la opción de la TV "Activar por red" / "Activar por Wi-Fi" (Wake on network / Wake on Wi-Fi) tiene que estar activada).
-
-La "Depuración inalámbrica" con código de emparejamiento (móviles con Android 11 o posterior) es otro protocolo, envuelto en TLS, y no es compatible: usa la depuración USB / por red.
 
 ## Extras opcionales
 
