@@ -256,11 +256,12 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:LaunchTile">
-                                <!-- The focus picks the launcher (ConsoleHomeView.ScaleTile); A plays it. -->
+                                <!-- The focus picks the launcher (ConsoleHomeView.ScaleTile); A or a click picks it too and Play now opens it. -->
                                 <StackPanel Spacing="18" Opacity="{x:Bind Opacity, Mode=OneWay}">
                                     <StackPanel.OpacityTransition><ScalarTransition Duration="0:0:0.14"/></StackPanel.OpacityTransition>
                                     <Button Style="{StaticResource LaunchTileButton}" Background="{x:Bind Background}"
-                                            Command="{Binding ViewModel.PlayLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
+                                            Command="{Binding ViewModel.ChooseLaunchTileCommand, ElementName=Page}" CommandParameter="{x:Bind}"
+                                            Click="OnLaunchTileClick"
                                             AutomationProperties.Name="{x:Bind Text}">
                                         <Grid>
                                             <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Margin="0,0,0,20" Visibility="{x:Bind ShowGlyph, Mode=OneWay}"/>

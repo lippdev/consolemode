@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Mudanças
+- Início: clicar num iniciador (ou apertar A nele) só escolhe o que vai abrir; quem começa é **Jogar agora**. Antes o clique já entrava no modo console, e escolher parecia abrir sozinho. No controle e no teclado, o foco desce para **Jogar agora** depois da escolha, então um segundo A joga. (#193)
 
 ## [1.7.0-beta.2]
 ### Correções

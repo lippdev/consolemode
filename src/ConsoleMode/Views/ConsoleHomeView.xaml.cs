@@ -941,6 +941,16 @@ public sealed partial class ConsoleHomeView : UserControl
         if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
     }
 
+    /// <summary>
+    /// A on a launcher (pad or keyboard) picks it and takes the focus down to Play now, so a second A plays.
+    /// A mouse click only picks it: the pointer is already where it can click Play now.
+    /// </summary>
+    private void OnLaunchTileClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: LaunchTile { IsAdd: false } } button || button.FocusState == FocusState.Pointer) return;
+        if (ViewModel.CanStart) PlayButton.Focus(FocusState.Keyboard);
+    }
+
     /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>
     private static void ScaleTile(object source, float scale)
     {
