@@ -21,9 +21,11 @@ If the app closes or the PC shuts down in the middle of a session, the next time
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-The session menu has two ways out. **Back to the PC** ends the session and puts screens, resolution, HDR, audio and the FPS limit back as they were; the app stays in the tray. **Exit Console Mode** does the same and then closes the app, so the controller shortcuts stop until you open it again. The first time the menu opens, it offers a tour that explains each option; to see it later, press **Y** (△ on PlayStation) or **F1** in the menu, or use **Settings → Session menu tour**.
+The session menu has two ways out. **Back to the PC** ends the session and puts screens, resolution, HDR, audio and the FPS limit back as they were; the app stays in the tray. **Exit Console Mode** does the same and then closes the app, so the controller shortcuts stop until you open it again. The first time the menu opens, it offers a tour that explains each option; to see it later, press **Y** (△ on PlayStation) or **F1** in the menu, or use **System → App → Session menu tour**.
 
-## Settings in Console mode
+## The interface
+
+Console Mode has one interface, made like a console's: it fills the screen and works with an Xbox or PlayStation controller, the mouse or the keyboard (click a tab or use Page Up / Page Down; Enter and Esc work as A and B). The first time you open it, a guided tour walks through the tabs, the launchers, the play button, the screens, the quick settings and the controller shortcuts; **A** goes on, **B** skips it. To see it again: **System → App → Tutorial**. While the app loads it shows an opening with its logo and an entrance sound; any button skips it, now and then it is, as a surprise, one inspired by the Xbox 360 or the PS4, with that console's sound; **System → App** picks a style (which ends the surprises), plays it right away, and turns it off, or just its sound.
 
 **Home** puts your launchers in a row at the top (Steam Big Picture, Playnite, Xbox mode): **A** on one picks what opens, and **Play now** below starts it. The line under the name says where you will play and what changes (audio, resolution, FPS, HDR, VRR); the round button next to Play now opens **Session**, with the screens and quick settings.
 
@@ -31,7 +33,7 @@ The **System** tab lists its categories on the left (Gaming display, When enteri
 
 In **System → Controller**, choose the button layout: **Automatic**, **Xbox** or **PlayStation**. The preview and shortcut labels follow the choice, which is saved when you close the app. This changes the displayed symbols; the controller's inputs keep their existing mapping.
 
-The **System** tab provides the same settings as desktop mode, including controller shortcuts, Playnite, Android TV, custom FPS and the data folder. Both interfaces share the saved values, which remain after restarting the app.
+The **System** tab holds every setting, including controller shortcuts, Playnite, Android TV, custom FPS, the FPS counter's layout, the custom app's arguments, the diagnostics report and the data folder. The values stay saved after restarting the app.
 
 Open the shortcut action you want to configure, choose **Set** or **Change**, hold the desired combination on one controller and release the buttons. **Remove** disables that shortcut. During capture, controller buttons do not navigate the interface; use **Cancel** or **Esc** to stop capture. Outside capture, **B** leaves the editor. Address and custom FPS fields accept keyboard input.
 
@@ -43,7 +45,7 @@ Changing the main display can make Windows reshuffle the desktop icons. **Put de
 
 **Wake the PC with the controller** lets the Xbox Wireless Adapter, the Bluetooth radio or a wired controller wake the PC from sleep with the controller's center button. **Turn on** asks Windows for administrator permission and ticks *Allow this device to wake the computer* on those devices. It can't wake a PC that is shut down or hibernating, and some PCs cut power to Bluetooth while asleep. Together with **Enter when a controller connects**, the PC wakes straight into console mode.
 
-**Per-game profiles** give each Steam game its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings for…**: whatever the game screen uses at that moment is saved. Next time that game starts during a session, Console Mode applies it, and when the game closes the screen goes back to how it was. The game is detected from Steam, whether it was opened from Big Picture, Playnite or the Xbox app. The saved profiles are listed in Settings → **Per-game profiles**, where you can delete them (in the Console interface: System → When entering console mode).
+**Per-game profiles** give each Steam game its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings for…**: whatever the game screen uses at that moment is saved. Next time that game starts during a session, Console Mode applies it, and when the game closes the screen goes back to how it was. The game is detected from Steam, whether it was opened from Big Picture, Playnite or the Xbox app. The saved profiles are listed in System → When entering console mode → **Per-game profiles**, where you can delete them.
 
 ## Local control API
 
@@ -58,7 +60,7 @@ Changing the main display can make Windows reshuffle the desktop icons. **Put de
 
 ## TV control
 
-Settings → **TV** can turn the TV on and switch it to the PC's HDMI input when console mode starts, and optionally put it back in standby after the desk is restored. A TV that doesn't answer never blocks console mode: the app logs it and waits for the game screen as usual.
+System → **TV** can turn the TV on and switch it to the PC's HDMI input when console mode starts, and optionally put it back in standby after the desk is restored. A TV that doesn't answer never blocks console mode: the app logs it and waits for the game screen as usual.
 
 With the default, **Don't control it**, nothing is sent and nothing is added to starting or restoring. With a route selected, the TV step runs first when console mode starts and is capped at **30 seconds** (the worst case, when the TV doesn't answer and Wake-on-LAN is tried); the optional standby on restore is capped at **15 seconds**. A TV that is already on usually answers in about a second or two.
 
@@ -112,7 +114,7 @@ Check that the target output is connected and available in Windows before starti
 
 ### The controller shows up but does nothing (DualSense / DualShock)
 
-Open **Settings → Test controller**: it shows live what Windows delivers from each pad. If the reading stays empty while you press buttons, Steam is most likely capturing the pad (Steam running with PlayStation support in Steam Input turns it into keyboard/mouse on the desktop). Close Steam, or turn off PlayStation support in Steam Input, and test again. If the reading still shows nothing, use **Copy diagnostics** and paste it into the feedback form.
+Open **System → Shortcut, help, and data → Test controller**: it shows live what Windows delivers from each pad. If the reading stays empty while you press buttons, Steam is most likely capturing the pad (Steam running with PlayStation support in Steam Input turns it into keyboard/mouse on the desktop). Close Steam, or turn off PlayStation support in Steam Input, and test again. If the reading still shows nothing, use **Copy diagnostics** and paste it into the feedback form.
 
 ### HDR or VRR did not change
 

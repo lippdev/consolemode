@@ -6,7 +6,8 @@ using Windows.Foundation;
 namespace ConsoleMode.Controls;
 
 /// <summary>
-/// ItemsPanel that places each screen tile at its desktop position, like Windows display settings.
+/// ItemsPanel that places each screen at its desktop position, like Windows display settings (a screen standing up
+/// shows standing up).
 /// Positions and sizes are precomputed in <see cref="MainViewModel"/> (LayoutX/LayoutY/TileWidth/TileHeight).
 /// </summary>
 public sealed class MonitorLayoutPanel : Panel

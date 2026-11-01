@@ -20,7 +20,7 @@ Baixe a **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**,
 
 Está na 1.5? O app oferece a atualização e mantém as configurações; os atalhos do controle você escolhe de novo na primeira abertura.
 
-Quer testar o que vem aí antes de todo mundo? Ligue Ajustes → "Receber versões de teste (alpha e beta)".
+Quer testar o que vem aí antes de todo mundo? Ligue Sistema → App → "Receber versões de teste (alpha e beta)".
 
 Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) ou o app Xbox. O [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) é opcional, para o limite de FPS e o contador de FPS.
 
@@ -32,7 +32,7 @@ Windows 10 ou 11, com [Steam](https://store.steampowered.com/) (Big Picture), [P
 
 Prefere o sofá? Com o app na bandeja, segure o seu atalho do controle e ele começa dali.
 
-Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunta na primeira abertura (e dá para mudar em Ajustes). Nenhum botão pode servir para duas ações.
+Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da primeira abertura mostra onde escolhê-los (Sistema → Controle). Nenhum botão pode servir para duas ações.
 
 | Atalho no controle | Faz | Sugestão |
 |---|---|---|
@@ -49,7 +49,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o app pergunt
 - [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
 - **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS) e pela web com o [JoyChromium](https://github.com/lippdev/joychromium)
-- Duas interfaces: **Desktop** (mouse) e **Console** (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo)
+- Uma interface no estilo dos consoles, feita para a TV, que também funciona com mouse e teclado (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo), com um tour guiado na primeira vez que você abre
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês, espanhol, alemão, francês e russo
 
@@ -84,7 +84,7 @@ Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/
 ## Mais
 
 - [Guia](docs/GUIDE.pt-BR.md): modos e restauração, API de controle, HDR/VRR/FPS, solução de problemas, compilar
-- **Feedback:** o botão ao lado de Ajustes no app, ou [este formulário](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Uma ⭐ ajuda outros jogadores de sofá a encontrar o projeto.
+- **Feedback:** Sistema → Atalho, ajuda e dados → Enviar feedback no app, ou [este formulário](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). Uma ⭐ ajuda outros jogadores de sofá a encontrar o projeto.
 - **Traduções:** corrija um texto ou traga o seu idioma pelo [guia de tradução](docs/TRANSLATING.md) (em inglês); não precisa de Windows.
 - As versões ainda não são assinadas, então o Windows SmartScreen ou um antivírus pode avisar sobre o download; o código está todo aqui.
 

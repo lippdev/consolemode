@@ -17,13 +17,15 @@ Si la aplicación se cierra o el PC se apaga en medio de una sesión, la próxim
 
 También puedes restaurar en cualquier momento desde la bandeja (*Restaurar pantallas* / *Mostrar ventana*). Con las pantallas negras, **ESC** quita las cortinas.
 
-El menú de la sesión tiene dos salidas. **Volver al PC** termina la sesión y devuelve pantallas, resolución, HDR, audio y límite de FPS a como estaban; la aplicación sigue en la bandeja. **Salir de Console Mode** hace lo mismo y además cierra la aplicación, así que los atajos del mando dejan de funcionar hasta que la vuelvas a abrir. La primera vez que se abre el menú, ofrece un recorrido que explica cada opción; para verlo más tarde, pulsa **Y** (△ en PlayStation) o **F1** en el menú, o usa **Ajustes → Recorrido del menú de sesión**.
+El menú de la sesión tiene dos salidas. **Volver al PC** termina la sesión y devuelve pantallas, resolución, HDR, audio y límite de FPS a como estaban; la aplicación sigue en la bandeja. **Salir de Console Mode** hace lo mismo y además cierra la aplicación, así que los atajos del mando dejan de funcionar hasta que la vuelvas a abrir. La primera vez que se abre el menú, ofrece un recorrido que explica cada opción; para verlo más tarde, pulsa **Y** (△ en PlayStation) o **F1** en el menú, o usa **Sistema → Aplicación → Recorrido del menú de sesión**.
 
-## Ajustes en la interfaz Consola
+## La interfaz
+
+Console Mode tiene una sola interfaz, hecha como la de una consola: ocupa toda la pantalla y funciona con un mando de Xbox o PlayStation, el ratón o el teclado (haz clic en una pestaña o usa Re Pág / Av Pág; Intro y Esc hacen de A y B). La primera vez que la abres, un recorrido guiado pasa por las pestañas, los lanzadores, el botón de jugar, las pantallas, los ajustes rápidos y los atajos del mando; **A** avanza y **B** lo salta. Para volver a verlo: **Sistema → Aplicación → Tutorial**. Mientras carga, la aplicación muestra una apertura con el logotipo y un sonido de entrada; cualquier botón la salta, de vez en cuando, por sorpresa, es una inspirada en la Xbox 360 o en la PS4, con el sonido de la consola; **Sistema → Aplicación** elige un estilo (lo que acaba con las sorpresas), la muestra al momento y desactiva la apertura o solo su sonido.
 
 En **Sistema → Mando**, elige el diseño de botones: **Automático**, **Xbox** o **PlayStation**. La vista previa y las etiquetas de los atajos siguen esa elección, que se guarda al cerrar la aplicación. Esto solo cambia los símbolos que se muestran; las entradas del mando mantienen su asignación.
 
-La pestaña **Sistema** ofrece los mismos ajustes que la interfaz Escritorio, incluidos los atajos del mando, Playnite, Android TV, el FPS personalizado y la carpeta de datos. Las dos interfaces comparten los valores guardados, que se mantienen al reiniciar la aplicación.
+La pestaña **Sistema** reúne todos los ajustes, incluidos los atajos del mando, Playnite, Android TV, el FPS personalizado, el diseño del contador de FPS, los argumentos de la aplicación personalizada, el informe de diagnóstico y la carpeta de datos. Los valores se mantienen al reiniciar la aplicación.
 
 Abre la acción del atajo que quieras configurar, elige **Definir** o **Cambiar**, mantén la combinación deseada en un mando y suelta los botones. **Quitar** desactiva ese atajo. Durante la captura, los botones del mando no navegan por la interfaz; usa **Cancelar** o **Esc** para detener la captura. Fuera de la captura, **B** sale del editor. Los campos de dirección y de FPS personalizado aceptan el teclado.
 
@@ -35,7 +37,7 @@ Cambiar la pantalla principal puede hacer que Windows reordene los iconos del es
 
 **Despertar el PC con el mando** permite que el adaptador inalámbrico Xbox, el Bluetooth o un mando con cable despierten el PC de la suspensión con el botón central del mando. **Activar** pide permiso de administrador a Windows y marca *Permitir que este dispositivo reactive el equipo* en esos dispositivos. No despierta un PC apagado o en hibernación, y algunos PC cortan la energía del Bluetooth al suspender. Junto con **Entrar al conectar un mando**, el PC despierta directamente en modo consola.
 
-Los **perfiles por juego** dan a cada juego de Steam su propia resolución, HDR, límite de FPS y salida de audio. Con el juego en marcha, abre el menú de la sesión y elige **Perfil del juego → Guardar los ajustes actuales para…**: se guarda lo que usa la pantalla de juego en ese momento. La próxima vez que ese juego se abra durante una sesión, Console Mode aplica el perfil y, cuando el juego se cierra, la pantalla vuelve a estar como antes. El juego se detecta a través de Steam, tanto si se abre desde Big Picture como desde Playnite o la aplicación Xbox. Los perfiles guardados aparecen en Ajustes → **Perfiles por juego**, donde puedes borrarlos (en la interfaz Consola: Sistema → Al entrar en modo consola).
+Los **perfiles por juego** dan a cada juego de Steam su propia resolución, HDR, límite de FPS y salida de audio. Con el juego en marcha, abre el menú de la sesión y elige **Perfil del juego → Guardar los ajustes actuales para…**: se guarda lo que usa la pantalla de juego en ese momento. La próxima vez que ese juego se abra durante una sesión, Console Mode aplica el perfil y, cuando el juego se cierra, la pantalla vuelve a estar como antes. El juego se detecta a través de Steam, tanto si se abre desde Big Picture como desde Playnite o la aplicación Xbox. Los perfiles guardados aparecen en Sistema → Al entrar en modo consola → **Perfiles por juego**, donde puedes borrarlos.
 
 ## API de control local
 
@@ -50,7 +52,7 @@ Los enlaces `consolemode://` se lanzan sin esperar respuesta. Las herramientas q
 
 ## Control de la TV
 
-Ajustes → **TV** puede encender la TV y cambiarla a la entrada HDMI del PC cuando empieza el modo consola, y, si quieres, volver a ponerla en reposo cuando se restaura el escritorio. Una TV que no responde nunca bloquea el modo consola: la aplicación lo anota en el registro y espera a la pantalla de juego como siempre.
+Sistema → **TV** puede encender la TV y cambiarla a la entrada HDMI del PC cuando empieza el modo consola, y, si quieres, volver a ponerla en reposo cuando se restaura el escritorio. Una TV que no responde nunca bloquea el modo consola: la aplicación lo anota en el registro y espera a la pantalla de juego como siempre.
 
 Con la opción predeterminada, **No controlarla**, no se envía nada y no se añade nada al inicio ni a la restauración. Con una ruta elegida, el paso de la TV va primero cuando empieza el modo consola y dura como máximo **30 segundos** (el peor caso, cuando la TV no responde y se prueba Wake-on-LAN); el reposo opcional al restaurar dura como máximo **15 segundos**. Una TV que ya está encendida suele responder en uno o dos segundos.
 
@@ -104,7 +106,7 @@ Comprueba que la salida de destino está conectada y disponible en Windows antes
 
 ### El mando aparece pero no hace nada (DualSense / DualShock)
 
-Abre **Ajustes → Probar mando**: muestra en directo lo que Windows recibe de cada mando. Si la lectura sigue vacía mientras pulsas botones, lo más probable es que Steam esté capturando el mando (Steam abierto con la compatibilidad con PlayStation de Steam Input activada lo convierte en teclado y ratón en el escritorio). Cierra Steam, o desactiva la compatibilidad con PlayStation en Steam Input, y vuelve a probar. Si la lectura sigue sin mostrar nada, usa **Copiar diagnóstico** y pégalo en el formulario de comentarios.
+Abre **Sistema → Acceso directo, ayuda y datos → Probar mando**: muestra en directo lo que Windows recibe de cada mando. Si la lectura sigue vacía mientras pulsas botones, lo más probable es que Steam esté capturando el mando (Steam abierto con la compatibilidad con PlayStation de Steam Input activada lo convierte en teclado y ratón en el escritorio). Cierra Steam, o desactiva la compatibilidad con PlayStation en Steam Input, y vuelve a probar. Si la lectura sigue sin mostrar nada, usa **Copiar diagnóstico** y pégalo en el formulario de comentarios.
 
 ### El HDR o el VRR no cambiaron
 

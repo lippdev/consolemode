@@ -13,7 +13,7 @@ public sealed class LocalizationTests
     public void Embedded_catalogs_support_en_us_and_pt_br_with_matching_keys()
     {
         LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
-        Assert.Equal("Onde você vai jogar?", LocalizationService.Get("HomeHeading"));
+        Assert.Equal("Escolha a tela onde você quer jogar.", LocalizationService.Get("ChooseGameScreen"));
 
         // Every catalog must carry exactly the English key set: no silent fallbacks in a translation.
         var englishKeys = LocalizationService.GetKeys(LocalizationService.EnglishUnitedStates).Order().ToList();
@@ -26,9 +26,9 @@ public sealed class LocalizationTests
         try
         {
             LocalizationService.SetLanguage(LocalizationService.EnglishUnitedStates);
-            Assert.Equal("Where do you want to play?", LocalizationService.Get("HomeHeading"));
+            Assert.Equal("Choose the display you want to play on.", LocalizationService.Get("ChooseGameScreen"));
             Assert.Equal("Returning to normal in 15 sec", LocalizationService.Get("Countdown", 15));
-            Assert.Contains(nameof(LocalizedStrings.HomeHeading), changedProperties);
+            Assert.Contains(nameof(LocalizedStrings.TabHome), changedProperties);
         }
         finally
         {
@@ -41,10 +41,10 @@ public sealed class LocalizationTests
         Assert.Equal(LocalizationService.EnglishUnitedStates, LocalizationService.Language);
         LocalizationService.SetLanguage("es-MX");
         Assert.Equal(LocalizationService.SpanishSpain, LocalizationService.Language);
-        Assert.Equal("¿Dónde vas a jugar?", LocalizationService.Get("HomeHeading"));
+        Assert.Equal("Elige la pantalla en la que quieres jugar.", LocalizationService.Get("ChooseGameScreen"));
         LocalizationService.SetLanguage("de-AT");
         Assert.Equal(LocalizationService.GermanGermany, LocalizationService.Language);
-        Assert.Equal("Wo möchtest du spielen?", LocalizationService.Get("HomeHeading"));
+        Assert.Equal("Wähle den Bildschirm aus, auf dem du spielen möchtest.", LocalizationService.Get("ChooseGameScreen"));
         LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
     }
 

@@ -59,6 +59,7 @@ public partial class MonitorRowViewModel : ObservableObject
             OnPropertyChanged(nameof(Role));
             OnPropertyChanged(nameof(IsFocus));
             OnPropertyChanged(nameof(IsHide));
+            OnPropertyChanged(nameof(IsKeep));
             OnPropertyChanged(nameof(RoleLabel));
             OnPropertyChanged(nameof(RoleGlyph));
             OnPropertyChanged(nameof(TileBackground));
@@ -107,6 +108,7 @@ public partial class MonitorRowViewModel : ObservableObject
 
     public bool IsFocus => Role == MonitorRole.Focus;
     public bool IsHide => Role == MonitorRole.Hide;
+    public bool IsKeep => Role == MonitorRole.Keep;
 
     /// <summary>Off in Windows right now; drawn dashed next to the live desktop.</summary>
     public bool IsOff => !Monitor.IsActive;

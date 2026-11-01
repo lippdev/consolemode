@@ -20,9 +20,10 @@ public static class UiSounds
     /// <summary>Settings → interface sounds.</summary>
     public static bool Enabled { get; set; } = true;
 
-    public static void Play(UiSound sound)
+    /// <param name="evenWhenOff">For the opening's sound, which has its own setting (Settings → App).</param>
+    public static void Play(UiSound sound, bool evenWhenOff = false)
     {
-        if (!Enabled || _failed) return;
+        if (!Enabled && !evenWhenOff || _failed) return;
         try
         {
             if (!Buffers.TryGetValue(sound, out var handle))

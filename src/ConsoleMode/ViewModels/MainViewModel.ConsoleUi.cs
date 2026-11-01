@@ -6,15 +6,12 @@ using ConsoleMode.Services;
 
 namespace ConsoleMode.ViewModels;
 
-// The console (10-foot) interface: which interface is showing, the quick-setting cards
-// that cycle their value on A, and the role panel for a screen.
+// The console (10-foot) interface, the app's only one: the quick-setting cards that cycle their
+// value on A, the option picker and the role panel for a screen.
 public partial class MainViewModel
 {
-    public ObservableCollection<ComboOption> UiModeOptions { get; } = [];
     public ObservableCollection<ComboOption> ControllerLayoutOptions { get; } = [];
 
-    [ObservableProperty] private bool _isConsoleUi;
-    [ObservableProperty] private ComboOption? _selectedUiMode;
     [ObservableProperty] private bool _isRolePanelOpen;
     [ObservableProperty] private MonitorRowViewModel? _rolePanelMonitor;
     [ObservableProperty] private bool _isPlayStationHints;
@@ -24,10 +21,6 @@ public partial class MainViewModel
     /// <summary>Set by App when the session was requested from the controller's Home button.</summary>
     public bool LaunchedByController { get; set; }
 
-    public bool IsDesktopHome => !IsConsoleUi && IsHomePage;
-    public bool IsDesktopSettings => !IsConsoleUi && IsSettingsPage;
-    /// <summary>The desktop interface: the title bar shows the app's name there (the console one has its own brand mark).</summary>
-    public bool IsDesktopUi => !IsConsoleUi;
     public string FocusScreenName => FocusRow?.Name ?? "";
     public string RolePanelTitle => LocalizationService.Get("ChooseRoleFor", RolePanelMonitor?.Name ?? "");
     public string HdrText => LocalizationService.Get(HdrEnable ? "ToggleOn" : "ToggleOff");
@@ -46,20 +39,6 @@ public partial class MainViewModel
         SaveQuietly();
     }
 
-    partial void OnIsConsoleUiChanged(bool value)
-    {
-        OnPropertyChanged(nameof(IsDesktopHome));
-        OnPropertyChanged(nameof(IsDesktopUi));
-        OnPropertyChanged(nameof(IsDesktopSettings));
-        OnPropertyChanged(nameof(IsTourMap));
-        OnPropertyChanged(nameof(IsTourRole));
-        OnPropertyChanged(nameof(IsTourPlay));
-        if (value) { IsRolePanelOpen = false; IsControllerToastOpen = false; }
-        else { ConsoleTabIndex = HomeTabIndex; IsPickerOpen = false; }
-    }
-
-    partial void OnIsHomePageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopHome));
-    partial void OnIsSettingsPageChanged(bool value) => OnPropertyChanged(nameof(IsDesktopSettings));
     partial void OnRolePanelMonitorChanged(MonitorRowViewModel? value) => OnPropertyChanged(nameof(RolePanelTitle));
     partial void OnIsPlayStationHintsChanged(bool value)
     {
@@ -71,24 +50,7 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HintLb));
         OnPropertyChanged(nameof(HintRb));
         NotifyShortcutTexts();
-    }
-
-    partial void OnSelectedUiModeChanged(ComboOption? value)
-    {
-        if (_applying || value is null) return;
-        SaveQuietly();
-        ResolveUi();
-    }
-
-    private void BuildUiModeOptions()
-    {
-        var current = SelectedUiMode?.Value ?? _loadedConfig.UiMode;
-        UiModeOptions.Clear();
-        UiModeOptions.Add(new ComboOption { Text = LocalizationService.Get("UiModeAuto"), Value = UiModeResolver.Auto });
-        UiModeOptions.Add(new ComboOption { Text = LocalizationService.Get("UiModeDesktop"), Value = UiModeResolver.Desktop });
-        UiModeOptions.Add(new ComboOption { Text = LocalizationService.Get("UiModeConsole"), Value = UiModeResolver.Console });
-        SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == current) ?? UiModeOptions[0];
-        BuildControllerLayoutOptions();
+        RefreshConsoleTourTexts();
     }
 
     private void BuildControllerLayoutOptions()
@@ -102,31 +64,13 @@ public partial class MainViewModel
     }
 
     [ObservableProperty] private bool _controllerDetected;
-    [ObservableProperty] private bool _isControllerToastOpen;
-    private int _controllerToastId;
 
-    // A toast instead of a permanent chip: shown for a few seconds when a pad connects.
-    partial void OnControllerDetectedChanged(bool value)
-    {
-        var id = ++_controllerToastId;
-        IsControllerToastOpen = value && !IsConsoleUi;
-        if (!IsControllerToastOpen) return;
-        _ = HideControllerToastAsync(id);
-    }
-
-    private async Task HideControllerToastAsync(int id)
-    {
-        await Task.Delay(4000);
-        if (id == _controllerToastId) IsControllerToastOpen = false;
-    }
-
-    /// <summary>Called after the config is applied and whenever the choice changes.</summary>
-    private void ResolveUi()
+    /// <summary>Which pad is connected, for the button hints (✕ / A). At startup and when a pad comes or goes.</summary>
+    private void DetectController()
     {
         _detectedControllerFamily = ControllerInput.DetectFamily();
         RefreshControllerHints();
         ControllerDetected = _detectedControllerFamily != ControllerFamily.None;
-        IsConsoleUi = UiModeResolver.IsConsole(SelectedUiMode?.Value, ControllerDetected, LaunchedByController);
     }
 
     private void RefreshControllerHints()
@@ -142,14 +86,13 @@ public partial class MainViewModel
 
     /// <summary>
     /// A pad appeared or went away. Windows lists HID pads asynchronously, so the startup check
-    /// often misses them; re-resolving here is what makes "Automatic" pick the console interface.
-    /// Never flips the interface during a session.
+    /// often misses them; checking again here keeps the button hints right.
     /// </summary>
     public void OnControllerPresenceChanged()
     {
         _ = RefreshBatteryAsync();
         if (IsConsoleActive) return;
-        ResolveUi();
+        DetectController();
     }
 
     /// <summary>Startup safety net for pads that enumerate late (Bluetooth, DualSense).</summary>
@@ -170,49 +113,16 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HdrText));
         OnPropertyChanged(nameof(VrrText));
         OnPropertyChanged(nameof(BackgroundModeText));
-        OnPropertyChanged(nameof(ConsoleTutorialTitle));
-        OnPropertyChanged(nameof(ConsoleTutorialBody));
-        OnPropertyChanged(nameof(ConsoleTutorialAction));
+        RefreshConsoleTourTexts();
         if (IsShortcutEditorOpen) ShortcutEditorTitle = ShortcutName(_shortcutEditorSlot);
-    }
-
-    /// <summary>"desktop" / "console": the on-screen switch, remembered as an explicit choice.</summary>
-    [RelayCommand]
-    private void SwitchUi(string mode)
-    {
-        if (IsConsoleActive && mode == UiModeResolver.Desktop) return;
-        SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == mode) ?? SelectedUiMode;
-        if (mode == UiModeResolver.Desktop) ShowPage(settings: false);
     }
 
     [ObservableProperty] private bool _isConsoleSettingsOpen;
     [ObservableProperty] private bool _isShortcutEditorOpen;
     [ObservableProperty] private string _shortcutEditorTitle = "";
-    [ObservableProperty] private bool _isConsoleTutorialOpen;
     private ShortcutSlot _shortcutEditorSlot;
 
     public string ShortcutEditorSlot => _shortcutEditorSlot.ToString().ToLowerInvariant();
-    public string ConsoleTutorialTitle => LocalizationService.Get(TourStep switch
-    {
-        2 => "TourRoleTitle",
-        3 => "TourPlayTitle",
-        _ => "TourMapTitle"
-    });
-    public string ConsoleTutorialBody => TourStep switch
-    {
-        2 => LocalizationService.Get("TourRoleDescription"),
-        3 => LocalizationService.Get("TourPlayDescription"),
-        _ => TourMapText
-    };
-    public string ConsoleTutorialAction => LocalizationService.Get(TourStep >= 3 ? "GotIt" : "Next");
-
-    partial void OnTourStepChanged(int value)
-    {
-        OnPropertyChanged(nameof(ConsoleTutorialTitle));
-        OnPropertyChanged(nameof(ConsoleTutorialBody));
-        OnPropertyChanged(nameof(ConsoleTutorialAction));
-    }
-
     /// <summary>x:Bind helper for on/off rows.</summary>
     public string OnOff(bool value) => LocalizationService.Get(value ? "ToggleOn" : "ToggleOff");
 
@@ -245,7 +155,7 @@ public partial class MainViewModel
                 break;
             case "mode":
                 if (FocusRow is null) return;
-                var index = UiModeResolver.Cycle(FocusRow.Modes.Count, FocusRow.Modes.ToList().IndexOf(FocusRow.SelectedMode), step);
+                var index = OptionCycle.Cycle(FocusRow.Modes.Count, FocusRow.Modes.ToList().IndexOf(FocusRow.SelectedMode), step);
                 if (index >= 0) FocusRow.SelectedMode = FocusRow.Modes[index];
                 SaveQuietly();
                 break;
@@ -253,7 +163,6 @@ public partial class MainViewModel
             case "vrr": VrrEnable = !VrrEnable; break;
             case "hide": SelectedHideStrategy = Next(HideStrategies, SelectedHideStrategy, step); break;
             case "language": SelectedLanguage = Next(LanguageOptions, SelectedLanguage, step); break;
-            case "ui": SelectedUiMode = Next(UiModeOptions, SelectedUiMode, step); break;
             case "home": ToggleSuggestedShortcut(ShortcutSlot.Home); break;
             case "menushortcut": ToggleSuggestedShortcut(ShortcutSlot.Menu); break;
             case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
@@ -261,6 +170,7 @@ public partial class MainViewModel
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "controllerwake": _ = EnableControllerWakeAsync(); break;
             case "sounds": InterfaceSounds = !InterfaceSounds; break;
+            case "introsound": IntroSound = !IntroSound; break;
             case "background": CycleBackgroundMode(); break;
             case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;
@@ -271,6 +181,19 @@ public partial class MainViewModel
             case "desktopicons": RestoreDesktopIcons = !RestoreDesktopIcons; break;
             case "parkpointer": ParkPointer = !ParkPointer; break;
             case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
+            // The FPS counter (RTSS): what it shows, one item at a time.
+            case "overlaycard": OverlayCard = !OverlayCard; break;
+            case "overlayline": OverlaySingleLine = !OverlaySingleLine; break;
+            case "ovfps": OverlayShowFps = !OverlayShowFps; break;
+            case "ovframetime": OverlayShowFrameTime = !OverlayShowFrameTime; break;
+            case "ovapi": OverlayShowApi = !OverlayShowApi; break;
+            case "ovcpu": OverlayShowCpu = !OverlayShowCpu; break;
+            case "ovcpuclock": OverlayShowCpuClock = !OverlayShowCpuClock; break;
+            case "ovram": OverlayShowRam = !OverlayShowRam; break;
+            case "ovvram": OverlayShowVram = !OverlayShowVram; break;
+            case "ovgpu": OverlayShowGpu = !OverlayShowGpu; break;
+            case "ovgpuclock": OverlayShowGpuClock = !OverlayShowGpuClock; break;
+            case "ovgputemp": OverlayShowGpuTemp = !OverlayShowGpuTemp; break;
         }
     }
 
@@ -297,7 +220,7 @@ public partial class MainViewModel
 
     private static ComboOption? Next(IList<ComboOption> options, ComboOption? current, int step)
     {
-        var index = UiModeResolver.Cycle(options.Count, current is null ? -1 : options.IndexOf(current), step);
+        var index = OptionCycle.Cycle(options.Count, current is null ? -1 : options.IndexOf(current), step);
         return index < 0 ? current : options[index];
     }
 
@@ -310,7 +233,7 @@ public partial class MainViewModel
     [ObservableProperty] private string _pickerTitle = "";
     private string _pickerKey = "";
 
-    /// <summary>"launch", "audio", "mode", "fps", "hide", "language", "ui".</summary>
+    /// <summary>"launch", "audio", "mode", "fps", "hide", "language", "overlay"…: the row's key.</summary>
     [RelayCommand]
     private void OpenPicker(string key)
     {
@@ -322,10 +245,14 @@ public partial class MainViewModel
             "fps" => (LocalizationService.Get("FpsCard"), FpsOptions.Select(o => (o.Text, o.Value)), SelectedFps?.Value),
             "hide" => (LocalizationService.Get("HideOtherScreensCard"), HideStrategies.Select(o => (o.Text, o.Value)), SelectedHideStrategy?.Value),
             "language" => (LocalizationService.Get("LanguageCard"), LanguageOptions.Select(o => (o.Text, o.Value)), SelectedLanguage?.Value),
-            "ui" => (LocalizationService.Get("UiModeCard"), UiModeOptions.Select(o => (o.Text, o.Value)), SelectedUiMode?.Value),
             "controllerlayout" => (LocalizationService.Get("ControllerLayoutCard"), ControllerLayoutOptions.Select(o => (o.Text, o.Value)), SelectedControllerLayout?.Value),
             "tvprovider" => (LocalizationService.Get("TvControlCard"), TvProviders.Select(o => (o.Text, o.Value)), SelectedTvProvider?.Value),
+            "introstyle" => (LocalizationService.Get("IntroStyleCard"), IntroStyleOptions.Select(o => (o.Text, o.Value)), SelectedIntroStyle?.Value),
             "tvhdmi" => (LocalizationService.Get("TvHdmiCard"), TvHdmiInputs.Select(o => (o.Text, o.Value)), SelectedTvHdmiInput?.Value),
+            "overlay" => (LocalizationService.Get("FpsOverlayCard"), FpsOverlayOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlay?.Value),
+            "overlaysize" => (LocalizationService.Get("FpsOverlaySize"), FpsOverlaySizeOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlaySize?.Value),
+            "overlayposition" => (LocalizationService.Get("FpsOverlayPosition"), FpsOverlayPositionOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlayPosition?.Value),
+            "overlaycolor" => (LocalizationService.Get("FpsOverlayColor"), FpsOverlayColorOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlayColor?.Value),
             "profiles" when _gameProfiles.Count > 0 => (LocalizationService.Get("GameProfilesPickerTitle"),
                 _gameProfiles.Select(p => (LocalizationService.Get("GameProfileRemove", p.Name), p.SteamAppId.ToString())), null),
             "mode" when FocusRow is not null => (LocalizationService.Get("ResolutionRefreshCard"), FocusRow.Modes.Select(m => (m.Text, m.Key)), FocusRow.SelectedMode?.Key),
@@ -353,10 +280,14 @@ public partial class MainViewModel
             case "fps": SelectedFps = FpsOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFps; break;
             case "hide": SelectedHideStrategy = HideStrategies.FirstOrDefault(o => o.Value == item.Value) ?? SelectedHideStrategy; break;
             case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
-            case "ui": SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedUiMode; break;
             case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
             case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
+            case "introstyle": ChooseIntroStyle(item.Value); break;
             case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
+            case "overlay": SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlay; break;
+            case "overlaysize": SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlaySize; break;
+            case "overlayposition": SelectedFpsOverlayPosition = FpsOverlayPositionOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlayPosition; break;
+            case "overlaycolor": SelectedFpsOverlayColor = FpsOverlayColorOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlayColor; break;
             case "profiles":
                 if (int.TryParse(item.Value, out var appId))
                     RemoveGameProfile(GameProfileItems.FirstOrDefault(p => p.AppId == appId));

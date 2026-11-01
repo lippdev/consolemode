@@ -29,7 +29,8 @@ public class UiSoundSynthTests
     {
         var samples = UiSoundSynth.Samples(sound);
         var seconds = (double)samples.Length / UiSoundSynth.SampleRate;
-        Assert.InRange(seconds, 0.03, 0.25);
+        // The opening plays once, under the logo; the menu sounds play on every press.
+        Assert.InRange(seconds, 0.03, sound is UiSound.Boot or UiSound.BootX360 or UiSound.BootPs4 ? 1.0 : 0.25);
         var peak = samples.Max(Math.Abs);
         Assert.InRange(peak, 0.05, 0.5);   // audible, but never loud over a TV
     }

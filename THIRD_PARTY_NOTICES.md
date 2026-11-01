@@ -19,6 +19,9 @@ Embarcados no executável (`src/ConsoleMode/Assets/Sounds`), convertidos para WA
 | Som | Origem | Licença |
 |-----|--------|---------|
 | `move.wav` (`glass_002`), `confirm.wav` (`confirmation_001`), `back.wav` (`minimize_008`) | [Interface Sounds](https://kenney.nl/assets/interface-sounds), da Kenney | CC0 1.0 (domínio público; crédito opcional) |
+| `boot.wav` (`boot_chime_sparkle`), som da abertura | Gerado pelo [`tools/make_sounds.py`](https://github.com/mattxslv/Selene/blob/main/tools/make_sounds.py) do [Selene](https://github.com/mattxslv/Selene), de Matthew Silva (mattxslv): síntese pura, sem amostras | MIT, Copyright (c) 2026 Matthew Silva |
+| `bootx360.wav`, som da abertura "Inspirada no Xbox 360" | Som de inicialização do Xbox 360 (2005), © Microsoft. Está aqui por escolha do mantenedor e será removido se a Microsoft pedir | Não é livre: © Microsoft |
+| `bootps4.wav`, som da abertura "Inspirada no PS4" | Som de início do PS4, © Sony Interactive Entertainment (via OrbisPro). Está aqui por escolha do mantenedor e será removido se a Sony pedir | Não é livre: © Sony |
 | `tab.wav` (`cursor_c`) | Gerado pelo [`tools/make_sounds.py`](https://github.com/mattxslv/Selene/blob/main/tools/make_sounds.py) do [Selene](https://github.com/mattxslv/Selene), de Matthew Silva (mattxslv): síntese pura, sem amostras | MIT, Copyright (c) 2026 Matthew Silva |
 
 ## Limite de FPS (opcional)

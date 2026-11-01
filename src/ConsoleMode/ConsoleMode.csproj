@@ -52,6 +52,8 @@
   <!-- The console interface's font (Inter, OFL) and its licence, next to the exe so ms-appx:/// finds them. -->
   <ItemGroup>
     <Content Include="Assets\Fonts\InterVariable.ttf;Assets\Fonts\Inter-OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The logo of the console-inspired openings (the app's own draws it as vectors). -->
+    <Content Include="Assets\Intro\logo.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

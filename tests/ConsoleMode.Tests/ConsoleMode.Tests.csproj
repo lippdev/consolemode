@@ -25,7 +25,7 @@
     <Compile Include="../../src/ConsoleMode/Services/FeedbackService.cs" Link="FeedbackService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ProtocolService.cs" Link="ProtocolService.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControlProtocol.cs" Link="ControlProtocol.cs" />
-    <Compile Include="../../src/ConsoleMode/Services/UiModeResolver.cs" Link="UiModeResolver.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/OptionCycle.cs" Link="OptionCycle.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlaynitePaths.cs" Link="PlaynitePaths.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerConnectPolicy.cs" Link="ControllerConnectPolicy.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PlayniteExitPolicy.cs" Link="PlayniteExitPolicy.cs" />
@@ -35,6 +35,8 @@
     <Compile Include="../../src/ConsoleMode/Services/SessionJournal.cs" Link="SessionJournal.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuMath.cs" Link="SessionMenuMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SessionMenuTour.cs" Link="SessionMenuTour.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/ConsoleTour.cs" Link="ConsoleTour.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/BootIntro.cs" Link="BootIntro.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMouseMath.cs" Link="ControllerMouseMath.cs" />
     <Compile Include="../../src/ConsoleMode/Services/RtssOverlay.cs" Link="RtssOverlay.cs" />
     <Compile Include="../../src/ConsoleMode/Services/HardwareStats.cs" Link="HardwareStats.cs" />

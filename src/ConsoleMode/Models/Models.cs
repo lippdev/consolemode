@@ -33,14 +33,14 @@ public sealed class AppConfig
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }
 
-    /// <summary>"auto" | "desktop" | "console": which interface to show (UiModeResolver).</summary>
-    public string UiMode { get; set; } = "auto";
-
     /// <summary>"auto" | "xbox" | "playstation": which controller symbols to show in the console UI.</summary>
     public string ControllerLayout { get; set; } = "auto";
 
-    /// <summary>The first-run tour was finished or skipped.</summary>
-    public bool TourDone { get; set; }
+    /// <summary>
+    /// The console interface's first-run tour was finished or skipped. A new flag, not the desktop interface's old
+    /// TourDone: everyone sees this tour once, since the interface they knew is gone.
+    /// </summary>
+    public bool ConsoleTourDone { get; set; }
 
     /// <summary>The session menu's tour was taken, finished or declined: it is no longer offered when the menu opens.</summary>
     public bool SessionMenuTourDone { get; set; }
@@ -89,6 +89,18 @@ public sealed class AppConfig
 
     /// <summary>Sounds for moving, picking and going back in the console interface.</summary>
     public bool InterfaceSounds { get; set; } = true;
+
+    /// <summary>The opening with the logo and a loading bar when the app opens (BootIntro).</summary>
+    public bool IntroAnimation { get; set; } = true;
+
+    /// <summary>The opening's sound; has its own switch, apart from the interface sounds.</summary>
+    public bool IntroSound { get; set; } = true;
+
+    /// <summary>
+    /// "console" (the app's own), "x360" or "ps4": the opening's style, once picked in System → App. Null while never
+    /// picked: the app's own then, with the console-inspired ones now and then as a surprise (BootIntro.PickForOpening).
+    /// </summary>
+    public string? IntroStyle { get; set; }
 
     /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
     public bool MinimizeToTray { get; set; }
