@@ -662,6 +662,8 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 ### Lista de Sistema e outros apps
 
+- [ ] Início: os ícones dos tiles (Steam, Playnite, Xbox e um app personalizado) têm bordas lisas, sem serrilhado, com o tile parado e com foco; repetir com a tela em 150 % de escala e arrastando a janela para uma tela de escala diferente. Resultado: ______
+
 - [ ] Sistema, numa categoria longa (App, Extras opcionais): a borda de baixo esmaece no fundo enquanto há linhas abaixo, e a de cima quando já rolou; no fim e no começo da lista, a borda fica limpa. A barra fina à direita aparece só quando a lista rola e acompanha a posição (controle, roda do mouse e teclado). Resultado: ______
 - [ ] Sistema → Outros apps do desenvolvedor: ControlFS (Alpha), Tako Launcher (Alpha fechado) e JoyChromium (Beta) em três cards lado a lado, com a arte em cima e nome, fase e descrição embaixo; o card com foco cresce sem ser cortado nas bordas, e esquerda/direita passam de um para outro; A abre a página do GitHub de cada um. Não há mais WakeOn nem Next Boost. Resultado: ______
 

@@ -64,12 +64,60 @@ public partial class MainViewModel
         foreach (var tile in LaunchTiles.Where(t => !t.IsAdd)) _ = LoadLaunchLogoAsync(tile);
     }
 
-    /// <summary>Asked in pixels: the tile draws it at 64, so this stays sharp on a 4K TV.</summary>
+    /// <summary>Read at this size (pixels), enough for a 4K TV; each tile then gets it shrunk to what it draws.</summary>
     private const int LaunchLogoSize = 256;
 
+    /// <summary>The logo's size on a tile (ConsoleHomeView.xaml), grown by the focused tile's 1.14 (ConsoleHomeView.ScaleTile).</summary>
+    private const double LaunchLogoShown = 64 * 1.14;
+
+    /// <summary>The screen's pixels per view pixel (1 at 100 %, 1.5 at 150 %), from the view.</summary>
+    private double _logoScale = 1;
+
     // The logos are read once per app: the tiles are rebuilt on every language switch.
-    // A Store app's logo is a file of its package; a program's, the icon pixels of its exe.
-    private readonly Dictionary<string, (string? File, IconBitmap? Pixels)> _launchLogos = new(StringComparer.OrdinalIgnoreCase);
+    // A Store app's logo is a file of its package; a program's, the icon pixels of its exe. Both end up as pixels.
+    private readonly Dictionary<string, IconBitmap?> _launchLogos = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The window moved to a screen with another scale: the logos are shrunk again for it.</summary>
+    public void SetLogoScale(double scale)
+    {
+        if (scale <= 0 || Math.Abs(scale - _logoScale) < 0.01) return;
+        _logoScale = scale;
+        foreach (var tile in LaunchTiles)
+            if (tile.LogoKey is { } key && _launchLogos.TryGetValue(key, out var logo) && logo is not null) ShowLaunchLogo(tile, logo);
+    }
+
+    /// <summary>
+    /// The logo shrunk here, averaging every pixel, to the pixels the tile shows: left to the screen, a 256-pixel
+    /// logo drawn at 64 comes out with jagged edges.
+    /// </summary>
+    private void ShowLaunchLogo(LaunchTile tile, IconBitmap logo)
+    {
+        var (width, height) = IconPixels.FitInside(logo.Width, logo.Height, (int)Math.Ceiling(LaunchLogoShown * _logoScale));
+        var pixels = IconPixels.Shrink(logo.Pixels, logo.Width, logo.Height, width, height);
+        var image = new WriteableBitmap(width, height);
+        using (var stream = image.PixelBuffer.AsStream()) stream.Write(pixels);
+        tile.Logo = image;
+    }
+
+    /// <summary>A package's logo file as premultiplied BGRA, no larger than <see cref="LaunchLogoSize"/>.</summary>
+    private static async Task<IconBitmap> ReadLogoFileAsync(string file)
+    {
+        var storage = await Windows.Storage.StorageFile.GetFileFromPathAsync(file);
+        using var stream = await storage.OpenReadAsync();
+        var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(stream);
+        var (width, height) = IconPixels.FitInside((int)decoder.PixelWidth, (int)decoder.PixelHeight, LaunchLogoSize);
+        var transform = new Windows.Graphics.Imaging.BitmapTransform
+        {
+            ScaledWidth = (uint)width,
+            ScaledHeight = (uint)height,
+            InterpolationMode = Windows.Graphics.Imaging.BitmapInterpolationMode.Fant
+        };
+        var data = await decoder.GetPixelDataAsync(Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
+            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied, transform,
+            Windows.Graphics.Imaging.ExifOrientationMode.IgnoreExifOrientation,
+            Windows.Graphics.Imaging.ColorManagementMode.DoNotColorManage);
+        return new IconBitmap(width, height, data.DetachPixelData());
+    }
 
     /// <summary>A launcher's path changed: its tile shows the new app's logo (or the glyph).</summary>
     private void RefreshLaunchLogo(string mode)
@@ -96,28 +144,18 @@ public partial class MainViewModel
         // The app this tile now waits for: a slower load for a previous path must not land after this one.
         tile.LogoKey = key;
         if (string.IsNullOrWhiteSpace(key)) return;
-        if (!_launchLogos.TryGetValue(key, out var logo))
-        {
-            logo = await Task.Run(() =>
-            {
-                var file = appId is null ? null : PackageLogos.Find(appId);
-                return (file, file is null ? WindowIcons.ForApp(exe, appId, LaunchLogoSize) : null);
-            });
-            _launchLogos[key] = logo;
-        }
-        if (!string.Equals(tile.LogoKey, key, StringComparison.OrdinalIgnoreCase)) return;
         try
         {
-            if (logo.File is not null)
+            if (!_launchLogos.TryGetValue(key, out var logo))
             {
-                tile.Logo = new BitmapImage(new Uri(logo.File)) { DecodePixelWidth = LaunchLogoSize };
+                var file = appId is null ? null : await Task.Run(() => PackageLogos.Find(appId));
+                logo = file is not null
+                    ? await Task.Run(() => ReadLogoFileAsync(file))
+                    : await Task.Run(() => WindowIcons.ForApp(exe, appId, LaunchLogoSize));
+                _launchLogos[key] = logo;
             }
-            else if (logo.Pixels is { } bitmap)
-            {
-                var image = new WriteableBitmap(bitmap.Width, bitmap.Height);
-                using (var stream = image.PixelBuffer.AsStream()) stream.Write(bitmap.Pixels);
-                tile.Logo = image;
-            }
+            if (!string.Equals(tile.LogoKey, key, StringComparison.OrdinalIgnoreCase) || logo is null) return;
+            ShowLaunchLogo(tile, logo);
         }
         catch (Exception ex)
         {

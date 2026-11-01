@@ -84,6 +84,13 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        // The Home logos are shrunk to the screen's own pixels: they follow the window to a screen with another scale.
+        if (XamlRoot is { } xamlRoot)
+        {
+            ViewModel.SetLogoScale(xamlRoot.RasterizationScale);
+            xamlRoot.Changed -= OnXamlRootChanged;
+            xamlRoot.Changed += OnXamlRootChanged;
+        }
         _navigator ??= new GamepadNavigator(DispatcherQueue, this,
             App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0,
             readSonyHid: true);
@@ -885,6 +892,9 @@ public sealed partial class ConsoleHomeView : UserControl
             AppLog.Write($"Tour: animação: {ex.Message}");
         }
     }
+
+    private void OnXamlRootChanged(XamlRoot sender, XamlRootChangedEventArgs args) =>
+        ViewModel.SetLogoScale(sender.RasterizationScale);
 
     /// <summary>Back to the option that was in use, else the first one of the category, else the category itself.</summary>
     private void FocusSystemRow()

@@ -40,4 +40,63 @@ public static class IconPixels
             if (pixels[i] != 0) return false;
         return true;
     }
+
+    /// <summary>
+    /// The size an icon of <paramref name="width"/> × <paramref name="height"/> takes inside a square of
+    /// <paramref name="box"/> pixels, keeping its shape; never larger than it is (enlarging is left to the screen).
+    /// </summary>
+    public static (int Width, int Height) FitInside(int width, int height, int box)
+    {
+        if (width <= 0 || height <= 0 || box <= 0) return (0, 0);
+        var scale = Math.Min(1.0, (double)box / Math.Max(width, height));
+        return (Math.Max(1, (int)Math.Round(width * scale)), Math.Max(1, (int)Math.Round(height * scale)));
+    }
+
+    /// <summary>
+    /// Shrinks premultiplied BGRA by averaging every source pixel each new one covers (a box filter, partial
+    /// pixels weighted by how much they cover). Drawing a 256-pixel logo at 64 lets the screen sample only a few
+    /// of them, which leaves jagged edges; averaging them all keeps the edges smooth.
+    /// </summary>
+    public static byte[] Shrink(byte[] pixels, int width, int height, int newWidth, int newHeight)
+    {
+        if (newWidth >= width && newHeight >= height) return pixels;
+        // Across first (each row to the new width), then down (each column to the new height).
+        newWidth = Math.Min(newWidth, width);
+        newHeight = Math.Min(newHeight, height);
+        var across = new double[newWidth * height * 4];
+        for (var y = 0; y < height; y++)
+            for (var x = 0; x < newWidth; x++)
+            {
+                var (first, last, start, end) = Covered(x, width, newWidth);
+                for (var i = first; i <= last; i++)
+                {
+                    var weight = Math.Min(end, i + 1) - Math.Max(start, i);
+                    for (var c = 0; c < 4; c++) across[(y * newWidth + x) * 4 + c] += weight * pixels[(y * width + i) * 4 + c];
+                }
+                for (var c = 0; c < 4; c++) across[(y * newWidth + x) * 4 + c] /= end - start;
+            }
+        var result = new byte[newWidth * newHeight * 4];
+        for (var y = 0; y < newHeight; y++)
+        {
+            var (first, last, start, end) = Covered(y, height, newHeight);
+            for (var x = 0; x < newWidth; x++)
+                for (var c = 0; c < 4; c++)
+                {
+                    var sum = 0.0;
+                    for (var i = first; i <= last; i++)
+                        sum += (Math.Min(end, i + 1) - Math.Max(start, i)) * across[(i * newWidth + x) * 4 + c];
+                    result[(y * newWidth + x) * 4 + c] = (byte)Math.Clamp(Math.Round(sum / (end - start)), 0, 255);
+                }
+        }
+        return result;
+    }
+
+    /// <summary>The source pixels new pixel <paramref name="index"/> covers, shrinking <paramref name="from"/> to <paramref name="to"/>.</summary>
+    private static (int First, int Last, double Start, double End) Covered(int index, int from, int to)
+    {
+        var step = (double)from / to;
+        var start = index * step;
+        var end = Math.Min(from, start + step);
+        return ((int)start, Math.Min(from - 1, (int)Math.Ceiling(end) - 1), start, end);
+    }
 }
