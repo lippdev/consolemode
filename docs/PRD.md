@@ -320,11 +320,11 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 ### Fase 1.7 — Fechar a 1.7.0 (P0)
 
-- [ ] **REL-020 — Validar no hardware** os PRs #167 a #170 pelo `TESTING.md` e corrigir o que falhar. _Estado: a branch local `local/1.7-teste` junta os quatro._
-- [ ] **INPUT-013 — Ajuste do #168:** se o script de ativação não encontrar nenhum dispositivo (por exemplo, desconectado com o UAC aberto), mostrar erro em vez de "Feito", ou conferir o estado depois.
-- [ ] **REL-021 — Mesclar** #167 a #170 e o #175.
+- [ ] **REL-020 — Validar no hardware** os PRs #167 a #170 pelo `TESTING.md` e corrigir o que falhar. _Estado (29/10): JoyChromium, ponteiro e restauração depois de uma queda testados de verdade neste PC, mas com uma tela só (acesso remoto). Falta a TV com os monitores da mesa desligados e o controle, pelas checklists do `TESTING.md`._
+- [x] **INPUT-013 — Ajuste do #168:** se o script de ativação não encontrar nenhum dispositivo (por exemplo, desconectado com o UAC aberto), mostrar erro em vez de "Feito", ou conferir o estado depois. _Feito: o script sai com código 2 e o app relê os dispositivos antes de dizer "Pronto"._
+- [x] **REL-021 — Mesclar** #167 a #170, #175, #177, #178 e #180 (29/10/2026).
 - [x] **REL-025 — Correções de uso diário (issue #149):** BUG-001, BUG-002 e BUG-003 entram na 1.7. (#180)
-- [ ] **REL-022 — Preparar a 1.7.0:** `[Unreleased]` vira `## [1.7.0]` nos dois changelogs; README, GUIDE e traduções enxutas; roadmap do README revisado.
+- [ ] **REL-022 — Preparar a 1.7.0:** `[Unreleased]` vira `## [1.7.0]` nos dois changelogs; README, GUIDE e traduções enxutas; roadmap do README revisado. _Estado: PR `chore: prepare 1.7.0` (#179) aberto; entra na `main` junto com a publicação, porque o README já aponta para a release._
 - [ ] **REL-023 — Sincronizar o fork do winget** (`lippdev/winget-pkgs`) antes da estável; sem isso o job falha com `CreateRef`.
 - [ ] **REL-024 — Publicar a 1.7.0**, só com pedido do mantenedor (D-06).
 
@@ -353,7 +353,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **LAUNCH-004 —** `stop` e Start + Select fecham o Big Picture e o Playnite antes de restaurar. (#121, 1.6.0; a primeira versão, #45, foi revertida no #125, §2.3)
 - [x] **LAUNCH-005 —** Steam: fechar o Big Picture e mandar a Steam para a bandeja, só nas janelas da Steam e nunca com jogo aberto. (#121, #131, #140, 1.6.0)
 - [x] **LAUNCH-006 —** Aplicativo personalizado: qualquer `.exe` com argumentos e processo a vigiar. (#161, 1.7.0-alpha.1; issue #111)
-- [ ] **LAUNCH-007 (P0) —** Logos oficiais dos lançadores nos tiles da Início, lidos dos apps instalados. (#169)
+- [x] **LAUNCH-007 —** Logos oficiais dos lançadores nos tiles da Início, lidos dos apps instalados. (#169, 1.7.0)
 - [ ] **LAUNCH-010 (P1) — Tako Launcher.** Tile na Início com logo, abrir o Tako em tela cheia na tela de jogo (`tako --console-session`), restaurar quando o Tako avisar o fim pela API (API-002), detectar a instalação. Aceite: entrar, jogar e voltar ao PC sem mouse, com o Tako. Depende de CMI-004 do Tako.
 - [x] **LAUNCH-011 — JoyChromium.** Auxiliar do menu da sessão, como o ControlFS (decisão do mantenedor em 29/10: não é iniciador nem aparece na Início): linha fixa abaixo do ControlFS, abre em tela cheia (`--tv`) na tela da sessão, instala pelo próprio menu se faltar (SHA-256 do GitHub, NSIS `/S` por usuário) e, ao voltar ao PC, o deixa em janela (`--window`). (#175, #181, 1.7.0)
 - [ ] **LAUNCH-012 (P2) —** Scripts próprios ao entrar e ao voltar (comando, `.bat` ou PowerShell), com tempo-limite e o comando de fim gravado em disco (CORE-012). Vem do #173, em PR próprio.
@@ -376,7 +376,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **INPUT-010 —** Layout de botões Automático, Xbox ou PlayStation, com prévia. (#131, 1.6.0)
 - [x] **INPUT-011 —** Esconder o ponteiro e mouse pelo controle no menu da sessão (D-12). (#145, 1.6.1)
 - [x] **INPUT-012 —** Bateria do controle no menu e na interface Console, com avisos em 15 % e 5 %. (#160, 1.7.0-alpha.1)
-- [ ] **INPUT-013 (P0) —** Acordar o PC pelo controle (adaptador Xbox, Bluetooth, cabo). (#168; ajuste na Fase 1.7)
+- [x] **INPUT-013 —** Acordar o PC pelo controle (adaptador Xbox, Bluetooth, cabo). (#168, 1.7.0)
 - [x] **INPUT-014 —** Estacionar o ponteiro no canto da tela de jogo quando o launcher aparece, ligado por padrão, devolvendo a posição ao voltar (D-21). Issue #172; base de @JarJarShinks no #173. (#177, 1.7.0)
 - [ ] **INPUT-015 (P3) —** Atalhos por voz e assistente (Alexa, MCP). Issue #12.
 
@@ -427,13 +427,13 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 ### Épico DESK — Mesa
 
-- [ ] **DESK-001 (P0) —** Devolver os ícones da área de trabalho ao lugar depois da sessão. (#167; issue #30)
+- [x] **DESK-001 —** Devolver os ícones da área de trabalho ao lugar depois da sessão. (#167, 1.7.0; issue #30)
 - [ ] **DESK-002 (P2) —** Perfis de setup (sala, quarto, simulador) escolhidos ao entrar.
 - [ ] **DESK-003 (P2) —** Várias telas de jogo (simuladores de corrida e voo). Issue #112.
 
 ### Épico PROF — Perfis por jogo
 
-- [ ] **PROF-001 (P0) —** Perfis por jogo da Steam: resolução, HDR, FPS e áudio, salvos pelo menu e aplicados ao abrir o jogo. (#170; issue #69)
+- [x] **PROF-001 —** Perfis por jogo da Steam: resolução, HDR, FPS e áudio, salvos pelo menu e aplicados ao abrir o jogo. (#170, 1.7.0; issue #69)
 - [ ] **PROF-002 (P1) —** Regra de convivência com o Tako (D-20).
 
 ### Épico API — Automação e API local
@@ -494,8 +494,8 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **DOC-001 —** README enxuto com detalhes no GUIDE, animações de novidades e roadmap. (#55, #67, #68, #79, #105)
 - [x] **DOC-002 —** Guia em português sincronizado. (#85)
 - [x] **DOC-003 —** README e guia em seis idiomas e guia de tradução. (#157)
-- [ ] **DOC-010 (P0) —** Este PRD. (#174)
-- [ ] **DOC-011 (P1) —** Protótipo HTML da interface Console. (#171)
+- [x] **DOC-010 —** Este PRD. (#174)
+- [x] **DOC-011 —** Protótipo HTML da interface Console. (#171)
 
 ### Épico FUND — Apoio ao projeto (P1)
 
