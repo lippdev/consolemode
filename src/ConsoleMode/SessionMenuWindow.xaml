@@ -218,7 +218,10 @@
                 </Button>
                 </StackPanel>
 
-                <ScrollViewer x:Name="RowsScroller" Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <!-- The list scrolls under the pinned apps: its edges fade into the panel while there is more past them,
+                     and a thin thumb on the right shows where it is (ScrollEdges; the fades take the panel's colour in ApplyMaterial) -->
+                <Grid Grid.Row="1">
+                <ScrollViewer x:Name="RowsScroller" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">
                         <Button x:Name="FirstRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
                             <Button.Background>
@@ -373,6 +376,30 @@
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
+                <Rectangle x:Name="RowsFadeTop" Height="48" VerticalAlignment="Top" IsHitTestVisible="False" Opacity="0">
+                    <Rectangle.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Rectangle.OpacityTransition>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FF111820" Offset="0"/>
+                            <GradientStop Color="#00111820" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle x:Name="RowsFadeBottom" Height="110" VerticalAlignment="Bottom" IsHitTestVisible="False" Opacity="0">
+                    <Rectangle.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Rectangle.OpacityTransition>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                            <GradientStop Color="#FF111820" Offset="0"/>
+                            <GradientStop Color="#00111820" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Grid x:Name="RowsScrollTrack" Width="4" HorizontalAlignment="Right" Margin="0,6,-10,6" IsHitTestVisible="False" Opacity="0">
+                    <Grid.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Grid.OpacityTransition>
+                    <Border CornerRadius="2" Background="#1FFFFFFF"/>
+                    <Border x:Name="RowsScrollThumb" CornerRadius="2" Background="#A6FFFFFF" VerticalAlignment="Top" Height="40"/>
+                </Grid>
+                </Grid>
               </Grid>
             </Border>
 

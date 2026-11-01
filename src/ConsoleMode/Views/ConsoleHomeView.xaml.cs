@@ -23,6 +23,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private static Style? _cardStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
+    private readonly ScrollEdges _rowsEdges;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
     private long _railPointerPressedAt = long.MinValue / 2;
     private int _shownTab;
@@ -52,9 +53,7 @@ public sealed partial class ConsoleHomeView : UserControl
         };
         CategoryRail.GotFocus += (_, _) => RowHelp.Text = "";
         // The list's edges and its scroll thumb follow the scrolling, the window's size and the category shown.
-        SettingsRows.ViewChanged += (_, _) => UpdateRowsScroll();
-        SettingsRows.SizeChanged += (_, _) => UpdateRowsScroll();
-        if (SettingsRows.Content is FrameworkElement rows) rows.SizeChanged += (_, _) => UpdateRowsScroll();
+        _rowsEdges = new ScrollEdges(SettingsRows, RowsFadeTop, RowsFadeBottom, RowsScrollTrack, RowsScrollThumb);
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
@@ -133,6 +132,10 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         switch (e.PropertyName)
         {
+            case nameof(MainViewModel.IsSystemTab) when ViewModel.IsSystemTab:
+                // Entering System: the list's edges land with it, never a hard cut that then fades.
+                _rowsEdges.Snap();
+                break;
             case nameof(MainViewModel.IsConsoleActive):
                 RefreshNavigator();
                 DispatcherQueue.TryEnqueue(FocusDefault);
@@ -367,25 +370,6 @@ public sealed partial class ConsoleHomeView : UserControl
         // The tour opens the System tab under itself: the focus stays on its card.
         if (ViewModel.IsConsoleTourOpen) { ConsoleTourNextButton.Focus(FocusState.Keyboard); return; }
         CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
-    }
-
-    /// <summary>
-    /// The System list: an edge fades into the background while there are rows past it (instead of a hard cut), and the
-    /// thumb on the right shows where the list is, only when it is longer than the screen.
-    /// </summary>
-    private void UpdateRowsScroll()
-    {
-        var scrollable = SettingsRows.ScrollableHeight > 1;
-        var offset = SettingsRows.VerticalOffset;
-        RowsFadeTop.Opacity = scrollable && offset > 1 ? 1 : 0;
-        RowsFadeBottom.Opacity = scrollable && offset < SettingsRows.ScrollableHeight - 1 ? 1 : 0;
-        RowsScrollTrack.Opacity = scrollable ? 1 : 0;
-        if (!scrollable || SettingsRows.ExtentHeight <= 0) return;
-        var track = RowsScrollTrack.ActualHeight;
-        if (track <= 0) return;
-        var thumb = Math.Max(36, track * SettingsRows.ViewportHeight / SettingsRows.ExtentHeight);
-        RowsScrollThumb.Height = thumb;
-        RowsScrollThumb.Margin = new Thickness(0, (track - thumb) * Math.Clamp(offset / SettingsRows.ScrollableHeight, 0, 1), 0, 0);
     }
 
     // ───────────── Opening ─────────────
@@ -902,6 +886,7 @@ public sealed partial class ConsoleHomeView : UserControl
         if (sender is not FrameworkElement { Tag: string tag } || !int.TryParse(tag, out var index) || index == ViewModel.SystemCategory) return;
         ViewModel.SystemCategory = index;
         _lastSettingsRow = null;
+        _rowsEdges.Snap();
         SettingsRows.ChangeView(null, 0, null, true);
     }
 
