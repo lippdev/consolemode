@@ -662,6 +662,8 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 ### Lista de Sistema e outros apps
 
+- [ ] Aviso de início de sessão (com o atalho do menu definido) e de bateria fraca: entra deslizando da borda direita da TV, sem aparecer em outra tela ao lado; o fundo em volta do card é transparente (sem retângulo preto); a barrinha verde esvazia e o aviso sai deslizando para a direita. O jogo não perde o foco em nenhum momento. Resultado: ______
+
 - [ ] Menu fora do modo console: com o atalho do menu definido e o Console Mode só na bandeja, segurar o atalho abre o Menu da sessão na tela de jogo (ou na principal, com a TV desligada), com o selo "Fora da sessão" e sem limite/contador de FPS. Resultado: ______
 - [ ] Fora da sessão, **Controlar o mouse com o controle** move o ponteiro e clica; com a janela do Console Mode em primeiro plano o controle volta a navegar a interface (o mouse espera); com o menu aberto, também. **Ocultar o cursor** some com a seta. Começar uma sessão desliga os dois; fechar o Console Mode traz o cursor de volta. Resultado: ______
 - [ ] Sistema → Controle → **Menu da sessão fora do modo console** desligado: o atalho não abre o menu fora da sessão (abre numa sessão), o ícone da bandeja continua abrindo; desligar com o mouse do controle ligado o desliga. Resultado: ______
