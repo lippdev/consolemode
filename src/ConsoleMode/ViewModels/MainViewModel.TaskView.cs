@@ -3,8 +3,9 @@ using ConsoleMode.Services;
 
 namespace ConsoleMode.ViewModels;
 
-// The Task View shortcut: Windows' Win + Tab from the controller, in a session or not, driven with the pad while it
-// is open (TaskViewDriver). The controller mouse waits meanwhile, so the stick moves the selection, not the pointer.
+// The Task View shortcut: Windows' Win + Tab from the controller, in a session or not. Windows moves Task View with an
+// Xbox controller itself; a PlayStation one is driven from here while it is open (TaskViewDriver, optional). The
+// controller mouse waits meanwhile, so the stick moves the selection, not the pointer.
 // The first few times, a toast shows how to drive it before it opens: nothing of ours can show over Task View
 // (Windows draws it above every always-on-top window), so the hint comes first and Task View a moment later.
 public partial class MainViewModel
@@ -22,6 +23,15 @@ public partial class MainViewModel
     [ObservableProperty] private bool _isTaskViewOpen;
 
     partial void OnIsTaskViewOpenChanged(bool value) => UpdateSessionPointer();
+
+    /// <summary>System → Controller: a PlayStation controller drives Task View (Windows already does it for Xbox ones).</summary>
+    [ObservableProperty] private bool _taskViewPlayStation = true;
+
+    partial void OnTaskViewPlayStationChanged(bool value)
+    {
+        _taskView.DrivePlayStation = value;
+        SaveQuietly();
+    }
 
     /// <summary>The shortcut: opens Task View, or closes it when it was opened from here.</summary>
     public void ToggleTaskView()

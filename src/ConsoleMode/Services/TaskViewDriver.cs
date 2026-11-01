@@ -4,9 +4,10 @@ using System.Runtime.InteropServices;
 namespace ConsoleMode.Services;
 
 /// <summary>
-/// The Task View shortcut: opens Windows' Task View (Win + Tab) and, while it is open, lets the controller drive it
-/// with the keys it understands (<see cref="TaskViewKeys"/>: arrows, Enter, Escape). Reads XInput and Sony HID on its
-/// own thread, like the controller mouse, since neither needs the focus. It stops when A or B closes Task View, when
+/// The Task View shortcut: opens Windows' Task View (Win + Tab) and, while it is open, lets a PlayStation controller
+/// drive it with the keys it understands (<see cref="TaskViewKeys"/>: arrows, Enter, Escape). Windows already moves
+/// Task View with an Xbox (XInput) controller, so those are left to it (driving them too sent every move twice);
+/// Sony pads, which Windows doesn't understand there, are read over HID on this driver's own thread, without the focus. It stops when A or B closes Task View, when
 /// something else does (a click, the keyboard), or after a while; and at once if Task View never took the
 /// foreground, so the controller never types into the game behind it.
 /// </summary>
@@ -19,12 +20,20 @@ public sealed class TaskViewDriver : IDisposable
 
     private CancellationTokenSource? _cts;
     private Thread? _thread;
-    private static bool _xinputMissing;
 
     /// <summary>Raised on the driver's thread once it stops driving Task View.</summary>
     public event Action? Stopped;
 
     public bool IsRunning => _cts is not null;
+
+    /// <summary>System → Controller: a PlayStation controller drives Task View (on by default).</summary>
+    public bool DrivePlayStation
+    {
+        get => _drivePlayStation;
+        set => _drivePlayStation = value;
+    }
+
+    private volatile bool _drivePlayStation = true;
 
     /// <summary>Opens Task View and starts driving it; with Task View already open from here, closes it instead.</summary>
     public void Toggle()
@@ -86,6 +95,7 @@ public sealed class TaskViewDriver : IDisposable
                 }
 
                 var ended = false;
+                if (!_drivePlayStation) continue;
                 foreach (var key in keys.Step(Read(), clock.Elapsed))
                 {
                     SendKey(key switch
@@ -121,37 +131,17 @@ public sealed class TaskViewDriver : IDisposable
         }
     }
 
-    /// <summary>Every pad at once: buttons from all of them, the stick pushed furthest.</summary>
+    /// <summary>The PlayStation pads (Sony HID): buttons from all of them, the left stick pushed furthest.</summary>
     private static TaskViewPad Read()
     {
-        ushort buttons = 0;
         double x = 0, y = 0;
-
-        void Take(double sx, double sy)
+        foreach (var s in SonyHidReader.ReadSticks())
         {
+            var sx = ControllerMouseMath.FromHidByte(s.LeftX, false);
+            var sy = ControllerMouseMath.FromHidByte(s.LeftY, true);
             if (sx * sx + sy * sy > x * x + y * y) { x = sx; y = sy; }
         }
-
-        if (!_xinputMissing)
-        {
-            try
-            {
-                for (uint i = 0; i < 4; i++)
-                {
-                    if (XInputGetState(i, out var state) != 0) continue;
-                    buttons |= state.Gamepad.wButtons;
-                    Take(ControllerMouseMath.FromXInput(state.Gamepad.sThumbLX), ControllerMouseMath.FromXInput(state.Gamepad.sThumbLY));
-                }
-            }
-            catch (DllNotFoundException)
-            {
-                _xinputMissing = true;
-            }
-        }
-        buttons |= SonyHidReader.Held;
-        foreach (var s in SonyHidReader.ReadSticks())
-            Take(ControllerMouseMath.FromHidByte(s.LeftX, false), ControllerMouseMath.FromHidByte(s.LeftY, true));
-        return new TaskViewPad(buttons, x, y);
+        return new TaskViewPad(SonyHidReader.Held, x, y);
     }
 
     private const byte VkLeftWin = 0x5B;
@@ -180,28 +170,6 @@ public sealed class TaskViewDriver : IDisposable
         keybd_event(key, 0, flags, 0);
         keybd_event(key, 0, flags | KeyEventUp, 0);
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XInputGamepad
-    {
-        public ushort wButtons;
-        public byte bLeftTrigger;
-        public byte bRightTrigger;
-        public short sThumbLX;
-        public short sThumbLY;
-        public short sThumbRX;
-        public short sThumbRY;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XInputState
-    {
-        public uint dwPacketNumber;
-        public XInputGamepad Gamepad;
-    }
-
-    [DllImport("xinput1_4.dll", EntryPoint = "XInputGetState")]
-    private static extern uint XInputGetState(uint userIndex, out XInputState state);
 
     [DllImport("user32.dll")]
     private static extern nint GetForegroundWindow();

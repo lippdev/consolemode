@@ -353,6 +353,7 @@ public partial class MainViewModel : ObservableObject
             MinimizeToTray = config.MinimizeToTray;
             MenuOutsideSession = config.MenuOutsideSession;
             _taskViewHintsShown = config.TaskViewHintsShown;
+            TaskViewPlayStation = config.TaskViewPlayStation;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
@@ -906,6 +907,7 @@ public partial class MainViewModel : ObservableObject
             ExitShortcut = _shortcuts[(int)ShortcutSlot.Exit],
             TaskViewShortcut = _shortcuts[(int)ShortcutSlot.TaskView],
             TaskViewHintsShown = _taskViewHintsShown,
+            TaskViewPlayStation = TaskViewPlayStation,
             ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,

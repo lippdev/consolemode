@@ -87,6 +87,8 @@
   "TaskViewShortcutCard": "Controller shortcut for Task View",
   "TaskViewShortcutDescription": "Opens Windows' Task View (Win + Tab) with all your open windows, in a session or not. While it is open, the D-pad or the stick picks a window, A opens it and B closes the view; the shortcut again closes it too.",
   "TaskViewHint": "D-pad or stick picks a window · {0} opens it · {1} closes",
+  "TaskViewPlayStationCard": "Move around Task View with a PlayStation controller",
+  "TaskViewPlayStationDescription": "Windows already moves around Task View with an Xbox controller. On, Console Mode does the same with a PlayStation controller, which Windows doesn't understand there. Turn it off if a tool makes your controller an Xbox one (DS4Windows, Steam) and moves repeat.",
   "ExitShortcutDescription": "During a session, hold this shortcut for 1 second to restore your desk and go back to the PC.",
   "ShortcutHome": "Open Console Mode",
   "ControllerSection": "Controller",

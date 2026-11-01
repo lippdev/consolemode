@@ -76,6 +76,12 @@ public sealed class AppConfig
     /// </summary>
     public int TaskViewShortcut { get; set; } = 0x0020 | 0x4000;
 
+    /// <summary>
+    /// A PlayStation controller drives Task View opened from the shortcut (Windows already does it for Xbox ones).
+    /// Off for whoever has a tool that makes the pad an Xbox one too (DS4Windows, Steam), where moves would repeat.
+    /// </summary>
+    public bool TaskViewPlayStation { get; set; } = true;
+
     /// <summary>How many times the Task View shortcut showed how to drive it before opening (it stops after a few).</summary>
     public int TaskViewHintsShown { get; set; }
 

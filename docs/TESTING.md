@@ -663,7 +663,8 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 ### Atalho da visão de tarefas
 
 - [ ] Numa instalação nova e numa que já existia, Sistema → Controle → **Atalho do controle para a visão de tarefas** já mostra Select + X. Noutra rodada, trocar para só o botão Xbox (com o atalho de abrir o Console Mode desligado). Fora da sessão e numa sessão, segurar o atalho abre a visão de tarefas do Windows. Resultado: ______
-- [ ] Com ela aberta: direcional e analógico esquerdo movem a seleção (segurar repete), **A** abre a janela escolhida, **B** fecha a visão, o atalho de novo também fecha. Fechando com o mouse, o controle volta ao jogo (A não vira Enter). Com o controle como mouse ligado, o ponteiro não se mexe enquanto a visão está aberta. Resultado: ______
+- [ ] Controle **Xbox**, com ela aberta: o próprio Windows move a seleção, cada toque anda **uma** casa só (sem repetir), **A** abre, **B** fecha; o atalho de novo também fecha. Com o controle como mouse ligado, o ponteiro não se mexe enquanto a visão está aberta. Resultado: ______
+- [ ] Controle **PlayStation** (sem DS4Windows/Steam Input transformando em Xbox): direcional e analógico esquerdo movem a seleção (segurar repete), ✕ abre, ○ fecha. Fechando com o mouse, o controle volta ao jogo (✕ não vira Enter). Com **Navegar na visão de tarefas com controle PlayStation** desligado, o controle PlayStation não mexe na visão. Resultado: ______
 - [ ] Com o menu da sessão aberto, o atalho fecha o menu e abre a visão de tarefas. Resultado: ______
 - [ ] Nas três primeiras vezes, o aviso "Visão de tarefas" desliza no canto com os botões do controle em uso (A/B ou ✕/○) e a visão abre ~1,6 s depois; da quarta em diante abre na hora, sem aviso. O aviso não aparece como janela dentro da visão de tarefas. Resultado: ______
 

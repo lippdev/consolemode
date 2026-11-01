@@ -71,5 +71,7 @@ public class AppConfigTests
         var off = System.Text.Json.JsonSerializer.Deserialize<AppConfig>("{\"taskViewShortcut\":0}", options)!;
         Assert.Equal(0, off.TaskViewShortcut);
         Assert.Equal(0, new AppConfig().TaskViewHintsShown);
+        // Windows already drives Task View with an Xbox pad; a PlayStation one is driven from here unless turned off.
+        Assert.True(old.TaskViewPlayStation);
     }
 }

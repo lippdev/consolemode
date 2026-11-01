@@ -87,6 +87,8 @@
   "TaskViewShortcutCard": "Atalho do controle para a visão de tarefas",
   "TaskViewShortcutDescription": "Abre a visão de tarefas do Windows (Win + Tab) com todas as janelas abertas, dentro ou fora de uma sessão. Com ela aberta, o direcional ou o analógico escolhe a janela, A abre e B fecha; o atalho de novo também fecha.",
   "TaskViewHint": "Direcional ou analógico escolhe a janela · {0} abre · {1} fecha",
+  "TaskViewPlayStationCard": "Navegar na visão de tarefas com controle PlayStation",
+  "TaskViewPlayStationDescription": "O Windows já move a visão de tarefas com controle Xbox. Ligado, o Console Mode faz o mesmo com controle PlayStation, que o Windows não entende ali. Desligue se usar um programa que transforma o controle em Xbox (DS4Windows, Steam) e os comandos se repetirem.",
   "ExitShortcutDescription": "Durante a sessão, segure este atalho por 1 segundo para restaurar a mesa e voltar ao PC.",
   "ShortcutHome": "Abrir o Console Mode",
   "ControllerSection": "Controle",

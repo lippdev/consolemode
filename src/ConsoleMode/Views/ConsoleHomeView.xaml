@@ -701,6 +701,12 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.TaskViewShortcutText, Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="taskviewplaystation" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TaskViewPlayStationDescription, Mode=OneWay}">
+                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TaskViewPlayStationCard, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.TaskViewPlayStation), Mode=OneWay}"/>
+                                            </Grid>
+                                        </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="menuoutside" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.MenuOutsideSessionDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.MenuOutsideSessionCard, Mode=OneWay}"/>

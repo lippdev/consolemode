@@ -87,6 +87,8 @@
   "TaskViewShortcutCard": "Raccourci manette pour l'affichage des tâches",
   "TaskViewShortcutDescription": "Ouvre l'affichage des tâches de Windows (Win + Tab) avec toutes les fenêtres ouvertes, en session ou non. Tant qu'il est ouvert, la croix ou le stick choisit la fenêtre, A l'ouvre et B ferme l'affichage ; le raccourci le ferme aussi.",
   "TaskViewHint": "La croix ou le stick choisit la fenêtre · {0} l'ouvre · {1} ferme",
+  "TaskViewPlayStationCard": "Naviguer dans l'affichage des tâches avec une manette PlayStation",
+  "TaskViewPlayStationDescription": "Windows permet déjà de naviguer dans l'affichage des tâches avec une manette Xbox. Activé, Console Mode fait de même avec une manette PlayStation, que Windows ne comprend pas à cet endroit. Désactivez-le si un programme transforme votre manette en manette Xbox (DS4Windows, Steam) et que les commandes se répètent.",
   "ExitShortcutDescription": "Pendant une session, maintenez ce raccourci pendant 1 seconde pour restaurer votre bureau et revenir au PC.",
   "ShortcutHome": "Ouvrir Console Mode",
   "ControllerSection": "Manette",

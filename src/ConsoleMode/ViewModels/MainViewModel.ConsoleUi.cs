@@ -167,6 +167,7 @@ public partial class MainViewModel
             case "menushortcut": ToggleSuggestedShortcut(ShortcutSlot.Menu); break;
             case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
             case "taskviewshortcut": ToggleSuggestedShortcut(ShortcutSlot.TaskView); break;
+            case "taskviewplaystation": TaskViewPlayStation = !TaskViewPlayStation; break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "controllerwake": _ = EnableControllerWakeAsync(); break;
