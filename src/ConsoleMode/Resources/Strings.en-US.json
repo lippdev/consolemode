@@ -416,7 +416,7 @@
   "ConsoleTourQuickSettingsTitle": "Quick settings",
   "ConsoleTourQuickSettingsBody": "Audio output, resolution, HDR and FPS limit for the next session, one press away. When you go back to the PC, everything goes back to how it was.",
   "ConsoleTourSystemTitle": "Every setting",
-  "ConsoleTourSystemBody": "The System tab holds every setting, by category: game display, what happens when entering, controller, TV, extras and the app. {0} opens and closes this tab from anywhere.",
+  "ConsoleTourSystemBody": "The System tab holds every setting, by category: game display, what happens when entering, controller, extras and the app. {0} opens and closes this tab from anywhere.",
   "ConsoleTourShortcutsTitle": "Controller shortcuts",
   "ConsoleTourShortcutsBody": "Pick the shortcuts that work even with this window closed here: one to enter console mode, one to open the session menu over the game and one to go back to the PC. A shortcut with no combination does nothing.",
   "ConsoleTourDoneTitle": "All set",
