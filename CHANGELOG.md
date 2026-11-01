@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+
+## [1.7.0-beta.3]
 ### Mudanças
 - Início: clicar num iniciador (ou apertar A nele) só escolhe o que vai abrir; quem começa é **Jogar agora**. Antes o clique já entrava no modo console, e escolher parecia abrir sozinho. No controle e no teclado, o foco desce para **Jogar agora** depois da escolha, então um segundo A joga. (#193)
 - Tour guiado: cada parada avança sozinha depois do tempo de ler o texto (de 7 a 16 s), com uma barra embaixo do cartão mostrando quanto falta, e a última fecha o tour. Ninguém fica preso numa parada se o controle não responder (houve relato com controle de PS5). **A** avança na hora e **B** pula, como antes. (#194)
