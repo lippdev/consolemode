@@ -53,6 +53,7 @@ public partial class MainViewModel
     private void PreviewIntro()
     {
         if (IsConsoleActive) return;
+        if (!IntroAnimation) return;
         StartIntro(SelectedIntroStyle?.Value, IntroSound, BootIntro.MinimumShown(SelectedIntroStyle?.Value) + TimeSpan.FromMilliseconds(400));
     }
 
@@ -83,7 +84,8 @@ public partial class MainViewModel
         IntroStyleOptions.Add(new ComboOption { Text = LocalizationService.Get("IntroStyleConsole"), Value = BootIntro.ConsoleStyle });
         IntroStyleOptions.Add(new ComboOption { Text = LocalizationService.Get("IntroStyleX360"), Value = BootIntro.Xbox360Style });
         IntroStyleOptions.Add(new ComboOption { Text = LocalizationService.Get("IntroStylePs4"), Value = BootIntro.Ps4Style });
-        SelectedIntroStyle = IntroStyleOptions.FirstOrDefault(o => o.Value == BootIntro.Normalize(current)) ?? IntroStyleOptions[0];
+        IntroStyleOptions.Add(new ComboOption { Text = LocalizationService.Get("IntroStyleNone"), Value = BootIntro.NoOpening });
+        SelectedIntroStyle = IntroStyleOption(IntroAnimation ? current : BootIntro.NoOpening);
     }
 
     partial void OnSelectedIntroStyleChanged(ComboOption? value)
@@ -100,13 +102,26 @@ public partial class MainViewModel
     private void ChooseIntroStyle(string value)
     {
         _introStyleChosen = true;
+        // "None" turns the opening off; any style turns it back on.
+        _applying = true;
+        try { IntroAnimation = value != BootIntro.NoOpening; }
+        finally { _applying = false; }
         var option = IntroStyleOptions.FirstOrDefault(o => o.Value == value) ?? SelectedIntroStyle;
         if (ReferenceEquals(option, SelectedIntroStyle)) SaveQuietly();
         else SelectedIntroStyle = option;
     }
 
-    /// <summary>What is saved: the picked style, or nothing while none was picked (keeps the surprises).</summary>
-    private string? IntroStyleToSave => _introStyleChosen ? SelectedIntroStyle?.Value : null;
+    /// <summary>The picker's option for a style, "None" included; an unknown one is the app's own.</summary>
+    internal ComboOption? IntroStyleOption(string? value) =>
+        IntroStyleOptions.FirstOrDefault(o => o.Value == (value == BootIntro.NoOpening ? value : BootIntro.Normalize(value))) ?? IntroStyleOptions.FirstOrDefault();
+
+    /// <summary>
+    /// What is saved: the picked style, or nothing while none was picked (keeps the surprises). "None" is saved as the
+    /// opening turned off, keeping the style that was there.
+    /// </summary>
+    private string? IntroStyleToSave => !_introStyleChosen ? null
+        : SelectedIntroStyle?.Value == BootIntro.NoOpening ? _loadedConfig.IntroStyle ?? BootIntro.ConsoleStyle
+        : SelectedIntroStyle?.Value;
 
     partial void OnIntroAnimationChanged(bool value)
     {

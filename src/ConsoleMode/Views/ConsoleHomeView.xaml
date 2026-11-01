@@ -874,10 +874,10 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.InterfaceSounds), Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="intro" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroAnimationDescription, Mode=OneWay}">
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="introstyle" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroStyleDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroAnimationCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IntroAnimation), Mode=OneWay}"/>
+                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroStyleCard, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedIntroStyle.Text, Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="introsound" IsEnabled="{x:Bind ViewModel.IntroSoundRowEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroSoundDescription, Mode=OneWay}">
@@ -886,13 +886,7 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IntroSound), Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="introstyle" IsEnabled="{x:Bind ViewModel.IntroSoundRowEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroStyleDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroStyleCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedIntroStyle.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.PreviewIntroCommand}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroPreviewDescription, Mode=OneWay}">
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.PreviewIntroCommand}" IsEnabled="{x:Bind ViewModel.IntroSoundRowEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroPreviewDescription, Mode=OneWay}">
                                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroPreviewCard, Mode=OneWay}"/>
                                         </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="language" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.LanguageDescription, Mode=OneWay}">
@@ -1207,9 +1201,11 @@
              "Aproximação": the logo comes from close to the camera, big and blurred, and settles sharp in the middle, then
              the name; shown and faded out from code (ConsoleHomeView.ShowIntro / HideIntro), skipped by any press, click or key. -->
         <Grid x:Name="IntroPanel" Visibility="Collapsed" Margin="-56,-48,-56,-32" Background="#07090D" Tapped="OnIntroTapped">
-            <!-- Console Mode's own -->
+            <!-- Console Mode's own, "Liga o PC": the logo drawn as vectors (viewBox 256, like assets/icon.ico) so each part can
+                 come on by itself: the power light, the base, the screen drawing itself, a green flash, the >_ typed, the name.
+                 Opacities that start at 0 are set from code (ConsoleHomeView.ShowConsoleIntro). -->
             <Grid x:Name="IntroConsole">
-                <Ellipse Width="900" Height="900" Opacity="0.55" IsHitTestVisible="False">
+                <Ellipse x:Name="IntroGlow" Width="900" Height="900" Opacity="0.55" IsHitTestVisible="False">
                     <Ellipse.Fill>
                         <RadialGradientBrush>
                             <GradientStop Color="#552FD3A0" Offset="0"/>
@@ -1219,11 +1215,35 @@
                     </Ellipse.Fill>
                 </Ellipse>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
-                    <!-- The blurred copy is the sharp logo plus a 64 px margin of blur on each side (384 for 256) -->
-                    <Grid x:Name="IntroLogoBox" Width="132" Height="132" HorizontalAlignment="Center">
-                        <Image x:Name="IntroLogoBlur" Source="ms-appx:///Assets/Intro/logo-blur.png" Width="198" Height="198" Margin="-33"/>
-                        <Image x:Name="IntroLogo" Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
-                    </Grid>
+                    <Viewbox Width="132" Height="132" HorizontalAlignment="Center">
+                        <Canvas Width="256" Height="256">
+                            <Rectangle x:Name="LogoScreenFill" Canvas.Left="22" Canvas.Top="14" Width="212" Height="156" RadiusX="30" RadiusY="30" Fill="#33D69F"/>
+                            <!-- Dash lengths are in stroke widths: one dash as long as the whole line, so the offset draws it -->
+                            <Rectangle x:Name="LogoScreen" Canvas.Left="22" Canvas.Top="14" Width="212" Height="156" RadiusX="30" RadiusY="30"
+                                       Stroke="#24292E" StrokeThickness="18" StrokeDashArray="40 40"/>
+                            <Path x:Name="LogoChevron" Data="M64,62 L104,88 L64,114" Stroke="#33D69F" StrokeThickness="14" StrokeDashArray="7.2 7.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashCap="Round" StrokeLineJoin="Round"/>
+                            <!-- The box shows the cursor when it's typed; the cursor itself blinks -->
+                            <Canvas x:Name="LogoCursorBox">
+                                <Path x:Name="LogoCursor" Data="M118,124 L168,124" Stroke="#33D69F" StrokeThickness="14" StrokeDashArray="3.8 3.8"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashCap="Round"/>
+                            </Canvas>
+                            <Rectangle x:Name="LogoBase" Canvas.Left="8" Canvas.Top="182" Width="240" Height="64" RadiusX="16" RadiusY="16" Fill="#24292E"/>
+                            <Path x:Name="LogoDash" Data="M30,214 L50,214" Stroke="#33D69F" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            <Ellipse x:Name="LogoPowerGlow" Canvas.Left="176" Canvas.Top="161" Width="80" Height="80">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#B333D69F" Offset="0"/>
+                                        <GradientStop Color="#0033D69F" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Canvas x:Name="LogoPower">
+                                <Path Data="M206,200 A18,18 0 1 0 226,200" Stroke="#33D69F" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                <Path Data="M216,190 L216,212" Stroke="#33D69F" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            </Canvas>
+                        </Canvas>
+                    </Viewbox>
                     <TextBlock x:Name="IntroName" Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10"
                                HorizontalAlignment="Center"/>
                 </StackPanel>

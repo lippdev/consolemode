@@ -416,8 +416,6 @@
   "ConsoleTourDoneTitle": "Todo listo",
   "ConsoleTourDoneBody": "Comprueba la pantalla de juego en la pestaña Sesión y pulsa Jugar ahora. Para volver a ver este recorrido: Sistema → {0} → {1}.",
   "ConsoleTourFinish": "Empezar",
-  "IntroAnimationCard": "Apertura al abrir la aplicación",
-  "IntroAnimationDescription": "Muestra el logotipo de Console Mode llegando a la pantalla mientras se abre la aplicación.",
   "IntroSoundCard": "Sonido de apertura",
   "IntroSoundDescription": "Reproduce un sonido de entrada con la apertura.",
   "IntroStyleCard": "Estilo de apertura",
@@ -425,6 +423,7 @@
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Inspirada en la Xbox 360",
   "IntroStylePs4": "Inspirada en la PS4",
+  "IntroStyleNone": "Ninguna (abre directamente)",
   "IntroPreviewCard": "Ver la apertura",
   "IntroPreviewDescription": "Muestra ahora la apertura elegida, con su sonido."
 }

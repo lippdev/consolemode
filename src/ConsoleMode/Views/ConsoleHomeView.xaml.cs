@@ -377,8 +377,8 @@ public sealed partial class ConsoleHomeView : UserControl
         IntroX360.Visibility = style == BootIntro.Xbox360Style ? Visibility.Visible : Visibility.Collapsed;
         IntroPs4.Visibility = style == BootIntro.Ps4Style ? Visibility.Visible : Visibility.Collapsed;
         IntroPanel.Visibility = Visibility.Visible;
-        // Without animations, the style's background and logo just show (no flash over them).
-        if (!Ui.AnimationsEnabled) { Visual(X360Flash).Opacity = 0f; return; }
+        // Without animations, the style's background and logo just show (no flash over them, the logo drawn whole).
+        if (!Ui.AnimationsEnabled) { Visual(X360Flash).Opacity = 0f; ShowConsoleLogoWhole(); return; }
         try
         {
             ElementCompositionPreview.GetElementVisual(IntroPanel).Opacity = 1f;
@@ -396,18 +396,100 @@ public sealed partial class ConsoleHomeView : UserControl
     }
 
     /// <summary>
-    /// "Aproximação": the logo starts three times its size, blurred and clear, and settles sharp in the middle (the blurred
-    /// copy fades into the sharp one on the way), then the name fades in.
+    /// "Liga o PC": everything starts dark; the power light on the base comes on and pulses, the base shows, the screen
+    /// draws itself and flashes green, the >_ is typed and the cursor blinks, then the name.
     /// </summary>
     private void ShowConsoleIntro()
     {
-        var box = Visual(IntroLogoBox);
-        box.CenterPoint = new Vector3((float)IntroLogoBox.Width / 2, (float)IntroLogoBox.Height / 2, 0);
-        ScaleTo(box, 3f, 1f, 0, 900);
-        Fade(box, 0, 1, 0, 500);
-        Fade(Visual(IntroLogo), 0, 1, 0, 900);
-        Fade(Visual(IntroLogoBlur), 1, 0, 0, 900);
-        Fade(Visual(IntroName), 0, 1, 600, 500);
+        Fade(Visual(LogoPower), 0, 1, 200, 150);
+        Pulse(Visual(LogoPowerGlow), 350, 900, 2);
+        Fade(Visual(LogoBase), 0, 1, 700, 400);
+        Fade(Visual(LogoDash), 0, 1, 900, 200);
+        var draw = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+        Draw(draw, LogoScreen, 40, 900, 700);
+        Draw(draw, LogoChevron, 7.2, 1750, 300);
+        Draw(draw, LogoCursor, 3.8, 2050, 200);
+        draw.Begin();
+        // A hidden line still shows its round caps as dots: the prompt stays out of sight until it is typed.
+        Fade(Visual(LogoChevron), 0, 1, 1750, 1);
+        Fade(Visual(LogoCursorBox), 0, 1, 2050, 1);
+        var flash = Visual(LogoScreenFill);
+        var glow = flash.Compositor.CreateScalarKeyFrameAnimation();
+        glow.InsertKeyFrame(0f, 0f);
+        glow.InsertKeyFrame(0.25f, 0.35f);
+        glow.InsertKeyFrame(1f, 0f);
+        glow.DelayTime = TimeSpan.FromMilliseconds(1500);
+        glow.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+        glow.Duration = TimeSpan.FromMilliseconds(900);
+        flash.StartAnimation("Opacity", glow);
+        Blink(Visual(LogoCursor), 2300, 500, 3);
+        Fade(Visual(IntroGlow), 0, 0.55f, 1500, 800);
+        Fade(Visual(IntroName), 0, 1, 2400, 500);
+    }
+
+    /// <summary>The logo of the app's own opening as it ends: for Windows' animations off.</summary>
+    private void ShowConsoleLogoWhole()
+    {
+        LogoScreen.StrokeDashOffset = 0;
+        LogoChevron.StrokeDashOffset = 0;
+        LogoCursor.StrokeDashOffset = 0;
+        Visual(LogoScreenFill).Opacity = 0f;
+        Visual(LogoPowerGlow).Opacity = 0f;
+    }
+
+    /// <summary>Draws a line along itself: its one dash (as long as the line) slides in from the offset that hides it.</summary>
+    private static void Draw(Microsoft.UI.Xaml.Media.Animation.Storyboard storyboard, Microsoft.UI.Xaml.Shapes.Shape shape, double length, int beginMs, int ms)
+    {
+        shape.StrokeDashOffset = length;
+        var slide = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+        {
+            From = length,
+            To = 0,
+            BeginTime = TimeSpan.FromMilliseconds(beginMs),
+            Duration = TimeSpan.FromMilliseconds(ms),
+            EnableDependentAnimation = true,
+            EasingFunction = new Microsoft.UI.Xaml.Media.Animation.CubicEase { EasingMode = Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseInOut }
+        };
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(slide, shape);
+        Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(slide, "StrokeDashOffset");
+        storyboard.Children.Add(slide);
+    }
+
+    /// <summary>A light that comes up and dies down, a few times (the power light).</summary>
+    private static void Pulse(Microsoft.UI.Composition.Visual visual, int delayMs, int ms, int times)
+    {
+        var pulse = visual.Compositor.CreateScalarKeyFrameAnimation();
+        pulse.InsertKeyFrame(0f, 0f);
+        pulse.InsertKeyFrame(0.5f, 1f);
+        pulse.InsertKeyFrame(1f, 0f);
+        pulse.DelayTime = TimeSpan.FromMilliseconds(delayMs);
+        pulse.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+        pulse.Duration = TimeSpan.FromMilliseconds(ms);
+        pulse.IterationBehavior = Microsoft.UI.Composition.AnimationIterationBehavior.Count;
+        pulse.IterationCount = times;
+        visual.StartAnimation("Opacity", pulse);
+    }
+
+    /// <summary>On and off like a text cursor, a few times (half a period each), ending on.</summary>
+    private static void Blink(Microsoft.UI.Composition.Visual visual, int delayMs, int periodMs, int times)
+    {
+        var compositor = visual.Compositor;
+        var linear = compositor.CreateLinearEasingFunction();
+        var blink = compositor.CreateScalarKeyFrameAnimation();
+        // Hard cuts: each change happens within a thousandth of the run.
+        blink.InsertKeyFrame(0f, 1f);
+        for (var i = 0; i < times; i++)
+        {
+            var off = (i + 0.5f) / times;
+            var on = (i + 1f) / times;
+            blink.InsertKeyFrame(off - 0.001f, 1f, linear);
+            blink.InsertKeyFrame(off, 0f, linear);
+            blink.InsertKeyFrame(on - 0.001f, 0f, linear);
+            blink.InsertKeyFrame(on, 1f, linear);
+        }
+        blink.DelayTime = TimeSpan.FromMilliseconds(delayMs);
+        blink.Duration = TimeSpan.FromMilliseconds(periodMs * times);
+        visual.StartAnimation("Opacity", blink);
     }
 
     /// <summary>

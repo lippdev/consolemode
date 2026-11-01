@@ -200,8 +200,6 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string ExitShortcutCard => LocalizationService.Get(nameof(ExitShortcutCard));
     public string SoundsCard => LocalizationService.Get(nameof(SoundsCard));
-    public string IntroAnimationCard => LocalizationService.Get(nameof(IntroAnimationCard));
-    public string IntroAnimationDescription => LocalizationService.Get(nameof(IntroAnimationDescription));
     public string IntroSoundCard => LocalizationService.Get(nameof(IntroSoundCard));
     public string IntroSoundDescription => LocalizationService.Get(nameof(IntroSoundDescription));
     public string IntroStyleCard => LocalizationService.Get(nameof(IntroStyleCard));

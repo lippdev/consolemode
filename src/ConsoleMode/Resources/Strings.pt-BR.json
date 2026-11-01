@@ -416,8 +416,6 @@
   "ConsoleTourDoneTitle": "Tudo pronto",
   "ConsoleTourDoneBody": "Confira a tela de jogo na aba Sessão e aperte Jogar agora. Para ver este tour de novo: Sistema → {0} → {1}.",
   "ConsoleTourFinish": "Começar",
-  "IntroAnimationCard": "Abertura ao abrir o app",
-  "IntroAnimationDescription": "Mostra o logo do Console Mode chegando à tela enquanto o app abre.",
   "IntroSoundCard": "Som da abertura",
   "IntroSoundDescription": "Toca um som de entrada junto com a abertura.",
   "IntroStyleCard": "Estilo da abertura",
@@ -425,6 +423,7 @@
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Inspirada no Xbox 360",
   "IntroStylePs4": "Inspirada no PS4",
+  "IntroStyleNone": "Nenhuma (abre direto)",
   "IntroPreviewCard": "Ver a abertura",
   "IntroPreviewDescription": "Mostra agora a abertura escolhida, com o som."
 }

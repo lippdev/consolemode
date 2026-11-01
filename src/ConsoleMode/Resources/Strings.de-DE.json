@@ -416,8 +416,6 @@
   "ConsoleTourDoneTitle": "Alles bereit",
   "ConsoleTourDoneBody": "Prüfe den Spielbildschirm im Tab Sitzung und drücke Jetzt spielen. Um diese Tour noch einmal zu sehen: System → {0} → {1}.",
   "ConsoleTourFinish": "Los geht's",
-  "IntroAnimationCard": "Intro beim Start der App",
-  "IntroAnimationDescription": "Zeigt, wie das Console-Mode-Logo beim Start der App auf den Bildschirm kommt.",
   "IntroSoundCard": "Intro-Sound",
   "IntroSoundDescription": "Spielt zum Intro einen Startsound ab.",
   "IntroStyleCard": "Intro-Stil",
@@ -425,6 +423,7 @@
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Im Stil der Xbox 360",
   "IntroStylePs4": "Im Stil der PS4",
+  "IntroStyleNone": "Keins (startet sofort)",
   "IntroPreviewCard": "Intro ansehen",
   "IntroPreviewDescription": "Zeigt das gewählte Intro jetzt, mit Sound."
 }

@@ -327,8 +327,9 @@ public partial class MainViewModel : ObservableObject
             InterfaceSounds = config.InterfaceSounds;
             IntroAnimation = config.IntroAnimation;
             IntroSound = config.IntroSound;
-            SelectedIntroStyle = IntroStyleOptions.FirstOrDefault(o => o.Value == BootIntro.Normalize(config.IntroStyle)) ?? IntroStyleOptions.FirstOrDefault();
-            _introStyleChosen = !string.IsNullOrWhiteSpace(config.IntroStyle);
+            SelectedIntroStyle = IntroStyleOption(config.IntroAnimation ? config.IntroStyle : BootIntro.NoOpening);
+            // Turning the opening off (before "None" was in the picker too) was a choice as well.
+            _introStyleChosen = !string.IsNullOrWhiteSpace(config.IntroStyle) || !config.IntroAnimation;
             MinimizeToTray = config.MinimizeToTray;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";

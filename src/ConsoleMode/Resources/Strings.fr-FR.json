@@ -416,8 +416,6 @@
   "ConsoleTourDoneTitle": "Tout est prêt",
   "ConsoleTourDoneBody": "Vérifiez l'écran de jeu dans l'onglet Session et appuyez sur Jouer. Pour revoir cette visite : Système → {0} → {1}.",
   "ConsoleTourFinish": "C'est parti",
-  "IntroAnimationCard": "Ouverture au lancement de l'application",
-  "IntroAnimationDescription": "Montre le logo de Console Mode qui arrive à l'écran pendant l'ouverture de l'application.",
   "IntroSoundCard": "Son d'ouverture",
   "IntroSoundDescription": "Joue un son d'entrée avec l'ouverture.",
   "IntroStyleCard": "Style d'ouverture",
@@ -425,6 +423,7 @@
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Inspirée de la Xbox 360",
   "IntroStylePs4": "Inspirée de la PS4",
+  "IntroStyleNone": "Aucune (ouverture directe)",
   "IntroPreviewCard": "Voir l'ouverture",
   "IntroPreviewDescription": "Affiche maintenant l'ouverture choisie, avec son son."
 }

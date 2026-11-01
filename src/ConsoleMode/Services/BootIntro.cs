@@ -15,6 +15,9 @@ public static class BootIntro
 
     public static IReadOnlyList<string> Styles { get; } = [ConsoleStyle, Xbox360Style, Ps4Style];
 
+    /// <summary>The picker's last choice, "None (opens straight away)": no opening at all (saved as IntroAnimation off).</summary>
+    public const string NoOpening = "none";
+
     /// <summary>
     /// While no style was ever picked in System → App, now and then (this share of the openings) the app opens with one of
     /// the console-inspired styles instead of its own, as a surprise. Picking any style, its own included, ends that.
@@ -48,7 +51,8 @@ public static class BootIntro
     {
         Xbox360Style => TimeSpan.FromMilliseconds(3000),
         Ps4Style => TimeSpan.FromMilliseconds(2800),
-        _ => TimeSpan.FromMilliseconds(1800)
+        // "Liga o PC": the name comes in at 2.4 s.
+        _ => TimeSpan.FromMilliseconds(3000)
     };
 
     /// <summary>Each style has its own entrance sound.</summary>

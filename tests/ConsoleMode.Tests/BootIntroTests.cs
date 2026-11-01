@@ -69,7 +69,6 @@ public class BootIntroTests
             Assert.Equal(TimeSpan.Zero, BootIntro.StillToShow(TimeSpan.FromSeconds(5), style));
             Assert.True(BootIntro.LongestShown > minimum);
         }
-        Assert.True(BootIntro.MinimumShown(BootIntro.Xbox360Style) > BootIntro.MinimumShown(BootIntro.ConsoleStyle));
     }
 
     [Fact]

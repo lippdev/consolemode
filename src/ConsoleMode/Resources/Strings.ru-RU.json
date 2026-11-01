@@ -416,8 +416,6 @@
   "ConsoleTourDoneTitle": "Всё готово",
   "ConsoleTourDoneBody": "Проверьте игровой экран на вкладке Сеанс и нажмите «Играть». Чтобы снова посмотреть этот обзор: Система → {0} → {1}.",
   "ConsoleTourFinish": "Начать",
-  "IntroAnimationCard": "Заставка при запуске",
-  "IntroAnimationDescription": "Показывает, как логотип Console Mode появляется на экране, пока приложение открывается.",
   "IntroSoundCard": "Звук заставки",
   "IntroSoundDescription": "Воспроизводит звук при появлении заставки.",
   "IntroStyleCard": "Стиль заставки",
@@ -425,6 +423,7 @@
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "В духе Xbox 360",
   "IntroStylePs4": "В духе PS4",
+  "IntroStyleNone": "Без заставки (сразу)",
   "IntroPreviewCard": "Показать заставку",
   "IntroPreviewDescription": "Показывает выбранную заставку прямо сейчас, со звуком."
 }
