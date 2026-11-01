@@ -404,7 +404,7 @@
   "ConsoleTourLaunchersTitle": "O que vai abrir",
   "ConsoleTourLaunchersBody": "Cada bloco é um iniciador: Steam Big Picture, Playnite, modo Xbox ou um aplicativo seu. Passe por cima do que você quer: ele fica marcado e é o que abre quando você jogar.",
   "ConsoleTourPlayTitle": "Jogar",
-  "ConsoleTourPlayBody": "{0} aqui, ou {1} de qualquer lugar da Início, entra no modo console: a tela de jogo vira a principal, as outras se apagam e o iniciador abre nela. A linha acima mostra onde você vai jogar e o que muda.",
+  "ConsoleTourPlayBody": "{0} aqui, ou {1} de qualquer lugar da Início, entra no modo console: a tela de jogo vira a principal, as outras se apagam e o iniciador abre nela. O nome e a linha embaixo dele mostram o que abre, onde você vai jogar e o que muda.",
   "ConsoleTourScreensTitle": "Suas telas",
   "ConsoleTourScreensBody": "Na aba Sessão ficam as telas deste PC. {0} numa tela escolhe o papel dela durante a sessão: jogar nela, apagar ou continuar ligada.",
   "ConsoleTourQuickSettingsTitle": "Ajustes rápidos",

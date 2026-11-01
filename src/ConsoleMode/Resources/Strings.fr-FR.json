@@ -404,7 +404,7 @@
   "ConsoleTourLaunchersTitle": "Ce qui s'ouvre",
   "ConsoleTourLaunchersBody": "Chaque tuile est un lanceur : Steam Big Picture, Playnite, le mode Xbox ou une application à vous. Placez-vous sur celui que vous voulez : il est coché et c'est lui qui s'ouvre quand vous jouez.",
   "ConsoleTourPlayTitle": "Jouer",
-  "ConsoleTourPlayBody": "{0} ici, ou {1} depuis n'importe où sur l'Accueil, lance le mode console : l'écran de jeu devient l'écran principal, les autres s'éteignent et le lanceur s'y ouvre. La ligne au-dessus indique où vous jouerez et ce qui change.",
+  "ConsoleTourPlayBody": "{0} ici, ou {1} depuis n'importe où sur l'Accueil, lance le mode console : l'écran de jeu devient l'écran principal, les autres s'éteignent et le lanceur s'y ouvre. Le nom et la ligne en dessous indiquent ce qui s'ouvre, où vous jouerez et ce qui change.",
   "ConsoleTourScreensTitle": "Vos écrans",
   "ConsoleTourScreensBody": "L'onglet Session liste les écrans de ce PC. {0} sur un écran choisit son rôle pendant la session : y jouer, l'éteindre ou le laisser allumé.",
   "ConsoleTourQuickSettingsTitle": "Réglages rapides",

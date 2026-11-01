@@ -371,7 +371,8 @@ public sealed partial class ConsoleHomeView : UserControl
         {
             ConsoleTourStop.Tabs => [TabBar],
             ConsoleTourStop.Launchers => [LaunchRow],
-            ConsoleTourStop.Play => [PlayRow],
+            // What will open, where and what changes, and the play button: the text talks about the line above it.
+            ConsoleTourStop.Play => [HomeSummary],
             ConsoleTourStop.Screens => [ScreenCards],
             ConsoleTourStop.QuickSettings => [QuickCards],
             ConsoleTourStop.System => [CategoryRail],

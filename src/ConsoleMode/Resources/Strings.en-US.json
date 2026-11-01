@@ -404,7 +404,7 @@
   "ConsoleTourLaunchersTitle": "What opens",
   "ConsoleTourLaunchersBody": "Each tile is a launcher: Steam Big Picture, Playnite, Xbox mode or an app of your own. Move over the one you want: it gets the check and is what opens when you play.",
   "ConsoleTourPlayTitle": "Play",
-  "ConsoleTourPlayBody": "{0} here, or {1} from anywhere on Home, enters console mode: the game display becomes the main one, the others go dark and the launcher opens on it. The line above shows where you'll play and what changes.",
+  "ConsoleTourPlayBody": "{0} here, or {1} from anywhere on Home, enters console mode: the game display becomes the main one, the others go dark and the launcher opens on it. The name and the line under it show what opens, where you'll play and what changes.",
   "ConsoleTourScreensTitle": "Your displays",
   "ConsoleTourScreensBody": "The Session tab lists this PC's displays. {0} on a display picks its role during the session: play on it, turn it off or keep it on.",
   "ConsoleTourQuickSettingsTitle": "Quick settings",

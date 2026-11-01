@@ -404,7 +404,7 @@
   "ConsoleTourLaunchersTitle": "Was sich öffnet",
   "ConsoleTourLaunchersBody": "Jede Kachel ist ein Launcher: Steam Big Picture, Playnite, der Xbox-Modus oder eine eigene App. Geh auf den, den du willst: Er wird markiert und öffnet sich, wenn du spielst.",
   "ConsoleTourPlayTitle": "Spielen",
-  "ConsoleTourPlayBody": "{0} hier, oder {1} von überall auf der Startseite, startet den Konsolenmodus: Der Spielbildschirm wird zum Hauptbildschirm, die anderen gehen aus und der Launcher öffnet sich darauf. Die Zeile darüber zeigt, wo du spielst und was sich ändert.",
+  "ConsoleTourPlayBody": "{0} hier, oder {1} von überall auf der Startseite, startet den Konsolenmodus: Der Spielbildschirm wird zum Hauptbildschirm, die anderen gehen aus und der Launcher öffnet sich darauf. Der Name und die Zeile darunter zeigen, was sich öffnet, wo du spielst und was sich ändert.",
   "ConsoleTourScreensTitle": "Deine Bildschirme",
   "ConsoleTourScreensBody": "Im Tab Sitzung stehen die Bildschirme dieses PCs. {0} auf einem Bildschirm legt seine Rolle während der Sitzung fest: darauf spielen, ausschalten oder anlassen.",
   "ConsoleTourQuickSettingsTitle": "Schnelleinstellungen",
