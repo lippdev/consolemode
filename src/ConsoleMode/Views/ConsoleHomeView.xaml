@@ -531,7 +531,9 @@
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ConsoleCategory}" Tag="3" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
+                            <!-- TV: hidden while TV control is out (TvControlService.IsAvailable) -->
+                            <Button Style="{StaticResource ConsoleCategory}" Tag="3" Click="OnCategoryClick" GotFocus="OnCategoryFocused"
+                                    Visibility="{x:Bind ViewModel.IsTvControlAvailable}">
                                 <Grid>
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"

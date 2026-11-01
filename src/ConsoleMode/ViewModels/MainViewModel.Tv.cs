@@ -24,6 +24,9 @@ public partial class MainViewModel
 
     private string TvProvider => SelectedTvProvider?.Value ?? TvControlConfig.None;
 
+    /// <summary>The System → TV category shows only while the feature is in (<see cref="TvControlService.IsAvailable"/>).</summary>
+    public bool IsTvControlAvailable => TvControlService.IsAvailable;
+
     public bool IsTvEnabled => TvProvider != TvControlConfig.None;
     public bool IsTvAndroid => TvProvider == TvControlConfig.AndroidTv;
     public bool UsesTvHost => IsTvAndroid;

@@ -94,6 +94,7 @@ refeita e sem caminho de volta perdido.
 | D-21 | **Estacionar o ponteiro** no canto da tela de jogo quando o launcher aparece vem **ligado por padrão** e devolve o ponteiro para onde estava ao voltar. | Decidido (resposta à issue #172; implementação no INPUT-014) |
 | D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido e implementado no CORE-012 (#178). Antes dele, depois de uma queda nada era restaurado sozinho: os backups ficavam no disco, mas o "Restaurar agora" não os usava sem uma sessão ativa. |
 | D-25 | **Escala de console:** a interface e o Menu da sessão são desenhados para uma tela de 1080 de altura e ocupam sempre a mesma proporção da janela, qualquer que seja a escala do Windows (125 %, 150 %, 200 %) ou a resolução (1080p, 1440p, 4K). Escolhido entre "proporcional à tela" e "sempre em 100 %". | Decidido pelo dono em 01/11/2026; UI-018. |
+| D-26 | **Controle da TV fora da 1.7.** O dono decidiu (01/11/2026) que ligar a Google TV / Android TV, trocar a entrada e pôr em espera não vai na 1.7 final. A categoria TV some do Sistema e a sessão não fala com a TV; o código (`Services/Tv`) e os ajustes salvos ficam, e `TvControlService.IsAvailable` traz tudo de volta. | Decidido pelo dono em 01/11/2026; TV-001. |
 | D-24 | **Sons oficiais de console, por conta e risco:** o dono pode usar sons da Microsoft e da Sony (como os das aberturas inspiradas no Xbox 360 e no PS4), registrados no THIRD_PARTY_NOTICES e trocados se o dono dos direitos pedir. A parte visual imita só o clima, sem logos nem nomes dos consoles. | Decidido pelo dono em 31/10/2026 |
 | D-23 | **Uma interface só:** a partir da 1.7.0 o app tem apenas a interface Console, que também funciona com mouse e teclado. A interface Desktop e a escolha de interface saem; o que só existia nela vai para a aba Sistema, e a primeira abertura ganha um tour guiado. | Decidido pelo dono em 31/10/2026; UI-012 e UI-013. |
 
@@ -431,7 +432,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 
 ### Épico TV — Controle da TV
 
-- [x] **TV-001 —** Google TV / Android TV pela rede (ADB): ligar, trocar a entrada HDMI, standby ao voltar. (#126, 1.6.0; a primeira versão, #93, foi revertida no #125, §2.3)
+- [ ] **TV-001 —** Google TV / Android TV pela rede (ADB): ligar, trocar a entrada HDMI, standby ao voltar. (#126, 1.6.0; a primeira versão, #93, foi revertida no #125, §2.3) Fora da 1.7 (D-26): escondido, código e ajustes guardados.
 - [ ] **TV-002 (P2) —** LG webOS. Partir do #94 (fechado, já revisado) e do código C# antigo do Tako (§3).
 - [ ] **TV-003 (P2) —** Samsung Tizen, a partir do código C# antigo do Tako.
 - [ ] **TV-004 (P3) —** HDMI-CEC com adaptador USB, para TVs sem rede. Issue #75; partir do #96.

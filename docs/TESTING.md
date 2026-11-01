@@ -649,6 +649,11 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Com o app em segundo plano (Alt + Tab para outra janela), a parada não avança; ao voltar, ela conta o tempo de novo. Resultado: ______
 - [ ] Com controle de PS5: o tour avança sozinho mesmo que os botões não respondam nele. Anotar se ✕ e ○ funcionam no tour. Resultado: ______
 
+## Controle da TV fora da 1.7 (#195)
+
+- [ ] Sistema não mostra mais a categoria **TV**; o direcional e o mouse andam pelas outras categorias sem buracos. Resultado: ______
+- [ ] Com uma Android TV que estava configurada na 1.6: uma sessão não liga a TV nem troca a entrada, e a volta não a coloca em espera (o log não tem linhas "TV: ligar" / "TV: desligar"). O `config.json` continua com o bloco `tv` como estava. Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.
