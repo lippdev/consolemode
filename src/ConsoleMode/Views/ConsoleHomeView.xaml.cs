@@ -350,7 +350,7 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private Button CategoryButton(int index) => (Button)CategoryRail.Children[Math.Clamp(index, 0, CategoryRail.Children.Count - 1)];
 
-    private StackPanel SystemSection(int index) => index switch
+    private Panel SystemSection(int index) => index switch
     {
         0 => SystemSection0,
         1 => SystemSection1,
