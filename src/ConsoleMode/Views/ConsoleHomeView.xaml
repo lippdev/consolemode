@@ -1215,6 +1215,10 @@
                             <TextBlock Text="{x:Bind ViewModel.Texts.SkipTour, Mode=OneWay}" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </StackPanel>
+                    <!-- The stop's time running out: the tour moves on by itself when it fills (ConsoleTour.DwellTime) -->
+                    <Grid Height="4" CornerRadius="2" Background="#26FFFFFF" Margin="0,4,0,0">
+                        <Border x:Name="TourTimeBar" CornerRadius="2" Background="{ThemeResource AccentFillColorDefaultBrush}"/>
+                    </Grid>
                 </StackPanel>
             </Border>
         </Grid>

@@ -642,6 +642,13 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Sessão: Saída de áudio e Resolução, escolhendo um valor ou fechando com B: o foco volta para o ajuste, não para a primeira tela. Resultado: ______
 - [ ] Com o mouse: clicar numa opção, escolher um valor; a lista fecha e a página não pula. Resultado: ______
 
+## Tour que avança sozinho (#194)
+
+- [ ] Sem tocar em nada, o tour passa por todas as paradas sozinho: cada uma fica o tempo de ler (de 7 a 16 s), a barra embaixo do cartão enche nesse tempo, e a última fecha o tour e volta para o Início (reabrir o app não mostra o tour de novo). Resultado: ______
+- [ ] A (ou ✕), Voltar e um clique em Próximo agem na hora, e a parada nova começa a barra do zero. B (ou ○) e Pular tutorial fecham o tour e a barra para. Resultado: ______
+- [ ] Com o app em segundo plano (Alt + Tab para outra janela), a parada não avança; ao voltar, ela conta o tempo de novo. Resultado: ______
+- [ ] Com controle de PS5: o tour avança sozinho mesmo que os botões não respondam nele. Anotar se ✕ e ○ funcionam no tour. Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.
