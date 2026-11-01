@@ -174,13 +174,15 @@ public partial class MainViewModel
         if (tile is not null && !tile.IsAdd && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
     }
 
-    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows; on "+", add a custom app.</summary>
+    /// <summary>
+    /// A (or a click) on a tile picks that launcher and nothing opens yet: Play now does that, so picking one never
+    /// looks like it starts on its own. On "+", add a custom app.
+    /// </summary>
     [RelayCommand]
-    private async Task PlayLaunchTile(LaunchTile? tile)
+    private async Task ChooseLaunchTile(LaunchTile? tile)
     {
         if (tile?.IsAdd == true) { await AddCustomAppAsync(); return; }
         SelectLaunchTile(tile);
-        if (CanStart) await StartAsync();
     }
 
     private void UpdateHomeMeta()

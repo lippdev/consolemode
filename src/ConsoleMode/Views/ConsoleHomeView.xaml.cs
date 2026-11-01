@@ -26,6 +26,11 @@ public sealed partial class ConsoleHomeView : UserControl
     private readonly ScrollEdges _rowsEdges;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
     private long _railPointerPressedAt = long.MinValue / 2;
+    /// <summary>
+    /// A mouse / touch press on a launcher is under way: from the press to the release, which is when the tile's
+    /// Click fires. That click picks it and leaves the focus where it is; A or Enter at any other moment is not one.
+    /// </summary>
+    private bool _launchPointerDown;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
 
@@ -57,6 +62,11 @@ public sealed partial class ConsoleHomeView : UserControl
         _rowsEdges = new ScrollEdges(SettingsRows, RowsFadeTop, RowsFadeBottom, RowsScrollTrack, RowsScrollThumb);
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
+        // The release reaches the row after the tile has handled it (and raised Click), so the flag covers that click only.
+        LaunchRow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _launchPointerDown = true), true);
+        LaunchRow.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler((_, _) => _launchPointerDown = false), true);
+        LaunchRow.AddHandler(UIElement.PointerCaptureLostEvent, new PointerEventHandler((_, _) => _launchPointerDown = false), true);
+        LaunchRow.AddHandler(UIElement.PointerCanceledEvent, new PointerEventHandler((_, _) => _launchPointerDown = false), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
         ViewModel.PropertyChanged += OnViewModelChanged;
         if (ViewModel.IsIntroShowing) ShowIntro();
@@ -939,6 +949,17 @@ public sealed partial class ConsoleHomeView : UserControl
     private void PickFocusedLauncher(object source)
     {
         if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
+    }
+
+    /// <summary>
+    /// A on a launcher (pad or keyboard) picks it and takes the focus down to Play now, so a second A plays.
+    /// A mouse click only picks it: the pointer is already where it can click Play now.
+    /// </summary>
+    private void OnLaunchTileClick(object sender, RoutedEventArgs e)
+    {
+        // How this press came in, not how the tile got its focus: it may hold the pad's focus and still be clicked.
+        if (sender is not Button { DataContext: LaunchTile { IsAdd: false } } || _launchPointerDown) return;
+        if (ViewModel.CanStart) PlayButton.Focus(FocusState.Keyboard);
     }
 
     /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>

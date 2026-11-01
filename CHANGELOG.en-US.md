@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Changes
+- Home: clicking a launcher (or pressing A on it) only picks what will open; **Play now** is what starts. Before, the click went straight into console mode, so picking looked like opening. With a controller or the keyboard, the focus moves down to **Play now** after the pick, so a second A plays. (#193)
 
 ## [1.7.0-beta.2]
 ### Fixes
