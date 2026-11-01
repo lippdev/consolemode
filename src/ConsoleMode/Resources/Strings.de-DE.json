@@ -417,7 +417,7 @@
   "ConsoleTourDoneBody": "Prüfe den Spielbildschirm im Tab Sitzung und drücke Jetzt spielen. Um diese Tour noch einmal zu sehen: System → {0} → {1}.",
   "ConsoleTourFinish": "Los geht's",
   "IntroAnimationCard": "Intro beim Start der App",
-  "IntroAnimationDescription": "Zeigt das Console-Mode-Logo mit einem Ladebalken, während die App startet.",
+  "IntroAnimationDescription": "Zeigt, wie das Console-Mode-Logo beim Start der App auf den Bildschirm kommt.",
   "IntroSoundCard": "Intro-Sound",
   "IntroSoundDescription": "Spielt zum Intro einen Startsound ab."
 }

@@ -651,7 +651,7 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 ### Abertura
 
-- [ ] Ao abrir o app: tela escura com o logo crescendo e acendendo, o nome e uma barrinha de carregamento, e o som de entrada; some com um fade em uns 2 s (ou quando o app termina de carregar, se demorar mais) e o Início aparece pronto (o tour, na primeira vez). Resultado: ______
+- [ ] Ao abrir o app: tela escura, o logo vem de perto (grande e desfocado) e assenta nítido no centro, o nome aparece embaixo e toca o som de entrada; some com um fade em uns 2 s (ou quando o app termina de carregar, se demorar mais) e o Início aparece pronto (o tour, na primeira vez). Resultado: ______
 - [ ] Um botão do controle, um clique ou uma tecla durante a abertura pula para a interface e não faz mais nada (não começa sessão, não troca de aba). Resultado: ______
 - [ ] Sistema → App → "Abertura ao abrir o app" desligada: reabrir o app vai direto para a interface, sem som; "Som da abertura" fica desabilitada. Ligada com o som desligado: abertura muda. Ligar o som toca o som. Resultado: ______
 - [ ] "Sons da interface" desligado não silencia a abertura (ela tem o próprio ajuste). Resultado: ______

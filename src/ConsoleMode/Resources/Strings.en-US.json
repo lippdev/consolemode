@@ -417,7 +417,7 @@
   "ConsoleTourDoneBody": "Check the game display on the Session tab and press Play now. To see this tour again: System → {0} → {1}.",
   "ConsoleTourFinish": "Get started",
   "IntroAnimationCard": "Opening when the app starts",
-  "IntroAnimationDescription": "Shows the Console Mode logo with a loading bar while the app opens.",
+  "IntroAnimationDescription": "Shows the Console Mode logo coming onto the screen while the app opens.",
   "IntroSoundCard": "Opening sound",
   "IntroSoundDescription": "Plays an entrance sound with the opening."
 }

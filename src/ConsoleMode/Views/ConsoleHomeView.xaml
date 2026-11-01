@@ -1195,8 +1195,8 @@
         </StackPanel>
 
         <!-- ───────────── Opening (over everything while the app loads) ─────────────
-             The logo, the name and a loading bar; shown and faded out from code (ConsoleHomeView.ShowIntro / HideIntro),
-             skipped by any press, click or key. -->
+             "Aproximação": the logo comes from close to the camera, big and blurred, and settles sharp in the middle, then
+             the name; shown and faded out from code (ConsoleHomeView.ShowIntro / HideIntro), skipped by any press, click or key. -->
         <Grid x:Name="IntroPanel" Visibility="Collapsed" Margin="-56,-48,-56,-32" Background="#07090D" Tapped="OnIntroTapped">
             <Ellipse Width="900" Height="900" Opacity="0.55" IsHitTestVisible="False">
                 <Ellipse.Fill>
@@ -1208,10 +1208,13 @@
                 </Ellipse.Fill>
             </Ellipse>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
-                <Image x:Name="IntroLogo" Width="132" Height="132" HorizontalAlignment="Center"/>
+                <!-- The blurred copy is the sharp logo plus a 64 px margin of blur on each side (384 for 256) -->
+                <Grid x:Name="IntroLogoBox" Width="132" Height="132" HorizontalAlignment="Center">
+                    <Image x:Name="IntroLogoBlur" Source="ms-appx:///Assets/Intro/logo-blur.png" Width="198" Height="198" Margin="-33"/>
+                    <Image x:Name="IntroLogo" Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
+                </Grid>
                 <TextBlock x:Name="IntroName" Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10"
                            HorizontalAlignment="Center"/>
-                <ProgressBar x:Name="IntroBar" IsIndeterminate="True" Width="220" Margin="0,18,0,0" HorizontalAlignment="Center"/>
             </StackPanel>
         </Grid>
     </Grid>

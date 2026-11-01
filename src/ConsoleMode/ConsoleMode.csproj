@@ -52,6 +52,8 @@
   <!-- The console interface's font (Inter, OFL) and its licence, next to the exe so ms-appx:/// finds them. -->
   <ItemGroup>
     <Content Include="Assets\Fonts\InterVariable.ttf;Assets\Fonts\Inter-OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The opening's logo, sharp and blurred (WinUI has no blur without Win2D: the two cross-fade instead). -->
+    <Content Include="Assets\Intro\logo.png;Assets\Intro\logo-blur.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

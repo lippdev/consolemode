@@ -417,7 +417,7 @@
   "ConsoleTourDoneBody": "Comprueba la pantalla de juego en la pestaña Sesión y pulsa Jugar ahora. Para volver a ver este recorrido: Sistema → {0} → {1}.",
   "ConsoleTourFinish": "Empezar",
   "IntroAnimationCard": "Apertura al abrir la aplicación",
-  "IntroAnimationDescription": "Muestra el logotipo de Console Mode con una carga mientras se abre la aplicación.",
+  "IntroAnimationDescription": "Muestra el logotipo de Console Mode llegando a la pantalla mientras se abre la aplicación.",
   "IntroSoundCard": "Sonido de apertura",
   "IntroSoundDescription": "Reproduce un sonido de entrada con la apertura."
 }

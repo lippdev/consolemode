@@ -55,7 +55,6 @@ public sealed partial class ConsoleHomeView : UserControl
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
         ViewModel.PropertyChanged += OnViewModelChanged;
-        if (File.Exists(AppPaths.IconPath)) IntroLogo.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(AppPaths.IconPath));
         if (ViewModel.IsIntroShowing) ShowIntro();
         ViewModel.PickBackgroundImageRequested += () => _ = PickBackgroundImageAsync();
     }
@@ -370,7 +369,10 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnIntroTapped(object sender, TappedRoutedEventArgs e) => ViewModel.SkipIntro();
 
-    /// <summary>The logo grows in and lights up, then the name, then the loading bar.</summary>
+    /// <summary>
+    /// "Aproximação": the logo starts three times its size, blurred and clear, and settles sharp in the middle (the blurred
+    /// copy fades into the sharp one on the way), then the name fades in.
+    /// </summary>
     private void ShowIntro()
     {
         IntroPanel.Visibility = Visibility.Visible;
@@ -379,18 +381,24 @@ public sealed partial class ConsoleHomeView : UserControl
         {
             var panel = ElementCompositionPreview.GetElementVisual(IntroPanel);
             panel.Opacity = 1f;
-            var logo = ElementCompositionPreview.GetElementVisual(IntroLogo);
-            var compositor = logo.Compositor;
-            var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f));
-            logo.CenterPoint = new Vector3((float)IntroLogo.Width / 2, (float)IntroLogo.Height / 2, 0);
-            var grow = compositor.CreateVector3KeyFrameAnimation();
-            grow.InsertKeyFrame(0f, new Vector3(0.86f, 0.86f, 1f));
-            grow.InsertKeyFrame(1f, Vector3.One, easing);
-            grow.Duration = TimeSpan.FromMilliseconds(700);
-            logo.StartAnimation("Scale", grow);
-            FadeIn(logo, 0, 600);
-            FadeIn(ElementCompositionPreview.GetElementVisual(IntroName), 180, 600);
-            FadeIn(ElementCompositionPreview.GetElementVisual(IntroBar), 480, 400);
+            var box = ElementCompositionPreview.GetElementVisual(IntroLogoBox);
+            var compositor = box.Compositor;
+            var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.2f, 0.8f), new Vector2(0.2f, 1f));
+            box.CenterPoint = new Vector3((float)IntroLogoBox.Width / 2, (float)IntroLogoBox.Height / 2, 0);
+            var approach = compositor.CreateVector3KeyFrameAnimation();
+            approach.InsertKeyFrame(0f, new Vector3(3f, 3f, 1f));
+            approach.InsertKeyFrame(1f, Vector3.One, easing);
+            approach.Duration = TimeSpan.FromMilliseconds(900);
+            box.StartAnimation("Scale", approach);
+            FadeIn(box, 0, 500);
+            FadeIn(ElementCompositionPreview.GetElementVisual(IntroLogo), 0, 900);
+            var blur = ElementCompositionPreview.GetElementVisual(IntroLogoBlur);
+            var unblur = compositor.CreateScalarKeyFrameAnimation();
+            unblur.InsertKeyFrame(0f, 1f);
+            unblur.InsertKeyFrame(1f, 0f, easing);
+            unblur.Duration = TimeSpan.FromMilliseconds(900);
+            blur.StartAnimation("Opacity", unblur);
+            FadeIn(ElementCompositionPreview.GetElementVisual(IntroName), 600, 500);
         }
         catch (Exception ex)
         {

@@ -417,7 +417,7 @@
   "ConsoleTourDoneBody": "Проверьте игровой экран на вкладке Сеанс и нажмите «Играть». Чтобы снова посмотреть этот обзор: Система → {0} → {1}.",
   "ConsoleTourFinish": "Начать",
   "IntroAnimationCard": "Заставка при запуске",
-  "IntroAnimationDescription": "Показывает логотип Console Mode с индикатором загрузки, пока приложение открывается.",
+  "IntroAnimationDescription": "Показывает, как логотип Console Mode появляется на экране, пока приложение открывается.",
   "IntroSoundCard": "Звук заставки",
   "IntroSoundDescription": "Воспроизводит звук при появлении заставки."
 }
