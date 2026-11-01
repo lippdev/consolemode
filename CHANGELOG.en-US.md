@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+
+## [1.7.0-beta.3]
 ### Changes
 - Home: clicking a launcher (or pressing A on it) only picks what will open; **Play now** is what starts. Before, the click went straight into console mode, so picking looked like opening. With a controller or the keyboard, the focus moves down to **Play now** after the pick, so a second A plays. (#193)
 - Guided tour: each stop moves on by itself once there has been time to read it (7 to 16 s), with a bar under the card showing how long is left, and the last one closes the tour. Nobody is stuck on a stop if the controller doesn't answer (reported with a PS5 controller). **A** goes on at once and **B** skips, as before. (#194)
