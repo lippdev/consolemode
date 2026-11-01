@@ -96,8 +96,11 @@ public sealed class AppConfig
     /// <summary>The opening's sound; has its own switch, apart from the interface sounds.</summary>
     public bool IntroSound { get; set; } = true;
 
-    /// <summary>"console" (the app's own), "x360" or "ps4": the opening's style (BootIntro).</summary>
-    public string IntroStyle { get; set; } = "console";
+    /// <summary>
+    /// "console" (the app's own), "x360" or "ps4": the opening's style, once picked in System → App. Null while never
+    /// picked: the app's own then, with the console-inspired ones now and then as a surprise (BootIntro.PickForOpening).
+    /// </summary>
+    public string? IntroStyle { get; set; }
 
     /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
     public bool MinimizeToTray { get; set; }

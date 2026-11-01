@@ -656,6 +656,7 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] Sistema → App → "Abertura ao abrir o app" desligada: reabrir o app vai direto para a interface, sem som; "Som da abertura" fica desabilitada. Ligada com o som desligado: abertura muda. Ligar o som toca o som. Resultado: ______
 - [ ] "Sons da interface" desligado não silencia a abertura (ela tem o próprio ajuste). Resultado: ______
 - [ ] Sistema → App → "Estilo da abertura": Console Mode, "Inspirada no Xbox 360" (fundo claro, faixas verdes e prateadas girando em volta de um orbe que cresce num clarão, logo com o nome escuro) e "Inspirada no PS4" (azul, ondas de luz passando, partículas subindo, logo na luz), cada um com o seu som; a escolha fica salva e vale na próxima abertura do app. Resultado: ______
+- [ ] Sem estilo escolhido (config sem `introStyle`): abrindo o app várias vezes, quase sempre vem a do Console Mode e de vez em quando (cerca de 1 em 8) a do Xbox 360 ou a do PS4, cada uma com o seu som. Escolher qualquer estilo em Sistema → App (até "Console Mode", já marcado) grava `introStyle` e, daí em diante, só vem aquele. Resultado: ______
 - [ ] "Ver a abertura" toca o estilo escolhido na hora, por cima da interface, e some sozinha (ou com qualquer botão); com a abertura desligada, "Estilo" fica desabilitado. Resultado: ______
 - [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
 

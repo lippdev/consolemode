@@ -421,7 +421,7 @@
   "IntroSoundCard": "Opening sound",
   "IntroSoundDescription": "Plays an entrance sound with the opening.",
   "IntroStyleCard": "Opening style",
-  "IntroStyleDescription": "Console Mode's own opening, or one inspired by the Xbox 360 or the PS4, each with its own sound.",
+  "IntroStyleDescription": "Console Mode's own is the official one, and now and then the app opens with one inspired by the Xbox 360 or the PS4 as a surprise. Picking a style here keeps that style and ends the surprises.",
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Inspired by the Xbox 360",
   "IntroStylePs4": "Inspired by the PS4",

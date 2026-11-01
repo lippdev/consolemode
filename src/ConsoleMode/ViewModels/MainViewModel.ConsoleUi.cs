@@ -283,7 +283,7 @@ public partial class MainViewModel
             case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
             case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
             case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
-            case "introstyle": SelectedIntroStyle = IntroStyleOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedIntroStyle; break;
+            case "introstyle": ChooseIntroStyle(item.Value); break;
             case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
             case "overlay": SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlay; break;
             case "overlaysize": SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlaySize; break;

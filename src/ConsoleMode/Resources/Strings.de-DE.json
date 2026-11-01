@@ -421,7 +421,7 @@
   "IntroSoundCard": "Intro-Sound",
   "IntroSoundDescription": "Spielt zum Intro einen Startsound ab.",
   "IntroStyleCard": "Intro-Stil",
-  "IntroStyleDescription": "Das eigene Intro von Console Mode oder eines im Stil der Xbox 360 oder der PS4, jeweils mit eigenem Sound.",
+  "IntroStyleDescription": "Das eigene Intro von Console Mode ist das offizielle, und ab und zu startet die App überraschend mit einem im Stil der Xbox 360 oder der PS4. Wählst du hier einen Stil, bleibt es bei diesem, ohne Überraschungen.",
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "Im Stil der Xbox 360",
   "IntroStylePs4": "Im Stil der PS4",

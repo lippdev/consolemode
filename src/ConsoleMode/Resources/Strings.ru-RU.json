@@ -421,7 +421,7 @@
   "IntroSoundCard": "Звук заставки",
   "IntroSoundDescription": "Воспроизводит звук при появлении заставки.",
   "IntroStyleCard": "Стиль заставки",
-  "IntroStyleDescription": "Собственная заставка Console Mode или заставка в духе Xbox 360 или PS4, у каждой свой звук.",
+  "IntroStyleDescription": "Заставка Console Mode — официальная, а время от времени приложение для сюрприза открывается заставкой в духе Xbox 360 или PS4. Если выбрать стиль здесь, он закрепится и сюрпризов больше не будет.",
   "IntroStyleConsole": "Console Mode",
   "IntroStyleX360": "В духе Xbox 360",
   "IntroStylePs4": "В духе PS4",

@@ -29,6 +29,26 @@ public class BootIntroTests
     public void Unknown_styles_fall_back_to_the_apps_own(string? style, string expected) =>
         Assert.Equal(expected, BootIntro.Normalize(style));
 
+    [Theory]
+    [InlineData(null, 0.01, "x360")]
+    [InlineData(null, 0.07, "ps4")]
+    [InlineData(null, 0.5, "console")]
+    [InlineData(null, 0.999, "console")]
+    [InlineData("", 0.01, "x360")]
+    [InlineData("console", 0.01, "console")]
+    [InlineData("ps4", 0.9, "ps4")]
+    [InlineData("x360", 0.5, "x360")]
+    public void Unpicked_it_is_the_apps_own_with_now_and_then_a_surprise_picked_it_is_always_that_one(string? chosen, double roll, string expected) =>
+        Assert.Equal(expected, BootIntro.PickForOpening(chosen, roll));
+
+    [Fact]
+    public void The_surprises_are_rare_and_split_between_the_two()
+    {
+        var picks = Enumerable.Range(0, 10000).Select(i => BootIntro.PickForOpening(null, i / 10000.0)).ToList();
+        Assert.InRange(picks.Count(p => p == BootIntro.ConsoleStyle) / 10000.0, 0.85, 0.9);
+        Assert.Equal(picks.Count(p => p == BootIntro.Xbox360Style), picks.Count(p => p == BootIntro.Ps4Style));
+    }
+
     [Fact]
     public void Each_style_has_its_own_sound()
     {
@@ -53,11 +73,12 @@ public class BootIntroTests
     }
 
     [Fact]
-    public void Existing_configs_get_the_opening_its_sound_and_the_apps_own_style()
+    public void Existing_configs_get_the_opening_its_sound_and_the_surprises()
     {
         var config = JsonSerializer.Deserialize<AppConfig>("{}")!;
         Assert.True(config.IntroAnimation);
         Assert.True(config.IntroSound);
+        Assert.Null(config.IntroStyle);
         Assert.Equal(BootIntro.ConsoleStyle, BootIntro.Normalize(config.IntroStyle));
     }
 }

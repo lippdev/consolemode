@@ -15,6 +15,24 @@ public static class BootIntro
 
     public static IReadOnlyList<string> Styles { get; } = [ConsoleStyle, Xbox360Style, Ps4Style];
 
+    /// <summary>
+    /// While no style was ever picked in System → App, now and then (this share of the openings) the app opens with one of
+    /// the console-inspired styles instead of its own, as a surprise. Picking any style, its own included, ends that.
+    /// </summary>
+    public const double SurpriseShare = 0.125;
+
+    /// <summary>
+    /// The style to show: the one picked in System → App; with none picked, the app's own, or a console-inspired one
+    /// when the roll (0 to 1) falls in the surprise share, half each.
+    /// </summary>
+    public static string PickForOpening(string? chosen, double roll)
+    {
+        if (!string.IsNullOrWhiteSpace(chosen)) return Normalize(chosen);
+        if (roll < SurpriseShare / 2) return Xbox360Style;
+        if (roll < SurpriseShare) return Ps4Style;
+        return ConsoleStyle;
+    }
+
     /// <summary>Never longer than this, even if loading hangs: the interface comes up anyway.</summary>
     public static readonly TimeSpan LongestShown = TimeSpan.FromSeconds(8);
 

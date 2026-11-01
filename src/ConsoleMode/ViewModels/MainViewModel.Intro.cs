@@ -32,7 +32,7 @@ public partial class MainViewModel
     {
         var config = ConfigService.Load();
         if (!BootIntro.ShouldShow(config.IntroAnimation, windowShown: true)) return;
-        StartIntro(config.IntroStyle, config.IntroSound, BootIntro.LongestShown);
+        StartIntro(BootIntro.PickForOpening(config.IntroStyle, Random.Shared.NextDouble()), config.IntroSound, BootIntro.LongestShown);
     }
 
     /// <summary>Loading is done (or failed): keep the logo up for what is left of its minimum, then fade it out.</summary>
@@ -73,6 +73,9 @@ public partial class MainViewModel
         if (run == _introRun) IsIntroShowing = false;
     }
 
+    /// <summary>A style was picked in System → App (any of them): no more surprises, it is always that one.</summary>
+    private bool _introStyleChosen;
+
     private void BuildIntroStyleOptions()
     {
         var current = SelectedIntroStyle?.Value ?? _loadedConfig.IntroStyle;
@@ -86,8 +89,24 @@ public partial class MainViewModel
     partial void OnSelectedIntroStyleChanged(ComboOption? value)
     {
         if (_applying || value is null) return;
+        _introStyleChosen = true;
         SaveQuietly();
     }
+
+    /// <summary>
+    /// Picked in System → App, even the one already shown (Console Mode, while unset): that counts as a choice and ends
+    /// the surprises.
+    /// </summary>
+    private void ChooseIntroStyle(string value)
+    {
+        _introStyleChosen = true;
+        var option = IntroStyleOptions.FirstOrDefault(o => o.Value == value) ?? SelectedIntroStyle;
+        if (ReferenceEquals(option, SelectedIntroStyle)) SaveQuietly();
+        else SelectedIntroStyle = option;
+    }
+
+    /// <summary>What is saved: the picked style, or nothing while none was picked (keeps the surprises).</summary>
+    private string? IntroStyleToSave => _introStyleChosen ? SelectedIntroStyle?.Value : null;
 
     partial void OnIntroAnimationChanged(bool value)
     {
