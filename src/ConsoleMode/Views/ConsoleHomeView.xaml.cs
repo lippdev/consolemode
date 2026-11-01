@@ -21,7 +21,6 @@ public sealed partial class ConsoleHomeView : UserControl
     private bool _windowActive = true;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _clock;
     private static Style? _cardStyle;
-    private static Style? _tabStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
@@ -54,8 +53,7 @@ public sealed partial class ConsoleHomeView : UserControl
         CategoryRail.GotFocus += (_, _) => RowHelp.Text = "";
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
-        // Mouse clicks on buttons sound like a confirm (the pad has its own sounds in the navigator).
-        Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
+        // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
         ViewModel.PropertyChanged += OnViewModelChanged;
         ViewModel.PickBackgroundImageRequested += () => _ = PickBackgroundImageAsync();
     }
@@ -609,19 +607,6 @@ public sealed partial class ConsoleHomeView : UserControl
         button.CenterPoint = new Vector3((float)button.ActualWidth / 2, (float)button.ActualHeight / 2, 0);
         button.ScaleTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(140) };
         button.Scale = new Vector3(scale, scale, 1);
-    }
-
-    private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
-    {
-        for (var node = e.OriginalSource as DependencyObject; node is not null; node = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(node))
-        {
-            if (node is Microsoft.UI.Xaml.Controls.Primitives.ButtonBase { IsEnabled: true } button)
-            {
-                // A tab sounds like LB / RB, not like picking something.
-                UiSounds.Play(ReferenceEquals(button.Style, _tabStyle ??= Application.Current.Resources["ConsoleTab"] as Style) ? UiSound.Tab : UiSound.Confirm);
-                return;
-            }
-        }
     }
 
     private static Microsoft.UI.Xaml.Input.FocusNavigationDirection? Arrow(VirtualKey key) => key switch
