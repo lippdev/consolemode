@@ -58,4 +58,18 @@ public class AppConfigTests
         foreach (var property in properties)
             Assert.Equal(property.GetValue(config), property.GetValue(copy));
     }
+
+    // The Task View shortcut is on from the start (Select + X), also for a config saved before it existed;
+    // turned off, it stays off.
+    [Fact]
+    public void Task_view_shortcut_defaults_to_select_x_and_stays_off_once_turned_off()
+    {
+        var options = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
+        var old = System.Text.Json.JsonSerializer.Deserialize<AppConfig>("{\"menuShortcut\":32800}", options)!;
+        Assert.Equal(ControllerShortcuts.Back | ControllerShortcuts.X, old.TaskViewShortcut);
+        Assert.Equal(ControllerShortcuts.Suggested(ShortcutSlot.TaskView), old.TaskViewShortcut);
+        var off = System.Text.Json.JsonSerializer.Deserialize<AppConfig>("{\"taskViewShortcut\":0}", options)!;
+        Assert.Equal(0, off.TaskViewShortcut);
+        Assert.Equal(0, new AppConfig().TaskViewHintsShown);
+    }
 }

@@ -86,6 +86,7 @@
   "ExitShortcutCard": "Controller-Tastenkombination für die Rückkehr zum PC",
   "TaskViewShortcutCard": "Controller-Tastenkombination für „Aktive Anwendungen“",
   "TaskViewShortcutDescription": "Öffnet „Aktive Anwendungen“ von Windows (Win + Tab) mit allen offenen Fenstern, in einer Sitzung oder außerhalb. Solange sie offen ist, wählen Steuerkreuz oder Stick ein Fenster, A öffnet es und B schließt die Ansicht; die Tastenkombination schließt sie ebenfalls.",
+  "TaskViewHint": "Steuerkreuz oder Stick wählt ein Fenster · {0} öffnet · {1} schließt",
   "ExitShortcutDescription": "Halte diese Tastenkombination während einer Sitzung 1 Sekunde lang gedrückt, um deinen Desktop wiederherzustellen und zum PC zurückzukehren.",
   "ShortcutHome": "Console Mode öffnen",
   "ControllerSection": "Controller",

@@ -70,8 +70,14 @@ public sealed class AppConfig
     public int HomeShortcut { get; set; }
     public int MenuShortcut { get; set; }
     public int ExitShortcut { get; set; }
-    /// <summary>Opens Windows' Task View (Win + Tab), driven with the controller; 0 = not set.</summary>
-    public int TaskViewShortcut { get; set; }
+    /// <summary>
+    /// Opens Windows' Task View (Win + Tab), driven with the controller; 0 = turned off. Set from the start to
+    /// Select + X (Back | X), also for a config from before it existed; one that collides with another shortcut is dropped.
+    /// </summary>
+    public int TaskViewShortcut { get; set; } = 0x0020 | 0x4000;
+
+    /// <summary>How many times the Task View shortcut showed how to drive it before opening (it stops after a few).</summary>
+    public int TaskViewHintsShown { get; set; }
 
     /// <summary>The shortcuts setup (first run of the version that made them configurable) was finished or skipped.</summary>
     public bool ShortcutsOnboardingDone { get; set; }

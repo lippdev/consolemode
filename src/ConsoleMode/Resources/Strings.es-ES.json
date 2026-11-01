@@ -86,6 +86,7 @@
   "ExitShortcutCard": "Atajo del mando para volver al PC",
   "TaskViewShortcutCard": "Atajo del mando para la vista de tareas",
   "TaskViewShortcutDescription": "Abre la vista de tareas de Windows (Win + Tab) con todas las ventanas abiertas, dentro o fuera de una sesión. Con ella abierta, la cruceta o el joystick eligen la ventana, A la abre y B cierra la vista; el atajo otra vez también la cierra.",
+  "TaskViewHint": "La cruceta o el joystick eligen la ventana · {0} la abre · {1} cierra",
   "ExitShortcutDescription": "Durante la sesión, mantén este atajo 1 segundo para restaurar el escritorio y volver al PC.",
   "ShortcutHome": "Abrir Console Mode",
   "ControllerSection": "Mando",

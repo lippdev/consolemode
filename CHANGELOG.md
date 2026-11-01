@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Novidades
-- **Atalho para a visão de tarefas**: um atalho do controle que faz o mesmo que Win + Tab, abrindo a visão de tarefas do Windows com todas as janelas, numa sessão ou fora dela. Com ela aberta, o direcional ou o analógico escolhe a janela, A abre e B fecha. Defina em Sistema → Controle (sugerido: Select + X; o botão Xbox sozinho, segurado, também serve). (#188)
+- **Atalho para a visão de tarefas**: um atalho do controle que faz o mesmo que Win + Tab, abrindo a visão de tarefas do Windows com todas as janelas, numa sessão ou fora dela. Com ela aberta, o direcional ou o analógico escolhe a janela, A abre e B fecha. Já vem ligado com **Select + X** (troque ou desligue em Sistema → Controle; o botão Xbox sozinho, segurado, também serve). Nas três primeiras vezes, um aviso desliza no canto mostrando os botões e a visão abre logo depois, já que nada aparece por cima dela. (#188)
 
 ## [1.7.0-alpha.3]
 ### Novidades

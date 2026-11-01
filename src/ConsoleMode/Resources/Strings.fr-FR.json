@@ -86,6 +86,7 @@
   "ExitShortcutCard": "Raccourci manette pour revenir au PC",
   "TaskViewShortcutCard": "Raccourci manette pour l'affichage des tâches",
   "TaskViewShortcutDescription": "Ouvre l'affichage des tâches de Windows (Win + Tab) avec toutes les fenêtres ouvertes, en session ou non. Tant qu'il est ouvert, la croix ou le stick choisit la fenêtre, A l'ouvre et B ferme l'affichage ; le raccourci le ferme aussi.",
+  "TaskViewHint": "La croix ou le stick choisit la fenêtre · {0} l'ouvre · {1} ferme",
   "ExitShortcutDescription": "Pendant une session, maintenez ce raccourci pendant 1 seconde pour restaurer votre bureau et revenir au PC.",
   "ShortcutHome": "Ouvrir Console Mode",
   "ControllerSection": "Manette",

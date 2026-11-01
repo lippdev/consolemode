@@ -86,6 +86,7 @@
   "ExitShortcutCard": "Controller shortcut to go back to the PC",
   "TaskViewShortcutCard": "Controller shortcut for Task View",
   "TaskViewShortcutDescription": "Opens Windows' Task View (Win + Tab) with all your open windows, in a session or not. While it is open, the D-pad or the stick picks a window, A opens it and B closes the view; the shortcut again closes it too.",
+  "TaskViewHint": "D-pad or stick picks a window · {0} opens it · {1} closes",
   "ExitShortcutDescription": "During a session, hold this shortcut for 1 second to restore your desk and go back to the PC.",
   "ShortcutHome": "Open Console Mode",
   "ControllerSection": "Controller",
