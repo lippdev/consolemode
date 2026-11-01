@@ -172,6 +172,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string StartupDescription => LocalizationService.Get(nameof(StartupDescription));
     public string MinimizeToTrayCard => LocalizationService.Get(nameof(MinimizeToTrayCard));
     public string MinimizeToTrayDescription => LocalizationService.Get(nameof(MinimizeToTrayDescription));
+    public string MenuOutsideSessionCard => LocalizationService.Get(nameof(MenuOutsideSessionCard));
+    public string MenuOutsideSessionDescription => LocalizationService.Get(nameof(MenuOutsideSessionDescription));
     public string CheckNow => LocalizationService.Get(nameof(CheckNow));
     public string SessionMenuTitle => LocalizationService.Get(nameof(SessionMenuTitle));
     public string BackToGame => LocalizationService.Get(nameof(BackToGame));

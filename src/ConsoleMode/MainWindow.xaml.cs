@@ -52,6 +52,9 @@ public sealed partial class MainWindow : Window
             if (appWindow.Presenter is OverlappedPresenter p) p.Maximize();
         };
 
+        // With the window in front the pad drives the interface; the controller mouse waits meanwhile.
+        Activated += (_, e) => ViewModel.IsMainWindowActive = e.WindowActivationState != WindowActivationState.Deactivated;
+
         appWindow.Closing += (_, e) =>
         {
             if (!ViewModel.TryCloseToTray()) return;

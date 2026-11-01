@@ -168,7 +168,7 @@ public partial class App : Application
     /// <summary>
     /// The shortcuts the user picked (Settings, or the first-run setup); none is set until then.
     /// Home, from the tray: enter console mode (a hold, or a press once Game Bar's shortcut is
-    /// off). Menu and Exit, in a session: the menu over the game, and back to the PC.
+    /// off). Menu: the Session menu, in a session and (unless turned off) outside one. Exit, in a session: back to the PC.
     /// </summary>
     private void WatchGuideButton()
     {
@@ -205,7 +205,7 @@ public partial class App : Application
     private void OnViewModelChangedForGuide(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is MainViewModel.ShortcutsProperty or nameof(MainViewModel.HomeButtonShortPress)
-            or nameof(MainViewModel.IsConsoleActive))
+            or nameof(MainViewModel.IsConsoleActive) or nameof(MainViewModel.MenuOutsideSession))
             RefreshGuideWatch();
         if (e.PropertyName == nameof(MainViewModel.IsConsoleActive) && ViewModel?.IsConsoleActive == false)
             _connect?.QuietFor(ControllerConnectPolicy.RestoreGrace);
@@ -223,8 +223,8 @@ public partial class App : Application
         // that isn't set never runs, and the three do not depend on each other.
         var idle = !ViewModel.IsCapturingShortcut;
         Apply(_guide, idle && _guide.Mask != 0 && !ViewModel.IsConsoleActive);
-        // The menu also opens outside a session in this alpha (a preview, to try it without console mode).
-        Apply(_menuChord, idle && _menuChord.Mask != 0);
+        // Outside a session too, unless turned off in System → Controller (a game may use the same buttons).
+        Apply(_menuChord, idle && _menuChord.Mask != 0 && (ViewModel.IsConsoleActive || ViewModel.MenuOutsideSession));
         Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
     }
 

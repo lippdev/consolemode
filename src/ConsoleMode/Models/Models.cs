@@ -110,6 +110,9 @@ public sealed class AppConfig
     /// <summary>Minimizing the main window hides it in the tray instead of leaving it on the taskbar.</summary>
     public bool MinimizeToTray { get; set; }
 
+    /// <summary>The menu shortcut also opens the Session menu outside console mode (the tray and consolemode://menu always do).</summary>
+    public bool MenuOutsideSession { get; set; } = true;
+
     /// <summary>Console background: "auto" (the built-in wallpaper), "covers" (of the installed Steam games), "gradient" or "image".</summary>
     public string ConsoleBackground { get; set; } = "auto";
 

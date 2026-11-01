@@ -95,7 +95,7 @@ public partial class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsIdle));
         NotifyStartState();
-        UpdateSessionPointer();
+        ResetSessionPointer();
         if (value) _ = ShowSessionHintAsync();
     }
     partial void OnFocusRowChanged(MonitorRowViewModel? value)
@@ -351,6 +351,7 @@ public partial class MainViewModel : ObservableObject
             // Turning the opening off (before "None" was in the picker too) was a choice as well.
             _introStyleChosen = !string.IsNullOrWhiteSpace(config.IntroStyle) || !config.IntroAnimation;
             MinimizeToTray = config.MinimizeToTray;
+            MenuOutsideSession = config.MenuOutsideSession;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
@@ -910,6 +911,7 @@ public partial class MainViewModel : ObservableObject
             IntroSound = IntroSound,
             IntroStyle = IntroStyleToSave,
             MinimizeToTray = MinimizeToTray,
+            MenuOutsideSession = MenuOutsideSession,
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,

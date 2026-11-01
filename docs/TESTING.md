@@ -662,6 +662,10 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 ### Lista de Sistema e outros apps
 
+- [ ] Menu fora do modo console: com o atalho do menu definido e o Console Mode só na bandeja, segurar o atalho abre o Menu da sessão na tela de jogo (ou na principal, com a TV desligada), com o selo "Fora da sessão" e sem limite/contador de FPS. Resultado: ______
+- [ ] Fora da sessão, **Controlar o mouse com o controle** move o ponteiro e clica; com a janela do Console Mode em primeiro plano o controle volta a navegar a interface (o mouse espera); com o menu aberto, também. **Ocultar o cursor** some com a seta. Começar uma sessão desliga os dois; fechar o Console Mode traz o cursor de volta. Resultado: ______
+- [ ] Sistema → Controle → **Menu da sessão fora do modo console** desligado: o atalho não abre o menu fora da sessão (abre numa sessão), o ícone da bandeja continua abrindo; desligar com o mouse do controle ligado o desliga. Resultado: ______
+
 - [ ] Escala de console: com o Windows em 100 %, 125 %, 150 % e 200 % (Configurações → Sistema → Tela → Escala), a Início, a Sessão, o Sistema e o Menu da sessão ocupam a mesma proporção da tela, sem nada cortado ou gigante. Na TV 4K, igual a uma TV 1080p. Com a janela restaurada e redimensionada, a interface encolhe junto, sem cortar. Resultado: ______
 
 - [ ] Início: os ícones dos tiles (Steam, Playnite, Xbox e um app personalizado) têm bordas lisas, sem serrilhado, com o tile parado e com foco; repetir com a tela em 150 % de escala e arrastando a janela para uma tela de escala diferente. Resultado: ______
