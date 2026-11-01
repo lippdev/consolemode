@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- Guided tour: the **Skip tutorial** and **Back** buttons no longer cut off the bottom of the letters, and they are as tall as **Next**. (#187)
 
 ## [1.7.0-alpha.3]
 ### What's new
