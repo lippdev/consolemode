@@ -425,5 +425,10 @@
   "IntroStylePs4": "В духе PS4",
   "IntroStyleNone": "Без заставки (сразу)",
   "IntroPreviewCard": "Показать заставку",
-  "IntroPreviewDescription": "Показывает выбранную заставку прямо сейчас, со звуком."
+  "IntroPreviewDescription": "Показывает выбранную заставку прямо сейчас, со звуком.",
+  "AddCustomAppTile": "Добавить",
+  "AddCustomAppCard": "Добавить своё приложение",
+  "AddCustomAppDescription": "Выберите .exe: он станет плиткой на Главной со значком и названием программы.",
+  "RemoveCustomAppCard": "Удалить это приложение",
+  "RemoveCustomAppDescription": "Убирает плитку этого приложения с Главной; вместо него откроется Steam Big Picture."
 }

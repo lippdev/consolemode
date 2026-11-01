@@ -621,6 +621,12 @@
                                         </Button>
                                         <TextBox Header="{x:Bind ViewModel.Texts.CustomAppArgumentsCard, Mode=OneWay}" PlaceholderText="--fullscreen" Text="{x:Bind ViewModel.CustomAppArguments, Mode=TwoWay}" Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}"/>
                                         <TextBox Header="{x:Bind ViewModel.Texts.CustomAppWatchCard, Mode=OneWay}" PlaceholderText="retroarch.exe" Text="{x:Bind ViewModel.CustomAppWatchProcess, Mode=TwoWay}" Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}"/>
+                                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.RemoveCustomAppCommand}" Visibility="{x:Bind ViewModel.IsCustomApp, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.RemoveCustomAppDescription, Mode=OneWay}">
+                                        <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.RemoveCustomAppCard, Mode=OneWay}"/>
+                                    </Button>
+                                    <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.AddCustomAppCommand}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.AddCustomAppDescription, Mode=OneWay}">
+                                        <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AddCustomAppCard, Mode=OneWay}"/>
+                                    </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="audio" AutomationProperties.HelpText="{x:Bind ViewModel.AudioHintText, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.AudioOutputCard, Mode=OneWay}"/>

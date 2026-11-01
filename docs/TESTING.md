@@ -660,6 +660,14 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] "Ver a abertura" toca o estilo escolhido na hora, por cima da interface, e some sozinha (ou com qualquer botão). Resultado: ______
 - [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
 
+### Vários aplicativos personalizados
+
+- [ ] Início: depois dos lançadores aparece o bloco **+ Adicionar app**; A (ou clique) nele abre o seletor de arquivo; escolher um `.exe` cria um bloco com o ícone e o nome do programa (a descrição do exe), já selecionado. Passar o foco pelo "+" não troca o lançador. Resultado: ______
+- [ ] Adicionar dois ou três apps: cada um tem o seu bloco; selecionar um mostra em Sistema → Ao entrar no modo console o .exe, os argumentos e o processo a acompanhar **dele**, e editar muda só ele (confira trocando de bloco e voltando). Resultado: ______
+- [ ] "Remover este aplicativo" tira o bloco e o Steam Big Picture passa a abrir; os outros apps continuam. Reabrir o app mantém a lista, o selecionado e os campos de cada um. Resultado: ______
+- [ ] Config antiga com um app personalizado: ele aparece como o primeiro bloco, selecionado se era o lançador. Resultado: ______
+- [ ] Sessão com um app que é só um iniciador (abre outro programa e fecha), com "Processo a acompanhar" vazio: o log mostra "X abriu Y e fechou; a sessão passa a acompanhar Y", a janela de Y vai para a tela de jogo e a sessão termina uns 8 s depois que Y fecha. Com "Processo a acompanhar" preenchido, vale o processo escrito. Resultado: ______
+
 ### Tour guiado
 
 - [ ] Primeira abertura: o tour abre sozinho em "Bem-vindo ao Console Mode", 1 de 9, com o cartão no meio da tela e o fundo escurecido. Resultado: ______

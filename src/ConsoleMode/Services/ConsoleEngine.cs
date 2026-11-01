@@ -65,6 +65,9 @@ public sealed partial class ConsoleEngine
         State.CustomAppWatchName = "";
         State.CustomAppGoneSince = null;
         State.CustomAppTimeoutLogged = false;
+        State.CustomAppLaunchPid = null;
+        State.CustomAppFollowChildren = false;
+        State.CustomAppHandedOff = false;
         State.CachedXboxHandle = 0;
         State.AudioWatchComplete = false;
         State.BigPictureWatchActive = false;
@@ -241,7 +244,10 @@ public sealed partial class ConsoleEngine
                 Monitors.UpdateFocusRect(config.FocusMonitor, State, true);
                 State.CustomAppWatchName = CustomApp.WatchedProcess(config.CustomAppPath, config.CustomAppWatchProcess);
                 AppLog.Write($"Start: aplicativo personalizado {CustomApp.CleanPath(config.CustomAppPath)}, acompanhando o processo {State.CustomAppWatchName}");
-                Launch.StartCustomApp(config.CustomAppPath, config.CustomAppArguments);
+                State.CustomAppLaunchPid = Launch.StartCustomApp(config.CustomAppPath, config.CustomAppArguments);
+                // A process named by hand is what counts; otherwise the app follows a launcher's hand-off by itself.
+                State.CustomAppFollowChildren = CustomApp.NormalizeProcessName(config.CustomAppWatchProcess).Length == 0;
+                State.CustomAppHandedOff = false;
                 break;
         }
 
@@ -417,6 +423,9 @@ public sealed partial class ConsoleEngine
             State.CustomAppWatchName = "";
             State.CustomAppGoneSince = null;
             State.CustomAppTimeoutLogged = false;
+            State.CustomAppLaunchPid = null;
+            State.CustomAppFollowChildren = false;
+            State.CustomAppHandedOff = false;
             State.CachedXboxHandle = 0;
             State.AudioWatchComplete = false;
             State.BigPictureWatchActive = false;
@@ -669,6 +678,7 @@ public sealed partial class ConsoleEngine
         var name = State.CustomAppWatchName;
         var now = DateTime.Now;
         var running = LaunchService.IsProcessRunning(name);
+        if (!running && FollowHandOff()) return false;
         if (running)
         {
             State.CustomAppGoneSince = null;
@@ -689,6 +699,28 @@ public sealed partial class ConsoleEngine
         var exit = CustomApp.IsExit(State.HasAppeared, running, State.CustomAppGoneSince, now);
         if (exit) AppLog.Write($"Loop: processo {name} fechou");
         return exit;
+    }
+
+    /// <summary>
+    /// The launched exe is gone, but it may only have been a launcher (a stub, a script) that started the real program
+    /// and quit: then that program is what the session follows, its window goes to the game screen, and nobody had to
+    /// name it in "Process to watch". Once per session, and only when no process was named.
+    /// </summary>
+    private bool FollowHandOff()
+    {
+        if (!State.CustomAppFollowChildren || State.CustomAppHandedOff || State.CustomAppLaunchPid is not { } pid) return false;
+        string? target;
+        try { target = CustomApp.HandOffTarget(ProcessTree.Snapshot(), pid); }
+        catch (Exception ex) { AppLog.Write($"Loop: árvore de processos: {ex.Message}"); return false; }
+        if (target is null || target.Equals(State.CustomAppWatchName, StringComparison.OrdinalIgnoreCase)) return false;
+        AppLog.Write($"Loop: {State.CustomAppWatchName} abriu {target} e fechou; a sessão passa a acompanhar {target}");
+        State.CustomAppHandedOff = true;
+        State.CustomAppWatchName = target;
+        State.CustomAppGoneSince = null;
+        State.HasAppeared = false;
+        State.SteamMoved = false;
+        State.MoveCount = 0;
+        return true;
     }
 
     /// <summary>Once its main window shows: moves it to the game screen (a few tries) and brings it to the front.</summary>

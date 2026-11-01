@@ -23,16 +23,19 @@ public sealed class LaunchService
     }
 
     /// <summary>"customApp": starts the exe from its own folder (emulators look for their files there).</summary>
-    public void StartCustomApp(string exePath, string? arguments)
+    /// <returns>The started process's id, to follow a hand-off from it; null if Windows didn't say.</returns>
+    public int? StartCustomApp(string exePath, string? arguments)
     {
         var exe = CustomApp.CleanPath(exePath);
-        Process.Start(new ProcessStartInfo
+        using var process = Process.Start(new ProcessStartInfo
         {
             FileName = exe,
             Arguments = arguments?.Trim() ?? "",
             WorkingDirectory = Path.GetDirectoryName(exe) ?? "",
             UseShellExecute = true
-        })?.Dispose();
+        });
+        try { return process?.Id; }
+        catch (InvalidOperationException) { return null; }
     }
 
     /// <summary>

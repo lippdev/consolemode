@@ -18,10 +18,15 @@ public sealed class AppConfig
     public string PlaynitePath { get; set; } = "";
 
     /// <summary>"customApp" mode: the exe to launch, its optional arguments, and an optional process to
-    /// watch instead of it (for launcher stubs that hand off to another process).</summary>
+    /// watch instead of it (for launcher stubs that hand off to another process). Always the custom app
+    /// selected in CustomApps (kept here for the engine and for older versions reading this file).</summary>
     public string CustomAppPath { get; set; } = "";
     public string CustomAppArguments { get; set; } = "";
     public string CustomAppWatchProcess { get; set; } = "";
+
+    /// <summary>Every custom app, each a tile on Home; CustomAppId is the selected one (CustomApp.Selected).</summary>
+    public List<CustomAppEntry> CustomApps { get; set; } = [];
+    public string CustomAppId { get; set; } = "";
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
@@ -396,6 +401,11 @@ public sealed class ConsoleRuntimeState
     public string CustomAppWatchName { get; set; } = "";
     public DateTime? CustomAppGoneSince { get; set; }
     public bool CustomAppTimeoutLogged { get; set; }
+    /// <summary>The process started for the custom app, so a launcher that hands off to a child can be followed.</summary>
+    public int? CustomAppLaunchPid { get; set; }
+    /// <summary>Nobody named a process to watch: the app may follow the launched exe's child (CustomApp.HandOffTarget).</summary>
+    public bool CustomAppFollowChildren { get; set; }
+    public bool CustomAppHandedOff { get; set; }
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }
@@ -450,4 +460,13 @@ public sealed class MonitorRestoreContext
     public string? FocusMonitor { get; set; }
     public List<string> HideMonitors { get; set; } = [];
     public string HideStrategy { get; set; } = "disconnect";
+}
+
+/// <summary>One custom app ("customApp" launch mode): any .exe, with its arguments and the process that marks its end.</summary>
+public sealed class CustomAppEntry
+{
+    public string Id { get; set; } = "";
+    public string Path { get; set; } = "";
+    public string Arguments { get; set; } = "";
+    public string WatchProcess { get; set; } = "";
 }

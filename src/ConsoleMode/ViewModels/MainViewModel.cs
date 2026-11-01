@@ -81,7 +81,7 @@ public partial class MainViewModel : ObservableObject
     {
         "playnite" => LocalizationService.Get("LaunchPlayniteDescription"),
         "xboxMode" => LocalizationService.Get("LaunchXboxDescription"),
-        CustomApp.Mode => LocalizationService.Get("LaunchCustomAppDescription"),
+        var custom when CustomApp.IsEntryMode(custom) => LocalizationService.Get("LaunchCustomAppDescription"),
         _ => LocalizationService.Get("LaunchSteamDescription")
     };
     public string FocusModeDescription => FocusRow is null
@@ -178,14 +178,7 @@ public partial class MainViewModel : ObservableObject
             HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyTurnOff"), Value = "turnOff" });
             SelectedHideStrategy = HideStrategies.FirstOrDefault(x => x.Value == hideValue) ?? HideStrategies[0];
 
-            LaunchOptions.Clear();
-            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchSteam"), Value = "bigPicture" });
-            if (IsPlayniteAvailable)
-                LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchPlaynite"), Value = "playnite" });
-            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
-            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchCustomApp"), Value = CustomApp.Mode });
-            SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == launchValue) ?? LaunchOptions[0];
-            RebuildLaunchTiles();
+            RebuildLaunchOptions(launchValue);
 
             FpsOptions.Clear();
             FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsNoLimit"), Value = "0" });
@@ -212,6 +205,35 @@ public partial class MainViewModel : ObservableObject
         {
             _applying = wasApplying;
         }
+    }
+
+    /// <summary>
+    /// The launchers: Steam, Playnite (when installed), Xbox and each custom app by its exe's name; then the Home tiles.
+    /// Keeps the one in use, or picks the given one.
+    /// </summary>
+    private void RebuildLaunchOptions(string? select = null)
+    {
+        var value = select ?? SelectedLaunch?.Value ?? "bigPicture";
+        var wasApplying = _applying;
+        _applying = true;
+        try
+        {
+            LaunchOptions.Clear();
+            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchSteam"), Value = "bigPicture" });
+            if (IsPlayniteAvailable)
+                LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchPlaynite"), Value = "playnite" });
+            LaunchOptions.Add(new ComboOption { Text = LocalizationService.Get("LaunchXbox"), Value = "xboxMode" });
+            foreach (var app in _customApps)
+                LaunchOptions.Add(new ComboOption { Text = LaunchService.GetCustomAppName(app.Path), Value = CustomApp.EntryMode(app.Id) });
+            SelectedLaunch = LaunchOptions.FirstOrDefault(x => x.Value == value) ?? LaunchOptions[0];
+            RebuildLaunchTiles();
+        }
+        finally
+        {
+            _applying = wasApplying;
+        }
+        OnPropertyChanged(nameof(IsCustomApp));
+        OnPropertyChanged(nameof(LaunchDescription));
     }
 
     private void BuildAudioOptions(string selectedValue)
@@ -310,12 +332,10 @@ public partial class MainViewModel : ObservableObject
 
             SelectedHideStrategy = HideStrategies.FirstOrDefault(s => s.Value == config.HideStrategy) ?? HideStrategies[0];
             PlaynitePath = config.PlaynitePath ?? "";
-            CustomAppPath = config.CustomAppPath ?? "";
-            CustomAppArguments = config.CustomAppArguments ?? "";
-            CustomAppWatchProcess = config.CustomAppWatchProcess ?? "";
+            LoadCustomApps(config);
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
-            SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
+            SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == LaunchValueOf(config)) ?? LaunchOptions[0];
             ApplyTv(config.Tv);
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
@@ -558,6 +578,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnVrrEnableChanged(bool value) { SettingChanged(); OnPropertyChanged(nameof(VrrText)); }
     partial void OnSelectedLaunchChanged(ComboOption? value)
     {
+        OnCustomAppPicked(value?.Value);
         OnPropertyChanged(nameof(LaunchDescription));
         SyncLaunchTiles();
         OnPropertyChanged(nameof(IsCustomApp));
@@ -857,7 +878,10 @@ public partial class MainViewModel : ObservableObject
             HideMonitors = [.. _loadedConfig.HideMonitors],
             MonitorModes = new Dictionary<string, SavedDisplayMode>(_loadedConfig.MonitorModes, StringComparer.OrdinalIgnoreCase),
             HideStrategy = SelectedHideStrategy?.Value ?? "disconnect",
-            FullscreenMode = SelectedLaunch?.Value ?? "bigPicture",
+            // The engine knows one "customApp" mode: the selected app's values go in the CustomApp* fields.
+            FullscreenMode = CustomApp.IsEntryMode(SelectedLaunch?.Value) ? CustomApp.Mode : SelectedLaunch?.Value ?? "bigPicture",
+            CustomApps = CustomAppsToSave(),
+            CustomAppId = _customAppId,
             PlaynitePath = PlaynitePath,
             CustomAppPath = CustomApp.CleanPath(CustomAppPath),
             CustomAppArguments = CustomAppArguments.Trim(),

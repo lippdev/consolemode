@@ -425,5 +425,10 @@
   "IntroStylePs4": "Im Stil der PS4",
   "IntroStyleNone": "Keins (startet sofort)",
   "IntroPreviewCard": "Intro ansehen",
-  "IntroPreviewDescription": "Zeigt das gewählte Intro jetzt, mit Sound."
+  "IntroPreviewDescription": "Zeigt das gewählte Intro jetzt, mit Sound.",
+  "AddCustomAppTile": "App hinzufügen",
+  "AddCustomAppCard": "Eigene App hinzufügen",
+  "AddCustomAppDescription": "Wähle eine .exe: Sie wird zur Kachel auf der Startseite, mit Symbol und Namen des Programms.",
+  "RemoveCustomAppCard": "Diese App entfernen",
+  "RemoveCustomAppDescription": "Entfernt die Kachel dieser App von der Startseite; stattdessen öffnet sich Steam Big Picture."
 }

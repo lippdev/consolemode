@@ -425,5 +425,10 @@
   "IntroStylePs4": "Inspired by the PS4",
   "IntroStyleNone": "None (opens straight away)",
   "IntroPreviewCard": "See the opening",
-  "IntroPreviewDescription": "Shows the chosen opening now, with its sound."
+  "IntroPreviewDescription": "Shows the chosen opening now, with its sound.",
+  "AddCustomAppTile": "Add app",
+  "AddCustomAppCard": "Add a custom app",
+  "AddCustomAppDescription": "Pick an .exe: it becomes a tile on Home, with the program's icon and name.",
+  "RemoveCustomAppCard": "Remove this app",
+  "RemoveCustomAppDescription": "Takes this app's tile off Home; Steam Big Picture opens instead."
 }

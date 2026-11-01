@@ -135,6 +135,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string CustomAppArgumentsDescription => LocalizationService.Get(nameof(CustomAppArgumentsDescription));
     public string CustomAppWatchCard => LocalizationService.Get(nameof(CustomAppWatchCard));
     public string CustomAppWatchDescription => LocalizationService.Get(nameof(CustomAppWatchDescription));
+    public string AddCustomAppCard => LocalizationService.Get(nameof(AddCustomAppCard));
+    public string AddCustomAppDescription => LocalizationService.Get(nameof(AddCustomAppDescription));
+    public string RemoveCustomAppCard => LocalizationService.Get(nameof(RemoveCustomAppCard));
+    public string RemoveCustomAppDescription => LocalizationService.Get(nameof(RemoveCustomAppDescription));
     public string AudioOutputCard => LocalizationService.Get(nameof(AudioOutputCard));
     public string OptionalExtrasSection => LocalizationService.Get(nameof(OptionalExtrasSection));
     public string HdrCard => LocalizationService.Get(nameof(HdrCard));

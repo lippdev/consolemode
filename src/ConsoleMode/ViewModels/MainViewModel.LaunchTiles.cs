@@ -14,6 +14,8 @@ namespace ConsoleMode.ViewModels;
 public sealed partial class LaunchTile : ObservableObject
 {
     public required ComboOption Option { get; init; }
+    /// <summary>The "+" tile after the launchers: A on it adds a custom app; the focus on it picks nothing.</summary>
+    public bool IsAdd { get; init; }
     public string Text => Option.Text;
     public string Glyph { get; init; } = "";
     public Brush Background { get; init; } = null!;
@@ -51,7 +53,15 @@ public partial class MainViewModel
                 IsSelected = ReferenceEquals(option, SelectedLaunch)
             });
         }
-        foreach (var tile in LaunchTiles) _ = LoadLaunchLogoAsync(tile);
+        var add = LaunchArt.For(LaunchArt.AddCustomApp);
+        LaunchTiles.Add(new LaunchTile
+        {
+            Option = new ComboOption { Text = LocalizationService.Get("AddCustomAppTile"), Value = LaunchArt.AddCustomApp },
+            Glyph = add.Glyph,
+            Background = TileGradient(add.From, add.To),
+            IsAdd = true
+        });
+        foreach (var tile in LaunchTiles.Where(t => !t.IsAdd)) _ = LoadLaunchLogoAsync(tile);
     }
 
     /// <summary>Asked in pixels: the tile draws it at 64, so this stays sharp on a 4K TV.</summary>
@@ -73,12 +83,13 @@ public partial class MainViewModel
 
     private async Task LoadLaunchLogoAsync(LaunchTile tile)
     {
+        var custom = CustomApp.EntryId(tile.Option.Value) is { } id ? _customApps.FirstOrDefault(a => a.Id == id) : null;
         var (exe, appId) = tile.Option.Value switch
         {
             "bigPicture" => (SteamSession.FindSteamExe(), (string?)null),
             "playnite" => (Engine.Launch.GetPlaynitePath(), null),
             "xboxMode" => (null, LaunchArt.XboxAppId),
-            CustomApp.Mode => (CustomApp.CleanPath(CustomAppPath), null),
+            _ when custom is not null => (CustomApp.CleanPath(custom.Path), null),
             _ => (null, null)
         };
         var key = appId ?? exe;
@@ -116,19 +127,20 @@ public partial class MainViewModel
 
     private void SyncLaunchTiles()
     {
-        foreach (var tile in LaunchTiles) tile.IsSelected = ReferenceEquals(tile.Option, SelectedLaunch);
+        foreach (var tile in LaunchTiles) tile.IsSelected = !tile.IsAdd && ReferenceEquals(tile.Option, SelectedLaunch);
     }
 
     [RelayCommand]
     private void SelectLaunchTile(LaunchTile? tile)
     {
-        if (tile is not null && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
+        if (tile is not null && !tile.IsAdd && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
     }
 
-    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows.</summary>
+    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows; on "+", add a custom app.</summary>
     [RelayCommand]
     private async Task PlayLaunchTile(LaunchTile? tile)
     {
+        if (tile?.IsAdd == true) { await AddCustomAppAsync(); return; }
         SelectLaunchTile(tile);
         if (CanStart) await StartAsync();
     }
