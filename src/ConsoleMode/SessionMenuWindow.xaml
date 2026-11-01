@@ -11,6 +11,9 @@
     <!-- Like Steam's Shift + Tab: the whole screen, the game dimmed behind, a side panel with the
          options and the open windows in the middle. Controller-first. -->
     <!-- Background is set in code (ApplyMaterial): glass or solid depending on Windows' transparency setting -->
+    <!-- In proportion to the screen, like a console: laid out 1080 tall, whatever scale Windows is at (UiScaleHost) -->
+    <Grid x:Name="ScaleArea">
+    <Viewbox x:Name="UiScaleBox">
     <Grid x:Name="Root" Background="Transparent" Padding="56,36,56,30" RowSpacing="22" RequestedTheme="Dark"
           XYFocusKeyboardNavigation="Enabled">
         <Grid.Resources>
@@ -556,5 +559,7 @@
         <Grid Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionMenuBusy, Mode=OneWay}" Background="{ThemeResource MenuVeil}">
             <ProgressRing IsActive="True" Width="56" Height="56"/>
         </Grid>
+    </Grid>
+    </Viewbox>
     </Grid>
 </Window>

@@ -70,7 +70,7 @@ public partial class MainViewModel
     /// <summary>The logo's size on a tile (ConsoleHomeView.xaml), grown by the focused tile's 1.14 (ConsoleHomeView.ScaleTile).</summary>
     private const double LaunchLogoShown = 64 * 1.14;
 
-    /// <summary>The screen's pixels per view pixel (1 at 100 %, 1.5 at 150 %), from the view.</summary>
+    /// <summary>The screen's pixels per interface pixel (Windows' scale times the interface's, UiScaleHost), from the window.</summary>
     private double _logoScale = 1;
 
     // The logos are read once per app: the tiles are rebuilt on every language switch.

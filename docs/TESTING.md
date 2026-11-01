@@ -662,6 +662,8 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 ### Lista de Sistema e outros apps
 
+- [ ] Escala de console: com o Windows em 100 %, 125 %, 150 % e 200 % (Configurações → Sistema → Tela → Escala), a Início, a Sessão, o Sistema e o Menu da sessão ocupam a mesma proporção da tela, sem nada cortado ou gigante. Na TV 4K, igual a uma TV 1080p. Com a janela restaurada e redimensionada, a interface encolhe junto, sem cortar. Resultado: ______
+
 - [ ] Início: os ícones dos tiles (Steam, Playnite, Xbox e um app personalizado) têm bordas lisas, sem serrilhado, com o tile parado e com foco; repetir com a tela em 150 % de escala e arrastando a janela para uma tela de escala diferente. Resultado: ______
 
 - [ ] Sistema, numa categoria longa (App, Extras opcionais): a borda de baixo esmaece no fundo enquanto há linhas abaixo, e a de cima quando já rolou; no fim e no começo da lista, a borda fica limpa. A barra fina à direita aparece só quando a lista rola e acompanha a posição (controle, roda do mouse e teclado). Resultado: ______

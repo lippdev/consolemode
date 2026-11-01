@@ -47,6 +47,7 @@ public sealed partial class SessionMenuWindow : Window
     {
         ViewModel = viewModel;
         InitializeComponent();
+        Controls.UiScaleHost.Attach(ScaleArea, UiScaleBox, Root);
 
         _hwnd = WindowNative.GetWindowHandle(this);
         var appWindow = AppWindow.GetFromWindowId(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_hwnd));

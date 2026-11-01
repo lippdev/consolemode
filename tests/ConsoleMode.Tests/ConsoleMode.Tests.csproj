@@ -49,6 +49,7 @@
     <Compile Include="../../src/ConsoleMode/Services/SteamArt.cs" Link="SteamArt.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AltTabRules.cs" Link="AltTabRules.cs" />
     <Compile Include="../../src/ConsoleMode/Services/IconPixels.cs" Link="IconPixels.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/UiScale.cs" Link="UiScale.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControlFsLocator.cs" Link="ControlFsLocator.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControlFsRelease.cs" Link="ControlFsRelease.cs" />
     <Compile Include="../../src/ConsoleMode/Services/SteamShutdown.cs" Link="SteamShutdown.cs" />

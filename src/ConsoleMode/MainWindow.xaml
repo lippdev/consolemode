@@ -14,7 +14,10 @@
 
         <!-- The console interface takes the whole window and paints its background under the title bar (it leaves the
              top 48 px free itself), so there is no separate strip above it. -->
-        <views:ConsoleHomeView Grid.RowSpan="2"/>
+        <!-- ...in proportion to the window, like a console: laid out 1080 tall, whatever scale Windows is at (UiScaleHost) -->
+        <Viewbox x:Name="UiScaleBox" Grid.RowSpan="2">
+            <views:ConsoleHomeView x:Name="HomeView"/>
+        </Viewbox>
 
         <!-- Title bar, drawn over the page: only a drag region, the interface has its own brand mark in its top bar. -->
         <Grid x:Name="AppTitleBar" Grid.Row="0" Background="Transparent"/>
