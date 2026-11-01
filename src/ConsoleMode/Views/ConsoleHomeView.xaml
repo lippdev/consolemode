@@ -1194,11 +1194,11 @@
                                 Command="{x:Bind ViewModel.ConsoleTourNextCommand}">
                             <TextBlock Text="{x:Bind ViewModel.ConsoleTourNextText, Mode=OneWay}" FontSize="20" FontWeight="SemiBold"/>
                         </Button>
-                        <Button Style="{StaticResource ConsoleSmallButton}" Padding="22,12" Command="{x:Bind ViewModel.ConsoleTourBackCommand}"
+                        <Button Style="{StaticResource ConsoleSmallButton}" Height="52" Padding="22,0" Command="{x:Bind ViewModel.ConsoleTourBackCommand}"
                                 Visibility="{x:Bind ViewModel.CanGoBackInConsoleTour, Mode=OneWay}">
                             <TextBlock Text="{x:Bind ViewModel.Texts.Back, Mode=OneWay}" FontSize="18"/>
                         </Button>
-                        <Button Style="{StaticResource ConsoleSmallButton}" Padding="22,12" Command="{x:Bind ViewModel.EndTourCommand}"
+                        <Button Style="{StaticResource ConsoleSmallButton}" Height="52" Padding="22,0" Command="{x:Bind ViewModel.EndTourCommand}"
                                 Visibility="{x:Bind ViewModel.ShowSkipConsoleTour, Mode=OneWay}">
                             <TextBlock Text="{x:Bind ViewModel.Texts.SkipTour, Mode=OneWay}" FontSize="18"/>
                         </Button>

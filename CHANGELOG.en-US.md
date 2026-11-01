@@ -5,6 +5,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### What's new
 - **Task View shortcut**: a controller shortcut that does what Win + Tab does, opening Windows' Task View with all your windows, in a session or not. While it is open, the D-pad or the stick picks a window, A opens it and B closes it: Windows itself does that with an Xbox controller, and Console Mode with a PlayStation one (option **Move around Task View with a PlayStation controller**, on by default). It comes on as **Select + X** (change it or turn it off in System → Controller; the Xbox button alone, held, works too). The first three times, a notice slides into the corner with the buttons and the view opens right after, since nothing shows on top of it. (#188)
+### Fixes
+- Guided tour: the **Skip tutorial** and **Back** buttons no longer cut off the bottom of the letters, and they are as tall as **Next**. (#187)
 
 ## [1.7.0-alpha.3]
 ### What's new
