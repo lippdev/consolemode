@@ -36,6 +36,7 @@ public sealed partial class ConsoleHomeView : UserControl
         HomeShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Home, consoleStyle: true);
         MenuShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Menu, consoleStyle: true);
         ExitShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.Exit, consoleStyle: true);
+        TaskViewShortcutPickerHost.Content = new ShortcutPicker(ViewModel, ShortcutSlot.TaskView, consoleStyle: true);
         Loaded += OnLoaded;
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
@@ -180,6 +181,7 @@ public sealed partial class ConsoleHomeView : UserControl
                         (HomeShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
                         (MenuShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
                         (ExitShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
+                        (TaskViewShortcutPickerHost.Content as ShortcutPicker)?.CancelCapture();
                         FocusShortcutEditorRow();
                     }
                     RefreshNavigator();
@@ -332,6 +334,7 @@ public sealed partial class ConsoleHomeView : UserControl
             "home" => HomeShortcutPickerHost.Content as ShortcutPicker,
             "menu" => MenuShortcutPickerHost.Content as ShortcutPicker,
             "exit" => ExitShortcutPickerHost.Content as ShortcutPicker,
+            "taskview" => TaskViewShortcutPickerHost.Content as ShortcutPicker,
             _ => null
         };
         if (picker?.FocusCaptureButton() != true)
@@ -345,6 +348,7 @@ public sealed partial class ConsoleHomeView : UserControl
             "home" => HomeShortcutRow,
             "menu" => MenuShortcutRow,
             "exit" => ExitShortcutRow,
+            "taskview" => TaskViewShortcutRow,
             _ => null
         };
         if (ViewModel.IsSystemTab && row?.Focus(FocusState.Keyboard) == true) return;

@@ -70,6 +70,8 @@ public sealed class AppConfig
     public int HomeShortcut { get; set; }
     public int MenuShortcut { get; set; }
     public int ExitShortcut { get; set; }
+    /// <summary>Opens Windows' Task View (Win + Tab), driven with the controller; 0 = not set.</summary>
+    public int TaskViewShortcut { get; set; }
 
     /// <summary>The shortcuts setup (first run of the version that made them configurable) was finished or skipped.</summary>
     public bool ShortcutsOnboardingDone { get; set; }

@@ -63,8 +63,8 @@ public partial class MainViewModel
     {
         CursorHider.SetHidden(IsCursorHidden);
 
-        // While the menu or the main window is up the pad drives it, not the mouse.
-        _controllerMouse.Paused = IsSessionMenuOpen || IsMainWindowActive;
+        // While the menu, the main window or Task View (from the shortcut) is up the pad drives it, not the mouse.
+        _controllerMouse.Paused = IsSessionMenuOpen || IsMainWindowActive || IsTaskViewOpen;
         if (IsControllerMouseOn)
             _controllerMouse.Start((IsConsoleActive ? Engine.State.FocusMonitorRect : Engine.Monitors.GetMonitorRect(SessionMonitorName, Engine.State))?.Height ?? 1080);
         else

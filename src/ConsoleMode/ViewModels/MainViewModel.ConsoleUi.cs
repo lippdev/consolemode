@@ -166,6 +166,7 @@ public partial class MainViewModel
             case "home": ToggleSuggestedShortcut(ShortcutSlot.Home); break;
             case "menushortcut": ToggleSuggestedShortcut(ShortcutSlot.Menu); break;
             case "exitshortcut": ToggleSuggestedShortcut(ShortcutSlot.Exit); break;
+            case "taskviewshortcut": ToggleSuggestedShortcut(ShortcutSlot.TaskView); break;
             case "shortpress": HomeButtonShortPress = !HomeButtonShortPress; break;
             case "autostart": AutoStartOnController = !AutoStartOnController; break;
             case "controllerwake": _ = EnableControllerWakeAsync(); break;
@@ -207,6 +208,7 @@ public partial class MainViewModel
             "home" => ShortcutSlot.Home,
             "menu" => ShortcutSlot.Menu,
             "exit" => ShortcutSlot.Exit,
+            "taskview" => ShortcutSlot.TaskView,
             _ => (ShortcutSlot?)null
         };
         if (target is null) return;

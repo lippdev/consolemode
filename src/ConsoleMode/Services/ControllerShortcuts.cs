@@ -8,7 +8,9 @@ public enum ShortcutSlot
     /// <summary>In a session: open the menu over the game.</summary>
     Menu,
     /// <summary>In a session: go back to the PC (restore the desk).</summary>
-    Exit
+    Exit,
+    /// <summary>Anytime: Windows' Task View (Win + Tab), driven with the controller while it is open.</summary>
+    TaskView
 }
 
 /// <summary>
@@ -32,13 +34,14 @@ public static class ControllerShortcuts
     /// </summary>
     public const ushort Allowed = Guide | Start | Back | A | B | X | Y;
 
-    public static readonly ShortcutSlot[] Slots = [ShortcutSlot.Home, ShortcutSlot.Menu, ShortcutSlot.Exit];
+    public static readonly ShortcutSlot[] Slots = [ShortcutSlot.Home, ShortcutSlot.Menu, ShortcutSlot.Exit, ShortcutSlot.TaskView];
 
     /// <summary>The combo offered (never applied by itself) for each shortcut.</summary>
     public static ushort Suggested(ShortcutSlot slot) => slot switch
     {
         ShortcutSlot.Home => Guide,
         ShortcutSlot.Menu => Back | Y,
+        ShortcutSlot.TaskView => Back | X,
         _ => Start | Back
     };
 

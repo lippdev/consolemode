@@ -903,6 +903,7 @@ public partial class MainViewModel : ObservableObject
             HomeShortcut = _shortcuts[(int)ShortcutSlot.Home],
             MenuShortcut = _shortcuts[(int)ShortcutSlot.Menu],
             ExitShortcut = _shortcuts[(int)ShortcutSlot.Exit],
+            TaskViewShortcut = _shortcuts[(int)ShortcutSlot.TaskView],
             ShortcutsOnboardingDone = _loadedConfig.ShortcutsOnboardingDone,
             HomeButtonShortPress = HomeButtonShortPress,
             AutoStartOnController = AutoStartOnController,

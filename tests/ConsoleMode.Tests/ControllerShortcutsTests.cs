@@ -6,7 +6,7 @@ namespace ConsoleMode.Tests;
 
 public class ControllerShortcutsTests
 {
-    private static ushort[] Masks(ushort home = 0, ushort menu = 0, ushort exit = 0) => [home, menu, exit];
+    private static ushort[] Masks(ushort home = 0, ushort menu = 0, ushort exit = 0, ushort taskView = 0) => [home, menu, exit, taskView];
     private static IReadOnlyDictionary<string, ushort> Devices(params (string Id, ushort Buttons)[] devices) =>
         devices.ToDictionary(device => device.Id, device => device.Buttons, StringComparer.OrdinalIgnoreCase);
 

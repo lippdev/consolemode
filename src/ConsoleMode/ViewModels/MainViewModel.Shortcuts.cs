@@ -3,7 +3,7 @@ using ConsoleMode.Services;
 
 namespace ConsoleMode.ViewModels;
 
-// The controller shortcuts the user picks (Home, session menu, back to the PC). Nothing is set
+// The controller shortcuts the user picks (Home, session menu, back to the PC, Task View). Nothing is set
 // until they choose in the first-run setup or in Settings; a combo can serve one purpose only.
 public partial class MainViewModel
 {
@@ -18,6 +18,7 @@ public partial class MainViewModel
     public bool HomeShortcutSet => _shortcuts[(int)ShortcutSlot.Home] != 0;
     public bool ExitShortcutSet => _shortcuts[(int)ShortcutSlot.Exit] != 0;
     public bool MenuShortcutSet => _shortcuts[(int)ShortcutSlot.Menu] != 0;
+    public bool TaskViewShortcutSet => _shortcuts[(int)ShortcutSlot.TaskView] != 0;
 
     /// <summary>True while a "press the buttons you want" capture is running: no shortcut may fire.</summary>
     public bool IsCapturingShortcut => _shortcutCaptures > 0;
@@ -37,12 +38,14 @@ public partial class MainViewModel
     {
         ShortcutSlot.Home => "ShortcutHome",
         ShortcutSlot.Menu => "ShortcutMenu",
+        ShortcutSlot.TaskView => "ShortcutTaskView",
         _ => "ShortcutExit"
     });
 
     public string HomeShortcutText => ShortcutText(ShortcutSlot.Home);
     public string MenuShortcutText => ShortcutText(ShortcutSlot.Menu);
     public string ExitShortcutText => ShortcutText(ShortcutSlot.Exit);
+    public string TaskViewShortcutText => ShortcutText(ShortcutSlot.TaskView);
 
     /// <summary>The "or hold … to go back" line on the console screen; empty when the shortcut isn't set.</summary>
     public string ConsoleActiveHintText => ExitShortcutSet
@@ -112,6 +115,7 @@ public partial class MainViewModel
         _shortcuts[(int)ShortcutSlot.Home] = ControllerShortcuts.Sanitize(config.HomeShortcut);
         _shortcuts[(int)ShortcutSlot.Menu] = ControllerShortcuts.Sanitize(config.MenuShortcut);
         _shortcuts[(int)ShortcutSlot.Exit] = ControllerShortcuts.Sanitize(config.ExitShortcut);
+        _shortcuts[(int)ShortcutSlot.TaskView] = ControllerShortcuts.Sanitize(config.TaskViewShortcut);
         // A hand-edited file could give one combo two jobs: the later one is dropped.
         foreach (var slot in ControllerShortcuts.Slots)
         {
@@ -143,9 +147,11 @@ public partial class MainViewModel
         OnPropertyChanged(nameof(HomeShortcutSet));
         OnPropertyChanged(nameof(MenuShortcutSet));
         OnPropertyChanged(nameof(ExitShortcutSet));
+        OnPropertyChanged(nameof(TaskViewShortcutSet));
         OnPropertyChanged(nameof(HomeShortcutText));
         OnPropertyChanged(nameof(MenuShortcutText));
         OnPropertyChanged(nameof(ExitShortcutText));
+        OnPropertyChanged(nameof(TaskViewShortcutText));
         OnPropertyChanged(nameof(ConsoleActiveHintText));
         OnPropertyChanged(ShortcutsProperty);
     }
