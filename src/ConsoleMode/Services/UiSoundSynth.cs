@@ -8,7 +8,9 @@ public enum UiSound
     /// <summary>Something was picked, opened or switched.</summary>
     Confirm,
     /// <summary>Went back or closed a panel.</summary>
-    Back
+    Back,
+    /// <summary>Switched to another tab of the console interface (LB / RB, or a click on a tab).</summary>
+    Tab
 }
 
 /// <summary>
@@ -26,6 +28,7 @@ public static class UiSoundSynth
     private static Note[] Notes(UiSound sound) => sound switch
     {
         UiSound.Move => [new(1150, 1000, 45, 0.30)],
+        UiSound.Tab => [new(980, 1180, 55, 0.30)],
         UiSound.Confirm => [new(740, 740, 55, 0.32), new(1110, 1110, 95, 0.34)],
         _ => [new(820, 820, 50, 0.30), new(560, 540, 85, 0.30)]
     };

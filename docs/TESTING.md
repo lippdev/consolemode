@@ -80,7 +80,9 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 
 ### Sons
 
-- [ ] Há um som ao mover o foco, outro ao confirmar (A ou clique) e outro ao voltar (B); trocar de aba toca o de mover. Resultado: ______
+- [ ] Há um som ao mover o foco, outro ao confirmar (A ou clique) e outro ao voltar (B). Resultado: ______
+- [ ] Trocar de aba (LB / RB, ou clique numa aba) toca um som próprio, diferente do de mover; clicar em qualquer outro botão continua tocando o de confirmar. Resultado: ______
+- [ ] Os sons novos (vidro ao mover, confirmação, "minimizar" ao voltar e o cursor do Selene na aba) saem no mesmo volume, sem estalo no começo ou no fim. Resultado: ______
 - [ ] Sistema/Ajustes → "Sons da interface" desligado: silêncio total. Resultado: ______
 - [ ] Segurar o direcional não acumula sons (um novo interrompe o anterior). Resultado: ______
 

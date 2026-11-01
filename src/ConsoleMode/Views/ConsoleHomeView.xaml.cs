@@ -19,6 +19,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private bool _windowActive = true;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _clock;
     private static Style? _cardStyle;
+    private static Style? _tabStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
@@ -289,7 +290,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private void StepTab(int step)
     {
         if (ViewModel.IsConsoleActive || ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTutorialOpen || ViewModel.IsControllerTestOpen) return;
-        if (ViewModel.StepConsoleTab(step)) UiSounds.Play(UiSound.Move);
+        if (ViewModel.StepConsoleTab(step)) UiSounds.Play(UiSound.Tab);
     }
 
     private void GoBack()
@@ -431,9 +432,10 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         for (var node = e.OriginalSource as DependencyObject; node is not null; node = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(node))
         {
-            if (node is Microsoft.UI.Xaml.Controls.Primitives.ButtonBase { IsEnabled: true })
+            if (node is Microsoft.UI.Xaml.Controls.Primitives.ButtonBase { IsEnabled: true } button)
             {
-                UiSounds.Play(UiSound.Confirm);
+                // A tab sounds like LB / RB, not like picking something.
+                UiSounds.Play(ReferenceEquals(button.Style, _tabStyle ??= Application.Current.Resources["ConsoleTab"] as Style) ? UiSound.Tab : UiSound.Confirm);
                 return;
             }
         }
