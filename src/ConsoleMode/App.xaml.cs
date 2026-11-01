@@ -18,6 +18,7 @@ public partial class App : Application
     private TrayService? _tray;
     private ControllerHoldWatcher? _guide;
     private ControllerHoldWatcher? _exitChord;
+    private ControllerHoldWatcher? _taskViewChord;
     private ControllerHoldWatcher? _menuChord;
     private ControllerConnectWatcher? _connect;
     private Mutex? _instanceMutex;
@@ -186,6 +187,8 @@ public partial class App : Application
             HoldDuration = TimeSpan.FromMilliseconds(250)
         };
         _menuChord.Held += () => ViewModel?.ToggleSessionMenu();
+        _taskViewChord = new ControllerHoldWatcher(_window.DispatcherQueue, 0, "atalho Visão de tarefas");
+        _taskViewChord.Held += () => ViewModel?.ToggleTaskView();
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
         RefreshGuideWatch();
 
@@ -213,10 +216,13 @@ public partial class App : Application
 
     private void RefreshGuideWatch()
     {
-        if (_guide is null || _exitChord is null || _menuChord is null || ViewModel is null) return;
+        if (_guide is null || _exitChord is null || _menuChord is null || _taskViewChord is null || ViewModel is null) return;
         _guide.Mask = ViewModel.GetShortcut(ShortcutSlot.Home);
         _menuChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Menu);
         _exitChord.Mask = ViewModel.GetShortcut(ShortcutSlot.Exit);
+        _taskViewChord.Mask = ViewModel.GetShortcut(ShortcutSlot.TaskView);
+        // The Xbox button alone is a deliberate hold, like on the console; a combo of buttons is quick.
+        _taskViewChord.HoldDuration = _taskViewChord.Mask == ControllerShortcuts.Guide ? TimeSpan.FromMilliseconds(600) : TimeSpan.FromMilliseconds(250);
         _guide.HoldDuration = ViewModel.HomeButtonShortPress ? TimeSpan.Zero : ControllerHoldWatcher.LongHold;
 
         // Picking a shortcut presses buttons on purpose: nothing may fire meanwhile. A shortcut
@@ -226,6 +232,8 @@ public partial class App : Application
         // Outside a session too, unless turned off in System → Controller (a game may use the same buttons).
         Apply(_menuChord, idle && _menuChord.Mask != 0 && (ViewModel.IsConsoleActive || ViewModel.MenuOutsideSession));
         Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
+        // Anytime, in a session or not: Windows' Task View is always there.
+        Apply(_taskViewChord, idle && _taskViewChord.Mask != 0);
     }
 
     private static void Apply(ControllerHoldWatcher watcher, bool run)

@@ -695,6 +695,18 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.ExitShortcutText, Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
+                                        <Button x:Name="TaskViewShortcutRow" Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenShortcutEditorCommand}" CommandParameter="taskview" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TaskViewShortcutDescription, Mode=OneWay}">
+                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TaskViewShortcutCard, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.TaskViewShortcutText, Mode=OneWay}"/>
+                                            </Grid>
+                                        </Button>
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="taskviewplaystation" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TaskViewPlayStationDescription, Mode=OneWay}">
+                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TaskViewPlayStationCard, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.TaskViewPlayStation), Mode=OneWay}"/>
+                                            </Grid>
+                                        </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="menuoutside" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.MenuOutsideSessionDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.MenuOutsideSessionCard, Mode=OneWay}"/>
@@ -1207,12 +1219,12 @@
         </Grid>
 
         <Grid x:Name="ShortcutEditorPanel" Visibility="{x:Bind ViewModel.IsShortcutEditorOpen, Mode=OneWay}" Background="#E607090D" TabFocusNavigation="Cycle">
-            <Grid MaxWidth="1000" VerticalAlignment="Center" RowSpacing="18">
+            <Grid MaxWidth="1320" VerticalAlignment="Center" RowSpacing="18">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                 <TextBlock Text="{x:Bind ViewModel.ShortcutEditorTitle, Mode=OneWay}" FontSize="32" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                 <ScrollViewer Grid.Row="1" IsTabStop="False" MaxHeight="560" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid ColumnSpacing="16" Margin="4">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <Border Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
                             <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.HomeButtonCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="HomeShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
                         </Border>
@@ -1221,6 +1233,9 @@
                         </Border>
                         <Border Grid.Column="2" Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
                             <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.ExitShortcutCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="ExitShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Background="#FF20292E" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="14" Padding="16">
+                            <StackPanel Spacing="12"><TextBlock Text="{x:Bind ViewModel.Texts.TaskViewShortcutCard, Mode=OneWay}" FontSize="19" MinHeight="52" FontWeight="SemiBold" TextWrapping="Wrap"/><ContentControl x:Name="TaskViewShortcutPickerHost" IsTabStop="False" HorizontalContentAlignment="Stretch"/></StackPanel>
                         </Border>
                     </Grid>
                 </ScrollViewer>

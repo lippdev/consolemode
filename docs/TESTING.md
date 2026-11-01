@@ -660,6 +660,14 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] "Ver a abertura" toca o estilo escolhido na hora, por cima da interface, e some sozinha (ou com qualquer botão). Resultado: ______
 - [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
 
+### Atalho da visão de tarefas
+
+- [ ] Numa instalação nova e numa que já existia, Sistema → Controle → **Atalho do controle para a visão de tarefas** já mostra Select + X. Noutra rodada, trocar para só o botão Xbox (com o atalho de abrir o Console Mode desligado). Fora da sessão e numa sessão, segurar o atalho abre a visão de tarefas do Windows. Resultado: ______
+- [ ] Controle **Xbox**, com ela aberta: o próprio Windows move a seleção, cada toque anda **uma** casa só (sem repetir), **A** abre, **B** fecha; o atalho de novo também fecha. Com o controle como mouse ligado, o ponteiro não se mexe enquanto a visão está aberta. Resultado: ______
+- [ ] Controle **PlayStation** (sem DS4Windows/Steam Input transformando em Xbox): direcional e analógico esquerdo movem a seleção (segurar repete), ✕ abre, ○ fecha. Fechando com o mouse, o controle volta ao jogo (✕ não vira Enter). Com **Navegar na visão de tarefas com controle PlayStation** desligado, o controle PlayStation não mexe na visão. Resultado: ______
+- [ ] Com o menu da sessão aberto, o atalho fecha o menu e abre a visão de tarefas. Resultado: ______
+- [ ] Nas três primeiras vezes, o aviso "Visão de tarefas" desliza no canto com os botões do controle em uso (A/B ou ✕/○) e a visão abre ~1,6 s depois; da quarta em diante abre na hora, sem aviso. O aviso não aparece como janela dentro da visão de tarefas. Resultado: ______
+
 ### Lista de Sistema e outros apps
 
 - [ ] Aviso de início de sessão (com o atalho do menu definido) e de bateria fraca: entra deslizando da borda direita da TV, sem aparecer em outra tela ao lado; o fundo em volta do card é transparente (sem retângulo preto); a barrinha verde esvazia e o aviso sai deslizando para a direita. O jogo não perde o foco em nenhum momento. Resultado: ______

@@ -205,6 +205,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string ConsoleActiveHint => LocalizationService.Get(nameof(ConsoleActiveHint));
     public string HomeButtonCard => LocalizationService.Get(nameof(HomeButtonCard));
     public string ExitShortcutCard => LocalizationService.Get(nameof(ExitShortcutCard));
+    public string TaskViewShortcutCard => LocalizationService.Get(nameof(TaskViewShortcutCard));
+    public string TaskViewShortcutDescription => LocalizationService.Get(nameof(TaskViewShortcutDescription));
+    public string TaskViewPlayStationCard => LocalizationService.Get(nameof(TaskViewPlayStationCard));
+    public string TaskViewPlayStationDescription => LocalizationService.Get(nameof(TaskViewPlayStationDescription));
     public string SoundsCard => LocalizationService.Get(nameof(SoundsCard));
     public string IntroSoundCard => LocalizationService.Get(nameof(IntroSoundCard));
     public string IntroSoundDescription => LocalizationService.Get(nameof(IntroSoundDescription));
