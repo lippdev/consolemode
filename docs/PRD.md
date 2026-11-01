@@ -381,6 +381,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **INPUT-012 —** Bateria do controle no menu e na interface Console, com avisos em 15 % e 5 %. (#160, 1.7.0-alpha.1)
 - [ ] **INPUT-013 (P0) —** Acordar o PC pelo controle (adaptador Xbox, Bluetooth, cabo). (#168; ajuste na Fase 1.7)
 - [x] **INPUT-014 —** Estacionar o ponteiro no canto da tela de jogo quando o launcher aparece, ligado por padrão, devolvendo a posição ao voltar (D-21). Issue #172; base de @JarJarShinks no #173. (#177, 1.7.0)
+- [x] **INPUT-017 —** Atalho do controle para a visão de tarefas (Win + Tab), dentro ou fora da sessão, com o controle navegando nela (direcional/analógico = setas, A = Enter, B = Esc) até ela fechar. (#188, 1.7.0)
 - [ ] **INPUT-015 (P3) —** Atalhos por voz e assistente (Alexa, MCP). Issue #12.
 
 ### Épico UI — Interface Console

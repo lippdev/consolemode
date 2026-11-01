@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **Task View shortcut**: a controller shortcut that does what Win + Tab does, opening Windows' Task View with all your windows, in a session or not. While it is open, the D-pad or the stick picks a window, A opens it and B closes it. Set it in System → Controller (suggested: Select + X; the Xbox button alone, held, works too). (#188)
 
 ## [1.7.0-alpha.3]
 ### What's new

@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- **Atalho para a visão de tarefas**: um atalho do controle que faz o mesmo que Win + Tab, abrindo a visão de tarefas do Windows com todas as janelas, numa sessão ou fora dela. Com ela aberta, o direcional ou o analógico escolhe a janela, A abre e B fecha. Defina em Sistema → Controle (sugerido: Select + X; o botão Xbox sozinho, segurado, também serve). (#188)
 
 ## [1.7.0-alpha.3]
 ### Novidades
