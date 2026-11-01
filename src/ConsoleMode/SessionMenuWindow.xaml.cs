@@ -213,8 +213,7 @@ public sealed partial class SessionMenuWindow : Window
                 card.StartBringIntoView();
         };
         Root.LostFocus += (_, e) => ScaleFocused(e.OriginalSource, grow: false);
-        // Mouse clicks sound like a confirm (the pad has its own sounds in the navigator).
-        Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnPointerPressed), true);
+        // The sounds are the pad's (the navigator): mouse clicks stay silent.
 
         ViewModel.PropertyChanged += OnViewModelChanged;
         ViewModel.SessionPickerRefocus += FocusPickerSelection;
@@ -447,18 +446,6 @@ public sealed partial class SessionMenuWindow : Window
         catch (Exception ex)
         {
             AppLog.Write($"Menu da sessão: foco: {ex.Message}");
-        }
-    }
-
-    private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
-    {
-        for (var node = e.OriginalSource as DependencyObject; node is not null; node = VisualTreeHelper.GetParent(node))
-        {
-            if (node is ButtonBase { IsEnabled: true })
-            {
-                UiSounds.Play(UiSound.Confirm);
-                return;
-            }
         }
     }
 
