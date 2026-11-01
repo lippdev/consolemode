@@ -134,7 +134,10 @@ public sealed partial class ConsoleHomeView : UserControl
         if (App.MainWindowInstance is { } window)
             window.Activated += (_, args) =>
             {
+                var wasActive = _windowActive;
                 _windowActive = args.WindowActivationState != WindowActivationState.Deactivated;
+                // Back from another window: the tour's stop gets its full time again, bar and all.
+                if (_windowActive && !wasActive && ViewModel.IsConsoleTourOpen) StartTourCountdown();
                 RefreshNavigator();
             };
         RefreshNavigator();
