@@ -59,6 +59,17 @@ public static class ConsoleTour
     /// </summary>
     public static bool ShouldOffer(bool tourDone, bool sessionActive) => !tourDone && !sessionActive;
 
+    /// <summary>
+    /// How long a stop stays before the tour moves on by itself: time to read its texts (about 16 characters a
+    /// second, from across the room), never under 7 s or over 16 s. So the tour never depends on the pad answering:
+    /// with a controller it doesn't hear (reported with a PlayStation pad), nobody is left stuck on a stop.
+    /// </summary>
+    public static TimeSpan DwellTime(string title, string body)
+    {
+        var seconds = 3 + (title.Length + body.Length) / 16.0;
+        return TimeSpan.FromSeconds(Math.Clamp(seconds, 7, 16));
+    }
+
     /// <summary>The stop after (step 1) or before (-1) this one, or null past either end.</summary>
     public static int? Step(int index, int step)
     {

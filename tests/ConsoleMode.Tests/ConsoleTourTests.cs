@@ -8,6 +8,16 @@ namespace ConsoleMode.Tests;
 public class ConsoleTourTests
 {
     [Fact]
+    public void A_stop_stays_long_enough_to_read_it_and_then_moves_on()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(7), ConsoleTour.DwellTime("Hi", "Short."));
+        Assert.Equal(TimeSpan.FromSeconds(16), ConsoleTour.DwellTime("Title", new string('a', 2000)));
+        // A typical stop: a title and two sentences, about 13 s.
+        var typical = ConsoleTour.DwellTime(new string('t', 20), new string('b', 140));
+        Assert.Equal(13, typical.TotalSeconds, 1);
+    }
+
+    [Fact]
     public void The_tour_opens_with_a_welcome_and_closes_with_the_way_back_to_it()
     {
         Assert.Equal(ConsoleTourStop.Welcome, ConsoleTour.Stops[0]);

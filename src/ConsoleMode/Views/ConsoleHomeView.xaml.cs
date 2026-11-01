@@ -20,6 +20,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private GamepadNavigator? _navigator;
     private bool _windowActive = true;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _clock;
+    private Microsoft.UI.Dispatching.DispatcherQueueTimer? _tourTimer;
     private static Style? _cardStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
@@ -133,7 +134,10 @@ public sealed partial class ConsoleHomeView : UserControl
         if (App.MainWindowInstance is { } window)
             window.Activated += (_, args) =>
             {
+                var wasActive = _windowActive;
                 _windowActive = args.WindowActivationState != WindowActivationState.Deactivated;
+                // Back from another window: the tour's stop gets its full time again, bar and all.
+                if (_windowActive && !wasActive && ViewModel.IsConsoleTourOpen) StartTourCountdown();
                 RefreshNavigator();
             };
         RefreshNavigator();
@@ -209,7 +213,11 @@ public sealed partial class ConsoleHomeView : UserControl
                 else HideIntro();
                 break;
             case nameof(MainViewModel.IsConsoleTourOpen):
-                if (!ViewModel.IsConsoleTourOpen) DispatcherQueue.TryEnqueue(FocusDefault);
+                if (!ViewModel.IsConsoleTourOpen)
+                {
+                    StopTourCountdown();
+                    DispatcherQueue.TryEnqueue(FocusDefault);
+                }
                 break;
             case nameof(MainViewModel.ConsoleTourIndex):
                 // After the tab switch (queued by ConsoleTabIndex) has laid the new page out.
@@ -777,6 +785,7 @@ public sealed partial class ConsoleHomeView : UserControl
         PlaceTour();
         FadeInTourCard();
         ConsoleTourNextButton.Focus(FocusState.Keyboard);
+        StartTourCountdown();
     }
 
     private FrameworkElement? TourTargetElement(ConsoleTourStop stop) => stop switch
@@ -902,6 +911,48 @@ public sealed partial class ConsoleHomeView : UserControl
         {
             AppLog.Write($"Tour: animação: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Each stop moves on by itself once its time is up (ConsoleTour.DwellTime), the last one closing the tour, while
+    /// the bar under the card fills. A, B or a click still act at once, and the next stop starts its own time.
+    /// </summary>
+    private void StartTourCountdown()
+    {
+        _tourTimer ??= DispatcherQueue.CreateTimer();
+        _tourTimer.Stop();
+        _tourTimer.IsRepeating = false;
+        _tourTimer.Tick -= OnTourTimeUp;
+        _tourTimer.Tick += OnTourTimeUp;
+        var dwell = ConsoleTour.DwellTime(ViewModel.ConsoleTourTitle, ViewModel.ConsoleTourBody);
+        _tourTimer.Interval = dwell;
+        _tourTimer.Start();
+        try
+        {
+            // A clock, not a decoration: it runs with Windows' animations off too.
+            var bar = ElementCompositionPreview.GetElementVisual(TourTimeBar);
+            bar.CenterPoint = Vector3.Zero;
+            var fill = bar.Compositor.CreateScalarKeyFrameAnimation();
+            fill.InsertKeyFrame(0f, 0f);
+            fill.InsertKeyFrame(1f, 1f, bar.Compositor.CreateLinearEasingFunction());
+            fill.Duration = dwell;
+            bar.StartAnimation("Scale.X", fill);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Tour: barra de tempo: {ex.Message}");
+        }
+    }
+
+    private void StopTourCountdown() => _tourTimer?.Stop();
+
+    private void OnTourTimeUp(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args)
+    {
+        sender.Stop();
+        if (!ViewModel.IsConsoleTourOpen) return;
+        // Nobody is looking at a window in the background: its stop waits for them to come back.
+        if (!_windowActive) { StartTourCountdown(); return; }
+        ViewModel.ConsoleTourNextCommand.Execute(null);
     }
 
     /// <summary>Back to the option that was in use, else the first one of the category, else the category itself.</summary>
