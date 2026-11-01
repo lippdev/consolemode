@@ -26,6 +26,8 @@ public sealed partial class ConsoleHomeView : UserControl
     private readonly ScrollEdges _rowsEdges;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
     private long _railPointerPressedAt = long.MinValue / 2;
+    /// <summary>The same for the launchers: a click picks one and leaves the focus where it is.</summary>
+    private long _launchPointerPressedAt = long.MinValue / 2;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
 
@@ -57,6 +59,7 @@ public sealed partial class ConsoleHomeView : UserControl
         _rowsEdges = new ScrollEdges(SettingsRows, RowsFadeTop, RowsFadeBottom, RowsScrollTrack, RowsScrollThumb);
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
+        LaunchRow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _launchPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
         ViewModel.PropertyChanged += OnViewModelChanged;
         if (ViewModel.IsIntroShowing) ShowIntro();
@@ -947,7 +950,8 @@ public sealed partial class ConsoleHomeView : UserControl
     /// </summary>
     private void OnLaunchTileClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: LaunchTile { IsAdd: false } } button || button.FocusState == FocusState.Pointer) return;
+        // How this press came in, not how the tile got its focus: it may hold the pad's focus and still be clicked.
+        if (sender is not Button { DataContext: LaunchTile { IsAdd: false } } || Environment.TickCount64 - _launchPointerPressedAt < 1500) return;
         if (ViewModel.CanStart) PlayButton.Focus(FocusState.Keyboard);
     }
 
