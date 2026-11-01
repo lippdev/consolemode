@@ -93,6 +93,7 @@ refeita e sem caminho de volta perdido.
 | D-20 | **Perfis por jogo com o Tako:** quando a sessão vem do Tako, quem aplica resolução e áudio do jogo é o Tako (D-16); os perfis do Console Mode (#170) valem só nas sessões que não vêm dele. | A decidir com o Tako (CMI) |
 | D-21 | **Estacionar o ponteiro** no canto da tela de jogo quando o launcher aparece vem **ligado por padrão** e devolve o ponteiro para onde estava ao voltar. | Decidido (resposta à issue #172; implementação no INPUT-014) |
 | D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido e implementado no CORE-012 (#178). Antes dele, depois de uma queda nada era restaurado sozinho: os backups ficavam no disco, mas o "Restaurar agora" não os usava sem uma sessão ativa. |
+| D-23 | **Uma interface só:** a partir da 1.7.0 o app tem apenas a interface Console, que também funciona com mouse e teclado. A interface Desktop e a escolha de interface saem; o que só existia nela vai para a aba Sistema, e a primeira abertura ganha um tour guiado. | Decidido pelo dono em 31/10/2026; UI-012 e UI-013. |
 
 ### 2.1 Como chegamos aqui
 
@@ -251,8 +252,7 @@ com DPAPI. Nada vai para servidor próprio; a única rede é o GitHub (atualiza�
 
 ## 7. Interfaces e design
 
-- **Desktop:** janela WinUI com Mica, para mouse e teclado. Configura tudo, inclusive o que a Console não mostra.
-- **Console:** 10-foot, tema escuro fixo, foco com contorno branco, cards sem bordas, fonte Inter, transições
+- **Console (a única, D-23):** 10-foot, guiada pelo controle e também pelo mouse e pelo teclado, tema escuro fixo, foco com contorno branco, cards sem bordas, fonte Inter, transições
   curtas (140 a 260 ms) que respeitam "Efeitos de animação" do Windows. Referências: PS5, Xbox e o overlay da Steam.
 - **Menu da sessão:** tela cheia por cima do jogo, vidro ou fundo sólido conforme a transparência do Windows,
   tokens próprios com variante de alto contraste.
@@ -380,7 +380,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **INPUT-014 —** Estacionar o ponteiro no canto da tela de jogo quando o launcher aparece, ligado por padrão, devolvendo a posição ao voltar (D-21). Issue #172; base de @JarJarShinks no #173. (#177, 1.7.0)
 - [ ] **INPUT-015 (P3) —** Atalhos por voz e assistente (Alexa, MCP). Issue #12.
 
-### Épico UI — Interface Console e Desktop
+### Épico UI — Interface Console
 
 - [x] **UI-001 —** Interface Console em tela cheia, guiada pelo controle, com seleção de opções por lista. (#32, #42, 1.5.0)
 - [x] **UI-002 —** Correções de navegação nos Ajustes da Console e anel de foco visível. (#47, #60, #73, 1.5.0)
@@ -390,9 +390,12 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **UI-006 —** Redesenho estilo console doméstico: lançadores em fileira, Sistema com categorias. (#162, 1.7.0-alpha.1)
 - [x] **UI-007 —** Fonte Inter e o foco escolhe o lançador. (#164, 1.7.0-alpha.1)
 - [x] **UI-008 —** Fundo Aurora, lista de ajustes dentro da tela, hover e clique suaves. (#165, 1.7.0-alpha.2)
-- [ ] **UI-009 (P1) —** Primeira execução guiada: escolher a tela de jogo, testar, configurar o atalho. Hoje o setup só cobre os atalhos.
-- [ ] **UI-010 (P2) —** Acessibilidade: leitor de tela nas duas interfaces, alto contraste na interface Console, tamanho do texto, redução de animações própria.
-- [ ] **UI-011 (P2) —** Polimento contínuo: legibilidade em TV com sobrevarredura, escala do texto, consistência de foco e hover entre Desktop, Console e menu.
+- [ ] **UI-009 (P1) —** Primeira execução guiada: escolher a tela de jogo, testar, configurar o atalho. O tour (UI-013) mostra onde fica cada coisa; falta o passo a passo que faz junto com a pessoa.
+- [x] **UI-012 —** Uma interface só (D-23): a interface Desktop e a opção Interface saem; contador de FPS, argumentos do aplicativo personalizado, relatório de diagnóstico e versão passam para a aba Sistema. (1.7.0)
+- [x] **UI-013 —** Tour guiado na primeira abertura da interface: 9 paradas com recorte no que cada uma explica (abas, iniciadores, jogar, telas, ajustes rápidos, Sistema, atalhos do controle), A avança e B pula; de novo em Sistema → App → Tutorial. (1.7.0)
+- [x] **UI-014 —** A aba Sistema mostra, embaixo da lista, o que faz a linha em foco: as descrições que a interface Desktop tinha. (1.7.0)
+- [ ] **UI-010 (P2) —** Acessibilidade: leitor de tela, alto contraste na interface Console, tamanho do texto, redução de animações própria.
+- [ ] **UI-011 (P2) —** Polimento contínuo: legibilidade em TV com sobrevarredura, escala do texto, consistência de foco e hover entre a interface e o menu.
 
 ### Épico MENU — Menu da sessão
 

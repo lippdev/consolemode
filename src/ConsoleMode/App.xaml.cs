@@ -175,7 +175,6 @@ public partial class App : Application
         };
         _menuChord.Held += () => ViewModel?.ToggleSessionMenu();
         ViewModel.PropertyChanged += OnViewModelChangedForGuide;
-        ViewModel.ShortcutOnboardingRequested += () => _ = ShowShortcutOnboardingAsync();
         RefreshGuideWatch();
 
         // Issue #29: a pad connecting while we're in the tray means "I'm on the couch".
@@ -215,27 +214,6 @@ public partial class App : Application
         // The menu also opens outside a session in this alpha (a preview, to try it without console mode).
         Apply(_menuChord, idle && _menuChord.Mask != 0);
         Apply(_exitChord, idle && _exitChord.Mask != 0 && ViewModel.IsConsoleActive);
-    }
-
-    private bool _onboardingOpen;
-
-    /// <summary>The first-run shortcuts setup (nothing is set until the user chooses).</summary>
-    private async Task ShowShortcutOnboardingAsync()
-    {
-        if (_onboardingOpen || _window?.Content?.XamlRoot is not { } root || ViewModel is null) return;
-        _onboardingOpen = true;
-        try
-        {
-            await Controls.ShortcutPicker.ShowOnboardingAsync(root, ViewModel);
-        }
-        catch (Exception ex)
-        {
-            AppLog.Write($"Atalhos: {ex.Message}");
-        }
-        finally
-        {
-            _onboardingOpen = false;
-        }
     }
 
     private static void Apply(ControllerHoldWatcher watcher, bool run)

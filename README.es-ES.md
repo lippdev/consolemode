@@ -18,7 +18,7 @@ Descarga la última versión estable desde **[la página de releases](https://gi
 - **`ConsoleMode-Portable-x64.exe`**: un solo exe que guarda sus datos a su lado.
 - O con winget: `winget install lippdev.ConsoleMode`
 
-¿Quieres probar lo que viene antes que nadie? Activa Ajustes → "Recibir versiones de prueba (alfa y beta)".
+¿Quieres probar lo que viene antes que nadie? Activa Sistema → Aplicación → "Recibir versiones de prueba (alfa y beta)".
 
 Windows 10 u 11, más [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) o la aplicación Xbox. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) es opcional, para el límite de FPS y el contador de FPS.
 
@@ -30,7 +30,7 @@ Windows 10 u 11, más [Steam](https://store.steampowered.com/) (Big Picture), [P
 
 ¿Prefieres el sofá? Con la aplicación en la bandeja, mantén pulsado tu atajo del mando y empieza desde ahí.
 
-Los atajos del mando los eliges tú: al principio no hay ninguno activado, la aplicación te pregunta la primera vez que la abres (y puedes cambiarlos en Ajustes). Un mismo botón no puede servir para dos acciones.
+Los atajos del mando los eliges tú: al principio no hay ninguno activado, el recorrido de la primera vez te enseña dónde elegirlos (Sistema → Mando). Un mismo botón no puede servir para dos acciones.
 
 | Atajo del mando | Qué hace | Sugerido |
 |---|---|---|
@@ -47,7 +47,7 @@ Los atajos del mando los eliges tú: al principio no hay ninguno activado, la ap
 - [Enciende la TV y la cambia a la entrada del PC](docs/GUIDE.es-ES.md#control-de-la-tv) (Google TV / Android TV por la red), y puede ponerla en reposo después
 - Abre **Steam Big Picture**, **Playnite a pantalla completa** o el **modo Xbox**, y envía Steam a la bandeja al volver al PC
 - **Menú de la sesión** sobre el juego: cambia o cierra las ventanas abiertas, ajusta volumen, resolución, audio, FPS y HDR, oculta el puntero del ratón o muévelo con el mando, y explora tus archivos con [ControlFS](https://github.com/nextestudios/ControlFS) y la web con [JoyChromium](https://github.com/lippdev/joychromium)
-- Dos interfaces: **Escritorio** (ratón) y **Consola** (pantalla completa, mandos de Xbox y PlayStation, pestañas con LB/RB, un fondo de pantalla propio o tus portadas de Steam de fondo)
+- Una interfaz al estilo de las consolas, hecha para la TV, que también funciona con ratón y teclado (pantalla completa, mandos de Xbox y PlayStation, pestañas con LB/RB, un fondo de pantalla propio o tus portadas de Steam de fondo), con un recorrido guiado la primera vez que la abres
 - Automatización con los enlaces `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) y una [API de control local](docs/GUIDE.es-ES.md#api-de-control-local)
 - Inglés, portugués, español, alemán, francés y ruso
 

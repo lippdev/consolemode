@@ -18,7 +18,7 @@ Récupérez la dernière version stable sur **[la page des versions](https://git
 - **`ConsoleMode-Portable-x64.exe`** : un seul exe qui garde ses données à côté de lui.
 - Ou avec winget : `winget install lippdev.ConsoleMode`
 
-Envie d'essayer la suite avant tout le monde ? Activez Paramètres → « Recevoir les versions de test (alpha et bêta) ».
+Envie d'essayer la suite avant tout le monde ? Activez Système → Application → « Recevoir les versions de test (alpha et bêta) ».
 
 Windows 10 ou 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) ou l'application Xbox. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) est facultatif, pour la limite de FPS et le compteur de FPS.
 
@@ -30,7 +30,7 @@ Windows 10 ou 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [
 
 Plutôt canapé ? Avec l'application dans la zone de notification, maintenez votre raccourci manette et elle démarre depuis là.
 
-C'est vous qui choisissez les raccourcis manette : aucun n'est actif au départ, l'application vous les demande à la première ouverture (et vous pouvez les modifier dans les Paramètres). Un même bouton ne peut pas servir à deux actions.
+C'est vous qui choisissez les raccourcis manette : aucun n'est actif au départ, la visite de la première ouverture montre où les choisir (Système → Manette). Un même bouton ne peut pas servir à deux actions.
 
 | Raccourci manette | Action | Suggestion |
 |---|---|---|
@@ -47,7 +47,7 @@ C'est vous qui choisissez les raccourcis manette : aucun n'est actif au départ,
 - [Allume la TV et la bascule sur l'entrée du PC](docs/GUIDE.fr-FR.md#contrôle-de-la-tv) (Google TV / Android TV par le réseau), et peut la mettre en veille ensuite
 - Lance **Steam Big Picture**, **Playnite en plein écran** ou le mode **Xbox**, et réduit Steam dans la zone de notification quand vous revenez au PC
 - **Menu de session** par-dessus le jeu : changer de fenêtre ou fermer les fenêtres ouvertes, régler le volume, la résolution, le son, les FPS et le HDR, masquer le pointeur de la souris ou le piloter à la manette, et parcourir vos fichiers avec [ControlFS](https://github.com/nextestudios/ControlFS) et le Web avec [JoyChromium](https://github.com/lippdev/joychromium)
-- Deux interfaces : **Bureau** (souris) et **Console** (plein écran, manettes Xbox et PlayStation, onglets sur LB/RB, un fond d’écran maison ou vos jaquettes Steam en fond)
+- Une interface façon console, pensée pour la TV, qui marche aussi à la souris et au clavier (plein écran, manettes Xbox et PlayStation, onglets sur LB/RB, un fond d’écran maison ou vos jaquettes Steam en fond), avec une visite guidée à la première ouverture
 - Automatisation avec les liens `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) et une [API de contrôle local](docs/GUIDE.fr-FR.md#api-de-contrôle-local)
 - Anglais, portugais, espagnol, allemand, français et russe
 

@@ -20,7 +20,7 @@ Get **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**, the
 
 On 1.5? The app offers the update and keeps your settings; you pick your controller shortcuts again the first time it opens.
 
-Want to try what comes next before everyone else? Turn on Settings → "Receive test versions (alpha and beta)".
+Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (alpha and beta)".
 
 Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) or the Xbox app. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) is optional, for the FPS limit and the FPS counter.
 
@@ -32,7 +32,7 @@ Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [
 
 Prefer the couch? With the app in the tray, hold your controller shortcut and it starts from there.
 
-You pick the controller shortcuts yourself: none is on at first, the app asks the first time you open it (and you can change them in Settings). No button can serve two actions.
+You pick the controller shortcuts yourself: none is on at first, the tour the app opens with shows where to set them (System → Controller). No button can serve two actions.
 
 | Controller shortcut | Does | Suggested |
 |---|---|---|
@@ -49,7 +49,7 @@ You pick the controller shortcuts yourself: none is on at first, the app asks th
 - [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can put it in standby afterwards
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode, and sends Steam to the tray when you go back to the PC
 - **Session menu** over the game: switch or close the open windows, change volume, resolution, audio, FPS and HDR, hide the mouse pointer or drive it with the controller, and browse your files with [ControlFS](https://github.com/nextestudios/ControlFS) and the web with [JoyChromium](https://github.com/lippdev/joychromium)
-- Two interfaces: **Desktop** (mouse) and **Console** (full screen, Xbox and PlayStation pads, LB/RB tabs, its own wallpaper or your Steam covers as the background)
+- A console-style interface made for the TV that also works with the mouse and the keyboard (full screen, Xbox and PlayStation pads, LB/RB tabs, its own wallpaper or your Steam covers as the background), with a guided tour the first time you open it
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese, Spanish, German, French and Russian
 
@@ -84,7 +84,7 @@ All the details in the [release notes](https://github.com/lippdev/consolemode/re
 ## More
 
 - [Guide](docs/GUIDE.md): modes and restore, control API, HDR/VRR/FPS, troubleshooting, building from source
-- **Feedback:** the button next to Settings in the app, or [this form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). A ⭐ helps other couch gamers find the project.
+- **Feedback:** System → Shortcut, help, and data → Send feedback in the app, or [this form](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml). A ⭐ helps other couch gamers find the project.
 - **Translations:** fix a line or add your language with the [translation guide](docs/TRANSLATING.md); no Windows needed.
 - The releases are not code-signed yet, so Windows SmartScreen or an antivirus may warn about the download; the source is all here.
 

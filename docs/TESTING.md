@@ -4,6 +4,8 @@ Tudo aqui precisa de hardware ou de olho humano e **não é coberto pelos testes
 
 Como testar em build de desenvolvimento: `dotnet build src/ConsoleMode -c Debug -r win-x64` e rode `src/ConsoleMode/bin/Debug/net8.0-windows10.0.19041.0/win-x64/ConsoleMode.exe`. Os dados ficam em `ConsoleMode_Data` ao lado do exe (`config.json`, `consolemode.log`).
 
+> **Desde a 1.7.0 o app só tem a interface Console.** Itens antigos deste roteiro que falam da interface Desktop, de "Ajustes" ou do "modo PC" valem para a aba **Sistema** (ou não se aplicam mais, como o botão "Modo desktop" e a opção Interface). O roteiro da interface única e do tour está em "Interface única e tour guiado", no fim.
+
 ## 0. Atalhos do controle configuráveis e primeira configuração
 
 Pré-condições: config sem `shortcutsOnboardingDone` (instalação nova, ou apague a chave/`config.json`); controle Xbox e, se tiver, um PlayStation. Nenhum atalho vem ligado.
@@ -626,5 +628,31 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 
 - [ ] Interface Console: nenhuma faixa cinza no topo; o fundo (Aurora, capas ou imagem) vai até a borda da janela, e minimizar, maximizar e fechar aparecem brancos, com realce suave ao passar o mouse e mais forte ao clicar. Resultado: ______
 - [ ] Interface Console: arrastar a janela pela área de cima (fora das abas e dos botões) funciona; as abas, o relógio e os botões redondos continuam clicáveis. Resultado: ______
-- [ ] Interface Desktop: ícone e "Console Mode" à esquerda, botões de janela altos; em Ajustes, o botão de voltar aparece e funciona. Tema claro e escuro do Windows: os botões seguem o tema. Resultado: ______
-- [ ] Trocar entre Desktop e Console (botão ou Y): a barra muda junto, sem sobrar faixa nem botões brancos no tema claro. Resultado: ______
+
+## Interface única e tour guiado (1.7.0)
+
+Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.
+
+### Uma interface só
+
+- [ ] O app abre maximizado, direto na interface Console, com e sem controle conectado; não há mais o botão "Modo desktop" no topo nem a opção Interface em Sistema → App. Resultado: ______
+- [ ] Restaurar a janela (botão do meio) deixa ela no tamanho antigo e tudo continua utilizável; maximizar volta. Resultado: ______
+- [ ] Iniciado escondido (Iniciar com o Windows, `--start`, um controle conectando com o app na bandeja): a janela não aparece sozinha; ao abri-la pela bandeja, ela maximiza. Resultado: ______
+- [ ] Só com mouse e teclado: clicar nas abas, Page Up / Page Down, setas, Enter e Esc navegam em tudo (Início, Sessão, Sistema, listas de opções, editor de atalhos). Resultado: ______
+- [ ] Um `config.json` antigo com `"uiMode": "desktop"` abre normalmente na interface Console; a chave some na próxima gravação. Resultado: ______
+- [ ] Sistema → Extras opcionais, contador de FPS: estilo, tamanho, posição, cor, cartão, itens do jogo e do PC e "uma linha" mudam o contador na sessão; sem RTSS a linha do estilo fica desabilitada, e tamanho/posição/cor só valem com um estilo que desenha, os itens só no estilo personalizado. Resultado: ______
+- [ ] Sistema → Ao entrar no modo console, com Aplicativo personalizado: "Argumentos" e "Processo a acompanhar" aceitam texto (o teclado na tela não é necessário para o resto) e ficam salvos ao reabrir. Resultado: ______
+- [ ] Sistema → Atalho, ajuda e dados: "Diagnóstico → Copiar relatório" põe o relatório na área de transferência e mostra o aviso; a versão do app aparece no fim da lista. Resultado: ______
+- [ ] Sistema: com o foco numa linha, a descrição dela aparece embaixo da lista (até 3 linhas); no trilho das categorias, some. Em alemão, francês e russo o texto não estoura. Resultado: ______
+
+### Tour guiado
+
+- [ ] Primeira abertura: o tour abre sozinho em "Bem-vindo ao Console Mode", 1 de 9, com o cartão no meio da tela e o fundo escurecido. Resultado: ______
+- [ ] Cada parada troca para a aba certa e o recorte (com contorno na cor de destaque) envolve: as abas; a fileira de iniciadores; Jogar agora e o botão redondo; as telas (Sessão); os ajustes rápidos (Sessão, rolando se precisar); as categorias (Sistema); as três linhas de atalho (Sistema → Controle). Resultado: ______
+- [ ] O cartão nunca cobre o recorte nem sai da tela: em 1080p, em 4K com escala de 150% e com a janela restaurada (pequena). Redimensionar com o tour aberto reposiciona recorte e cartão. Resultado: ______
+- [ ] Controle: A avança, B pula, as setas andam entre Próximo / Voltar / Pular; LB/RB, Start e Y não fazem nada durante o tour (nenhuma sessão começa). Mouse: os três botões funcionam e clicar no fundo escuro não faz nada. Teclado: Enter avança, Esc pula. Resultado: ______
+- [ ] Os símbolos nos textos seguem o controle: LB/RB, A, ☰ e Y no Xbox; L1/R1, ✕, OPTIONS e △ no PlayStation (e mudam se trocar o layout em Sistema → Controle). Resultado: ______
+- [ ] "Começar" (última parada) ou "Pular tutorial" volta para o Início com o foco em Jogar agora e grava `consoleTourDone: true` (e `shortcutsOnboardingDone`); reabrir o app não mostra o tour de novo. Resultado: ______
+- [ ] Sistema → App → Tutorial abre o tour de novo, do começo. Resultado: ______
+- [ ] O app iniciado escondido mostra o tour só quando a janela é aberta pela bandeja; com uma sessão ativa, nunca. Resultado: ______
+- [ ] Alemão, francês e russo: título e texto do cartão quebram linha sem cortar; os botões cabem. Resultado: ______

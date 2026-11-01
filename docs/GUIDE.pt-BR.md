@@ -21,9 +21,11 @@ Se o app fechar ou o PC desligar no meio de uma sessão, na próxima vez que o C
 
 Também dá para restaurar a qualquer momento pela bandeja (*Restaurar setup* / *Mostrar janela*). Com cortinas pretas, **ESC** remove o overlay.
 
-No menu da sessão há duas saídas. **Voltar ao PC** encerra a sessão e devolve telas, resolução, HDR, áudio e limite de FPS ao que eram; o app continua na bandeja. **Sair do Console Mode** faz o mesmo e depois fecha o app, então os atalhos do controle param até você abri-lo de novo. Na primeira vez que o menu abre, ele oferece um tour que explica cada opção; para vê-lo depois, aperte **Y** (△ no PlayStation) ou **F1** no menu, ou use **Ajustes → Tour do menu da sessão**.
+No menu da sessão há duas saídas. **Voltar ao PC** encerra a sessão e devolve telas, resolução, HDR, áudio e limite de FPS ao que eram; o app continua na bandeja. **Sair do Console Mode** faz o mesmo e depois fecha o app, então os atalhos do controle param até você abri-lo de novo. Na primeira vez que o menu abre, ele oferece um tour que explica cada opção; para vê-lo depois, aperte **Y** (△ no PlayStation) ou **F1** no menu, ou use **Sistema → App → Tour do menu da sessão**.
 
-## Configurações no modo Console
+## A interface
+
+O Console Mode tem uma interface só, feita como a de um console: ocupa a tela toda e funciona com controle Xbox ou PlayStation, mouse ou teclado (clique numa aba ou use Page Up / Page Down; Enter e Esc fazem o papel de A e B). Na primeira vez que você abre, um tour guiado passa pelas abas, pelos iniciadores, pelo botão de jogar, pelas telas, pelos ajustes rápidos e pelos atalhos do controle; **A** avança e **B** pula. Para ver de novo: **Sistema → App → Tutorial**.
 
 O **Início** mostra os seus iniciadores numa fileira no topo (Steam Big Picture, Playnite, modo Xbox): **A** num deles escolhe o que abre, e **Jogar agora** logo abaixo começa. A linha embaixo do nome diz onde você vai jogar e o que muda (áudio, resolução, FPS, HDR, VRR); o botão redondo ao lado de Jogar agora abre a **Sessão**, com as telas e os ajustes rápidos.
 
@@ -31,7 +33,7 @@ A aba **Sistema** lista as categorias à esquerda (Tela de jogo, Ao entrar no mo
 
 Em **Sistema → Controle**, escolha o layout dos botões: **Automático**, **Xbox** ou **PlayStation**. A prévia e os nomes dos atalhos acompanham a escolha, que fica salva ao fechar o app. Isso muda os símbolos exibidos; as entradas do controle mantêm o mapeamento existente.
 
-A aba **Sistema** oferece os mesmos ajustes do modo PC, incluindo os atalhos do controle, Playnite, Android TV, FPS personalizado e pasta de dados. Os valores são compartilhados entre as duas interfaces e permanecem salvos ao reabrir o app.
+A aba **Sistema** reúne todos os ajustes, incluindo os atalhos do controle, Playnite, Android TV, FPS personalizado, o layout do contador de FPS, os argumentos do aplicativo personalizado, o relatório de diagnóstico e a pasta de dados. Os valores permanecem salvos ao reabrir o app.
 
 Abra a ação de atalho que deseja configurar, escolha **Definir** ou **Alterar**, segure a combinação desejada em um único controle e solte os botões. **Remover** desativa aquele atalho. Durante a captura, os botões não navegam pela interface; use **Cancelar** ou **Esc** para interrompê-la. Fora da captura, **B** volta do editor. Campos de endereço e FPS personalizado aceitam digitação por teclado.
 
@@ -43,7 +45,7 @@ Trocar a tela principal pode fazer o Windows embaralhar os ícones da área de t
 
 **Acordar o PC pelo controle** deixa o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo acordarem o PC da suspensão pelo botão central do controle. **Ativar** pede permissão de administrador ao Windows e marca *Permitir que este dispositivo ative o computador* nesses dispositivos. Não acorda o PC desligado ou em hibernação, e alguns PCs cortam a energia do Bluetooth ao suspender. Junto com **Entrar ao conectar um controle**, o PC já acorda no modo console.
 
-**Perfis por jogo** dão a cada jogo da Steam sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais para…**: o que a tela de jogo usa naquele momento fica salvo. Da próxima vez que esse jogo abrir durante uma sessão, o Console Mode aplica o perfil e, quando o jogo fecha, a tela volta a ser como era. O jogo é detectado pela Steam, seja ele aberto pelo Big Picture, pelo Playnite ou pelo app Xbox. Os perfis salvos ficam em Ajustes → **Perfis por jogo**, onde dá para apagá-los (na interface Console: Sistema → Ao entrar no modo console).
+**Perfis por jogo** dão a cada jogo da Steam sua própria resolução, HDR, limite de FPS e saída de áudio. Com o jogo rodando, abra o menu da sessão e escolha **Perfil do jogo → Salvar os ajustes atuais para…**: o que a tela de jogo usa naquele momento fica salvo. Da próxima vez que esse jogo abrir durante uma sessão, o Console Mode aplica o perfil e, quando o jogo fecha, a tela volta a ser como era. O jogo é detectado pela Steam, seja ele aberto pelo Big Picture, pelo Playnite ou pelo app Xbox. Os perfis salvos ficam em Sistema → Ao entrar no modo console → **Perfis por jogo**, onde dá para apagá-los.
 
 ## API de controle local
 
@@ -58,7 +60,7 @@ Os links `consolemode://` não dão resposta. Ferramentas que precisam de uma �
 
 ## Controle da TV
 
-Ajustes → **TV** pode ligar a TV e trocar para a entrada HDMI do PC quando o modo console começa e, se você quiser, colocá-la em espera depois que a mesa volta. Uma TV que não responde nunca trava o modo console: o app registra no log e espera a tela de jogo como sempre.
+Sistema → **TV** pode ligar a TV e trocar para a entrada HDMI do PC quando o modo console começa e, se você quiser, colocá-la em espera depois que a mesa volta. Uma TV que não responde nunca trava o modo console: o app registra no log e espera a tela de jogo como sempre.
 
 Com o padrão, **Não controlar**, nada é enviado e nada é acrescentado ao iniciar nem ao restaurar. Com um caminho escolhido, a etapa da TV roda primeiro quando o modo console começa e tem limite de **30 segundos** (o pior caso, quando a TV não responde e o Wake-on-LAN é tentado); a espera opcional ao restaurar tem limite de **15 segundos**. Uma TV que já está ligada costuma responder em um ou dois segundos.
 
@@ -112,7 +114,7 @@ Confira se a saída de destino está conectada e disponível no Windows antes de
 
 ### O controle aparece mas não faz nada (DualSense / DualShock)
 
-Abra **Ajustes → Testar controle**: ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
+Abra **Sistema → Atalho, ajuda e dados → Testar controle**: ele mostra ao vivo o que o Windows entrega de cada controle. Se a leitura fica vazia enquanto você aperta botões, quase sempre é o Steam capturando o controle (Steam aberto com suporte a PlayStation no Steam Input vira teclado/mouse no desktop). Feche o Steam, ou desligue o suporte a PlayStation no Steam Input, e teste de novo. Se continuar vazio, use **Copiar diagnóstico** e cole no formulário de feedback.
 
 ### HDR ou VRR não mudaram
 

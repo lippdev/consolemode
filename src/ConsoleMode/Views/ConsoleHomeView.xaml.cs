@@ -7,6 +7,8 @@ using ConsoleMode.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Windows.Foundation;
 using Windows.System;
 
 namespace ConsoleMode.Views;
@@ -42,7 +44,14 @@ public sealed partial class ConsoleHomeView : UserControl
         Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); };
         Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
         // System tab: remember the option in use, so closing a picker lands back on it.
-        SettingsRows.GotFocus += (_, e) => { if (e.OriginalSource is Control row) _lastSettingsRow = row; };
+        SettingsRows.GotFocus += (_, e) =>
+        {
+            if (e.OriginalSource is not Control row) return;
+            _lastSettingsRow = row;
+            // What the row does, under the list: the descriptions the settings always had.
+            RowHelp.Text = Microsoft.UI.Xaml.Automation.AutomationProperties.GetHelpText(row);
+        };
+        CategoryRail.GotFocus += (_, _) => RowHelp.Text = "";
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // Mouse clicks on buttons sound like a confirm (the pad has its own sounds in the navigator).
@@ -76,8 +85,8 @@ public sealed partial class ConsoleHomeView : UserControl
             App.MainWindowInstance is { } w ? WinRT.Interop.WindowNative.GetWindowHandle(w) : 0,
             readSonyHid: true);
         _navigator.SearchRoot = () =>
-            ViewModel.IsControllerTestOpen ? ControllerTestPanel
-            : ViewModel.IsConsoleTutorialOpen ? ConsoleTutorialPanel
+            ViewModel.IsConsoleTourOpen ? ConsoleTourPanel
+            : ViewModel.IsControllerTestOpen ? ControllerTestPanel
             : ViewModel.IsShortcutEditorOpen ? ShortcutEditorPanel
             : ViewModel.IsPickerOpen ? PickerPanel
             : ViewModel.IsConsoleSettingsOpen ? SettingsPanel
@@ -94,13 +103,13 @@ public sealed partial class ConsoleHomeView : UserControl
         _navigator.MenuRequested += () =>
         {
             if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen
-                && !ViewModel.IsPickerOpen && !ViewModel.IsShortcutEditorOpen && !ViewModel.IsConsoleTutorialOpen
+                && !ViewModel.IsPickerOpen && !ViewModel.IsShortcutEditorOpen && !ViewModel.IsConsoleTourOpen
                 && !ViewModel.IsControllerTestOpen && !ViewModel.IsUpdateOpen)
                 ViewModel.StartCommand.Execute(null);
         };
         _navigator.AltRequested += () =>
         {
-            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTutorialOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen) return;
+            if (ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTourOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen) return;
             if (ViewModel.IsConsoleSettingsOpen) ViewModel.CloseConsoleSettingsCommand.Execute(null);
             else ViewModel.OpenFullSettingsCommand.Execute(null);
         };
@@ -119,7 +128,6 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         switch (e.PropertyName)
         {
-            case nameof(MainViewModel.IsConsoleUi):
             case nameof(MainViewModel.IsConsoleActive):
                 RefreshNavigator();
                 DispatcherQueue.TryEnqueue(FocusDefault);
@@ -169,12 +177,12 @@ public sealed partial class ConsoleHomeView : UserControl
                     RefreshNavigator();
                 });
                 break;
-            case nameof(MainViewModel.IsConsoleTutorialOpen):
-                DispatcherQueue.TryEnqueue(() =>
-                {
-                    if (ViewModel.IsConsoleTutorialOpen) ConsoleTutorialNextButton.Focus(FocusState.Keyboard);
-                    else FocusDefault();
-                });
+            case nameof(MainViewModel.IsConsoleTourOpen):
+                if (!ViewModel.IsConsoleTourOpen) DispatcherQueue.TryEnqueue(FocusDefault);
+                break;
+            case nameof(MainViewModel.ConsoleTourIndex):
+                // After the tab switch (queued by ConsoleTabIndex) has laid the new page out.
+                DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, ShowTourStop);
                 break;
             case MainViewModel.ShortcutsProperty:
                 RefreshNavigator();
@@ -201,24 +209,22 @@ public sealed partial class ConsoleHomeView : UserControl
     }
 
     /// <summary>
-    /// Only listen while this interface is showing and the window is in front: A pressed inside
-    /// Big Picture must not click something in a hidden window. (XInput reads without focus.)
+    /// Only listen while the window is in front: A pressed inside Big Picture must not click something
+    /// in a hidden window. (XInput reads without focus.)
     /// </summary>
     private void RefreshNavigator()
     {
         if (_navigator is null) return;
-        // Not Visibility: this runs from the IsConsoleUi change, before the binding has updated it.
-        var listen = ViewModel.IsConsoleUi && _windowActive;
+        var listen = _windowActive;
         if (listen && !_navigator.IsRunning) _navigator.Start();
         else if (!listen && _navigator.IsRunning) _navigator.Stop();
     }
 
     private void FocusDefault()
     {
-        if (!ViewModel.IsConsoleUi) return;
         if (ViewModel.IsConsoleActive) { RestoreButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsUpdateOpen) { UpdateNowButton.Focus(FocusState.Keyboard); return; }
-        if (ViewModel.IsConsoleTutorialOpen) { ConsoleTutorialNextButton.Focus(FocusState.Keyboard); return; }
+        if (ViewModel.IsConsoleTourOpen) { ConsoleTourNextButton.Focus(FocusState.Keyboard); return; }
         if (ViewModel.IsShortcutEditorOpen) { FocusShortcutEditorTarget(); return; }
         if (ViewModel.IsSystemTab) { FocusSystemCategory(); return; }
         if (ViewModel.IsSessionTab) { (FocusManager.FindFirstFocusableElement(ScreenCards) as Control)?.Focus(FocusState.Keyboard); return; }
@@ -289,7 +295,7 @@ public sealed partial class ConsoleHomeView : UserControl
     /// <summary>LB / RB: the previous / next tab, unless a panel is open over the page.</summary>
     private void StepTab(int step)
     {
-        if (ViewModel.IsConsoleActive || ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTutorialOpen || ViewModel.IsControllerTestOpen) return;
+        if (ViewModel.IsConsoleActive || ViewModel.IsRolePanelOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen || ViewModel.IsConsoleTourOpen || ViewModel.IsControllerTestOpen) return;
         if (ViewModel.StepConsoleTab(step)) UiSounds.Play(UiSound.Tab);
     }
 
@@ -298,7 +304,7 @@ public sealed partial class ConsoleHomeView : UserControl
         if (ViewModel.IsControllerTestOpen) ViewModel.CloseControllerTestCommand.Execute(null);
         else if (ViewModel.IsPickerOpen) ViewModel.ClosePickerCommand.Execute(null);
         else if (ViewModel.IsShortcutEditorOpen) ViewModel.CloseShortcutEditorCommand.Execute(null);
-        else if (ViewModel.IsConsoleTutorialOpen) ViewModel.EndTourCommand.Execute(null);
+        else if (ViewModel.IsConsoleTourOpen) ViewModel.EndTourCommand.Execute(null);
         else if (ViewModel.IsRolePanelOpen) ViewModel.CloseRolePanelCommand.Execute(null);
         else if (ViewModel.IsSystemTab && IsFocusInside(SettingsRows)) FocusSystemCategory();
         else if (!ViewModel.IsHomeTab) ViewModel.SelectConsoleTabCommand.Execute("0");
@@ -329,7 +335,7 @@ public sealed partial class ConsoleHomeView : UserControl
             "exit" => ExitShortcutRow,
             _ => null
         };
-        if (ViewModel.IsConsoleUi && ViewModel.IsSystemTab && row?.Focus(FocusState.Keyboard) == true) return;
+        if (ViewModel.IsSystemTab && row?.Focus(FocusState.Keyboard) == true) return;
         FocusDefault();
     }
 
@@ -347,7 +353,184 @@ public sealed partial class ConsoleHomeView : UserControl
         _ => SystemSection7
     };
 
-    private void FocusSystemCategory() => CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
+    private void FocusSystemCategory()
+    {
+        // The tour opens the System tab under itself: the focus stays on its card.
+        if (ViewModel.IsConsoleTourOpen) { ConsoleTourNextButton.Focus(FocusState.Keyboard); return; }
+        CategoryButton(ViewModel.SystemCategory).Focus(FocusState.Keyboard);
+    }
+
+    // ───────────── First-run tour ─────────────
+
+    private const double TourHolePadding = 14;
+    private const double TourEdge = 40;
+    private const double TourGap = 28;
+
+    /// <summary>The part of the screen a tour stop is about, or null for the stops that only talk.</summary>
+    private Rect? TourTarget(ConsoleTourStop stop)
+    {
+        FrameworkElement[] parts = stop switch
+        {
+            ConsoleTourStop.Tabs => [TabBar],
+            ConsoleTourStop.Launchers => [LaunchRow],
+            ConsoleTourStop.Play => [PlayRow],
+            ConsoleTourStop.Screens => [ScreenCards],
+            ConsoleTourStop.QuickSettings => [QuickCards],
+            ConsoleTourStop.System => [CategoryRail],
+            ConsoleTourStop.Shortcuts => [HomeShortcutRow, ExitShortcutRow],
+            _ => []
+        };
+        Rect? area = null;
+        foreach (var part in parts)
+        {
+            if (part.ActualWidth <= 0 || part.ActualHeight <= 0) continue;
+            var bounds = part.TransformToVisual(ConsoleTourPanel).TransformBounds(new Rect(0, 0, part.ActualWidth, part.ActualHeight));
+            if (area is { } union) { union.Union(bounds); area = union; }
+            else area = bounds;
+        }
+        return area;
+    }
+
+    /// <summary>A stop came up: the page under it is laid out, so draw the hole and place the card, then focus Next.</summary>
+    private void ShowTourStop()
+    {
+        if (!ViewModel.IsConsoleTourOpen) return;
+        if (TourTargetElement(ViewModel.ConsoleTourStopNow) is { } part)
+        {
+            // The quick settings sit low on the Session page: scroll them in before measuring.
+            part.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false });
+        }
+        TabPanel(ViewModel.ConsoleTabIndex).UpdateLayout();
+        ConsoleTourPanel.UpdateLayout();
+        PlaceTour();
+        FadeInTourCard();
+        ConsoleTourNextButton.Focus(FocusState.Keyboard);
+    }
+
+    private FrameworkElement? TourTargetElement(ConsoleTourStop stop) => stop switch
+    {
+        ConsoleTourStop.QuickSettings => QuickCards,
+        ConsoleTourStop.Screens => ScreenCards,
+        ConsoleTourStop.Shortcuts => HomeShortcutRow,
+        _ => null
+    };
+
+    private void OnTourPanelSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (ViewModel.IsConsoleTourOpen) PlaceTour();
+    }
+
+    /// <summary>The veil with its hole, the ring around the hole and the card beside it (below, above, beside or centred).</summary>
+    private void PlaceTour()
+    {
+        var width = ConsoleTourPanel.ActualWidth;
+        var height = ConsoleTourPanel.ActualHeight;
+        if (width <= 0 || height <= 0) return;
+
+        var stop = ViewModel.ConsoleTourStopNow;
+        var target = ConsoleTour.IsCentered(stop) ? null : TourTarget(stop);
+        Rect? hole = null;
+        if (target is { } t)
+        {
+            var left = Math.Max(t.X - TourHolePadding, 8);
+            var top = Math.Max(t.Y - TourHolePadding, 8);
+            var right = Math.Min(t.X + t.Width + TourHolePadding, width - 8);
+            var bottom = Math.Min(t.Y + t.Height + TourHolePadding, height - 8);
+            if (right > left && bottom > top) hole = new Rect(left, top, right - left, bottom - top);
+        }
+
+        var veil = new GeometryGroup { FillRule = FillRule.EvenOdd };
+        veil.Children.Add(new RectangleGeometry { Rect = new Rect(0, 0, width, height) });
+        if (hole is { } h)
+        {
+            veil.Children.Add(RoundedRectangle(h, 20));
+            TourRing.Margin = new Thickness(h.X, h.Y, 0, 0);
+            TourRing.Width = h.Width;
+            TourRing.Height = h.Height;
+            TourRing.Visibility = Visibility.Visible;
+        }
+        else TourRing.Visibility = Visibility.Collapsed;
+        TourVeil.Data = veil;
+
+        var cardWidth = Math.Min(600, width - 2 * TourEdge);
+        TourCard.Width = cardWidth;
+        TourCard.Measure(new Size(cardWidth, double.PositiveInfinity));
+        // DesiredSize counts the margin, which is where the card was put last time.
+        var cardHeight = TourCard.DesiredSize.Height - TourCard.Margin.Top - TourCard.Margin.Bottom;
+        double x, y;
+        if (hole is not { } spot)
+        {
+            x = (width - cardWidth) / 2;
+            y = (height - cardHeight) / 2;
+        }
+        else if (spot.Bottom + TourGap + cardHeight <= height - TourEdge)
+        {
+            x = spot.X;
+            y = spot.Bottom + TourGap;
+        }
+        else if (spot.Y - TourGap - cardHeight >= TourEdge)
+        {
+            x = spot.X;
+            y = spot.Y - TourGap - cardHeight;
+        }
+        else if (spot.Right + TourGap + cardWidth <= width - TourEdge)
+        {
+            x = spot.Right + TourGap;
+            y = spot.Y;
+        }
+        else if (spot.X - TourGap - cardWidth >= TourEdge)
+        {
+            x = spot.X - TourGap - cardWidth;
+            y = spot.Y;
+        }
+        else
+        {
+            x = (width - cardWidth) / 2;
+            y = height - TourEdge - cardHeight;
+        }
+        x = Math.Clamp(x, TourEdge, Math.Max(TourEdge, width - cardWidth - TourEdge));
+        y = Math.Clamp(y, TourEdge, Math.Max(TourEdge, height - cardHeight - TourEdge));
+        TourCard.Margin = new Thickness(x, y, 0, 0);
+    }
+
+    private static PathGeometry RoundedRectangle(Rect r, double radius)
+    {
+        radius = Math.Min(radius, Math.Min(r.Width, r.Height) / 2);
+        var corner = new Size(radius, radius);
+        var figure = new PathFigure { StartPoint = new Point(r.X + radius, r.Y), IsClosed = true, IsFilled = true };
+        void Line(double px, double py) => figure.Segments.Add(new LineSegment { Point = new Point(px, py) });
+        void Arc(double px, double py) => figure.Segments.Add(new ArcSegment { Point = new Point(px, py), Size = corner, SweepDirection = SweepDirection.Clockwise });
+        Line(r.Right - radius, r.Y);
+        Arc(r.Right, r.Y + radius);
+        Line(r.Right, r.Bottom - radius);
+        Arc(r.Right - radius, r.Bottom);
+        Line(r.X + radius, r.Bottom);
+        Arc(r.X, r.Bottom - radius);
+        Line(r.X, r.Y + radius);
+        Arc(r.X + radius, r.Y);
+        var geometry = new PathGeometry();
+        geometry.Figures.Add(figure);
+        return geometry;
+    }
+
+    /// <summary>Each stop's card fades in where it lands. Skipped when Windows has animations turned off.</summary>
+    private void FadeInTourCard()
+    {
+        if (!Ui.AnimationsEnabled) return;
+        try
+        {
+            var visual = ElementCompositionPreview.GetElementVisual(TourCard);
+            var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
+            fade.InsertKeyFrame(0f, 0f);
+            fade.InsertKeyFrame(1f, 1f);
+            fade.Duration = TimeSpan.FromMilliseconds(220);
+            visual.StartAnimation("Opacity", fade);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write($"Tour: animação: {ex.Message}");
+        }
+    }
 
     /// <summary>Back to the option that was in use, else the first one of the category, else the category itself.</summary>
     private void FocusSystemRow()

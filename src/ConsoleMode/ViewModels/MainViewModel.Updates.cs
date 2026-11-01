@@ -172,7 +172,6 @@ public partial class MainViewModel
             UpdateMessage = FirstNoteLine(update.Notes) ?? LocalizationService.Get("NewVersionOnGithub");
             OnPropertyChanged(nameof(UpdateActionText));
             IsUpdateOpen = true;
-            if (manual) ShowPage(settings: false);
         }
         catch (Exception ex)
         {

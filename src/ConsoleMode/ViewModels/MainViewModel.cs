@@ -42,8 +42,6 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel() => LocalizationService.LanguageChanged += OnLanguageChanged;
 
-    [ObservableProperty] private bool _isHomePage = true;
-    [ObservableProperty] private bool _isSettingsPage;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _hasMonitors;
     [ObservableProperty] private bool _isConsoleActive;
@@ -135,14 +133,12 @@ public partial class MainViewModel : ObservableObject
         // Save the detected defaults so the tray/shortcut work right away.
         if (firstRun && HasMonitors) TrySave(BuildConfig());
         InitializeAppSettings();
-        ResolveUi();
+        DetectController();
         _ = RecheckControllerAsync();
         StartBatteryPolling();
         _ = RefreshBackgroundAsync();
         _ = RefreshControllerWakeAsync();
-        // The tour points at desktop controls; the console interface explains itself.
-        if (interactive && HasMonitors && !_loadedConfig.TourDone && !IsConsoleUi) StartTour();
-        else if (interactive) RequestShortcutOnboarding();
+        if (interactive) OfferConsoleTour();
         _ = CheckForUpdatesOnStartupAsync();
     }
 
@@ -155,7 +151,6 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(FocusModeDescription));
         OnPropertyChanged(nameof(InstallKindText));
         OnPropertyChanged(nameof(UpdateActionText));
-        OnPropertyChanged(nameof(TourMapText));
         if (IsConsoleActive) ActiveDescText = DescribeActive(_loadedConfig);
         if (IsStatusOpen) IsStatusOpen = false;
         BuildLocalizedOptions();
@@ -208,7 +203,7 @@ public partial class MainViewModel : ObservableObject
 
             BuildFpsOverlayOptions();
             BuildAudioOptions(audioValue);
-            BuildUiModeOptions();
+            BuildControllerLayoutOptions();
             BuildTvOptions();
             FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
@@ -337,7 +332,6 @@ public partial class MainViewModel : ObservableObject
             ParkPointer = config.ParkPointer;
             LoadGameProfiles(config.GameProfiles);
             RefreshHomeButtonHint();
-            SelectedUiMode = UiModeOptions.FirstOrDefault(o => o.Value == config.UiMode) ?? UiModeOptions.FirstOrDefault();
             SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
 
             LoadFpsOverlay(config);
@@ -571,17 +565,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenSettings()
-    {
-        if (IsConsoleActive) return;
-        RefreshHomeButtonHint();
-        ShowPage(settings: true);
-    }
-
-    [RelayCommand]
-    private void GoHome() => ShowPage(settings: false);
-
-    [RelayCommand]
     private async Task RefreshAsync()
     {
         if (IsConsoleActive || IsLoading) return;
@@ -654,7 +637,6 @@ public partial class MainViewModel : ObservableObject
         _busy = true;
         IsStarting = true;
         IsStatusOpen = false;
-        TourStep = 0;
 
         // Safety net: a game screen/mode never seen working must be confirmed on the TV,
         // otherwise the desk screens come back by themselves.
@@ -667,7 +649,6 @@ public partial class MainViewModel : ObservableObject
             await Task.Run(() => Engine.Start(config, focus, confirm));
             Engine.State.SessionStartedAt = DateTime.Now;
             IsConsoleActive = true;
-            ShowPage(settings: false);
             ActiveDescText = DescribeActive(config);
             StartLoop();
             if (confirm is not null)
@@ -760,68 +741,6 @@ public partial class MainViewModel : ObservableObject
         SetStatus(LocalizationService.Get("ConfirmationResult",
                 LocalizationService.Get(confirmed ? "ConfirmationAccepted" : "ConfirmationWillRevert"), answerSource, family),
             confirmed ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
-    }
-
-    // ───────────── First-run tour ─────────────
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsTourMap), nameof(IsTourRole), nameof(IsTourPlay))]
-    private int _tourStep;
-
-    public bool IsTourMap => !IsConsoleUi && TourStep == 1;
-    public bool IsTourRole => !IsConsoleUi && TourStep == 2;
-    public bool IsTourPlay => !IsConsoleUi && TourStep == 3;
-
-    public string TourMapText => FocusRow is null
-        ? LocalizationService.Get("TourMapGeneric")
-        : LocalizationService.Get("TourMapWithFocus", FocusRow.Name);
-
-    [RelayCommand]
-    private void StartTour()
-    {
-        if (!HasMonitors || IsConsoleActive) return;
-        if (IsConsoleUi)
-        {
-            ConsoleTabIndex = HomeTabIndex;
-            IsConsoleTutorialOpen = true;
-            IsStatusOpen = false;
-            SelectedMonitor = FocusRow ?? SelectedMonitor;
-            OnPropertyChanged(nameof(TourMapText));
-            TourStep = 1;
-            return;
-        }
-        ShowPage(settings: false);
-        IsStatusOpen = false;
-        SelectedMonitor = FocusRow ?? SelectedMonitor;
-        OnPropertyChanged(nameof(TourMapText));
-        TourStep = 1;
-    }
-
-    [RelayCommand]
-    private void TourNext()
-    {
-        if (TourStep >= 3) EndTour();
-        else TourStep++;
-    }
-
-    /// <summary>"Pular tutorial" or the X; step changes close tips programmatically and are ignored.</summary>
-    public void OnTourTipClosed(TeachingTip sender, TeachingTipClosedEventArgs args)
-    {
-        if (args.Reason != TeachingTipCloseReason.Programmatic) EndTour();
-    }
-
-    [RelayCommand]
-    private void EndTour()
-    {
-        TourStep = 0;
-        IsConsoleTutorialOpen = false;
-        if (!_loadedConfig.TourDone)
-        {
-            var config = BuildConfig();
-            config.TourDone = true;
-            TrySave(config);
-        }
-        RequestShortcutOnboarding();
     }
 
     [RelayCommand]
@@ -945,7 +864,7 @@ public partial class MainViewModel : ObservableObject
             FpsOverlayLayout = ReadFpsOverlayLayout(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
-            TourDone = _loadedConfig.TourDone,
+            ConsoleTourDone = _loadedConfig.ConsoleTourDone,
             SessionMenuTourDone = _loadedConfig.SessionMenuTourDone,
             ConfirmedSetup = _loadedConfig.ConfirmedSetup,
             CheckUpdates = CheckUpdates,
@@ -964,7 +883,6 @@ public partial class MainViewModel : ObservableObject
             RestoreDesktopIcons = RestoreDesktopIcons,
             ParkPointer = ParkPointer,
             GameProfiles = [.. _gameProfiles],
-            UiMode = SelectedUiMode?.Value ?? _loadedConfig.UiMode,
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,
             Tv = BuildTvConfig()
@@ -1060,12 +978,6 @@ public partial class MainViewModel : ObservableObject
         CustomApp.Mode => LocalizationService.Get("ActiveCustomApp", LaunchService.GetCustomAppName(config.CustomAppPath)),
         _ => LocalizationService.Get("ActiveSteam")
     };
-
-    private void ShowPage(bool settings)
-    {
-        IsSettingsPage = settings;
-        IsHomePage = !settings;
-    }
 
     private void SetStatus(string text, InfoBarSeverity severity = InfoBarSeverity.Informational)
     {

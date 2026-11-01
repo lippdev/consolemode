@@ -38,13 +38,12 @@ public sealed class ShortcutPicker : StackPanel
     private readonly DispatcherQueueTimer _timer;
     private ShortcutCapture? _capture;
 
-    /// <param name="stacked">In the setup dialog: left-aligned under the text instead of a right-hand column.</param>
-    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool stacked = false, bool consoleStyle = false)
+    public ShortcutPicker(MainViewModel vm, ShortcutSlot slot, bool consoleStyle = false)
     {
         _vm = vm;
         _slot = slot;
         Spacing = 4;
-        var side = stacked || consoleStyle ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        var side = consoleStyle ? HorizontalAlignment.Left : HorizontalAlignment.Right;
         HorizontalAlignment = consoleStyle ? HorizontalAlignment.Stretch : side;
 
         if (consoleStyle)
@@ -170,63 +169,5 @@ public sealed class ShortcutPicker : StackPanel
         var error = _vm.TrySetShortcut(_slot, mask);
         _error.Text = error ?? "";
         _error.Visibility = error is null ? Visibility.Collapsed : Visibility.Visible;
-    }
-
-    /// <summary>
-    /// First run of the version that made shortcuts configurable: nothing is set, and the user
-    /// chooses each one here (or takes the suggestions), or skips and does it later in Settings.
-    /// </summary>
-    public static async Task ShowOnboardingAsync(XamlRoot root, MainViewModel vm)
-    {
-        var panel = new StackPanel { Spacing = 16 };
-        panel.Children.Add(new TextBlock
-        {
-            Text = LocalizationService.Get("ShortcutsOnboardingBody"),
-            TextWrapping = TextWrapping.Wrap
-        });
-
-        foreach (var (slot, descriptionKey) in new[]
-                 {
-                     (ShortcutSlot.Home, "HomeButtonDescription"),
-                     (ShortcutSlot.Menu, "SessionMenuDescription"),
-                     (ShortcutSlot.Exit, "ExitShortcutDescription")
-                 })
-        {
-            var text = new StackPanel { Spacing = 2 };
-            text.Children.Add(new TextBlock { Text = vm.ShortcutName(slot), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
-            text.Children.Add(new TextBlock
-            {
-                Text = LocalizationService.Get(descriptionKey),
-                TextWrapping = TextWrapping.Wrap,
-                FontSize = 12,
-                Opacity = 0.7
-            });
-            // Stacked: the dialog is narrow, a right-hand column would be clipped.
-            var row = new StackPanel { Spacing = 8 };
-            row.Children.Add(text);
-            row.Children.Add(new ShortcutPicker(vm, slot, stacked: true));
-            panel.Children.Add(row);
-        }
-
-        var suggest = new Button { Content = LocalizationService.Get("ShortcutsUseSuggested") };
-        suggest.Click += (_, _) => vm.UseSuggestedShortcuts();
-        panel.Children.Add(suggest);
-
-        var dialog = new ContentDialog
-        {
-            XamlRoot = root,
-            Title = LocalizationService.Get("ShortcutsOnboardingTitle"),
-            Content = new ScrollViewer { Content = panel },
-            CloseButtonText = LocalizationService.Get("ShortcutsOnboardingDone"),
-            DefaultButton = ContentDialogButton.Close
-        };
-        try
-        {
-            await dialog.ShowAsync();
-        }
-        finally
-        {
-            vm.CompleteShortcutOnboarding();
-        }
     }
 }

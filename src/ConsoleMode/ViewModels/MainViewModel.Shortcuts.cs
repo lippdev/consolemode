@@ -13,9 +13,6 @@ public partial class MainViewModel
     private readonly ushort[] _shortcuts = new ushort[ControllerShortcuts.Slots.Length];
     private int _shortcutCaptures;
 
-    /// <summary>The first-run setup asks the user to pick their shortcuts (desktop interface only).</summary>
-    public event Action? ShortcutOnboardingRequested;
-
     public ushort GetShortcut(ShortcutSlot slot) => _shortcuts[(int)slot];
 
     public bool HomeShortcutSet => _shortcuts[(int)ShortcutSlot.Home] != 0;
@@ -108,13 +105,6 @@ public partial class MainViewModel
         var config = BuildConfig();
         config.ShortcutsOnboardingDone = true;
         TrySave(config);
-    }
-
-    /// <summary>Asks the window to show the shortcuts setup, if it was never done and the desktop interface is up.</summary>
-    public void RequestShortcutOnboarding()
-    {
-        if (NeedsShortcutOnboarding && !IsConsoleUi && TourStep == 0)
-            ShortcutOnboardingRequested?.Invoke();
     }
 
     private void LoadShortcuts(AppConfig config)

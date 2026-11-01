@@ -18,7 +18,7 @@ Hol dir die neueste stabile Version unter **[Releases](https://github.com/lippde
 - **`ConsoleMode-Portable-x64.exe`**: eine einzelne EXE, die ihre Daten direkt daneben speichert.
 - Oder mit winget: `winget install lippdev.ConsoleMode`
 
-Du willst Neues vor allen anderen ausprobieren? Schalte unter Einstellungen „Testversionen erhalten (Alpha und Beta)“ ein.
+Du willst Neues vor allen anderen ausprobieren? Schalte unter System → App „Testversionen erhalten (Alpha und Beta)“ ein.
 
 Windows 10 oder 11, dazu [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) oder die Xbox-App. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) ist optional, für die FPS-Begrenzung und die FPS-Anzeige.
 
@@ -30,7 +30,7 @@ Windows 10 oder 11, dazu [Steam](https://store.steampowered.com/) (Big Picture),
 
 Lieber vom Sofa aus? Wenn die App im Infobereich läuft, halte deine Controller-Tastenkombination gedrückt und es geht von dort los.
 
-Die Controller-Tastenkombinationen wählst du selbst: Anfangs ist keine aktiv, die App fragt dich beim ersten Öffnen danach (und du kannst sie in den Einstellungen ändern). Keine Taste kann zwei Aktionen auslösen.
+Die Controller-Tastenkombinationen wählst du selbst: Anfangs ist keine aktiv, die Tour beim ersten Öffnen zeigt dir, wo du sie festlegst (System → Controller). Keine Taste kann zwei Aktionen auslösen.
 
 | Controller-Tastenkombination | Funktion | Vorschlag |
 |---|---|---|
@@ -47,7 +47,7 @@ Die Controller-Tastenkombinationen wählst du selbst: Anfangs ist keine aktiv, d
 - [Schaltet den Fernseher ein und wechselt auf den Eingang des PCs](docs/GUIDE.de-DE.md#fernsehersteuerung) (Google TV / Android TV über das Netzwerk) und kann ihn danach in den Standby versetzen
 - Startet **Steam Big Picture**, **Playnite im Vollbild** oder den **Xbox-Modus** und minimiert Steam in den Infobereich, wenn du zum PC zurückkehrst
 - **Sitzungsmenü** über dem Spiel: geöffnete Fenster wechseln oder schließen, Lautstärke, Auflösung, Audio, FPS und HDR ändern, den Mauszeiger ausblenden oder mit dem Controller steuern und deine Dateien mit [ControlFS](https://github.com/nextestudios/ControlFS) und das Web mit [JoyChromium](https://github.com/lippdev/joychromium) durchsuchen
-- Zwei Oberflächen: **Desktop** (Maus) und **Konsole** (Vollbild, Xbox- und PlayStation-Controller, Registerkarten mit LB/RB, ein eigenes Hintergrundbild oder deine Steam-Cover als Hintergrund)
+- Eine Oberfläche im Stil einer Konsole, gemacht für den Fernseher, die auch mit Maus und Tastatur funktioniert (Vollbild, Xbox- und PlayStation-Controller, Registerkarten mit LB/RB, ein eigenes Hintergrundbild oder deine Steam-Cover als Hintergrund), mit einer geführten Tour beim ersten Öffnen
 - Automatisierung mit den Links `consolemode://start` / `stop` / `menu` (Stream Deck, Skripte) und einer [lokalen Steuerungs-API](docs/GUIDE.de-DE.md#lokale-steuerungs-api)
 - Englisch, Portugiesisch, Spanisch, Deutsch, Französisch und Russisch
 

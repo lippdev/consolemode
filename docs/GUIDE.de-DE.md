@@ -17,13 +17,15 @@ Wird die App mitten in einer Sitzung geschlossen oder geht der PC aus, stellt Co
 
 Du kannst auch jederzeit über den Infobereich wiederherstellen (*Konfiguration wiederherstellen* / *Fenster anzeigen*). Bei schwarzen Bildschirmen blendest du die Abdeckungen mit **ESC** aus.
 
-Das Sitzungsmenü bietet zwei Wege hinaus. **Zurück zum PC** beendet die Sitzung und setzt Bildschirme, Auflösung, HDR, Ton und die FPS-Begrenzung auf den vorherigen Stand zurück; die App bleibt im Infobereich. **Console Mode beenden** macht dasselbe und schließt danach die App, sodass die Controller-Tastenkombinationen nicht mehr reagieren, bis du sie wieder öffnest. Beim ersten Öffnen bietet das Menü eine Führung an, die jede Option erklärt. Um sie später anzusehen, drücke im Menü **Y** (△ bei PlayStation) oder **F1**, oder verwende **Einstellungen → Führung durch das Sitzungsmenü**.
+Das Sitzungsmenü bietet zwei Wege hinaus. **Zurück zum PC** beendet die Sitzung und setzt Bildschirme, Auflösung, HDR, Ton und die FPS-Begrenzung auf den vorherigen Stand zurück; die App bleibt im Infobereich. **Console Mode beenden** macht dasselbe und schließt danach die App, sodass die Controller-Tastenkombinationen nicht mehr reagieren, bis du sie wieder öffnest. Beim ersten Öffnen bietet das Menü eine Führung an, die jede Option erklärt. Um sie später anzusehen, drücke im Menü **Y** (△ bei PlayStation) oder **F1**, oder verwende **System → App → Führung durch das Sitzungsmenü**.
 
-## Einstellungen im Konsolenmodus
+## Die Oberfläche
+
+Console Mode hat eine einzige Oberfläche, gestaltet wie die einer Konsole: Sie füllt den Bildschirm und funktioniert mit einem Xbox- oder PlayStation-Controller, der Maus oder der Tastatur (klicke auf eine Registerkarte oder nutze Bild auf / Bild ab; Eingabe und Esc wirken wie A und B). Beim ersten Öffnen führt dich eine Tour durch die Registerkarten, die Launcher, die Spielen-Schaltfläche, die Bildschirme, die Schnelleinstellungen und die Controller-Tastenkombinationen; **A** geht weiter, **B** überspringt sie. Um sie erneut zu sehen: **System → App → Tutorial**.
 
 Unter **System → Controller** wählst du das Tastenlayout: **Automatisch**, **Xbox** oder **PlayStation**. Vorschau und Tastenbeschriftungen richten sich nach dieser Wahl, die beim Schließen der App gespeichert wird. Das ändert nur die angezeigten Symbole; die Eingaben des Controllers behalten ihre bisherige Belegung.
 
-Die Registerkarte **System** bietet dieselben Einstellungen wie der Desktopmodus, darunter Controller-Tastenkombinationen, Playnite, Android TV, benutzerdefinierte FPS und den Datenordner. Beide Oberflächen teilen sich die gespeicherten Werte, die auch nach einem Neustart der App erhalten bleiben.
+Die Registerkarte **System** enthält alle Einstellungen, darunter Controller-Tastenkombinationen, Playnite, Android TV, benutzerdefinierte FPS, das Layout des FPS-Zählers, die Argumente der eigenen App, den Diagnosebericht und den Datenordner. Die Werte bleiben auch nach einem Neustart der App erhalten.
 
 Öffne die Aktion, deren Tastenkombination du einrichten willst, wähle **Festlegen** oder **Ändern**, halte die gewünschte Kombination auf einem Controller gedrückt und lass die Tasten los. **Entfernen** deaktiviert diese Tastenkombination. Während der Aufnahme navigieren die Controller-Tasten nicht durch die Oberfläche; mit **Abbrechen** oder **Esc** beendest du die Aufnahme. Außerhalb der Aufnahme verlässt du den Editor mit **B**. Die Felder für Adresse und benutzerdefinierte FPS nehmen Tastatureingaben an.
 
@@ -35,7 +37,7 @@ Ein Wechsel des Hauptbildschirms kann Windows dazu bringen, die Desktopsymbole n
 
 **PC mit dem Controller aufwecken** erlaubt dem Xbox Wireless Adapter, Bluetooth oder einem Controller am Kabel, den PC mit der mittleren Taste des Controllers aus dem Energiesparmodus zu wecken. **Einschalten** fragt Windows nach Administratorrechten und aktiviert bei diesen Geräten *Gerät kann den Computer aus dem Ruhezustand aktivieren*. Ein ausgeschalteter PC oder einer im Ruhezustand wacht nicht auf, und manche PCs schalten Bluetooth im Energiesparmodus ab. Zusammen mit **Beim Verbinden eines Controllers starten** wacht der PC direkt im Konsolenmodus auf.
 
-**Profile pro Spiel** geben jedem Steam-Spiel eine eigene Auflösung, HDR, ein FPS-Limit und eine Audioausgabe. Öffne bei laufendem Spiel das Sitzungsmenü und wähle **Spielprofil → Aktuelle Einstellungen für … speichern**: Gespeichert wird, was der Spielbildschirm in diesem Moment nutzt. Wenn das Spiel das nächste Mal während einer Sitzung startet, wendet Console Mode das Profil an, und beim Schließen kehrt der Bildschirm in den vorherigen Zustand zurück. Das Spiel wird über Steam erkannt, egal ob es aus Big Picture, Playnite oder der Xbox-App gestartet wurde. Die gespeicherten Profile stehen unter Einstellungen → **Profile pro Spiel** und lassen sich dort löschen (in der Konsolenoberfläche: System → Beim Starten des Konsolenmodus).
+**Profile pro Spiel** geben jedem Steam-Spiel eine eigene Auflösung, HDR, ein FPS-Limit und eine Audioausgabe. Öffne bei laufendem Spiel das Sitzungsmenü und wähle **Spielprofil → Aktuelle Einstellungen für … speichern**: Gespeichert wird, was der Spielbildschirm in diesem Moment nutzt. Wenn das Spiel das nächste Mal während einer Sitzung startet, wendet Console Mode das Profil an, und beim Schließen kehrt der Bildschirm in den vorherigen Zustand zurück. Das Spiel wird über Steam erkannt, egal ob es aus Big Picture, Playnite oder der Xbox-App gestartet wurde. Die gespeicherten Profile stehen unter System → Beim Starten des Konsolenmodus → **Profile pro Spiel** und lassen sich dort löschen.
 
 ## Lokale Steuerungs-API
 
@@ -50,7 +52,7 @@ Ein Wechsel des Hauptbildschirms kann Windows dazu bringen, die Desktopsymbole n
 
 ## Fernsehersteuerung
 
-Unter Einstellungen → **Fernseher** kann die App beim Start des Konsolenmodus den Fernseher einschalten und auf den HDMI-Eingang des PCs wechseln und ihn optional wieder in den Standby versetzen, nachdem der Schreibtisch wiederhergestellt ist. Ein Fernseher, der nicht antwortet, blockiert den Konsolenmodus nie: Die App protokolliert das und wartet wie gewohnt auf den Spielbildschirm.
+Unter System → **Fernseher** kann die App beim Start des Konsolenmodus den Fernseher einschalten und auf den HDMI-Eingang des PCs wechseln und ihn optional wieder in den Standby versetzen, nachdem der Schreibtisch wiederhergestellt ist. Ein Fernseher, der nicht antwortet, blockiert den Konsolenmodus nie: Die App protokolliert das und wartet wie gewohnt auf den Spielbildschirm.
 
 Mit der Voreinstellung **Nicht steuern** wird nichts gesendet und Start und Wiederherstellung dauern nicht länger. Ist ein Weg ausgewählt, läuft der Fernseher-Schritt beim Start des Konsolenmodus zuerst und ist auf **30 Sekunden** begrenzt (der schlimmste Fall, wenn der Fernseher nicht antwortet und Wake-on-LAN versucht wird); der optionale Standby bei der Wiederherstellung ist auf **15 Sekunden** begrenzt. Ein Fernseher, der schon an ist, antwortet meist in ein bis zwei Sekunden.
 
@@ -104,7 +106,7 @@ Prüfe vor dem Start des Konsolenmodus, ob der Zielausgang angeschlossen und in 
 
 ### Der Controller wird erkannt, tut aber nichts (DualSense / DualShock)
 
-Öffne **Einstellungen → Controller testen**: Dort siehst du live, was Windows von jedem Controller empfängt. Bleibt die Anzeige leer, während du Tasten drückst, fängt höchstwahrscheinlich Steam den Controller ab (läuft Steam mit PlayStation-Unterstützung in Steam Input, macht es ihn auf dem Desktop zu Tastatur/Maus). Schließe Steam oder schalte die PlayStation-Unterstützung in Steam Input aus und teste erneut. Zeigt die Anzeige immer noch nichts, verwende **Diagnosedaten kopieren** und füge sie in das Feedbackformular ein.
+Öffne **System → Tastenkombination, Hilfe und Daten → Controller testen**: Dort siehst du live, was Windows von jedem Controller empfängt. Bleibt die Anzeige leer, während du Tasten drückst, fängt höchstwahrscheinlich Steam den Controller ab (läuft Steam mit PlayStation-Unterstützung in Steam Input, macht es ihn auf dem Desktop zu Tastatur/Maus). Schließe Steam oder schalte die PlayStation-Unterstützung in Steam Input aus und teste erneut. Zeigt die Anzeige immer noch nichts, verwende **Diagnosedaten kopieren** und füge sie in das Feedbackformular ein.
 
 ### HDR oder VRR hat sich nicht geändert
 
