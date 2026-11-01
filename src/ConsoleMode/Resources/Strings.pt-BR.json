@@ -419,5 +419,12 @@
   "IntroAnimationCard": "Abertura ao abrir o app",
   "IntroAnimationDescription": "Mostra o logo do Console Mode chegando à tela enquanto o app abre.",
   "IntroSoundCard": "Som da abertura",
-  "IntroSoundDescription": "Toca um som de entrada junto com a abertura."
+  "IntroSoundDescription": "Toca um som de entrada junto com a abertura.",
+  "IntroStyleCard": "Estilo da abertura",
+  "IntroStyleDescription": "A abertura do próprio Console Mode ou uma inspirada no Xbox 360 ou no PS4, cada uma com o seu som.",
+  "IntroStyleConsole": "Console Mode",
+  "IntroStyleX360": "Inspirada no Xbox 360",
+  "IntroStylePs4": "Inspirada no PS4",
+  "IntroPreviewCard": "Ver a abertura",
+  "IntroPreviewDescription": "Mostra agora a abertura escolhida, com o som."
 }

@@ -886,6 +886,15 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.IntroSound), Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="introstyle" IsEnabled="{x:Bind ViewModel.IntroSoundRowEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroStyleDescription, Mode=OneWay}">
+                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroStyleCard, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedIntroStyle.Text, Mode=OneWay}"/>
+                                            </Grid>
+                                        </Button>
+                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.PreviewIntroCommand}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.IntroPreviewDescription, Mode=OneWay}">
+                                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.IntroPreviewCard, Mode=OneWay}"/>
+                                        </Button>
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="language" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.LanguageDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.LanguageCard, Mode=OneWay}"/>
@@ -1198,24 +1207,86 @@
              "Aproximação": the logo comes from close to the camera, big and blurred, and settles sharp in the middle, then
              the name; shown and faded out from code (ConsoleHomeView.ShowIntro / HideIntro), skipped by any press, click or key. -->
         <Grid x:Name="IntroPanel" Visibility="Collapsed" Margin="-56,-48,-56,-32" Background="#07090D" Tapped="OnIntroTapped">
-            <Ellipse Width="900" Height="900" Opacity="0.55" IsHitTestVisible="False">
-                <Ellipse.Fill>
-                    <RadialGradientBrush>
-                        <GradientStop Color="#552FD3A0" Offset="0"/>
-                        <GradientStop Color="#1A2F6FD3" Offset="0.45"/>
-                        <GradientStop Color="#0007090D" Offset="1"/>
-                    </RadialGradientBrush>
-                </Ellipse.Fill>
-            </Ellipse>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
-                <!-- The blurred copy is the sharp logo plus a 64 px margin of blur on each side (384 for 256) -->
-                <Grid x:Name="IntroLogoBox" Width="132" Height="132" HorizontalAlignment="Center">
-                    <Image x:Name="IntroLogoBlur" Source="ms-appx:///Assets/Intro/logo-blur.png" Width="198" Height="198" Margin="-33"/>
-                    <Image x:Name="IntroLogo" Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
-                </Grid>
-                <TextBlock x:Name="IntroName" Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10"
-                           HorizontalAlignment="Center"/>
-            </StackPanel>
+            <!-- Console Mode's own -->
+            <Grid x:Name="IntroConsole">
+                <Ellipse Width="900" Height="900" Opacity="0.55" IsHitTestVisible="False">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#552FD3A0" Offset="0"/>
+                            <GradientStop Color="#1A2F6FD3" Offset="0.45"/>
+                            <GradientStop Color="#0007090D" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+                    <!-- The blurred copy is the sharp logo plus a 64 px margin of blur on each side (384 for 256) -->
+                    <Grid x:Name="IntroLogoBox" Width="132" Height="132" HorizontalAlignment="Center">
+                        <Image x:Name="IntroLogoBlur" Source="ms-appx:///Assets/Intro/logo-blur.png" Width="198" Height="198" Margin="-33"/>
+                        <Image x:Name="IntroLogo" Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
+                    </Grid>
+                    <TextBlock x:Name="IntroName" Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- In the mood of the Xbox 360's: green and silver ribbons orbiting into an orb on a light background, a flash,
+                 the logo. Each ribbon is a dashed circle that turns inside a flattened frame (so its arcs orbit in
+                 perspective), inside a frame that shrinks to the orb. -->
+            <Grid x:Name="IntroX360" Visibility="Collapsed">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FFFFFFFF" Offset="0"/>
+                            <GradientStop Color="#FFE6EBE7" Offset="0.55"/>
+                            <GradientStop Color="#FFB9C2BD" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Grid x:Name="X360Ribbons"/>
+                <Ellipse x:Name="X360Orb" Width="240" Height="240">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FFFFFFFF" Offset="0"/>
+                            <GradientStop Color="#E6A0E65A" Offset="0.35"/>
+                            <GradientStop Color="#005CBE28" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <!-- Opacities that start at 0 are set from code: the Composition fades don't move a XAML Opacity -->
+                <Rectangle x:Name="X360Flash" Fill="White"/>
+                <StackPanel x:Name="X360Mark" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+                    <Image Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
+                    <TextBlock Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10" Foreground="#FF1F2A24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- In the mood of the PS4's: a deep blue with waves of light drifting across and particles rising, the logo
+                 coming up in the light. -->
+            <Grid x:Name="IntroPs4" Visibility="Collapsed">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF0A3A9E" Offset="0"/>
+                            <GradientStop Color="#FF06205E" Offset="0.55"/>
+                            <GradientStop Color="#FF020B26" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Canvas x:Name="Ps4Waves" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Canvas x:Name="Ps4Particles"/>
+                <Ellipse x:Name="Ps4Light" Width="1100" Height="1100">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#59A0C8FF" Offset="0"/>
+                            <GradientStop Color="#00A0C8FF" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <StackPanel x:Name="Ps4Mark" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+                    <Image Source="ms-appx:///Assets/Intro/logo.png" Width="132" Height="132"/>
+                    <TextBlock Text="Console Mode" FontSize="46" FontWeight="SemiBold" CharacterSpacing="-10" Foreground="White" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

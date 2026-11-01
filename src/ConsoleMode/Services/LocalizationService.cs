@@ -204,6 +204,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string IntroAnimationDescription => LocalizationService.Get(nameof(IntroAnimationDescription));
     public string IntroSoundCard => LocalizationService.Get(nameof(IntroSoundCard));
     public string IntroSoundDescription => LocalizationService.Get(nameof(IntroSoundDescription));
+    public string IntroStyleCard => LocalizationService.Get(nameof(IntroStyleCard));
+    public string IntroStyleDescription => LocalizationService.Get(nameof(IntroStyleDescription));
+    public string IntroPreviewCard => LocalizationService.Get(nameof(IntroPreviewCard));
+    public string IntroPreviewDescription => LocalizationService.Get(nameof(IntroPreviewDescription));
     public string SessionPreviewBadge => LocalizationService.Get(nameof(SessionPreviewBadge));
     public string CloseMenu => LocalizationService.Get(nameof(CloseMenu));
     public string ControlFsCard => LocalizationService.Get(nameof(ControlFsCard));

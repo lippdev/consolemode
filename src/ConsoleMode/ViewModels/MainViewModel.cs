@@ -204,6 +204,7 @@ public partial class MainViewModel : ObservableObject
             BuildFpsOverlayOptions();
             BuildAudioOptions(audioValue);
             BuildControllerLayoutOptions();
+            BuildIntroStyleOptions();
             BuildTvOptions();
             FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
@@ -326,6 +327,7 @@ public partial class MainViewModel : ObservableObject
             InterfaceSounds = config.InterfaceSounds;
             IntroAnimation = config.IntroAnimation;
             IntroSound = config.IntroSound;
+            SelectedIntroStyle = IntroStyleOptions.FirstOrDefault(o => o.Value == BootIntro.Normalize(config.IntroStyle)) ?? IntroStyleOptions.FirstOrDefault();
             MinimizeToTray = config.MinimizeToTray;
             ConsoleBackgroundMode = ConsoleBackgroundService.NormalizeMode(config.ConsoleBackground);
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
@@ -880,6 +882,7 @@ public partial class MainViewModel : ObservableObject
             InterfaceSounds = InterfaceSounds,
             IntroAnimation = IntroAnimation,
             IntroSound = IntroSound,
+            IntroStyle = SelectedIntroStyle?.Value ?? _loadedConfig.IntroStyle,
             MinimizeToTray = MinimizeToTray,
             ConsoleBackground = ConsoleBackgroundMode,
             ConsoleBackgroundImage = ConsoleBackgroundImage,

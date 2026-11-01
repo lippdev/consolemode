@@ -419,5 +419,12 @@
   "IntroAnimationCard": "Intro beim Start der App",
   "IntroAnimationDescription": "Zeigt, wie das Console-Mode-Logo beim Start der App auf den Bildschirm kommt.",
   "IntroSoundCard": "Intro-Sound",
-  "IntroSoundDescription": "Spielt zum Intro einen Startsound ab."
+  "IntroSoundDescription": "Spielt zum Intro einen Startsound ab.",
+  "IntroStyleCard": "Intro-Stil",
+  "IntroStyleDescription": "Das eigene Intro von Console Mode oder eines im Stil der Xbox 360 oder der PS4, jeweils mit eigenem Sound.",
+  "IntroStyleConsole": "Console Mode",
+  "IntroStyleX360": "Im Stil der Xbox 360",
+  "IntroStylePs4": "Im Stil der PS4",
+  "IntroPreviewCard": "Intro ansehen",
+  "IntroPreviewDescription": "Zeigt das gewählte Intro jetzt, mit Sound."
 }

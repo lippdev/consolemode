@@ -248,6 +248,7 @@ public partial class MainViewModel
             "language" => (LocalizationService.Get("LanguageCard"), LanguageOptions.Select(o => (o.Text, o.Value)), SelectedLanguage?.Value),
             "controllerlayout" => (LocalizationService.Get("ControllerLayoutCard"), ControllerLayoutOptions.Select(o => (o.Text, o.Value)), SelectedControllerLayout?.Value),
             "tvprovider" => (LocalizationService.Get("TvControlCard"), TvProviders.Select(o => (o.Text, o.Value)), SelectedTvProvider?.Value),
+            "introstyle" => (LocalizationService.Get("IntroStyleCard"), IntroStyleOptions.Select(o => (o.Text, o.Value)), SelectedIntroStyle?.Value),
             "tvhdmi" => (LocalizationService.Get("TvHdmiCard"), TvHdmiInputs.Select(o => (o.Text, o.Value)), SelectedTvHdmiInput?.Value),
             "overlay" => (LocalizationService.Get("FpsOverlayCard"), FpsOverlayOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlay?.Value),
             "overlaysize" => (LocalizationService.Get("FpsOverlaySize"), FpsOverlaySizeOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlaySize?.Value),
@@ -282,6 +283,7 @@ public partial class MainViewModel
             case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
             case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
             case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
+            case "introstyle": SelectedIntroStyle = IntroStyleOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedIntroStyle; break;
             case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
             case "overlay": SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlay; break;
             case "overlaysize": SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlaySize; break;

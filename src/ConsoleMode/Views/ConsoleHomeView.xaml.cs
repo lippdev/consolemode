@@ -369,52 +369,214 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnIntroTapped(object sender, TappedRoutedEventArgs e) => ViewModel.SkipIntro();
 
-    /// <summary>
-    /// "Aproximação": the logo starts three times its size, blurred and clear, and settles sharp in the middle (the blurred
-    /// copy fades into the sharp one on the way), then the name fades in.
-    /// </summary>
+    /// <summary>Shows the opening in the style it was started with (BootIntro): one layer each, animated by Composition.</summary>
     private void ShowIntro()
     {
+        var style = ViewModel.IntroStyleNow;
+        IntroConsole.Visibility = style == BootIntro.ConsoleStyle ? Visibility.Visible : Visibility.Collapsed;
+        IntroX360.Visibility = style == BootIntro.Xbox360Style ? Visibility.Visible : Visibility.Collapsed;
+        IntroPs4.Visibility = style == BootIntro.Ps4Style ? Visibility.Visible : Visibility.Collapsed;
         IntroPanel.Visibility = Visibility.Visible;
-        if (!Ui.AnimationsEnabled) return;
+        // Without animations, the style's background and logo just show (no flash over them).
+        if (!Ui.AnimationsEnabled) { Visual(X360Flash).Opacity = 0f; return; }
         try
         {
-            var panel = ElementCompositionPreview.GetElementVisual(IntroPanel);
-            panel.Opacity = 1f;
-            var box = ElementCompositionPreview.GetElementVisual(IntroLogoBox);
-            var compositor = box.Compositor;
-            var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.2f, 0.8f), new Vector2(0.2f, 1f));
-            box.CenterPoint = new Vector3((float)IntroLogoBox.Width / 2, (float)IntroLogoBox.Height / 2, 0);
-            var approach = compositor.CreateVector3KeyFrameAnimation();
-            approach.InsertKeyFrame(0f, new Vector3(3f, 3f, 1f));
-            approach.InsertKeyFrame(1f, Vector3.One, easing);
-            approach.Duration = TimeSpan.FromMilliseconds(900);
-            box.StartAnimation("Scale", approach);
-            FadeIn(box, 0, 500);
-            FadeIn(ElementCompositionPreview.GetElementVisual(IntroLogo), 0, 900);
-            var blur = ElementCompositionPreview.GetElementVisual(IntroLogoBlur);
-            var unblur = compositor.CreateScalarKeyFrameAnimation();
-            unblur.InsertKeyFrame(0f, 1f);
-            unblur.InsertKeyFrame(1f, 0f, easing);
-            unblur.Duration = TimeSpan.FromMilliseconds(900);
-            blur.StartAnimation("Opacity", unblur);
-            FadeIn(ElementCompositionPreview.GetElementVisual(IntroName), 600, 500);
+            ElementCompositionPreview.GetElementVisual(IntroPanel).Opacity = 1f;
+            switch (style)
+            {
+                case BootIntro.Xbox360Style: ShowX360Intro(); break;
+                case BootIntro.Ps4Style: ShowPs4Intro(); break;
+                default: ShowConsoleIntro(); break;
+            }
         }
         catch (Exception ex)
         {
             AppLog.Write($"Abertura: animação: {ex.Message}");
         }
+    }
 
-        static void FadeIn(Microsoft.UI.Composition.Visual visual, int delayMs, int ms)
+    /// <summary>
+    /// "Aproximação": the logo starts three times its size, blurred and clear, and settles sharp in the middle (the blurred
+    /// copy fades into the sharp one on the way), then the name fades in.
+    /// </summary>
+    private void ShowConsoleIntro()
+    {
+        var box = Visual(IntroLogoBox);
+        box.CenterPoint = new Vector3((float)IntroLogoBox.Width / 2, (float)IntroLogoBox.Height / 2, 0);
+        ScaleTo(box, 3f, 1f, 0, 900);
+        Fade(box, 0, 1, 0, 500);
+        Fade(Visual(IntroLogo), 0, 1, 0, 900);
+        Fade(Visual(IntroLogoBlur), 1, 0, 0, 900);
+        Fade(Visual(IntroName), 0, 1, 600, 500);
+    }
+
+    /// <summary>
+    /// In the mood of the Xbox 360's: ribbons orbit and close in on a growing orb, the orb flashes white, and the logo is
+    /// there when the flash clears (dark name on the light background).
+    /// </summary>
+    private void ShowX360Intro()
+    {
+        if (X360Ribbons.Children.Count == 0) BuildX360Ribbons();
+        var (width, height) = IntroSize();
+        var ribbons = Visual(X360Ribbons);
+        ribbons.CenterPoint = new Vector3((float)width / 2, (float)height / 2, 0);
+        ScaleTo(ribbons, 1.6f, 0.12f, 0, 1700);
+        Fade(ribbons, 1, 0, 1450, 500);
+        foreach (var turn in X360Ribbons.Children.OfType<Grid>())
         {
-            var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
-            fade.InsertKeyFrame(0f, 0f);
-            fade.InsertKeyFrame(1f, 1f);
-            fade.DelayTime = TimeSpan.FromMilliseconds(delayMs);
-            fade.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
-            fade.Duration = TimeSpan.FromMilliseconds(ms);
-            visual.StartAnimation("Opacity", fade);
+            var spin = Visual(turn.Children[0] as FrameworkElement ?? turn);
+            var size = (float)((FrameworkElement)turn.Children[0]).Width;
+            spin.CenterPoint = new Vector3(size / 2, size / 2, 0);
+            var rotate = spin.Compositor.CreateScalarKeyFrameAnimation();
+            var from = (float)(turn.Tag is double d ? d : 0);
+            rotate.InsertKeyFrame(0f, from);
+            rotate.InsertKeyFrame(1f, from + 540f, spin.Compositor.CreateLinearEasingFunction());
+            rotate.Duration = TimeSpan.FromMilliseconds(2000);
+            spin.StartAnimation("RotationAngleInDegrees", rotate);
         }
+        var orb = Visual(X360Orb);
+        orb.CenterPoint = new Vector3(120, 120, 0);
+        var grow = orb.Compositor.CreateVector3KeyFrameAnimation();
+        grow.InsertKeyFrame(0f, new Vector3(0.25f, 0.25f, 1));
+        grow.InsertKeyFrame(0.55f, new Vector3(1f, 1f, 1));
+        grow.InsertKeyFrame(1f, new Vector3(5f, 5f, 1));
+        grow.Duration = TimeSpan.FromMilliseconds(2000);
+        orb.StartAnimation("Scale", grow);
+        Fade(orb, 1, 0, 1500, 600);
+        var flash = Visual(X360Flash);
+        var blink = flash.Compositor.CreateScalarKeyFrameAnimation();
+        blink.InsertKeyFrame(0f, 0f);
+        blink.InsertKeyFrame(0.45f, 0.85f);
+        blink.InsertKeyFrame(1f, 0f);
+        blink.DelayTime = TimeSpan.FromMilliseconds(1450);
+        blink.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+        blink.Duration = TimeSpan.FromMilliseconds(600);
+        flash.StartAnimation("Opacity", blink);
+        var mark = Visual(X360Mark);
+        mark.CenterPoint = new Vector3((float)X360Mark.ActualWidth / 2, (float)X360Mark.ActualHeight / 2, 0);
+        Fade(mark, 0, 1, 1750, 450);
+        ScaleTo(mark, 0.92f, 1f, 1750, 650);
+    }
+
+    /// <summary>Nine dashed circles of different sizes, green and silver, each turning inside a flattened frame.</summary>
+    private void BuildX360Ribbons()
+    {
+        for (var i = 0; i < 9; i++)
+        {
+            var size = 700 + i % 3 * 180 + i * 20;
+            var silver = i % 3 == 2;
+            var circle = new Microsoft.UI.Xaml.Shapes.Ellipse
+            {
+                Width = size,
+                Height = size,
+                Stroke = new SolidColorBrush(silver ? Windows.UI.Color.FromArgb(0x99, 0x96, 0xA0, 0xAA) : Windows.UI.Color.FromArgb(0xB3, 0x5C, 0xBE, 0x28)),
+                StrokeThickness = silver ? 4 : 9,
+                // One long arc and a short one per circle, like the ribbons.
+                StrokeDashArray = [size * 0.9 / (silver ? 4 : 9), size * 1.4 / (silver ? 4 : 9), size * 0.25 / (silver ? 4 : 9), size * 0.6 / (silver ? 4 : 9)],
+                StrokeDashCap = PenLineCap.Round
+            };
+            // The frame flattens the circle (an orbit seen from the side) and tilts it a little.
+            var frame = new Grid
+            {
+                Width = size,
+                Height = size,
+                Tag = (double)(i * 40),
+                RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5),
+                RenderTransform = new CompositeTransform { ScaleX = 1.25, ScaleY = 0.46, Rotation = -8 + i % 4 * 5 }
+            };
+            frame.Children.Add(circle);
+            X360Ribbons.Children.Add(frame);
+        }
+    }
+
+    /// <summary>In the mood of the PS4's: waves of light drifting across a deep blue, particles rising, the logo in the light.</summary>
+    private void ShowPs4Intro()
+    {
+        var (width, height) = IntroSize();
+        if (Ps4Waves.Children.Count == 0) BuildPs4(width, height);
+        var waves = Visual(Ps4Waves);
+        var drift = waves.Compositor.CreateScalarKeyFrameAnimation();
+        drift.InsertKeyFrame(0f, 0f);
+        drift.InsertKeyFrame(1f, -(float)width, waves.Compositor.CreateLinearEasingFunction());
+        drift.Duration = TimeSpan.FromSeconds(9);
+        ElementCompositionPreview.SetIsTranslationEnabled(Ps4Waves, true);
+        waves.StartAnimation("Translation.X", drift);
+        Fade(waves, 0, 1, 0, 800);
+        ElementCompositionPreview.SetIsTranslationEnabled(Ps4Particles, true);
+        var particles = Visual(Ps4Particles);
+        var rise = particles.Compositor.CreateScalarKeyFrameAnimation();
+        rise.InsertKeyFrame(0f, 0f);
+        rise.InsertKeyFrame(1f, -(float)height * 0.25f, particles.Compositor.CreateLinearEasingFunction());
+        rise.Duration = TimeSpan.FromSeconds(4);
+        particles.StartAnimation("Translation.Y", rise);
+        Fade(particles, 0, 1, 0, 800);
+        Fade(Visual(Ps4Light), 0, 1, 600, 1000);
+        Fade(Visual(Ps4Mark), 0, 1, 900, 1000);
+    }
+
+    /// <summary>Four sine waves twice as wide as the screen (they drift left) and sixty particles.</summary>
+    private void BuildPs4(double width, double height)
+    {
+        for (var i = 0; i < 4; i++)
+        {
+            var line = new Microsoft.UI.Xaml.Shapes.Polyline
+            {
+                Stroke = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(46 + i * 13), 120, 180, 255)),
+                StrokeThickness = 1.5 + i
+            };
+            for (var x = 0.0; x <= width * 2; x += 12)
+                line.Points.Add(new Windows.Foundation.Point(x, height * (0.55 + i * 0.07) + Math.Sin(x / width * Math.PI * 2 + i) * height * 0.08));
+            Ps4Waves.Children.Add(line);
+        }
+        var random = new Random(7);
+        for (var i = 0; i < 60; i++)
+        {
+            var r = 1.2 + random.NextDouble() * 3.4;
+            var dot = new Microsoft.UI.Xaml.Shapes.Ellipse
+            {
+                Width = r,
+                Height = r,
+                Fill = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(40 + random.Next(120)), 190, 220, 255))
+            };
+            Canvas.SetLeft(dot, random.NextDouble() * width);
+            Canvas.SetTop(dot, random.NextDouble() * height * 1.3);
+            Ps4Particles.Children.Add(dot);
+        }
+    }
+
+    /// <summary>The window's size for drawing; before the first layout, the screen's.</summary>
+    private (double Width, double Height) IntroSize()
+    {
+        var width = IntroPanel.ActualWidth;
+        var height = IntroPanel.ActualHeight;
+        if (width > 0 && height > 0) return (width, height);
+        var bounds = XamlRoot?.Size ?? new Windows.Foundation.Size(1920, 1080);
+        return (Math.Max(bounds.Width, 1280), Math.Max(bounds.Height, 720));
+    }
+
+    private static Microsoft.UI.Composition.Visual Visual(UIElement element) => ElementCompositionPreview.GetElementVisual(element);
+
+    private static void Fade(Microsoft.UI.Composition.Visual visual, float from, float to, int delayMs, int ms)
+    {
+        var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
+        fade.InsertKeyFrame(0f, from);
+        fade.InsertKeyFrame(1f, to);
+        fade.DelayTime = TimeSpan.FromMilliseconds(delayMs);
+        fade.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+        fade.Duration = TimeSpan.FromMilliseconds(ms);
+        visual.StartAnimation("Opacity", fade);
+    }
+
+    private static void ScaleTo(Microsoft.UI.Composition.Visual visual, float from, float to, int delayMs, int ms)
+    {
+        var compositor = visual.Compositor;
+        var scale = compositor.CreateVector3KeyFrameAnimation();
+        scale.InsertKeyFrame(0f, new Vector3(from, from, 1f));
+        scale.InsertKeyFrame(1f, new Vector3(to, to, 1f), compositor.CreateCubicBezierEasingFunction(new Vector2(0.2f, 0.8f), new Vector2(0.2f, 1f)));
+        scale.DelayTime = TimeSpan.FromMilliseconds(delayMs);
+        scale.DelayBehavior = Microsoft.UI.Composition.AnimationDelayBehavior.SetInitialValueBeforeDelay;
+        scale.Duration = TimeSpan.FromMilliseconds(ms);
+        visual.StartAnimation("Scale", scale);
     }
 
     /// <summary>The opening fades out over the interface, which is ready underneath (the tour too, the first time).</summary>

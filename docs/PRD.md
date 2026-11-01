@@ -93,6 +93,7 @@ refeita e sem caminho de volta perdido.
 | D-20 | **Perfis por jogo com o Tako:** quando a sessão vem do Tako, quem aplica resolução e áudio do jogo é o Tako (D-16); os perfis do Console Mode (#170) valem só nas sessões que não vêm dele. | A decidir com o Tako (CMI) |
 | D-21 | **Estacionar o ponteiro** no canto da tela de jogo quando o launcher aparece vem **ligado por padrão** e devolve o ponteiro para onde estava ao voltar. | Decidido (resposta à issue #172; implementação no INPUT-014) |
 | D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido e implementado no CORE-012 (#178). Antes dele, depois de uma queda nada era restaurado sozinho: os backups ficavam no disco, mas o "Restaurar agora" não os usava sem uma sessão ativa. |
+| D-24 | **Sons oficiais de console, por conta e risco:** o dono pode usar sons da Microsoft e da Sony (como os das aberturas inspiradas no Xbox 360 e no PS4), registrados no THIRD_PARTY_NOTICES e trocados se o dono dos direitos pedir. A parte visual imita só o clima, sem logos nem nomes dos consoles. | Decidido pelo dono em 31/10/2026 |
 | D-23 | **Uma interface só:** a partir da 1.7.0 o app tem apenas a interface Console, que também funciona com mouse e teclado. A interface Desktop e a escolha de interface saem; o que só existia nela vai para a aba Sistema, e a primeira abertura ganha um tour guiado. | Decidido pelo dono em 31/10/2026; UI-012 e UI-013. |
 
 ### 2.1 Como chegamos aqui
@@ -394,6 +395,8 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **UI-012 —** Uma interface só (D-23): a interface Desktop e a opção Interface saem; contador de FPS, argumentos do aplicativo personalizado, relatório de diagnóstico e versão passam para a aba Sistema. (1.7.0)
 - [x] **UI-013 —** Tour guiado na primeira abertura da interface: 9 paradas com recorte no que cada uma explica (abas, iniciadores, jogar, telas, ajustes rápidos, Sistema, atalhos do controle), A avança e B pula; de novo em Sistema → App → Tutorial. (1.7.0)
 - [x] **UI-015 —** Abertura ao abrir o app ("Aproximação", escolhida num catálogo de 14): o logo vem de perto e assenta nítido, com som de entrada, enquanto carrega, com fade para a interface; pula com qualquer botão; desligável (abertura e som) em Sistema → App. (1.7.0)
+- [x] **UI-016 —** Estilos de abertura em Sistema → App: a do Console Mode, "Inspirada no Xbox 360" e "Inspirada no PS4" (só o clima visual, com o nosso logo; sons oficiais por escolha do dono, D-24), e "Ver a abertura". (1.7.0)
+- [ ] **UI-017 (P1) —** A nossa abertura própria (conceito e som originais), escolhida num catálogo de protótipos; entra como mais um estilo e vira o padrão.
 - [x] **UI-014 —** A aba Sistema mostra, embaixo da lista, o que faz a linha em foco: as descrições que a interface Desktop tinha. (1.7.0)
 - [ ] **UI-010 (P2) —** Acessibilidade: leitor de tela, alto contraste na interface Console, tamanho do texto, redução de animações própria.
 - [ ] **UI-011 (P2) —** Polimento contínuo: legibilidade em TV com sobrevarredura, escala do texto, consistência de foco e hover entre a interface e o menu.
