@@ -328,14 +328,13 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:MonitorRowViewModel">
-                                            <Button Style="{StaticResource ConsoleCard}" Width="{x:Bind TileWidth, Mode=OneWay}" Height="{x:Bind TileHeight, Mode=OneWay}" MinWidth="0" MinHeight="0" Padding="0"
+                                            <Button Style="{StaticResource ConsoleCard}" Width="{x:Bind TileWidth, Mode=OneWay}" Height="{x:Bind TileHeight, Mode=OneWay}" MinWidth="0" MinHeight="0" Padding="0" CornerRadius="12" Tag="ScreenTile"
                                                     Background="{x:Bind ConsoleTileBackground, Mode=OneWay}" Opacity="{x:Bind TileOpacity, Mode=OneWay}"
                                                     Command="{Binding ViewModel.OpenRolePanelCommand, ElementName=Page}" CommandParameter="{x:Bind}"
                                                     AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
                                                 <Grid>
-                                                    <!-- The bezel; dashed while the screen is off in Windows right now -->
-                                                    <Border CornerRadius="12" BorderThickness="3" BorderBrush="#D9E6EBEF" Visibility="{x:Bind IsOn}"/>
-                                                    <Rectangle RadiusX="12" RadiusY="12" StrokeThickness="2.5" StrokeDashArray="3,2" Stroke="#99E6EBEF" Visibility="{x:Bind IsOff}"/>
+                                                    <!-- Dashed while the screen is off in Windows right now (no bezel otherwise: the focus ring is the only outline) -->
+                                                    <Rectangle RadiusX="12" RadiusY="12" StrokeThickness="2" StrokeDashArray="3,2" Stroke="#80E6EBEF" Visibility="{x:Bind IsOff}"/>
                                                     <!-- Shrinks to fit small and standing screens, never grows past its size -->
                                                     <Viewbox StretchDirection="DownOnly" Margin="14,10">
                                                         <StackPanel Spacing="8" HorizontalAlignment="Center" MaxWidth="320">

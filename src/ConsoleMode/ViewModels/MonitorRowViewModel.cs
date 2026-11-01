@@ -112,7 +112,6 @@ public partial class MonitorRowViewModel : ObservableObject
 
     /// <summary>Off in Windows right now; drawn dashed next to the live desktop.</summary>
     public bool IsOff => !Monitor.IsActive;
-    public bool IsOn => Monitor.IsActive;
 
     public string RoleLabel => Role switch
     {

@@ -600,7 +600,8 @@ public sealed partial class ConsoleHomeView : UserControl
     /// <summary>Cards (not settings rows) grow when focused and shrink back when it leaves; the launchers grow more.</summary>
     private static void ScaleTile(object source, float scale)
     {
-        if (source is not Button button) return;
+        // The screens on Session sit side by side as on the desk: growing one would cover its neighbour.
+        if (source is not Button button || button.Tag is "ScreenTile") return;
         _cardStyle ??= Application.Current.Resources["ConsoleCard"] as Style;
         _launchTileStyle ??= Application.Current.Resources["LaunchTileButton"] as Style;
         if (ReferenceEquals(button.Style, _launchTileStyle)) scale = scale > 1f ? 1.14f : 1f;
