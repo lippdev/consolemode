@@ -63,6 +63,9 @@ public static class NativeWindows
     [DllImport("user32.dll")]
     public static extern bool IsWindowVisible(nint hWnd);
 
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(nint hWnd);
+
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
 

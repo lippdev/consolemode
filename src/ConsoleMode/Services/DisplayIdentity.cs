@@ -190,6 +190,26 @@ public static class DisplayIdentity
     }
 
     /// <summary>
+    /// What each name of the backup is called now (saved name → current name), matched by <c>MonitorID</c> like
+    /// <see cref="RemapLayoutNames"/>. The names saved next to the backup (primary, game screen, hidden screens) go
+    /// through it: a session can shuffle the \\.\DISPLAYn names, and a stale one would point at another screen.
+    /// Names whose monitor isn't found are left out (they stay as saved).
+    /// </summary>
+    public static Dictionary<string, string> CurrentNames(
+        Dictionary<string, Dictionary<string, string>> specs, IEnumerable<(string MonitorId, string Name)> current)
+    {
+        var byId = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (id, name) in current)
+            if (!string.IsNullOrWhiteSpace(id)) byId.TryAdd(id, name);
+
+        var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (savedName, spec) in specs)
+            if (spec.TryGetValue("MonitorID", out var id) && byId.TryGetValue(id, out var now))
+                names[savedName] = now;
+        return names;
+    }
+
+    /// <summary>
     /// Re-keys layout sections by the name each monitor has now, matched by <c>MonitorID</c>: a
     /// monitor that was disabled can come back as another \.\DISPLAYn. Sections whose monitor isn't
     /// found keep their saved name.

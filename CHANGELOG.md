@@ -3,6 +3,9 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Correções
+- Playnite: abrir um jogo não encerra mais a sessão. Com "Minimizar após iniciar o jogo" ligado (o tema Selene liga), o Playnite esconde a janela enquanto o jogo roda, e depois de 20 s o Console Mode achava que ele tinha fechado e devolvia as telas da mesa no meio do jogo. Agora a sessão segue até o Playnite fechar de verdade. (#191)
+- Telas: quando o Windows troca o nome das telas no meio da sessão (a TV entra como `DISPLAY3` e sai como `DISPLAY1`), a resolução escolhida vai para a TV e a volta ao PC liga e desliga as telas certas; antes, ele podia desligar um monitor da mesa achando que era a TV. A volta também não perde mais 10 s tentando desligar a TV enquanto ela ainda é a tela principal. (#191)
 
 ## [1.7.0-beta.1]
 ### Novidades

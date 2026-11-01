@@ -39,6 +39,7 @@ public sealed partial class ConsoleEngine
         // Before anything changes on screen: a custom app that can't be launched blocks the start.
         if (config.FullscreenMode == CustomApp.Mode && CustomApp.ProblemText(config.CustomAppPath) is { } problem)
             throw new InvalidOperationException(problem);
+        var saved = config;
         config = ResolveMonitorNames(config);
         AppLog.Write($"Start: foco={config.FocusMonitor}, esconder={string.Join('+', config.HideMonitors)}, estratégia={config.HideStrategy}, modo={config.FullscreenMode}");
 
@@ -62,6 +63,8 @@ public sealed partial class ConsoleEngine
         State.AbsenceCount = 0;
         State.CachedBigPictureHandle = 0;
         State.PlayniteWindowMissingSince = null;
+        State.PlayniteWindow = 0;
+        State.PlayniteWindowPutAway = false;
         State.CustomAppWatchName = "";
         State.CustomAppGoneSince = null;
         State.CustomAppTimeoutLogged = false;
@@ -146,6 +149,7 @@ public sealed partial class ConsoleEngine
                 AppLog.Write($"Start: {config.FocusMonitor} não ativou; restaurando");
                 throw new InvalidOperationException(LocalizationService.Get("GameScreenDidNotTurnOn"));
             }
+            config = FollowFocusRename(saved, config);
             focusInfo = Monitors.GetMonitors(true).FirstOrDefault(m => m.Name == config.FocusMonitor);
             Monitors.GetDisplayModes(config.FocusMonitor, focusInfo, forceRefresh: true);
         }
@@ -169,6 +173,7 @@ public sealed partial class ConsoleEngine
                     Thread.Sleep(400);
                     break;
             }
+            config = FollowFocusRename(saved, config);
         }
 
         Monitors.SetPrimary(config.FocusMonitor);
@@ -618,6 +623,22 @@ public sealed partial class ConsoleEngine
         return config.WithMonitors(focus, hide, modes);
     }
 
+    /// <summary>
+    /// Turning screens on and off can give the game screen another \\.\DISPLAYn (the TV went in as DISPLAY3 and came
+    /// out as DISPLAY1 once the desk screens were detached): it is looked up again by its id, so the mode, HDR and
+    /// the window placement land on it and not on a name that is now another screen's, or nobody's.
+    /// </summary>
+    private AppConfig FollowFocusRename(AppConfig saved, AppConfig resolved)
+    {
+        Monitors.ClearCache();
+        var now = ResolveMonitorNames(saved);
+        if (string.Equals(now.FocusMonitor, resolved.FocusMonitor, StringComparison.OrdinalIgnoreCase)) return resolved;
+        AppLog.Write($"Telas: a tela de jogo passou de {resolved.FocusMonitor} para {now.FocusMonitor}");
+        State.FocusMonitor = now.FocusMonitor;
+        State.FocusMonitorRect = null;
+        return now;
+    }
+
     private void MoveToFocus(string monitorName, nint[] handles, ScreenRect? rect)
     {
         if (rect is not null)
@@ -655,17 +676,28 @@ public sealed partial class ConsoleEngine
     {
         if (watchedGone) State.CachedBigPictureHandle = 0;
         var showing = Launch.IsPlayniteActive(State);
+        var handle = State.CachedBigPictureHandle;
         if (showing && watchedGone)
         {
-            var handle = State.CachedBigPictureHandle;
-            AppLog.Write("Loop: Playnite trocou de janela; acompanhando a nova");
+            // The same window back from a game is not a new one; it is watched again all the same.
+            if (handle != State.PlayniteWindow) AppLog.Write("Loop: Playnite trocou de janela; acompanhando a nova");
             OnUi(() => State.BigPictureWatchActive = NativeWindows.StartBigPictureExitWatch(handle));
         }
+        if (showing) State.PlayniteWindow = handle;
 
-        if (showing) State.PlayniteWindowMissingSince = null;
+        // A game started from Playnite: it hides its window until the game ends. That is not leaving the session.
+        var putAway = !showing && LaunchService.IsPlayniteWindowPutAway(State.PlayniteWindow);
+        if (putAway != State.PlayniteWindowPutAway)
+        {
+            State.PlayniteWindowPutAway = putAway;
+            AppLog.Write(putAway ? "Loop: Playnite escondeu a janela (jogo aberto); a sessão continua" : "Loop: Playnite voltou a mostrar a janela");
+        }
+
+        if (showing || putAway) State.PlayniteWindowMissingSince = null;
         else State.PlayniteWindowMissingSince ??= DateTime.Now;
-        var exit = PlayniteExitPolicy.IsExit(Launch.IsPlayniteRunning(), showing, State.PlayniteWindowMissingSince, DateTime.Now);
-        if (exit) AppLog.Write("Loop: Playnite fechou");
+        var running = Launch.IsPlayniteRunning();
+        var exit = PlayniteExitPolicy.IsExit(running, showing, State.PlayniteWindowMissingSince, DateTime.Now, putAway);
+        if (exit) AppLog.Write(running ? $"Loop: Playnite sem janela há {PlayniteExitPolicy.WindowGrace.TotalSeconds:0} s" : "Loop: Playnite fechou");
         return exit;
     }
 

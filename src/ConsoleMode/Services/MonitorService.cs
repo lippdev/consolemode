@@ -65,8 +65,13 @@ public sealed class MonitorService
         File.WriteAllText(AppPaths.BackupMonitorMeta, JsonSerializer.Serialize(meta, JsonUtil.Options));
     }
 
-    public MonitorRestoreContext GetRestoreContext(ConsoleRuntimeState state)
+    /// <param name="rename">
+    /// Saved name → current name (<see cref="DisplayIdentity.CurrentNames"/>), applied to what the backup's meta file
+    /// says only: those names are from the moment of the backup, while the session's own may already be current.
+    /// </param>
+    public MonitorRestoreContext GetRestoreContext(ConsoleRuntimeState state, IReadOnlyDictionary<string, string>? rename = null)
     {
+        string Now(string name) => rename is not null && rename.TryGetValue(name, out var current) ? current : name;
         var ctx = new MonitorRestoreContext
         {
             OriginalPrimary = state.OriginalPrimary,
@@ -81,10 +86,10 @@ public sealed class MonitorService
         {
             var meta = JsonSerializer.Deserialize<MonitorBackupMeta>(File.ReadAllText(AppPaths.BackupMonitorMeta), JsonUtil.Options);
             if (meta is null) return ctx;
-            if (!string.IsNullOrWhiteSpace(meta.OriginalPrimary)) ctx.OriginalPrimary = meta.OriginalPrimary;
+            if (!string.IsNullOrWhiteSpace(meta.OriginalPrimary)) ctx.OriginalPrimary = Now(meta.OriginalPrimary);
             ctx.FocusWasInactive = meta.FocusWasInactive;
-            if (!string.IsNullOrWhiteSpace(meta.FocusMonitor)) ctx.FocusMonitor = meta.FocusMonitor;
-            if (meta.HideMonitors.Count > 0) ctx.HideMonitors = meta.HideMonitors;
+            if (!string.IsNullOrWhiteSpace(meta.FocusMonitor)) ctx.FocusMonitor = Now(meta.FocusMonitor);
+            if (meta.HideMonitors.Count > 0) ctx.HideMonitors = [.. meta.HideMonitors.Select(Now)];
             if (!string.IsNullOrWhiteSpace(meta.HideStrategy)) ctx.HideStrategy = meta.HideStrategy;
         }
         catch { /* keep in-memory context */ }
@@ -102,8 +107,13 @@ public sealed class MonitorService
             return result;
         }
 
-        var ctx = GetRestoreContext(state);
-        var backupSpecs = _backend.ResolveLayout(GetBackupMonitorSpecs(AppPaths.BackupMonitorConfig));
+        var savedSpecs = GetBackupMonitorSpecs(AppPaths.BackupMonitorConfig);
+        var backupSpecs = _backend.ResolveLayout(savedSpecs);
+        var rename = DisplayIdentity.CurrentNames(savedSpecs, GetMonitors(true).Select(m => (m.MonitorId, m.Name)));
+        var ctx = GetRestoreContext(state, rename);
+        var moved = rename.Where(kv => !string.Equals(kv.Key, kv.Value, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (moved.Count > 0)
+            AppLog.Write($"Restore: telas com outro nome desde o backup: {string.Join(", ", moved.Select(kv => $"{kv.Key} → {kv.Value}"))}");
         AppLog.Write($"Restore: iniciando (primário={ctx.OriginalPrimary}, foco={ctx.FocusMonitor}, focoInativo={ctx.FocusWasInactive}, esconder={string.Join('+', ctx.HideMonitors)})");
 
         if (ctx.HideStrategy == "turnOff" && ctx.HideMonitors.Count > 0)
@@ -155,14 +165,22 @@ public sealed class MonitorService
         // 2. Detach the screens that were off BEFORE placing the others: while the TV is still part of the
         //    desktop, Windows keeps the positions around it and moves the other screens when it goes. If the
         //    originals didn't come back, the TV is the only picture left: leave it on.
+        //    The primary goes back first: Windows refuses to detach the primary screen (the TV, during the session).
+        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
+        {
+            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
+            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
+                result.Issues.Add($"Não foi possível restaurar o primário para {ctx.OriginalPrimary}");
+        }
+
         if (restored)
         {
             AppLog.Write($"Restore: telas que voltam a ficar desligadas: {(monitorsToDisable.Count == 0 ? "nenhuma" : string.Join('+', monitorsToDisable))}");
+            // A refusal here is tried again below; only a screen still on at the end is a problem.
             foreach (var name in monitorsToDisable)
             {
                 if (string.Equals(name, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase)) continue;
-                if (!DisableWithRetry(name))
-                    result.Issues.Add($"Não foi possível desconectar {name}");
+                DisableWithRetry(name);
             }
         }
         else
@@ -170,13 +188,7 @@ public sealed class MonitorService
             AppLog.Write("Restore: telas originais não voltaram; a tela de jogo fica ligada para não ficar sem imagem");
         }
 
-        // 3. Primary, then every position and mode of the backup in one go, and check that it stuck.
-        if (!string.IsNullOrWhiteSpace(ctx.OriginalPrimary))
-        {
-            backupSpecs.TryGetValue(ctx.OriginalPrimary, out var primarySpec);
-            if (!RestorePrimaryWithRetry(ctx.OriginalPrimary, primarySpec))
-                result.Issues.Add($"Não foi possível restaurar o primário para {ctx.OriginalPrimary}");
-        }
+        // 3. Every position and mode of the backup in one go, and check that it stuck.
 
         const int layoutAttempts = 3;
         for (var attempt = 1; attempt <= layoutAttempts; attempt++)
@@ -201,10 +213,12 @@ public sealed class MonitorService
                 if (back.Count == 0) break;
                 AppLog.Write($"Restore: {string.Join('+', back)} voltou a ligar ao aplicar o layout; desconectando de novo ({round}/2)");
                 foreach (var name in back)
-                {
-                    if (!DisableWithRetry(name) && round == 2)
-                        result.Issues.Add($"Não foi possível desconectar {name}");
-                }
+                    DisableWithRetry(name);
+            }
+            foreach (var name in monitorsToDisable)
+            {
+                if (string.Equals(name, ctx.OriginalPrimary, StringComparison.OrdinalIgnoreCase) || !IsActiveNow(name)) continue;
+                result.Issues.Add($"Não foi possível desconectar {name}");
             }
         }
 
