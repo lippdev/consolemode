@@ -135,6 +135,10 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string CustomAppArgumentsDescription => LocalizationService.Get(nameof(CustomAppArgumentsDescription));
     public string CustomAppWatchCard => LocalizationService.Get(nameof(CustomAppWatchCard));
     public string CustomAppWatchDescription => LocalizationService.Get(nameof(CustomAppWatchDescription));
+    public string AddCustomAppCard => LocalizationService.Get(nameof(AddCustomAppCard));
+    public string AddCustomAppDescription => LocalizationService.Get(nameof(AddCustomAppDescription));
+    public string RemoveCustomAppCard => LocalizationService.Get(nameof(RemoveCustomAppCard));
+    public string RemoveCustomAppDescription => LocalizationService.Get(nameof(RemoveCustomAppDescription));
     public string AudioOutputCard => LocalizationService.Get(nameof(AudioOutputCard));
     public string OptionalExtrasSection => LocalizationService.Get(nameof(OptionalExtrasSection));
     public string HdrCard => LocalizationService.Get(nameof(HdrCard));
@@ -168,6 +172,8 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string StartupDescription => LocalizationService.Get(nameof(StartupDescription));
     public string MinimizeToTrayCard => LocalizationService.Get(nameof(MinimizeToTrayCard));
     public string MinimizeToTrayDescription => LocalizationService.Get(nameof(MinimizeToTrayDescription));
+    public string MenuOutsideSessionCard => LocalizationService.Get(nameof(MenuOutsideSessionCard));
+    public string MenuOutsideSessionDescription => LocalizationService.Get(nameof(MenuOutsideSessionDescription));
     public string CheckNow => LocalizationService.Get(nameof(CheckNow));
     public string SessionMenuTitle => LocalizationService.Get(nameof(SessionMenuTitle));
     public string BackToGame => LocalizationService.Get(nameof(BackToGame));
@@ -259,8 +265,12 @@ public sealed class LocalizedStrings : INotifyPropertyChanged
     public string BetaUpdatesDescription => LocalizationService.Get(nameof(BetaUpdatesDescription));
     public string HelpDataSection => LocalizationService.Get(nameof(HelpDataSection));
     public string OtherAppsSection => LocalizationService.Get(nameof(OtherAppsSection));
-    public string WakeOnDescription => LocalizationService.Get(nameof(WakeOnDescription));
-    public string NextBoostDescription => LocalizationService.Get(nameof(NextBoostDescription));
+    public string OtherAppsControlFsDescription => LocalizationService.Get(nameof(OtherAppsControlFsDescription));
+    public string OtherAppsTakoDescription => LocalizationService.Get(nameof(OtherAppsTakoDescription));
+    public string OtherAppsJoyChromiumDescription => LocalizationService.Get(nameof(OtherAppsJoyChromiumDescription));
+    public string OtherAppsStageAlpha => LocalizationService.Get(nameof(OtherAppsStageAlpha));
+    public string OtherAppsStageClosedAlpha => LocalizationService.Get(nameof(OtherAppsStageClosedAlpha));
+    public string OtherAppsStageBeta => LocalizationService.Get(nameof(OtherAppsStageBeta));
     public string TvConfirmationCard => LocalizationService.Get(nameof(TvConfirmationCard));
     public string TvConfirmationDescription => LocalizationService.Get(nameof(TvConfirmationDescription));
     public string TvSection => LocalizationService.Get(nameof(TvSection));

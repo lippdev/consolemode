@@ -11,6 +11,9 @@
     <!-- Like Steam's Shift + Tab: the whole screen, the game dimmed behind, a side panel with the
          options and the open windows in the middle. Controller-first. -->
     <!-- Background is set in code (ApplyMaterial): glass or solid depending on Windows' transparency setting -->
+    <!-- In proportion to the screen, like a console: laid out 1080 tall, whatever scale Windows is at (UiScaleHost) -->
+    <Grid x:Name="ScaleArea">
+    <Viewbox x:Name="UiScaleBox">
     <Grid x:Name="Root" Background="Transparent" Padding="56,36,56,30" RowSpacing="22" RequestedTheme="Dark"
           XYFocusKeyboardNavigation="Enabled">
         <Grid.Resources>
@@ -126,7 +129,7 @@
                 <StackPanel VerticalAlignment="Center" Spacing="4">
                     <TextBlock Text="{x:Bind ViewModel.Texts.SessionMenuTitle, Mode=OneWay}" FontSize="28" FontWeight="SemiBold"/>
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <!-- Alpha: the menu also opens outside a session, to be tried without console mode -->
+                        <!-- The menu also opens outside a session: said here, since nothing is restored afterwards -->
                         <Border Visibility="{x:Bind ViewModel.IsSessionMenuPreview, Mode=OneWay}" CornerRadius="11" Padding="11,2"
                                 BorderThickness="1" BorderBrush="{ThemeResource AccentFillColorDefaultBrush}">
                             <TextBlock Text="{x:Bind ViewModel.Texts.SessionPreviewBadge, Mode=OneWay}" FontSize="13" FontWeight="SemiBold"
@@ -215,7 +218,10 @@
                 </Button>
                 </StackPanel>
 
-                <ScrollViewer x:Name="RowsScroller" Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <!-- The list scrolls under the pinned apps: its edges fade into the panel while there is more past them,
+                     and a thin thumb on the right shows where it is (ScrollEdges; the fades take the panel's colour in ApplyMaterial) -->
+                <Grid Grid.Row="1">
+                <ScrollViewer x:Name="RowsScroller" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="RowsPanel" Spacing="8">
                         <Button x:Name="FirstRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.CloseSessionMenuCommand}">
                             <Button.Background>
@@ -323,8 +329,7 @@
                         </Button>
 
                         <!-- Hidden until turned off here or the session ends; nothing automatic. -->
-                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleCursorHiddenCommand}"
-                                Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
+                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleCursorHiddenCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                 <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE8F4;" FontSize="19"/></Border>
@@ -339,8 +344,7 @@
 
                         <!-- For games and emulators whose menus ignore the controller; works once the menu is closed. -->
                         <!-- Grows with its two-line hint instead of the fixed row height. -->
-                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}"
-                                Visibility="{x:Bind ViewModel.IsSessionMenuLive, Mode=OneWay}">
+                        <Button Tag="row" Style="{StaticResource SideRow}" Height="Auto" MinHeight="74" Padding="16,12" Command="{x:Bind ViewModel.ToggleControllerMouseCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                 <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE962;" FontSize="19"/></Border>
@@ -372,6 +376,30 @@
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
+                <Rectangle x:Name="RowsFadeTop" Height="48" VerticalAlignment="Top" IsHitTestVisible="False" Opacity="0">
+                    <Rectangle.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Rectangle.OpacityTransition>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FF111820" Offset="0"/>
+                            <GradientStop Color="#00111820" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle x:Name="RowsFadeBottom" Height="110" VerticalAlignment="Bottom" IsHitTestVisible="False" Opacity="0">
+                    <Rectangle.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Rectangle.OpacityTransition>
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                            <GradientStop Color="#FF111820" Offset="0"/>
+                            <GradientStop Color="#00111820" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Grid x:Name="RowsScrollTrack" Width="4" HorizontalAlignment="Right" Margin="0,6,-10,6" IsHitTestVisible="False" Opacity="0">
+                    <Grid.OpacityTransition><ScalarTransition Duration="0:0:0.18"/></Grid.OpacityTransition>
+                    <Border CornerRadius="2" Background="#1FFFFFFF"/>
+                    <Border x:Name="RowsScrollThumb" CornerRadius="2" Background="#A6FFFFFF" VerticalAlignment="Top" Height="40"/>
+                </Grid>
+                </Grid>
               </Grid>
             </Border>
 
@@ -556,5 +584,7 @@
         <Grid Grid.RowSpan="3" Margin="-56,-36,-56,-30" Visibility="{x:Bind ViewModel.IsSessionMenuBusy, Mode=OneWay}" Background="{ThemeResource MenuVeil}">
             <ProgressRing IsActive="True" Width="56" Height="56"/>
         </Grid>
+    </Grid>
+    </Viewbox>
     </Grid>
 </Window>

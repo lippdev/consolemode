@@ -4,18 +4,32 @@ using ConsoleMode.Services;
 
 namespace ConsoleMode.ViewModels;
 
-// The mouse pointer in a session, both from the session menu and per session (off when it ends):
-// "Hide the mouse pointer" hides it until turned off, nothing automatic; "Control the mouse" lets
-// the controller drive it. One excludes the other: an invisible pointer can't be steered.
+// The mouse pointer, from the session menu, in a session or outside one (both go back to off when a
+// session starts or ends): "Hide the mouse pointer" hides it until turned off, nothing automatic;
+// "Control the mouse" lets the controller drive it. One excludes the other: an invisible pointer
+// can't be steered.
 public partial class MainViewModel
 {
     private readonly ControllerMouse _controllerMouse = new();
 
-    /// <summary>Session menu: the pointer is hidden until this is turned off or the session ends. Never saved.</summary>
+    /// <summary>Session menu: the pointer is hidden until this is turned off or a session starts or ends. Never saved.</summary>
     [ObservableProperty] private bool _isCursorHidden;
 
     /// <summary>Session menu: the sticks and A drive the mouse. Never saved; every session starts with it off.</summary>
     [ObservableProperty] private bool _isControllerMouseOn;
+
+    /// <summary>The main window has the focus: the pad drives its interface then, not the mouse (set by the window).</summary>
+    [ObservableProperty] private bool _isMainWindowActive;
+
+    partial void OnIsMainWindowActiveChanged(bool value) => UpdateSessionPointer();
+
+    /// <summary>A session started or ended: what the menu turned on for the pointer goes back to off.</summary>
+    private void ResetSessionPointer()
+    {
+        IsControllerMouseOn = false;
+        IsCursorHidden = false;
+        UpdateSessionPointer();
+    }
 
     /// <summary>The help line under the menu row, with the confirm button of the pad in use (A or ✕).</summary>
     public string ControllerMouseHint => LocalizationService.Get("ControllerMouseHint", HintConfirm);
@@ -44,23 +58,15 @@ public partial class MainViewModel
     [RelayCommand]
     private void ToggleControllerMouse() => IsControllerMouseOn = !IsControllerMouseOn;
 
-    /// <summary>Brings the pointer and the controller mouse in line with the session, the menu and the choices.</summary>
+    /// <summary>Brings the pointer and the controller mouse in line with the menu and the choices.</summary>
     private void UpdateSessionPointer()
     {
-        if (!IsConsoleActive && (IsControllerMouseOn || IsCursorHidden))
-        {
-            // The session ended: both go back to off (re-enters here).
-            IsControllerMouseOn = false;
-            IsCursorHidden = false;
-            return;
-        }
+        CursorHider.SetHidden(IsCursorHidden);
 
-        CursorHider.SetHidden(IsConsoleActive && IsCursorHidden);
-
-        // While the menu is open the pad drives the menu, not the mouse.
-        _controllerMouse.Paused = IsSessionMenuOpen;
-        if (IsConsoleActive && IsControllerMouseOn)
-            _controllerMouse.Start(Engine.State.FocusMonitorRect?.Height ?? 1080);
+        // While the menu or the main window is up the pad drives it, not the mouse.
+        _controllerMouse.Paused = IsSessionMenuOpen || IsMainWindowActive;
+        if (IsControllerMouseOn)
+            _controllerMouse.Start((IsConsoleActive ? Engine.State.FocusMonitorRect : Engine.Monitors.GetMonitorRect(SessionMonitorName, Engine.State))?.Height ?? 1080);
         else
             _controllerMouse.Stop();
     }

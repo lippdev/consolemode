@@ -93,6 +93,7 @@ refeita e sem caminho de volta perdido.
 | D-20 | **Perfis por jogo com o Tako:** quando a sessão vem do Tako, quem aplica resolução e áudio do jogo é o Tako (D-16); os perfis do Console Mode (#170) valem só nas sessões que não vêm dele. | A decidir com o Tako (CMI) |
 | D-21 | **Estacionar o ponteiro** no canto da tela de jogo quando o launcher aparece vem **ligado por padrão** e devolve o ponteiro para onde estava ao voltar. | Decidido (resposta à issue #172; implementação no INPUT-014) |
 | D-22 | **Restauração durável:** tudo o que a sessão muda (telas, áudio, ícones, ponteiro, comandos de fim) é gravado em disco antes da mudança e desfeito no próximo início se o app cair. | Decidido e implementado no CORE-012 (#178). Antes dele, depois de uma queda nada era restaurado sozinho: os backups ficavam no disco, mas o "Restaurar agora" não os usava sem uma sessão ativa. |
+| D-25 | **Escala de console:** a interface e o Menu da sessão são desenhados para uma tela de 1080 de altura e ocupam sempre a mesma proporção da janela, qualquer que seja a escala do Windows (125 %, 150 %, 200 %) ou a resolução (1080p, 1440p, 4K). Escolhido entre "proporcional à tela" e "sempre em 100 %". | Decidido pelo dono em 01/11/2026; UI-018. |
 | D-24 | **Sons oficiais de console, por conta e risco:** o dono pode usar sons da Microsoft e da Sony (como os das aberturas inspiradas no Xbox 360 e no PS4), registrados no THIRD_PARTY_NOTICES e trocados se o dono dos direitos pedir. A parte visual imita só o clima, sem logos nem nomes dos consoles. | Decidido pelo dono em 31/10/2026 |
 | D-23 | **Uma interface só:** a partir da 1.7.0 o app tem apenas a interface Console, que também funciona com mouse e teclado. A interface Desktop e a escolha de interface saem; o que só existia nela vai para a aba Sistema, e a primeira abertura ganha um tour guiado. | Decidido pelo dono em 31/10/2026; UI-012 e UI-013. |
 
@@ -357,6 +358,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [ ] **LAUNCH-007 (P0) —** Logos oficiais dos lançadores nos tiles da Início, lidos dos apps instalados. (#169)
 - [ ] **LAUNCH-010 (P1) — Tako Launcher.** Tile na Início com logo, abrir o Tako em tela cheia na tela de jogo (`tako --console-session`), restaurar quando o Tako avisar o fim pela API (API-002), detectar a instalação. Aceite: entrar, jogar e voltar ao PC sem mouse, com o Tako. Depende de CMI-004 do Tako.
 - [x] **LAUNCH-011 — JoyChromium.** Auxiliar do menu da sessão, como o ControlFS (decisão do mantenedor em 29/10: não é iniciador nem aparece na Início): linha fixa abaixo do ControlFS, abre em tela cheia (`--tv`) na tela da sessão, instala pelo próprio menu se faltar (SHA-256 do GitHub, NSIS `/S` por usuário) e, ao voltar ao PC, o deixa em janela (`--window`). (#175, #181, 1.7.0)
+- [x] **LAUNCH-017 —** Vários aplicativos personalizados, cada um um bloco no Início com o ícone do .exe (+ Adicionar app), editáveis e removíveis em Sistema; e o fim da sessão segue sozinho o programa aberto por um iniciador (árvore de processos), sem precisar de "Processo a acompanhar". (1.7.0)
 - [ ] **LAUNCH-012 (P2) —** Scripts próprios ao entrar e ao voltar (comando, `.bat` ou PowerShell), com tempo-limite e o comando de fim gravado em disco (CORE-012). Vem do #173, em PR próprio.
 - [ ] **LAUNCH-013 (P2) — Hydra Launcher.** Detectar a instalação, abrir em tela cheia na tela de jogo, restaurar ao fechar, logo oficial (D-19). _A definir: caminho, processo real e modo tela cheia._
 - [ ] **LAUNCH-014 (P2) — AnyFSE.** Ferramenta que põe qualquer app como tela inicial da experiência de tela cheia do modo Xbox. Níveis: (a) detectar e conviver, sem briga com o modo Xbox do Console Mode; (b) mostrar o estado e abrir a configuração; (c) configurar o app de destino (Tako, Hydra, Playnite). Aceite mínimo: com o AnyFSE ativo, entrar e sair restaura a mesa. O Tako já tem o lado dele (PLAT-007 do Tako).
@@ -397,6 +399,8 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 - [x] **UI-015 —** Abertura ao abrir o app: o logo com som de entrada enquanto carrega, com fade para a interface; pula com qualquer botão; "Nenhuma" no estilo abre direto, e o som se desliga à parte, em Sistema → App. (1.7.0)
 - [x] **UI-016 —** Estilos de abertura em Sistema → App: a do Console Mode (a oficial; sem estilo escolhido, de vez em quando sai de surpresa uma das inspiradas, até a pessoa escolher um estilo), "Inspirada no Xbox 360" e "Inspirada no PS4" (só o clima visual, com o nosso logo; sons oficiais por escolha do dono, D-24), e "Ver a abertura". (1.7.0)
 - [x] **UI-017 —** A nossa abertura, "Liga o PC" (escolhida entre três protótipos originais): o logo redesenhado em vetor liga no escuro, peça por peça, com o som do Selene; é a do Console Mode, a oficial. (1.7.0)
+- [x] **UI-019 —** Menu da sessão fora do modo console: o atalho do menu o abre sem sessão (deixa de ser prévia), com esconder o cursor e controle como mouse também ali (voltam a desligado ao começar ou terminar uma sessão); limite e contador de FPS só na sessão. Opção em Sistema → Controle, ligada por padrão. (1.7.0)
+- [x] **UI-018 —** Escala de console (D-25): a interface e o Menu da sessão ficam com a mesma cara em qualquer escala do Windows e resolução; numa janela estreita, encolhem até caber 1280 de largura. Os ícones da Início são reduzidos para os pixels reais da tela. (1.7.0)
 - [x] **UI-014 —** A aba Sistema mostra, embaixo da lista, o que faz a linha em foco: as descrições que a interface Desktop tinha. (1.7.0)
 - [ ] **UI-010 (P2) —** Acessibilidade: leitor de tela, alto contraste na interface Console, tamanho do texto, redução de animações própria.
 - [ ] **UI-011 (P2) —** Polimento contínuo: legibilidade em TV com sobrevarredura, escala do texto, consistência de foco e hover entre a interface e o menu.
@@ -484,7 +488,7 @@ Legenda: **P0** = necessário para a 1.7.0; **P1** = próxima versão; **P2** = 
 ### Épico DIAG — Diagnóstico e suporte
 
 - [x] **DIAG-001 —** Botão de feedback com issue pré-preenchida. (#25, 1.5.0)
-- [x] **DIAG-002 —** "Mais apps do desenvolvedor" (WakeOn, Next Boost). (#63, 1.5.0)
+- [x] **DIAG-002 —** "Mais apps do desenvolvedor": WakeOn e Next Boost (#63, 1.5.0); na 1.7, ControlFS (alpha), Tako Launcher (alpha fechado) e JoyChromium (beta), com fase e descrição (#185).
 - [x] **DIAG-003 —** Diagnóstico com relatório copiável, sem dados pessoais. (#159, 1.7.0-alpha.1)
 - [ ] **DIAG-004 (contínuo) —** Coletar setups que funcionam ou quebram (issue #15) e levar os casos ao Diagnóstico.
 

@@ -14,6 +14,8 @@ namespace ConsoleMode.ViewModels;
 public sealed partial class LaunchTile : ObservableObject
 {
     public required ComboOption Option { get; init; }
+    /// <summary>The "+" tile after the launchers: A on it adds a custom app; the focus on it picks nothing.</summary>
+    public bool IsAdd { get; init; }
     public string Text => Option.Text;
     public string Glyph { get; init; } = "";
     public Brush Background { get; init; } = null!;
@@ -51,15 +53,71 @@ public partial class MainViewModel
                 IsSelected = ReferenceEquals(option, SelectedLaunch)
             });
         }
-        foreach (var tile in LaunchTiles) _ = LoadLaunchLogoAsync(tile);
+        var add = LaunchArt.For(LaunchArt.AddCustomApp);
+        LaunchTiles.Add(new LaunchTile
+        {
+            Option = new ComboOption { Text = LocalizationService.Get("AddCustomAppTile"), Value = LaunchArt.AddCustomApp },
+            Glyph = add.Glyph,
+            Background = TileGradient(add.From, add.To),
+            IsAdd = true
+        });
+        foreach (var tile in LaunchTiles.Where(t => !t.IsAdd)) _ = LoadLaunchLogoAsync(tile);
     }
 
-    /// <summary>Asked in pixels: the tile draws it at 64, so this stays sharp on a 4K TV.</summary>
+    /// <summary>Read at this size (pixels), enough for a 4K TV; each tile then gets it shrunk to what it draws.</summary>
     private const int LaunchLogoSize = 256;
 
+    /// <summary>The logo's size on a tile (ConsoleHomeView.xaml), grown by the focused tile's 1.14 (ConsoleHomeView.ScaleTile).</summary>
+    private const double LaunchLogoShown = 64 * 1.14;
+
+    /// <summary>The screen's pixels per interface pixel (Windows' scale times the interface's, UiScaleHost), from the window.</summary>
+    private double _logoScale = 1;
+
     // The logos are read once per app: the tiles are rebuilt on every language switch.
-    // A Store app's logo is a file of its package; a program's, the icon pixels of its exe.
-    private readonly Dictionary<string, (string? File, IconBitmap? Pixels)> _launchLogos = new(StringComparer.OrdinalIgnoreCase);
+    // A Store app's logo is a file of its package; a program's, the icon pixels of its exe. Both end up as pixels.
+    private readonly Dictionary<string, IconBitmap?> _launchLogos = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The window moved to a screen with another scale: the logos are shrunk again for it.</summary>
+    public void SetLogoScale(double scale)
+    {
+        if (scale <= 0 || Math.Abs(scale - _logoScale) < 0.01) return;
+        _logoScale = scale;
+        foreach (var tile in LaunchTiles)
+            if (tile.LogoKey is { } key && _launchLogos.TryGetValue(key, out var logo) && logo is not null) ShowLaunchLogo(tile, logo);
+    }
+
+    /// <summary>
+    /// The logo shrunk here, averaging every pixel, to the pixels the tile shows: left to the screen, a 256-pixel
+    /// logo drawn at 64 comes out with jagged edges.
+    /// </summary>
+    private void ShowLaunchLogo(LaunchTile tile, IconBitmap logo)
+    {
+        var (width, height) = IconPixels.FitInside(logo.Width, logo.Height, (int)Math.Ceiling(LaunchLogoShown * _logoScale));
+        var pixels = IconPixels.Shrink(logo.Pixels, logo.Width, logo.Height, width, height);
+        var image = new WriteableBitmap(width, height);
+        using (var stream = image.PixelBuffer.AsStream()) stream.Write(pixels);
+        tile.Logo = image;
+    }
+
+    /// <summary>A package's logo file as premultiplied BGRA, no larger than <see cref="LaunchLogoSize"/>.</summary>
+    private static async Task<IconBitmap> ReadLogoFileAsync(string file)
+    {
+        var storage = await Windows.Storage.StorageFile.GetFileFromPathAsync(file);
+        using var stream = await storage.OpenReadAsync();
+        var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(stream);
+        var (width, height) = IconPixels.FitInside((int)decoder.PixelWidth, (int)decoder.PixelHeight, LaunchLogoSize);
+        var transform = new Windows.Graphics.Imaging.BitmapTransform
+        {
+            ScaledWidth = (uint)width,
+            ScaledHeight = (uint)height,
+            InterpolationMode = Windows.Graphics.Imaging.BitmapInterpolationMode.Fant
+        };
+        var data = await decoder.GetPixelDataAsync(Windows.Graphics.Imaging.BitmapPixelFormat.Bgra8,
+            Windows.Graphics.Imaging.BitmapAlphaMode.Premultiplied, transform,
+            Windows.Graphics.Imaging.ExifOrientationMode.IgnoreExifOrientation,
+            Windows.Graphics.Imaging.ColorManagementMode.DoNotColorManage);
+        return new IconBitmap(width, height, data.DetachPixelData());
+    }
 
     /// <summary>A launcher's path changed: its tile shows the new app's logo (or the glyph).</summary>
     private void RefreshLaunchLogo(string mode)
@@ -73,40 +131,31 @@ public partial class MainViewModel
 
     private async Task LoadLaunchLogoAsync(LaunchTile tile)
     {
+        var custom = CustomApp.EntryId(tile.Option.Value) is { } id ? _customApps.FirstOrDefault(a => a.Id == id) : null;
         var (exe, appId) = tile.Option.Value switch
         {
             "bigPicture" => (SteamSession.FindSteamExe(), (string?)null),
             "playnite" => (Engine.Launch.GetPlaynitePath(), null),
             "xboxMode" => (null, LaunchArt.XboxAppId),
-            CustomApp.Mode => (CustomApp.CleanPath(CustomAppPath), null),
+            _ when custom is not null => (CustomApp.CleanPath(custom.Path), null),
             _ => (null, null)
         };
         var key = appId ?? exe;
         // The app this tile now waits for: a slower load for a previous path must not land after this one.
         tile.LogoKey = key;
         if (string.IsNullOrWhiteSpace(key)) return;
-        if (!_launchLogos.TryGetValue(key, out var logo))
-        {
-            logo = await Task.Run(() =>
-            {
-                var file = appId is null ? null : PackageLogos.Find(appId);
-                return (file, file is null ? WindowIcons.ForApp(exe, appId, LaunchLogoSize) : null);
-            });
-            _launchLogos[key] = logo;
-        }
-        if (!string.Equals(tile.LogoKey, key, StringComparison.OrdinalIgnoreCase)) return;
         try
         {
-            if (logo.File is not null)
+            if (!_launchLogos.TryGetValue(key, out var logo))
             {
-                tile.Logo = new BitmapImage(new Uri(logo.File)) { DecodePixelWidth = LaunchLogoSize };
+                var file = appId is null ? null : await Task.Run(() => PackageLogos.Find(appId));
+                logo = file is not null
+                    ? await Task.Run(() => ReadLogoFileAsync(file))
+                    : await Task.Run(() => WindowIcons.ForApp(exe, appId, LaunchLogoSize));
+                _launchLogos[key] = logo;
             }
-            else if (logo.Pixels is { } bitmap)
-            {
-                var image = new WriteableBitmap(bitmap.Width, bitmap.Height);
-                using (var stream = image.PixelBuffer.AsStream()) stream.Write(bitmap.Pixels);
-                tile.Logo = image;
-            }
+            if (!string.Equals(tile.LogoKey, key, StringComparison.OrdinalIgnoreCase) || logo is null) return;
+            ShowLaunchLogo(tile, logo);
         }
         catch (Exception ex)
         {
@@ -116,19 +165,20 @@ public partial class MainViewModel
 
     private void SyncLaunchTiles()
     {
-        foreach (var tile in LaunchTiles) tile.IsSelected = ReferenceEquals(tile.Option, SelectedLaunch);
+        foreach (var tile in LaunchTiles) tile.IsSelected = !tile.IsAdd && ReferenceEquals(tile.Option, SelectedLaunch);
     }
 
     [RelayCommand]
     private void SelectLaunchTile(LaunchTile? tile)
     {
-        if (tile is not null && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
+        if (tile is not null && !tile.IsAdd && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;
     }
 
-    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows.</summary>
+    /// <summary>A (or a click) on a tile: that launcher, and play it if the setup allows; on "+", add a custom app.</summary>
     [RelayCommand]
     private async Task PlayLaunchTile(LaunchTile? tile)
     {
+        if (tile?.IsAdd == true) { await AddCustomAppAsync(); return; }
         SelectLaunchTile(tile);
         if (CanStart) await StartAsync();
     }

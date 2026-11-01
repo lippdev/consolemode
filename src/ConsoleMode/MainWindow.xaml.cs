@@ -20,6 +20,8 @@ public sealed partial class MainWindow : Window
         SystemBackdrop = new MicaBackdrop();
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
+        // The Home logos are shrunk to the screen's own pixels, which now also follow the interface's scale.
+        Controls.UiScaleHost.Attach(RootGrid, UiScaleBox, HomeView, ViewModel.SetLogoScale);
 
         var hwnd = WindowNative.GetWindowHandle(this);
         var appWindow = AppWindow.GetFromWindowId(Win32Interop.GetWindowIdFromWindow(hwnd));
@@ -49,6 +51,9 @@ public sealed partial class MainWindow : Window
             maximized = true;
             if (appWindow.Presenter is OverlappedPresenter p) p.Maximize();
         };
+
+        // With the window in front the pad drives the interface; the controller mouse waits meanwhile.
+        Activated += (_, e) => ViewModel.IsMainWindowActive = e.WindowActivationState != WindowActivationState.Deactivated;
 
         appWindow.Closing += (_, e) =>
         {

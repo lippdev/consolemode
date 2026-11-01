@@ -175,6 +175,7 @@ public partial class MainViewModel
             case "backgroundimage": PickBackgroundImage(); break;
             case "startup": StartWithWindows = !StartWithWindows; break;
             case "minimizetray": MinimizeToTray = !MinimizeToTray; break;
+            case "menuoutside": MenuOutsideSession = !MenuOutsideSession; break;
             case "updates": CheckUpdates = !CheckUpdates; break;
             case "betas": BetaUpdates = !BetaUpdates; break;
             case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;

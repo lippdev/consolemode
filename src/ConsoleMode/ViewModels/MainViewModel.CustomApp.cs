@@ -1,19 +1,28 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ConsoleMode.Models;
 using ConsoleMode.Services;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
 
 namespace ConsoleMode.ViewModels;
 
-// "Custom app" launch mode: any .exe as the console launcher (issue #111).
+// "Custom app" launch mode: any .exe as the console launcher (issue #111), as many as you like, each a tile on Home
+// with its exe's icon and name. The three properties below are the selected one's, edited in System.
 public partial class MainViewModel
 {
     [ObservableProperty] private string _customAppPath = "";
     [ObservableProperty] private string _customAppArguments = "";
     [ObservableProperty] private string _customAppWatchProcess = "";
 
-    public bool IsCustomApp => SelectedLaunch?.Value == CustomApp.Mode;
+    private List<CustomAppEntry> _customApps = [];
+    private string _customAppId = "";
+    /// <summary>Showing another app's values: they are not edits to save.</summary>
+    private bool _showingCustomApp;
+
+    public bool IsCustomApp => CustomApp.IsEntryMode(SelectedLaunch?.Value);
+
+    private CustomAppEntry? SelectedCustomApp => _customApps.FirstOrDefault(a => a.Id == _customAppId);
 
     /// <summary>The exe's description or file name, shown in summaries.</summary>
     public string CustomAppName => CustomApp.Validate(CustomAppPath) == CustomApp.Problem.None
@@ -27,19 +36,106 @@ public partial class MainViewModel
         ? CustomAppName
         : SelectedLaunch?.Text ?? LocalizationService.Get("LaunchSteam");
 
+    /// <summary>The config's custom apps (an older config's one app becomes the first) and the one in use.</summary>
+    private void LoadCustomApps(AppConfig config)
+    {
+        _customApps = CustomApp.Entries(config);
+        _customAppId = CustomApp.Selected(_customApps, config.CustomAppId)?.Id ?? "";
+        ShowSelectedCustomApp();
+    }
+
+    /// <summary>The launcher value a config's mode stands for: a custom app's own value for "customApp".</summary>
+    private string LaunchValueOf(AppConfig config) =>
+        config.FullscreenMode == CustomApp.Mode && _customAppId.Length > 0 ? CustomApp.EntryMode(_customAppId) : config.FullscreenMode;
+
+    private void ShowSelectedCustomApp()
+    {
+        var app = SelectedCustomApp;
+        _showingCustomApp = true;
+        try
+        {
+            CustomAppPath = app?.Path ?? "";
+            CustomAppArguments = app?.Arguments ?? "";
+            CustomAppWatchProcess = app?.WatchProcess ?? "";
+        }
+        finally
+        {
+            _showingCustomApp = false;
+        }
+        OnPropertyChanged(nameof(CustomAppName));
+        OnPropertyChanged(nameof(CustomAppPathText));
+    }
+
+    /// <summary>A custom app's tile was picked as the launcher: System shows and edits that one.</summary>
+    private void OnCustomAppPicked(string? launchValue)
+    {
+        if (CustomApp.EntryId(launchValue) is not { } id || id == _customAppId) return;
+        _customAppId = id;
+        ShowSelectedCustomApp();
+    }
+
     partial void OnCustomAppPathChanged(string value)
     {
         OnPropertyChanged(nameof(CustomAppName));
         OnPropertyChanged(nameof(CustomAppPathText));
-        RefreshLaunchLogo(CustomApp.Mode);
+        if (_showingCustomApp || SelectedCustomApp is not { } app) return;
+        app.Path = CustomApp.CleanPath(value);
+        // Its tile takes the new exe's name and icon.
+        RebuildLaunchOptions();
         SettingChanged();
     }
 
-    partial void OnCustomAppArgumentsChanged(string value) => SaveQuietly();
-    partial void OnCustomAppWatchProcessChanged(string value) => SaveQuietly();
+    partial void OnCustomAppArgumentsChanged(string value)
+    {
+        if (_showingCustomApp || SelectedCustomApp is not { } app) return;
+        app.Arguments = value;
+        SaveQuietly();
+    }
 
+    partial void OnCustomAppWatchProcessChanged(string value)
+    {
+        if (_showingCustomApp || SelectedCustomApp is not { } app) return;
+        app.WatchProcess = value;
+        SaveQuietly();
+    }
+
+    /// <summary>The "+" tile on Home and System → Add a custom app: pick an exe, it becomes a tile and the launcher.</summary>
+    [RelayCommand]
+    private async Task AddCustomAppAsync()
+    {
+        if (IsConsoleActive || await PickExeAsync() is not { } path) return;
+        var app = new CustomAppEntry { Id = CustomApp.NextId(_customApps.Select(a => a.Id)), Path = path };
+        _customApps.Add(app);
+        _customAppId = app.Id;
+        ShowSelectedCustomApp();
+        RebuildLaunchOptions();
+        SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == CustomApp.EntryMode(app.Id)) ?? SelectedLaunch;
+        AppLog.Write($"Aplicativo personalizado: adicionado {path}");
+        SettingChanged();
+    }
+
+    /// <summary>System → the custom app's exe: another exe for the selected app (or a new app when there is none).</summary>
     [RelayCommand]
     private async Task PickCustomAppPathAsync()
+    {
+        if (SelectedCustomApp is null) { await AddCustomAppAsync(); return; }
+        if (await PickExeAsync() is { } path) CustomAppPath = path;
+    }
+
+    /// <summary>System → Remove this app: its tile goes, and Steam Big Picture opens instead.</summary>
+    [RelayCommand]
+    private void RemoveCustomApp()
+    {
+        if (IsConsoleActive || SelectedCustomApp is not { } app) return;
+        _customApps.Remove(app);
+        _customAppId = _customApps.FirstOrDefault()?.Id ?? "";
+        ShowSelectedCustomApp();
+        RebuildLaunchOptions("bigPicture");
+        AppLog.Write($"Aplicativo personalizado: removido {app.Path}");
+        SettingChanged();
+    }
+
+    private async Task<string?> PickExeAsync()
     {
         try
         {
@@ -48,13 +144,17 @@ public partial class MainViewModel
             if (App.MainWindowInstance is { } window)
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(window));
             var file = await picker.PickSingleFileAsync();
-            if (file is null) return;
-            CustomAppPath = file.Path;
+            return file?.Path;
         }
         catch (Exception ex)
         {
             AppLog.Write($"Aplicativo personalizado: {ex}");
             SetStatus(LocalizationService.Get("PlaynitePathPickError", ex.Message), InfoBarSeverity.Error);
+            return null;
         }
     }
+
+    /// <summary>The custom apps as saved: copies, so later edits don't change a config already handed to the engine.</summary>
+    private List<CustomAppEntry> CustomAppsToSave() =>
+        _customApps.Select(a => new CustomAppEntry { Id = a.Id, Path = CustomApp.CleanPath(a.Path), Arguments = a.Arguments.Trim(), WatchProcess = a.WatchProcess.Trim() }).ToList();
 }

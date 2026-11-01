@@ -660,6 +660,29 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] "Ver a abertura" toca o estilo escolhido na hora, por cima da interface, e some sozinha (ou com qualquer botão). Resultado: ______
 - [ ] Iniciar com o Windows / `--start` / bandeja: nenhuma abertura nem som com a janela escondida. Com as animações do Windows desligadas, o logo aparece parado e some sem fade. Resultado: ______
 
+### Lista de Sistema e outros apps
+
+- [ ] Aviso de início de sessão (com o atalho do menu definido) e de bateria fraca: entra deslizando da borda direita da TV, sem aparecer em outra tela ao lado; o fundo em volta do card é transparente (sem retângulo preto); a barrinha verde esvazia e o aviso sai deslizando para a direita. O jogo não perde o foco em nenhum momento. Resultado: ______
+
+- [ ] Menu fora do modo console: com o atalho do menu definido e o Console Mode só na bandeja, segurar o atalho abre o Menu da sessão na tela de jogo (ou na principal, com a TV desligada), com o selo "Fora da sessão" e sem limite/contador de FPS. Resultado: ______
+- [ ] Fora da sessão, **Controlar o mouse com o controle** move o ponteiro e clica; com a janela do Console Mode em primeiro plano o controle volta a navegar a interface (o mouse espera); com o menu aberto, também. **Ocultar o cursor** some com a seta. Começar uma sessão desliga os dois; fechar o Console Mode traz o cursor de volta. Resultado: ______
+- [ ] Sistema → Controle → **Menu da sessão fora do modo console** desligado: o atalho não abre o menu fora da sessão (abre numa sessão), o ícone da bandeja continua abrindo; desligar com o mouse do controle ligado o desliga. Resultado: ______
+
+- [ ] Escala de console: com o Windows em 100 %, 125 %, 150 % e 200 % (Configurações → Sistema → Tela → Escala), a Início, a Sessão, o Sistema e o Menu da sessão ocupam a mesma proporção da tela, sem nada cortado ou gigante. Na TV 4K, igual a uma TV 1080p. Com a janela restaurada e redimensionada, a interface encolhe junto, sem cortar. Resultado: ______
+
+- [ ] Início: os ícones dos tiles (Steam, Playnite, Xbox e um app personalizado) têm bordas lisas, sem serrilhado, com o tile parado e com foco; repetir com a tela em 150 % de escala e arrastando a janela para uma tela de escala diferente. Resultado: ______
+
+- [ ] Sistema, numa categoria longa (App, Extras opcionais): a borda de baixo esmaece no fundo enquanto há linhas abaixo, e a de cima quando já rolou; no fim e no começo da lista, a borda fica limpa. A barra fina à direita aparece só quando a lista rola e acompanha a posição (controle, roda do mouse e teclado). Ao entrar na aba Sistema e ao trocar de categoria (de uma curta, como Tela de jogo, para App), a borda de baixo já aparece esmaecida, sem mostrar a lista cortada por um instante. No menu da sessão, a lista do painel lateral faz o mesmo (com o "Fechar menu" fora da tela, a borda de baixo esmaece e a barra aparece). Resultado: ______
+- [ ] Sistema → Outros apps do desenvolvedor: ControlFS (Alpha), Tako Launcher (Alpha fechado) e JoyChromium (Beta) em três cards lado a lado, com a arte em cima e nome, fase e descrição embaixo; o card com foco cresce sem ser cortado nas bordas, e esquerda/direita passam de um para outro; A abre a página do GitHub de cada um. Não há mais WakeOn nem Next Boost. Resultado: ______
+
+### Vários aplicativos personalizados
+
+- [ ] Início: depois dos lançadores aparece o bloco **+ Adicionar app**; A (ou clique) nele abre o seletor de arquivo; escolher um `.exe` cria um bloco com o ícone e o nome do programa (a descrição do exe), já selecionado. Passar o foco pelo "+" não troca o lançador. Resultado: ______
+- [ ] Adicionar dois ou três apps: cada um tem o seu bloco; selecionar um mostra em Sistema → Ao entrar no modo console o .exe, os argumentos e o processo a acompanhar **dele**, e editar muda só ele (confira trocando de bloco e voltando). Resultado: ______
+- [ ] "Remover este aplicativo" tira o bloco e o Steam Big Picture passa a abrir; os outros apps continuam. Reabrir o app mantém a lista, o selecionado e os campos de cada um. Resultado: ______
+- [ ] Config antiga com um app personalizado: ele aparece como o primeiro bloco, selecionado se era o lançador. Resultado: ______
+- [ ] Sessão com um app que é só um iniciador (abre outro programa e fecha), com "Processo a acompanhar" vazio: o log mostra "X abriu Y e fechou; a sessão passa a acompanhar Y", a janela de Y vai para a tela de jogo e a sessão termina uns 8 s depois que Y fecha. Com "Processo a acompanhar" preenchido, vale o processo escrito. Resultado: ______
+
 ### Tour guiado
 
 - [ ] Primeira abertura: o tour abre sozinho em "Bem-vindo ao Console Mode", 1 de 9, com o cartão no meio da tela e o fundo escurecido. Resultado: ______

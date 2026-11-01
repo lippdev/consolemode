@@ -10,9 +10,10 @@ using Microsoft.UI.Xaml;
 namespace ConsoleMode.ViewModels;
 
 // The in-session menu (Select + Y): a window over the game with volume, resolution, audio,
-// FPS, HDR and the two ways out. In this alpha it also opens outside a session ("preview"), on the
-// game screen or the primary one, so it can be tried without entering console mode: nothing that
-// needs a restore afterwards (the FPS limit) is offered there.
+// FPS, HDR and the two ways out. It also opens outside a session (IsSessionMenuPreview), on the
+// game screen or the primary one, to use the PC from the couch without console mode (System →
+// Controller can turn that off for the shortcut): nothing that needs a restore afterwards (the FPS
+// limit and counter) is offered there.
 public partial class MainViewModel
 {
     private SessionMenuWindow? _sessionMenu;
@@ -28,7 +29,10 @@ public partial class MainViewModel
 
     [ObservableProperty] private bool _isSessionMenuOpen;
     [ObservableProperty] private bool _isSessionMenuBusy;
+    /// <summary>The menu is open outside a session (the property name is from when that was an alpha preview).</summary>
     [ObservableProperty] private bool _isSessionMenuPreview;
+    /// <summary>System → Controller: the menu shortcut also works outside console mode. On by default.</summary>
+    [ObservableProperty] private bool _menuOutsideSession = true;
     [ObservableProperty] private bool _isSessionPickerOpen;
     [ObservableProperty] private string _sessionPickerTitle = "";
     [ObservableProperty] private string _sessionClock = "";
@@ -56,6 +60,13 @@ public partial class MainViewModel
         : FocusRow?.Monitor is { IsActive: true } game ? game.Name
         // The chosen game screen is often the TV, which is off until a session starts: use a live one.
         : (Monitors.FirstOrDefault(m => m.Monitor.IsPrimary && m.Monitor.IsActive) ?? Monitors.FirstOrDefault(m => m.Monitor.IsActive))?.Monitor.Name ?? "";
+
+    partial void OnMenuOutsideSessionChanged(bool value)
+    {
+        SaveQuietly();
+        // Turned off from the couch: what the menu turned on outside a session goes back to off.
+        if (!value && !IsConsoleActive) { IsControllerMouseOn = false; IsCursorHidden = false; }
+    }
 
     partial void OnIsSessionMenuPreviewChanged(bool value)
     {

@@ -23,6 +23,7 @@ public sealed partial class ConsoleHomeView : UserControl
     private static Style? _cardStyle;
     private static Style? _launchTileStyle;
     private Control? _lastSettingsRow;
+    private readonly ScrollEdges _rowsEdges;
     /// <summary>When a category was last pressed with the mouse / touch: that click picks it, A goes into its options.</summary>
     private long _railPointerPressedAt = long.MinValue / 2;
     private int _shownTab;
@@ -51,6 +52,8 @@ public sealed partial class ConsoleHomeView : UserControl
             RowHelp.Text = Microsoft.UI.Xaml.Automation.AutomationProperties.GetHelpText(row);
         };
         CategoryRail.GotFocus += (_, _) => RowHelp.Text = "";
+        // The list's edges and its scroll thumb follow the scrolling, the window's size and the category shown.
+        _rowsEdges = new ScrollEdges(SettingsRows, RowsFadeTop, RowsFadeBottom, RowsScrollTrack, RowsScrollThumb);
         CategoryRail.GettingFocus += OnRailGettingFocus;
         CategoryRail.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler((_, _) => _railPointerPressedAt = Environment.TickCount64), true);
         // The sounds are the pad's (GamepadNavigator, LB / RB): mouse clicks stay silent.
@@ -129,6 +132,10 @@ public sealed partial class ConsoleHomeView : UserControl
     {
         switch (e.PropertyName)
         {
+            case nameof(MainViewModel.IsSystemTab) when ViewModel.IsSystemTab:
+                // Entering System: the list's edges land with it, never a hard cut that then fades.
+                _rowsEdges.Snap();
+                break;
             case nameof(MainViewModel.IsConsoleActive):
                 RefreshNavigator();
                 DispatcherQueue.TryEnqueue(FocusDefault);
@@ -346,7 +353,7 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private Button CategoryButton(int index) => (Button)CategoryRail.Children[Math.Clamp(index, 0, CategoryRail.Children.Count - 1)];
 
-    private StackPanel SystemSection(int index) => index switch
+    private Panel SystemSection(int index) => index switch
     {
         0 => SystemSection0,
         1 => SystemSection1,
@@ -879,6 +886,7 @@ public sealed partial class ConsoleHomeView : UserControl
         if (sender is not FrameworkElement { Tag: string tag } || !int.TryParse(tag, out var index) || index == ViewModel.SystemCategory) return;
         ViewModel.SystemCategory = index;
         _lastSettingsRow = null;
+        _rowsEdges.Snap();
         SettingsRows.ChangeView(null, 0, null, true);
     }
 

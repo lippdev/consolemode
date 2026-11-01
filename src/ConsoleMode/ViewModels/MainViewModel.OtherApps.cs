@@ -7,18 +7,18 @@ using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace ConsoleMode.ViewModels;
 
-// "More apps from the developer" in Settings: WakeOn and Next Boost, logos taken from their sites.
-// Links: https://wake.nextestudios.com and https://nextboost.pro (in the views).
+// "More apps from the developer" in Settings: ControlFS, Tako Launcher and JoyChromium, logos from their repos.
+// Links (in the views): their GitHub pages.
 public partial class MainViewModel
 {
-    private ImageSource? _wakeOnLogo;
-    private ImageSource? _nextBoostLogo;
     private ImageSource? _controlFsLogo;
+    private ImageSource? _takoLogo;
+    private ImageSource? _joyChromiumBrandLogo;
 
-    public ImageSource? WakeOnLogo => _wakeOnLogo ??= LoadLogo("wakeon.png");
-    public ImageSource? NextBoostLogo => _nextBoostLogo ??= LoadLogo("nextboost.png");
     public ImageSource? ControlFsLogo => _controlFsLogo ??= LoadLogo("controlfs.png");
-
+    public ImageSource? TakoLogo => _takoLogo ??= LoadLogo("tako.png");
+    /// <summary>JoyChromium's own logo (the session menu's row shows the installed exe's icon instead).</summary>
+    public ImageSource? JoyChromiumBrandLogo => _joyChromiumBrandLogo ??= LoadLogo("joychromium.png");
     /// <summary>Embedded, so the installed and portable builds need no loose files.</summary>
     private static BitmapImage? LoadLogo(string file)
     {

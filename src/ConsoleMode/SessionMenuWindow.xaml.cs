@@ -31,6 +31,8 @@ public sealed partial class SessionMenuWindow : Window
     private static readonly UISettings Ui = new();
 
     private readonly nint _hwnd;
+    // Kept: its handlers keep the list's edges and thumb in line with the scrolling.
+    private readonly Controls.ScrollEdges _rowsEdges;
     private readonly GamepadNavigator _navigator;
     private bool _editingVolume;
     private bool _closing;
@@ -47,6 +49,8 @@ public sealed partial class SessionMenuWindow : Window
     {
         ViewModel = viewModel;
         InitializeComponent();
+        Controls.UiScaleHost.Attach(ScaleArea, UiScaleBox, Root);
+        _rowsEdges = new Controls.ScrollEdges(RowsScroller, RowsFadeTop, RowsFadeBottom, RowsScrollTrack, RowsScrollThumb);
 
         _hwnd = WindowNative.GetWindowHandle(this);
         var appWindow = AppWindow.GetFromWindowId(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_hwnd));
@@ -271,6 +275,18 @@ public sealed partial class SessionMenuWindow : Window
         }
         Root.Background = new SolidColorBrush(glass ? Windows.UI.Color.FromArgb(0x99, 0x07, 0x0A, 0x0E) : Windows.UI.Color.FromArgb(0xF7, 0x07, 0x0A, 0x0E));
         SidebarPanel.Background = new SolidColorBrush(glass ? Windows.UI.Color.FromArgb(0xB3, 0x11, 0x18, 0x20) : Windows.UI.Color.FromArgb(0xFF, 0x13, 0x1A, 0x22));
+        // The list's edges fade into the panel: the same colour, solid at the edge.
+        var panel = glass ? Windows.UI.Color.FromArgb(0xFF, 0x11, 0x18, 0x20) : Windows.UI.Color.FromArgb(0xFF, 0x13, 0x1A, 0x22);
+        RowsFadeTop.Fill = EdgeFade(panel, fromTop: true);
+        RowsFadeBottom.Fill = EdgeFade(panel, fromTop: false);
+    }
+
+    private static LinearGradientBrush EdgeFade(Windows.UI.Color color, bool fromTop)
+    {
+        var brush = new LinearGradientBrush { StartPoint = new Windows.Foundation.Point(0, fromTop ? 0 : 1), EndPoint = new Windows.Foundation.Point(0, fromTop ? 1 : 0) };
+        brush.GradientStops.Add(new GradientStop { Color = color, Offset = 0 });
+        brush.GradientStops.Add(new GradientStop { Color = Windows.UI.Color.FromArgb(0, color.R, color.G, color.B), Offset = 1 });
+        return brush;
     }
 
     private void OnColorValuesChanged(UISettings sender, object args) => DispatcherQueue.TryEnqueue(ApplyMaterial);
