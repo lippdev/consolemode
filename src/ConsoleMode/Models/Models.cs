@@ -414,6 +414,10 @@ public sealed class ConsoleRuntimeState
     public bool AudioPendingTarget { get; set; }
     public nint CachedBigPictureHandle { get; set; }
     public DateTime? PlayniteWindowMissingSince { get; set; }
+    /// <summary>Playnite's big window last seen showing; it stays (hidden) while a game it started runs.</summary>
+    public nint PlayniteWindow { get; set; }
+    /// <summary>That window is put away for a game; only so the log says it once per game.</summary>
+    public bool PlayniteWindowPutAway { get; set; }
     /// <summary>"customApp": the process name that keeps the session going, and when it went missing.</summary>
     public string CustomAppWatchName { get; set; } = "";
     public DateTime? CustomAppGoneSince { get; set; }

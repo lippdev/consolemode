@@ -630,6 +630,12 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Interface Console: nenhuma faixa cinza no topo; o fundo (Aurora, capas ou imagem) vai até a borda da janela, e minimizar, maximizar e fechar aparecem brancos, com realce suave ao passar o mouse e mais forte ao clicar. Resultado: ______
 - [ ] Interface Console: arrastar a janela pela área de cima (fora das abas e dos botões) funciona; as abas, o relógio e os botões redondos continuam clicáveis. Resultado: ______
 
+## Playnite com jogo aberto e nomes das telas (#191)
+
+- [ ] Playnite em tela cheia com "Minimizar após iniciar o jogo" ligado (Selene): abrir um jogo pela sessão e jogar mais de 1 minuto. A sessão continua (o log diz "Playnite escondeu a janela (jogo aberto); a sessão continua"); ao fechar o jogo o Playnite volta na TV ("voltou a mostrar a janela") e a sessão segue. Resultado: ______
+- [ ] Fechar o Playnite depois disso encerra a sessão e a mesa volta como estava ("Restore: concluído com sucesso", sem "Não foi possível desconectar"). Resultado: ______
+- [ ] Com a TV como tela de jogo e os dois monitores da mesa desligados pela sessão, abrir e encerrar várias sessões seguidas. Se o log mostrar "Telas: a tela de jogo passou de … para …", a resolução da TV é aplicada, o jogo abre na TV e a volta religa os monitores da mesa nas posições certas (o log da volta mostra "telas com outro nome desde o backup"). Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.

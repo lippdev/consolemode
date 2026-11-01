@@ -188,6 +188,15 @@ public sealed class LaunchService
 
     public bool IsPlayniteRunning() => Process.GetProcessesByName("Playnite.FullscreenApp").Length > 0;
 
+    /// <summary>
+    /// Playnite puts its window away while a game runs ("Minimize after game startup" in its fullscreen settings, on in
+    /// themes like Selene): the same window is hidden (or minimized) and comes back when the game ends. It still
+    /// exists, unlike a loading window swapped for the main one, which is destroyed.
+    /// </summary>
+    public static bool IsPlayniteWindowPutAway(nint window) =>
+        window != 0 && NativeWindows.IsWindow(window)
+                    && (!NativeWindows.IsWindowVisible(window) || NativeWindows.IsIconic(window));
+
     public nint[] GetFullscreenHandles(string mode) =>
         mode == "playnite" ? GetPlayniteHandles() : GetBigPictureHandles();
 

@@ -89,6 +89,40 @@ public sealed class DisplayIdentityTests
     }
 
     [Fact]
+    public void Saved_names_follow_their_monitors_when_two_swap()
+    {
+        // The owner's desk: the TV (off) was DISPLAY3 and the HP DISPLAY1 at the backup; after the session the
+        // TV is DISPLAY1 and the HP DISPLAY3. The game screen saved as DISPLAY3 must now mean DISPLAY1, not the HP.
+        var text = DisplayIdentity.FormatLayout(
+        [
+            new LayoutEntry(@"\\.\DISPLAY2", @"MONITOR\TCL1003\{x}\0011", "", 32, 1920, 1080, 240, 0, 0),
+            new LayoutEntry(@"\\.\DISPLAY1", @"MONITOR\HWP3318\{x}\0012", "BRG", 32, 1080, 1920, 60, 1920, -301, 1),
+            new LayoutEntry(@"\\.\DISPLAY3", @"MONITOR\GSM0001\{x}\0002", "", 0, 0, 0, 0, 0, 0)
+        ]);
+        var specs = DisplayIdentity.ParseLayout(text.Split("\r\n"));
+
+        var names = DisplayIdentity.CurrentNames(specs,
+        [
+            (@"MONITOR\TCL1003\{x}\0011", @"\\.\DISPLAY2"),
+            (@"MONITOR\GSM0001\{x}\0002", @"\\.\DISPLAY1"),
+            (@"MONITOR\HWP3318\{x}\0012", @"\\.\DISPLAY3")
+        ]);
+
+        Assert.Equal(@"\\.\DISPLAY2", names[@"\\.\DISPLAY2"]);
+        Assert.Equal(@"\\.\DISPLAY1", names[@"\\.\DISPLAY3"]);
+        Assert.Equal(@"\\.\DISPLAY3", names[@"\\.\DISPLAY1"]);
+    }
+
+    [Fact]
+    public void Saved_names_of_a_missing_monitor_are_left_out()
+    {
+        var specs = DisplayIdentity.ParseLayout(DisplayIdentity.FormatLayout(
+            [new LayoutEntry(@"\\.\DISPLAY3", @"MONITOR\GSM0001\{x}\0002", "", 0, 0, 0, 0, 0, 0)]).Split("\r\n"));
+
+        Assert.Empty(DisplayIdentity.CurrentNames(specs, [(@"MONITOR\DEL4083\{x}\0001", @"\\.\DISPLAY1")]));
+    }
+
+    [Fact]
     public void Layout_file_keeps_a_rotated_monitor_portrait()
     {
         // A monitor turned to portrait: 1080x1920 at 90 degrees. Restoring it needs the rotation too.

@@ -10,10 +10,15 @@ public static class PlayniteExitPolicy
     public static readonly TimeSpan WindowGrace = TimeSpan.FromSeconds(20);
 
     /// <param name="windowMissingSince">When the big window went missing, or null if it is showing.</param>
-    public static bool IsExit(bool processRunning, bool bigWindowShowing, DateTime? windowMissingSince, DateTime now)
+    /// <param name="windowPutAway">
+    /// Its window still exists but is hidden or minimized: Playnite does that while a game it started runs, however
+    /// long the game lasts.
+    /// </param>
+    public static bool IsExit(bool processRunning, bool bigWindowShowing, DateTime? windowMissingSince, DateTime now,
+        bool windowPutAway = false)
     {
         if (!processRunning) return true;
-        if (bigWindowShowing || windowMissingSince is null) return false;
+        if (bigWindowShowing || windowPutAway || windowMissingSince is null) return false;
         return now - windowMissingSince.Value >= WindowGrace;
     }
 }

@@ -3,6 +3,9 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- Playnite: starting a game no longer ends the session. With "Minimize after game startup" on (the Selene theme turns it on), Playnite hides its window while the game runs, and after 20 s Console Mode took it as closed and brought the desk screens back mid-game. The session now lasts until Playnite really closes. (#191)
+- Screens: when Windows renames the screens during a session (the TV goes in as `DISPLAY3` and comes out as `DISPLAY1`), the chosen resolution goes to the TV and going back to the PC turns the right screens on and off; before, it could turn off a desk monitor taking it for the TV. Going back also no longer spends 10 s trying to detach the TV while it is still the main screen. (#191)
 
 ## [1.7.0-beta.1]
 ### What's new
