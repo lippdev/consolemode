@@ -126,13 +126,57 @@ public partial class MainViewModel
     [RelayCommand]
     private void RemoveCustomApp()
     {
-        if (IsConsoleActive || SelectedCustomApp is not { } app) return;
-        _customApps.Remove(app);
-        _customAppId = _customApps.FirstOrDefault()?.Id ?? "";
-        ShowSelectedCustomApp();
-        RebuildLaunchOptions("bigPicture");
+        if (SelectedCustomApp is { } app) RemoveCustomAppEntry(app);
+    }
+
+    /// <summary>
+    /// Takes an app off Home (System, or its tile's menu). The launcher that opens stays, unless it was this app: then
+    /// Steam Big Picture opens instead. System goes on showing another of the apps, if any is left.
+    /// </summary>
+    private void RemoveCustomAppEntry(CustomAppEntry app)
+    {
+        if (IsConsoleActive || !_customApps.Remove(app)) return;
+        var wasLauncher = SelectedLaunch?.Value == CustomApp.EntryMode(app.Id);
+        if (_customAppId == app.Id)
+        {
+            _customAppId = _customApps.FirstOrDefault()?.Id ?? "";
+            ShowSelectedCustomApp();
+        }
+        RebuildLaunchOptions(wasLauncher ? "bigPicture" : null);
         AppLog.Write($"Aplicativo personalizado: removido {app.Path}");
         SettingChanged();
+    }
+
+    // ── A custom app's tile menu (Start / Options on it, or a right click): Remove from Home ──
+
+    private const string TileMenuRemove = "remove";
+    private const string TileMenuCancel = "cancel";
+    /// <summary>The app whose tile menu is open (its id).</summary>
+    private string _tileMenuAppId = "";
+
+    /// <summary>Only the apps added with "+" have one: Steam, Playnite and Xbox mode always stay.</summary>
+    public static bool HasTileMenu(LaunchTile? tile) => tile is { IsAdd: false } && CustomApp.IsEntryMode(tile.Option.Value);
+
+    /// <summary>Opens the tile's menu in the option picker, titled with the app's name. False when it has none.</summary>
+    public bool OpenTileMenu(LaunchTile? tile)
+    {
+        if (IsConsoleActive || !HasTileMenu(tile) || CustomApp.EntryId(tile!.Option.Value) is not { } id) return false;
+        _tileMenuAppId = id;
+        _pickerKey = "tile";
+        PickerTitle = tile.Text;
+        PickerOptions.Clear();
+        PickerOptions.Add(new PickerItem(LocalizationService.Get("RemoveFromHome"), TileMenuRemove, false));
+        PickerOptions.Add(new PickerItem(LocalizationService.Get("Cancel"), TileMenuCancel, false));
+        IsRolePanelOpen = false;
+        IsPickerOpen = true;
+        AppLog.Write($"Início: menu do bloco \"{tile.Text}\"");
+        return true;
+    }
+
+    private void PickTileMenu(string value)
+    {
+        if (value == TileMenuRemove && _customApps.FirstOrDefault(a => a.Id == _tileMenuAppId) is { } app) RemoveCustomAppEntry(app);
+        _tileMenuAppId = "";
     }
 
     private async Task<string?> PickExeAsync()

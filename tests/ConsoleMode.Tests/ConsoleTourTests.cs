@@ -68,6 +68,7 @@ public class ConsoleTourTests
         var arguments = new Dictionary<ConsoleTourStop, int>
         {
             [ConsoleTourStop.Tabs] = 2,
+            [ConsoleTourStop.Launchers] = 1,
             [ConsoleTourStop.Play] = 2,
             [ConsoleTourStop.Screens] = 1,
             [ConsoleTourStop.System] = 1,

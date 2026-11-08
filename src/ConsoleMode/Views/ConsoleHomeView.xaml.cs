@@ -120,6 +120,8 @@ public sealed partial class ConsoleHomeView : UserControl
         _navigator.TabRequested += StepTab;
         _navigator.MenuRequested += () =>
         {
+            // Like a console's game row: ☰ on one of your apps opens its menu (Remove from Home). Anywhere else, it plays.
+            if (!IsOverlayOpen() && ViewModel.OpenTileMenu(FocusedLaunchTile())) { UiSounds.Play(UiSound.Confirm); return; }
             if (ViewModel.CanStart && !ViewModel.IsRolePanelOpen && !ViewModel.IsConsoleSettingsOpen
                 && !ViewModel.IsPickerOpen && !ViewModel.IsShortcutEditorOpen && !ViewModel.IsConsoleTourOpen
                 && !ViewModel.IsControllerTestOpen && !ViewModel.IsUpdateOpen)
@@ -1020,6 +1022,24 @@ public sealed partial class ConsoleHomeView : UserControl
     private void PickFocusedLauncher(object source)
     {
         if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
+    }
+
+    /// <summary>A panel over the page (a picker, the tour, the editor...): the tile menu waits for it to close.</summary>
+    private bool IsOverlayOpen() =>
+        ViewModel.IsRolePanelOpen || ViewModel.IsConsoleSettingsOpen || ViewModel.IsPickerOpen || ViewModel.IsShortcutEditorOpen
+        || ViewModel.IsConsoleTourOpen || ViewModel.IsControllerTestOpen || ViewModel.IsUpdateOpen || !ViewModel.IsHomeTab;
+
+    /// <summary>The launcher tile with the focus, or null.</summary>
+    private LaunchTile? FocusedLaunchTile() =>
+        Root.XamlRoot is { } root && FocusManager.GetFocusedElement(root) is Button { DataContext: LaunchTile tile } button && IsInside(button, LaunchRow)
+            ? tile : null;
+
+    /// <summary>A right click on one of your apps' tiles: its menu. The launcher that opens doesn't change.</summary>
+    private void OnLaunchTileRightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: LaunchTile tile } || IsOverlayOpen() || !MainViewModel.HasTileMenu(tile)) return;
+        e.Handled = true;
+        ViewModel.OpenTileMenu(tile);
     }
 
     /// <summary>

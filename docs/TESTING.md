@@ -654,6 +654,14 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Sistema não mostra mais a categoria **TV**; o direcional e o mouse andam pelas outras categorias sem buracos. Resultado: ______
 - [ ] Com uma Android TV que estava configurada na 1.6: uma sessão não liga a TV nem troca a entrada, e a volta não a coloca em espera (o log não tem linhas "TV: ligar" / "TV: desligar"). O `config.json` continua com o bloco `tv` como estava. Resultado: ______
 
+## Remover um app pelo bloco da Início (#198)
+
+- [ ] Com dois apps adicionados pelo **+**: foco num deles, **☰** (ou OPTIONS) abre o menu com o nome do app, **Remover da Início** e **Cancelar**. **Remover da Início** tira o bloco (e do `config.json`); **Cancelar** ou B fecham sem mudar nada. Resultado: ______
+- [ ] O botão direito do mouse no bloco abre o mesmo menu. Resultado: ______
+- [ ] Removendo o app que estava escolhido para abrir, o Steam Big Picture passa a ser o escolhido; removendo outro, o escolhido não muda. Resultado: ______
+- [ ] **☰** num bloco da Steam, do Playnite ou do modo Xbox, ou no botão **Jogar agora**, continua começando a jogar. Com uma sessão ativa, o menu não abre. Resultado: ______
+- [ ] Tour, parada dos iniciadores: o texto mostra o botão certo (☰ no Xbox, OPTIONS no PlayStation). Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.

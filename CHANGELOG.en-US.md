@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- Home: the apps you added with **+** leave Home from their own tile. With the focus on it, **☰** (OPTIONS on PlayStation) or a right click opens a menu with **Remove from Home**. Before, only the System tab could do it. Steam, Playnite and Xbox mode have no such menu, and anywhere else on Home **☰** still starts playing. (#198)
 
 ## [1.7.0-beta.3]
 ### Changes
