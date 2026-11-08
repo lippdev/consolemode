@@ -292,6 +292,7 @@ public partial class MainViewModel
             case "overlaysize": SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlaySize; break;
             case "overlayposition": SelectedFpsOverlayPosition = FpsOverlayPositionOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlayPosition; break;
             case "overlaycolor": SelectedFpsOverlayColor = FpsOverlayColorOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlayColor; break;
+            case "tile": PickTileMenu(item.Value); break;
             case "profiles":
                 if (int.TryParse(item.Value, out var appId))
                     RemoveGameProfile(GameProfileItems.FirstOrDefault(p => p.AppId == appId));
