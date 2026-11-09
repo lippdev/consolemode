@@ -19,7 +19,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 - Avisos na tela de jogo entram deslizando pela direita, mostram quanto tempo falta e saem pelo mesmo lado; as listas de opções esmaecem nas bordas quando há mais itens e mostram onde você está. (#185)
 - Bateria do controle no menu da sessão e na barra de cima, e um relatório de diagnóstico para copiar em Sistema. (#159, #160)
 - O aviso de atualização mostra o destaque da versão no idioma do app, quando há changelog nele. (#158)
-- **Console Mode Legacy**, para quem prefere a interface antiga: na mesma release, `ConsoleMode-Legacy-Setup-x64.exe` e `ConsoleMode-Legacy-Portable-x64.exe` são o Console Mode 1.6.2 como era, com as interfaces Desktop e Console e o controle da TV. Abre com os ajustes que você já tem e guarda os que só esta versão usa, então dá para ir e voltar sem perder nada. Está congelada: sem novas funções, sem correções, e nunca oferece atualização. Para voltar, instale a versão atual por cima. (#200, #202)
+- **Console Mode Legacy**, para quem prefere a interface antiga: na mesma release, `ConsoleModeLegacy-Setup-x64.exe` e `ConsoleModeLegacy-Portable-x64.exe` são o Console Mode 1.6.2 como era, com as interfaces Desktop e Console e o controle da TV. Abre com os ajustes que você já tem e guarda os que só esta versão usa, então dá para ir e voltar sem perder nada. Está congelada: sem novas funções, sem correções, e nunca oferece atualização. Para voltar, instale a versão atual por cima. (#200, #202)
 ### Mudanças
 - Início: clicar num iniciador (ou apertar A nele) só escolhe o que vai abrir; quem começa é **Jogar agora**. (#193)
 - A interface Desktop sai do app: tudo o que ela fazia está na aba Sistema. Ela continua na **Legacy**. (#184)
