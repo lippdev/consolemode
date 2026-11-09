@@ -662,6 +662,19 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] **☰** num bloco da Steam, do Playnite ou do modo Xbox, ou no botão **Jogar agora**, continua começando a jogar. Com uma sessão ativa, o menu não abre. Resultado: ______
 - [ ] Tour, parada dos iniciadores: o texto mostra o botão certo (☰ no Xbox, OPTIONS no PlayStation). Resultado: ______
 
+## Legacy e rascunho da 1.7.0 (#200, #201, #202)
+
+Com o rascunho da release aberto no GitHub (só o dono vê), baixar os quatro arquivos.
+
+- [ ] Com a beta instalada e aberta: o app **não** oferece a 1.7.0 enquanto ela é rascunho (Sistema → App → Verificar agora diz que está na versão mais recente). Resultado: ______
+- [ ] `ConsoleMode-Setup-x64.exe` por cima da beta: instala, abre como 1.7.0 e mantém todos os ajustes. Resultado: ______
+- [ ] `ConsoleMode-Legacy-Setup-x64.exe` por cima da 1.7.0: o instalador e a entrada em "Aplicativos instalados" dizem **Console Mode Legacy**; o app abre com o título "Console Mode Legacy", mostra o tutorial antigo uma vez, e telas, áudio, atalhos do controle e idioma estão como na 1.7.0. Ajustes mostra "1.7.0 Legacy" e não tem as linhas de atualização. Resultado: ______
+- [ ] Na Legacy, com um aplicativo adicionado pelo **+** escolhido na 1.7.0: o iniciador mostrado é o Steam Big Picture. Uma sessão pela Legacy (TV, voltar ao PC) funciona como na 1.6.2. Resultado: ______
+- [ ] Mudar um ajuste na Legacy (HDR, por exemplo), fechar, e instalar a 1.7.0 por cima: os aplicativos do **+**, os perfis por jogo, o estilo da abertura e o atalho da visão de tarefas estão como antes, o aplicativo escolhido continua escolhido e o HDR ficou como mudado na Legacy. Resultado: ______
+- [ ] De volta à Legacy mais uma vez: o tutorial antigo não aparece de novo e a interface escolhida nela (Desktop ou Console) foi lembrada. Resultado: ______
+- [ ] A Legacy portátil numa pasta própria abre com os ajustes padrão (dados na `ConsoleMode_Data` ao lado) e convive com a 1.7.0 instalada, uma aberta por vez. Resultado: ______
+- [ ] Depois de publicar o rascunho: a tag `v1.7.0` aparece, a beta instalada oferece a 1.7.0 (nunca a Legacy) e o workflow **Winget** roda sozinho. Resultado: ______
+
 ## Interface única e tour guiado (1.7.0)
 
 Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiza de uma versão anterior, mesmo tendo visto o tutorial antigo). Teste com controle, só com mouse e só com teclado.
