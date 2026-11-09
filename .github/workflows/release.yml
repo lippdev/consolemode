@@ -47,11 +47,16 @@ jobs:
   legacy:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.legacy != ''
     runs-on: windows-latest
+    # It runs the code of a branch named at run time: read-only, and the token doesn't stay in the checkout.
+    # Its files reach the release through the artifact, attached by the build job.
+    permissions:
+      contents: read
     steps:
       - name: Checkout the Legacy branch
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.legacy }}
+          persist-credentials: false
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
