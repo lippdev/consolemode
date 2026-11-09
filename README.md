@@ -18,7 +18,7 @@ Get **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, the
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
 - Or with winget: `winget install lippdev.ConsoleMode`
 
-On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? The same release has **Console Mode Legacy** (`ConsoleMode-Legacy-Setup-x64.exe` or `ConsoleMode-Legacy-Portable-x64.exe`): 1.6.2 as it was, sharing your settings with the current version. It is frozen: no fixes and no updates.
+On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? The same release has **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` or `ConsoleModeLegacy-Portable-x64.exe`): 1.6.2 as it was, sharing your settings with the current version. It is frozen: no fixes and no updates.
 
 Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (alpha and beta)".
 
