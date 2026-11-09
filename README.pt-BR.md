@@ -8,7 +8,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.6-short.gif" alt="Tour do Console Mode 1.6: um clique leva o jogo para a TV, o menu da sessão sobre o jogo com as janelas abertas, o explorador de arquivos ControlFS embutido, a interface Console com as abas Início, Sessão e Sistema e os atalhos do controle à sua escolha." width="800">
+<img src="assets/console-mode-1.7.gif" alt="O Console Mode 1.7 em um minuto: a abertura de console, uma interface só com os seus aplicativos no Início, o tour guiado, as telas dispostas como na sua mesa, a visão de tarefas pelo controle, o menu da sessão fora da sessão, os perfis por jogo e o controle acordando o PC." width="800">
 
 ## Download
 
