@@ -78,10 +78,6 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 
 All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
 
-## Roadmap
-
-**Next:** [Tako](https://github.com/lippdev/tako-launcher) as a launcher and a local API for it, Hydra and AnyFSE, a support link · **Later:** record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), more TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Exploring:** Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). The full plan is in the [PRD](docs/PRD.md) (Portuguese).
-
 ## More
 
 - [Guide](docs/GUIDE.md): modes and restore, control API, HDR/VRR/FPS, troubleshooting, building from source

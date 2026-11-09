@@ -78,10 +78,6 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 
 Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
-## Roadmap
-
-**Próximos:** o [Tako](https://github.com/lippdev/tako-launcher) como iniciador e uma API local para ele, Hydra e AnyFSE, um link de apoio ao projeto · **Depois:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), mais TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Explorando:** Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). O plano completo está no [PRD](docs/PRD.md).
-
 ## Mais
 
 - [Guia](docs/GUIDE.pt-BR.md): modos e restauração, API de controle, HDR/VRR/FPS, solução de problemas, compilar
