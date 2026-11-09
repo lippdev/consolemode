@@ -8,17 +8,17 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.6-short.gif" alt="Tour do Console Mode 1.6: um clique leva o jogo para a TV, o menu da sessão sobre o jogo com as janelas abertas, o explorador de arquivos ControlFS embutido, a interface Console com as abas Início, Sessão e Sistema e os atalhos do controle à sua escolha." width="800">
+<img src="assets/console-mode-1.7.gif" alt="O Console Mode 1.7 em um minuto: a abertura de console, uma interface só com os seus aplicativos no Início, o tour guiado, as telas dispostas como na sua mesa, a visão de tarefas pelo controle, o menu da sessão fora da sessão, os perfis por jogo e o controle acordando o PC." width="800">
 
 ## Download
 
-Baixe a **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**, a versão estável mais recente:
+Baixe a **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
 - Ou pelo winget: `winget install lippdev.ConsoleMode`
 
-Está na 1.5? O app oferece a atualização e mantém as configurações; os atalhos do controle você escolhe de novo na primeira abertura.
+Está na 1.6? O app oferece a atualização e mantém suas configurações. Prefere a interface antiga, com o modo Desktop? A mesma release tem o **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` ou `ConsoleModeLegacy-Portable-x64.exe`): a 1.6.2 como era, dividindo seus ajustes com a versão atual. Está congelado: sem correções e sem atualizações.
 
 Quer testar o que vem aí antes de todo mundo? Ligue Sistema → App → "Receber versões de teste (alpha e beta)".
 
@@ -49,36 +49,38 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
 - **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS) e pela web com o [JoyChromium](https://github.com/lippdev/joychromium)
 - Uma interface no estilo dos consoles, feita para a TV, que também funciona com mouse e teclado (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo), com um tour guiado na primeira vez que você abre
+- **Seus aplicativos** como iniciadores: qualquer `.exe` (RetroArch, outro launcher…) vira um bloco no Início
+- **Perfis por jogo** para os jogos da Steam (resolução, HDR, limite de FPS e áudio) e a bateria do controle na tela
+- Devolve os **ícones da área de trabalho** e o **ponteiro do mouse** ao lugar, pode deixar o controle **acordar o PC** e restaura a mesa na próxima abertura se uma sessão for interrompida
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês, espanhol, alemão, francês e russo
 
-## Novidades da 1.6.2
+## Novidades da 1.7.0
 
-- **Alemão, francês e russo:** a interface, o instalador e a lista de idiomas agora falam Deutsch (tradução de [u/Skinner99](https://www.reddit.com/user/Skinner99/) no Reddit), Français e Русский, e o app segue o Windows se ele estiver num desses idiomas
-- **Minimizar para a bandeja:** uma nova opção em Ajustes (e na interface Console, em Sistema) deixa o Console Mode nos ícones ocultos em vez da barra de tarefas quando você minimiza
+- **Uma interface só, com cara de console:** seus iniciadores numa fileira com os logos oficiais, a fonte Inter, o fundo Aurora, uma abertura com som e um tour guiado na primeira vez. Funciona com controle, mouse e teclado; a interface Desktop continua no Legacy
+- **Seus aplicativos no Início:** adicione qualquer `.exe` pelo **+**, quantos quiser, e tire um deles pelo próprio bloco
+- **Perfis por jogo:** cada jogo da Steam lembra a própria resolução, HDR, limite de FPS e áudio, salvos pelo menu da sessão
+- **Menu da sessão em qualquer lugar:** o atalho do menu abre sem iniciar uma sessão, para usar o PC do sofá, e um atalho novo abre a visão de tarefas do Windows
+- **JoyChromium no menu da sessão:** o navegador para a TV que se usa com o controle abre por cima do jogo e se instala por ali mesmo se faltar
+- **A mesa volta inteira:** os ícones da área de trabalho e o ponteiro do mouse voltam ao lugar e, se o app ou o PC cair no meio da sessão, a próxima abertura restaura tudo
+- **Acordar o PC pelo controle**, a bateria do controle na tela e a mesma cara em qualquer escala do Windows, de 1080p a 4K
+- **Console Mode Legacy** na mesma release, para quem prefere a interface antiga (ele também mantém o controle da TV, que ficou fora da 1.7)
 
-## Novidades da 1.6.1
-
-- **Contador de FPS num card:** três tamanhos, o canto da tela que você quiser e os novos estilos Apenas FPS, Compacto (uso de CPU, GPU e RAM) e Detalhado (clocks, temperatura da GPU, VRAM e RAM), tudo ajustado pelo próprio menu da sessão
-- **Cursor do mouse pelo menu da sessão:** esconda até ligar de novo, ou mova com o controle (o analógico move, A clica)
-- **Tour do menu da sessão:** na primeira vez que o menu abre, ele oferece um tour rápido por cada opção
-
-## Novidades da 1.6.0
+## Novidades da 1.6
 
 - **Interface Console redesenhada:** abas Início, Sessão e Sistema no LB/RB, blocos das telas, as capas da sua Steam como plano de fundo e sons da interface
 - **Menu da sessão como o overlay do Steam:** tela cheia sobre o jogo, com as janelas abertas no meio (um Alt+Tab para o controle)
 - **Explorador de arquivos embutido:** o ControlFS abre pelo menu da sessão, e é instalado dali mesmo se faltar
 - **Contador de FPS** sobre o jogo pelo RTSS, com os estilos Compacto, Detalhado e Personalizado
 - **Seus atalhos, seus botões:** escolha os botões do controle que abrem o Console Mode, o menu da sessão e a volta ao PC
-- **Controle da TV:** liga a Google TV / Android TV e troca para a entrada do PC
 - **Só código do projeto:** telas e áudio pelas APIs do Windows, sem as ferramentas da NirSoft
 - A Steam vai para a bandeja ao voltar ao PC, o layout da mesa volta idêntico (monitores em retrato também) e o Playnite demorando para abrir não encerra mais a sessão
 
-Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.6.2) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
+Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
 ## Roadmap
 
-**Próximos:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), posição dos ícones da área de trabalho ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Depois:** perfis por jogo ([#69](https://github.com/lippdev/consolemode/issues/69)) · **Explorando:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
+**Próximos:** o [Tako](https://github.com/lippdev/tako-launcher) como iniciador e uma API local para ele, Hydra e AnyFSE, um link de apoio ao projeto · **Depois:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), mais TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Explorando:** Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). O plano completo está no [PRD](docs/PRD.md).
 
 ## Mais
 

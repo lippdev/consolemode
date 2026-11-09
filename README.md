@@ -8,17 +8,17 @@ English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.6-short.gif" alt="Tour of Console Mode 1.6: one click moves the game to the TV, the session menu over the game with the open windows, the built-in ControlFS file explorer, the Console interface with its Home, Session and System tabs, and controller shortcuts you choose." width="800">
+<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 in a minute: the console boot animation, one interface with your own apps on Home, a guided tour, screens laid out as on your desk, Task View on the controller, the session menu outside a session, per-game profiles and the controller waking the PC." width="800">
 
 ## Download
 
-Get **[1.6.2](https://github.com/lippdev/consolemode/releases/tag/v1.6.2)**, the latest stable version:
+Get **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
 - Or with winget: `winget install lippdev.ConsoleMode`
 
-On 1.5? The app offers the update and keeps your settings; you pick your controller shortcuts again the first time it opens.
+On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? The same release has **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` or `ConsoleModeLegacy-Portable-x64.exe`): 1.6.2 as it was, sharing your settings with the current version. It is frozen: no fixes and no updates.
 
 Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (alpha and beta)".
 
@@ -49,36 +49,38 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode, and sends Steam to the tray when you go back to the PC
 - **Session menu** over the game: switch or close the open windows, change volume, resolution, audio, FPS and HDR, hide the mouse pointer or drive it with the controller, and browse your files with [ControlFS](https://github.com/nextestudios/ControlFS) and the web with [JoyChromium](https://github.com/lippdev/joychromium)
 - A console-style interface made for the TV that also works with the mouse and the keyboard (full screen, Xbox and PlayStation pads, LB/RB tabs, its own wallpaper or your Steam covers as the background), with a guided tour the first time you open it
+- **Your own apps** as launchers: any `.exe` (RetroArch, another launcher…) becomes a tile on Home
+- **Per-game profiles** for Steam games (resolution, HDR, FPS limit and audio) and the controller's battery on screen
+- Puts the **desktop icons** and the **mouse pointer** back where they were, can let the controller **wake the PC**, and restores the desk on the next start if a session was cut short
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese, Spanish, German, French and Russian
 
-## What's new in 1.6.2
+## What's new in 1.7.0
 
-- **German, French and Russian:** the interface, the installer and the language picker now speak Deutsch (translated by [u/Skinner99](https://www.reddit.com/user/Skinner99/) on Reddit), Français and Русский, and the app follows Windows if it is in one of them
-- **Minimize to the system tray:** a new option in Settings (and in the Console interface, under System) keeps Console Mode in the hidden icons instead of the taskbar when you minimize it
+- **One interface, made like a console's:** your launchers in a row with their official logos, the Inter font, the Aurora background, an opening with sound and a guided tour the first time. It works with the controller, the mouse and the keyboard; the Desktop interface lives on in Legacy
+- **Your apps on Home:** add any `.exe` with **+**, as many as you like, and take one off from its own tile
+- **Per-game profiles:** each Steam game remembers its resolution, HDR, FPS limit and audio, saved from the session menu
+- **Session menu anywhere:** the menu shortcut opens it without starting a session, to use the PC from the couch, and a new shortcut opens Windows' Task View
+- **JoyChromium in the session menu:** the TV browser you drive with the controller opens over the game and installs from there if it is missing
+- **The desk comes back whole:** desktop icons and the mouse pointer return to their places, and if the app or the PC goes down mid-session, the next start restores everything
+- **Wake the PC with the controller**, the controller's battery on screen and the same look at any Windows scale, from 1080p to 4K
+- **Console Mode Legacy** in the same release, for those who prefer the old interface (it also keeps TV control, which is out of 1.7)
 
-## What's new in 1.6.1
-
-- **FPS counter on a card:** three sizes, a screen corner of your choice, and the new FPS only, Compact (CPU, GPU and RAM usage) and Detailed (clocks, GPU temperature, VRAM and RAM) styles, all tuned from the session menu itself
-- **Mouse pointer from the session menu:** hide it until you turn it back on, or drive it with the controller (stick moves, A clicks)
-- **Session menu tour:** the first time the menu opens it offers a short guided tour of each option
-
-## What's new in 1.6.0
+## What's new in 1.6
 
 - **Console interface, redesigned:** Home, Session and System tabs on LB/RB, screen tiles, your Steam covers as the background and interface sounds
 - **Session menu like Steam's overlay:** full screen over the game, with the open windows in the middle (an Alt + Tab for the controller)
 - **File explorer built in:** ControlFS opens from the session menu, and installs from there if it is missing
 - **FPS counter** over the game through RTSS, with Compact, Detailed and Custom styles
 - **Your shortcuts, your buttons:** pick the controller buttons that open Console Mode, the session menu and the way back to the PC
-- **TV control:** turns a Google TV / Android TV on and switches it to the PC's input
 - **All the project's own code:** displays and audio through Windows' APIs, without the NirSoft tools
 - Steam goes to the tray when you go back to the PC, the desk layout comes back exactly as it was (portrait monitors too), and slow Playnite starts no longer end the session
 
-All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.6.2) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
+All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
 
 ## Roadmap
 
-**Next:** record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), desktop icon positions ([#30](https://github.com/lippdev/consolemode/issues/30)) · **Later:** per-game profiles ([#69](https://github.com/lippdev/consolemode/issues/69)) · **Exploring:** HDMI-CEC ([#75](https://github.com/lippdev/consolemode/issues/75)), Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap).
+**Next:** [Tako](https://github.com/lippdev/tako-launcher) as a launcher and a local API for it, Hydra and AnyFSE, a support link · **Later:** record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), more TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Exploring:** Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). The full plan is in the [PRD](docs/PRD.md) (Portuguese).
 
 ## More
 
