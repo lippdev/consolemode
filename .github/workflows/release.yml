@@ -7,6 +7,14 @@ name: Release
 # With "publish" unticked the workflow only builds and uploads the files as an artifact.
 # The app's update check (UpdateService) reads these releases and looks for the
 # ConsoleMode-Setup-*.exe / ConsoleMode-Portable-*.exe assets built here.
+#
+# "draft" (with "publish"): the release is created as a draft. Only people with write access see a draft:
+# the app's update check doesn't, nothing goes to winget and the tag isn't created yet. Publishing the draft
+# on GitHub creates the tag on the commit that was built, and winget.yml then sends it to winget.
+#
+# "legacy": a branch built next to this one (release/1.7-legacy: 1.6.2's interfaces, frozen) and attached to
+# the same release as ConsoleMode-Legacy-*.exe. Those names don't start like the ones the update check and
+# winget look for, so nobody is updated to Legacy.
 on:
   push:
     tags:
@@ -20,17 +28,89 @@ on:
         description: "Publish: create the tag and the GitHub release (only from main). Unticked, just build."
         type: boolean
         default: false
+      draft:
+        description: "Draft: with Publish, create the release as a draft (no update notice, no winget, no tag yet)."
+        type: boolean
+        default: false
+      legacy:
+        description: "Legacy: branch to build and attach as ConsoleMode-Legacy-*.exe (e.g. release/1.7-legacy). Empty: none."
+        required: false
+        default: ""
 
 permissions:
   contents: write
+  # The build job fetches the Legacy job's files of this same run.
+  actions: read
 
 jobs:
+  # The Legacy build: the branch's own code, tests and publish script, with the version of this release.
+  legacy:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.legacy != ''
+    runs-on: windows-latest
+    # It runs the code of a branch named at run time: read-only, and the token doesn't stay in the checkout.
+    # Its files reach the release through the artifact, attached by the build job.
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the Legacy branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.legacy }}
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          $v = $env:INPUT_VERSION.TrimStart("v")
+          if ($v -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.\-]+)?$') { throw "Versão inválida: $v" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test tests/ConsoleMode.Tests/ConsoleMode.Tests.csproj -c Release --nologo
+
+      - name: Install Inno Setup (if missing)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build portable + installer
+        shell: pwsh
+        run: .\build\Publish-ConsoleMode.ps1 -Runtime x64 -Target All -Version "${{ steps.version.outputs.version }}"
+
+      - name: Name the files Legacy
+        shell: pwsh
+        run: |
+          Rename-Item -LiteralPath "dist/ConsoleMode-Setup-x64.exe" -NewName "ConsoleMode-Legacy-Setup-x64.exe"
+          Rename-Item -LiteralPath "dist/ConsoleMode-Portable-x64.exe" -NewName "ConsoleMode-Legacy-Portable-x64.exe"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ConsoleMode-Legacy-${{ steps.version.outputs.version }}
+          path: |
+            dist/ConsoleMode-Legacy-Setup-x64.exe
+            dist/ConsoleMode-Legacy-Portable-x64.exe
+          if-no-files-found: error
+
   build:
+    needs: legacy
+    # Without Legacy that job is skipped, and a skipped job would skip this one too.
+    if: ${{ !cancelled() && (needs.legacy.result == 'success' || needs.legacy.result == 'skipped') }}
     runs-on: windows-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
       prerelease: ${{ steps.version.outputs.prerelease }}
       publish: ${{ steps.version.outputs.publish }}
+      draft: ${{ steps.version.outputs.draft }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -49,6 +129,7 @@ jobs:
           REF: ${{ github.ref }}
           INPUT_VERSION: ${{ github.event.inputs.version }}
           INPUT_PUBLISH: ${{ github.event.inputs.publish }}
+          INPUT_DRAFT: ${{ github.event.inputs.draft }}
         run: |
           $v = if ($env:EVENT_NAME -eq "push") { $env:REF_NAME } else { $env:INPUT_VERSION }
           $v = $v.TrimStart("v")
@@ -62,12 +143,16 @@ jobs:
           "version=$v" >> $env:GITHUB_OUTPUT
           "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
           "publish=$($publish.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          # A draft is only for a release made here: a pushed tag is public already.
+          $draft = $publish -and ($env:EVENT_NAME -ne "push") -and ($env:INPUT_DRAFT -eq "true")
+          "draft=$($draft.ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
       - name: Prepare release notes (English, a link to the Portuguese changelog, a summary per translated changelog)
         if: steps.version.outputs.publish == 'true'
         shell: pwsh
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          LEGACY: ${{ github.event.inputs.legacy }}
         run: |
           function Get-Notes([string]$file) {
             $changelog = Get-Content -LiteralPath $file -Raw -Encoding utf8
@@ -111,6 +196,19 @@ jobs:
             # Single quotes: in double-quoted pwsh strings the backtick is an escape and the Markdown code spans vanish.
             '- **Installer:** `ConsoleMode-Setup-x64.exe` — installs the app and offers shortcuts and starting with Windows.'
             '- **Portable:** `ConsoleMode-Portable-x64.exe` — a single executable; keeps its data in the `ConsoleMode_Data` folder next to the file.'
+          )
+          if ($env:LEGACY) {
+            $releaseNotes += @(
+              ""
+              "### Legacy"
+              ""
+              "Prefer the old interface? **Console Mode Legacy** is 1.6.2 as it was, with the Desktop and Console interfaces. It opens with the settings you already have and keeps the ones only the current version uses, so you can switch back and forth. It is frozen: no new features, no fixes, and it never offers an update. To come back, install the current version over it."
+              ""
+              '- **Legacy installer:** `ConsoleMode-Legacy-Setup-x64.exe`'
+              '- **Legacy portable:** `ConsoleMode-Legacy-Portable-x64.exe`'
+            )
+          }
+          $releaseNotes += @(
             ""
             "---"
             ""
@@ -180,15 +278,36 @@ jobs:
             dist/ConsoleMode-Portable-x64.exe
           if-no-files-found: error
 
+      # The Legacy job's files of this run, next to the ones built here.
+      - name: Fetch the Legacy build
+        id: legacy
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.legacy != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh run download $env:GITHUB_RUN_ID --repo $env:GITHUB_REPOSITORY --name "ConsoleMode-Legacy-$($env:VERSION)" --dir dist
+          foreach ($name in "ConsoleMode-Legacy-Setup-x64.exe", "ConsoleMode-Legacy-Portable-x64.exe") {
+            if (-not (Test-Path -LiteralPath (Join-Path "dist" $name))) { throw "The Legacy build did not bring $name" }
+          }
+          # A multi-line value for the release step below.
+          "files<<LIST" >> $env:GITHUB_OUTPUT
+          "dist/ConsoleMode-Legacy-Setup-x64.exe" >> $env:GITHUB_OUTPUT
+          "dist/ConsoleMode-Legacy-Portable-x64.exe" >> $env:GITHUB_OUTPUT
+          "LIST" >> $env:GITHUB_OUTPUT
+
       - name: Publish GitHub release
         if: steps.version.outputs.publish == 'true'
         uses: softprops/action-gh-release@v3
         with:
-          # Pushed tag: it already exists. Run by hand: it is created here, on the commit that was built.
+          # Pushed tag: it already exists. Run by hand: it is created here, on the commit that was built
+          # (for a draft, when the draft is published).
           tag_name: v${{ steps.version.outputs.version }}
           target_commitish: ${{ github.sha }}
           name: Console Mode ${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.prerelease }}
+          draft: ${{ steps.version.outputs.draft }}
           fail_on_unmatched_files: true
           generate_release_notes: false
           append_body: false
@@ -196,15 +315,18 @@ jobs:
           files: |
             dist/ConsoleMode-Setup-x64.exe
             dist/ConsoleMode-Portable-x64.exe
+            ${{ steps.legacy.outputs.files }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Opens the update PR on microsoft/winget-pkgs for stable releases (pre-releases are skipped).
+  # Opens the update PR on microsoft/winget-pkgs for stable releases (pre-releases and drafts are skipped;
+  # a draft goes to winget when it is published, through winget.yml).
   # Off until the WINGET_TOKEN secret exists: a classic PAT with the public_repo scope, from the
   # account that owns the lippdev/winget-pkgs fork.
   winget:
     needs: build
-    if: needs.build.outputs.publish == 'true' && needs.build.outputs.prerelease == 'false'
+    # "!cancelled()": the build job may have a skipped job (Legacy) before it.
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.publish == 'true' && needs.build.outputs.prerelease == 'false' && needs.build.outputs.draft != 'true' }}
     runs-on: ubuntu-latest
     env:
       WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}

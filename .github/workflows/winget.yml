@@ -1,0 +1,37 @@
+name: Winget
+
+# Sends a stable release to winget (an update PR on microsoft/winget-pkgs) when it is published by a person:
+# a draft made by the Release workflow and published on GitHub, the usual way out of a test release.
+# A release the Release workflow publishes right away never gets here (events caused by the workflow's own
+# token don't start workflows): that one is sent by the "winget" job of release.yml.
+# It can also be run by hand for a tag, if a submission has to be repeated.
+# Off until the WINGET_TOKEN secret exists (see release.yml).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag of a published stable release (e.g. v1.7.0)."
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  winget:
+    # Stable releases only: a pre-release tag has a hyphen.
+    if: ${{ !contains(github.event.release.tag_name || github.event.inputs.tag, '-') && github.event.release.prerelease != true }}
+    runs-on: ubuntu-latest
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+    steps:
+      - name: Submit to winget-pkgs
+        if: env.WINGET_TOKEN != ''
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: lippdev.ConsoleMode
+          release-tag: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          installers-regex: 'ConsoleMode-Setup-x64\.exe$'
+          fork-user: lippdev
+          token: ${{ env.WINGET_TOKEN }}
