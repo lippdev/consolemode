@@ -38,6 +38,11 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>Last config read from disk; monitor fields survive a failed monitor listing.</summary>
     private AppConfig _loadedConfig = new();
+    /// <summary>
+    /// The launcher the current app saved when Legacy doesn't have it (one of its custom apps). Steam Big Picture
+    /// shows and opens here; the saved one goes back to the file as it came, until another launcher is picked.
+    /// </summary>
+    private string? _newerLaunchMode;
     private List<AudioDevice> _availableAudioDevices = [];
 
     public MainViewModel() => LocalizationService.LanguageChanged += OnLanguageChanged;
@@ -70,7 +75,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private MonitorRowViewModel? _selectedMonitor;
     [ObservableProperty] private MonitorRowViewModel? _focusRow;
 
-    public string AppVersion => UpdateService.CurrentVersion;
+    public string AppVersion => $"{UpdateService.CurrentVersion} {AppEdition.Name}";
 
     public bool HasSelectedMonitor => SelectedMonitor is not null;
     public bool HasFocusRow => FocusRow is not null;
@@ -303,6 +308,7 @@ public partial class MainViewModel : ObservableObject
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == config.FullscreenMode) ?? LaunchOptions[0];
+            _newerLaunchMode = config.FullscreenMode is { } saved && saved.StartsWith("customApp", StringComparison.Ordinal) ? saved : null;
             ApplyTv(config.Tv);
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
@@ -538,6 +544,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnVrrEnableChanged(bool value) { SettingChanged(); OnPropertyChanged(nameof(VrrText)); }
     partial void OnSelectedLaunchChanged(ComboOption? value)
     {
+        if (!_applying) _newerLaunchMode = null;
         OnPropertyChanged(nameof(LaunchDescription));
         SettingChanged();
     }
@@ -899,6 +906,7 @@ public partial class MainViewModel : ObservableObject
         var auto = audioId == ConsoleEngine.AudioOnConnectId;
         var config = new AppConfig
         {
+            NewerSettings = _loadedConfig.NewerSettings,
             AppLanguage = SelectedLanguage?.Value ?? LocalizationService.Language,
             // Listing failed: keep the saved screens instead of wiping them.
             FocusMonitor = _loadedConfig.FocusMonitor,
@@ -965,7 +973,11 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            ConfigService.Save(config);
+            // Only in the file: what runs here is the launcher on screen.
+            var shown = config.FullscreenMode;
+            if (_newerLaunchMode is not null) config.FullscreenMode = _newerLaunchMode;
+            try { ConfigService.Save(config); }
+            finally { config.FullscreenMode = shown; }
             _loadedConfig = config;
         }
         catch (Exception ex)

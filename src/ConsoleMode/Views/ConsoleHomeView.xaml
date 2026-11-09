@@ -624,19 +624,19 @@
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.MinimizeToTray), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="updates">
+                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="updates" Visibility="Collapsed">
                                 <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.NotifyUpdatesCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.CheckUpdates), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="betas">
+                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="betas" Visibility="Collapsed">
                                 <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BetaUpdatesCard, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.BetaUpdates), Mode=OneWay}"/>
                                 </Grid>
                             </Button>
-                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CheckNowCommand}">
+                            <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CheckNowCommand}" Visibility="Collapsed">
                                 <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                     <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.CheckNow, Mode=OneWay}"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.UpdateStatusText, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="Normal" FontSize="16"/>

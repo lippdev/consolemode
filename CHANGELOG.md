@@ -4,6 +4,13 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.7.0-legacy]
+A **Legacy** é o Console Mode 1.6.2, com as duas interfaces (Desktop e Console), publicada junto da 1.7.0 para quem prefere a interface antiga. Está congelada: não recebe novas funções nem correções.
+### Mudanças
+- Guarda os ajustes que só a versão atual tem (aplicativos adicionados, perfis por jogo, abertura, atalho da visão de tarefas...) e os grava de volta sem mexer: trocar para a Legacy e voltar para a versão atual não perde nada.
+- Não procura atualizações nem avisa da versão atual; os ajustes de atualização saem das duas interfaces. Para voltar à versão atual, instale-a por cima.
+- Aparece como **Console Mode Legacy** no título da janela, na bandeja, em Ajustes e no instalador.
+
 ## [1.6.2]
 ### Novidades
 - Minimizar para a bandeja: com a nova opção em Ajustes (também na interface Console, em Sistema), minimizar a janela tira o Console Mode da barra de tarefas e deixa só o ícone nos ícones ocultos; um clique no ícone abre de novo. Vem desligada. (#150)
