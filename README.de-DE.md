@@ -8,7 +8,7 @@ Mach deinen Windows-PC mit einem Klick zur **Spielkonsole**: Der Fernseher wird 
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=Version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 in einer Minute: das Konsolen-Intro, eine einzige Oberfläche mit deinen eigenen Apps auf der Startseite, die geführte Tour, die Bildschirme wie auf deinem Schreibtisch angeordnet, die Aufgabenansicht mit dem Controller, das Sitzungsmenü außerhalb einer Sitzung, Profile pro Spiel und der Controller, der den PC aufweckt." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 

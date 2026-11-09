@@ -8,7 +8,7 @@
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 за минуту: заставка в духе консоли, единый интерфейс с вашими приложениями на главной, обзор при первом запуске, экраны как на вашем столе, представление задач с геймпада, меню сеанса вне сеанса, профили для игр и пробуждение ПК геймпадом." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Скачать
 

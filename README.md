@@ -8,7 +8,7 @@ English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 in a minute: the console boot animation, one interface with your own apps on Home, a guided tour, screens laid out as on your desk, Task View on the controller, the session menu outside a session, per-game profiles and the controller waking the PC." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 
