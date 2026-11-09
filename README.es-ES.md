@@ -8,7 +8,7 @@ Convierte tu PC con Windows en una **consola** con un clic: enfoca la TV, apaga 
 ![Versión](https://img.shields.io/github/v/release/lippdev/consolemode?label=versi%C3%B3n&color=brightgreen)
 ![Licencia](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 en un minuto: la animación de inicio de consola, una sola interfaz con tus aplicaciones en Inicio, el recorrido guiado, las pantallas dispuestas como en tu escritorio, la vista de tareas con el mando, el menú de sesión fuera de una sesión, los perfiles por juego y el mando despertando el PC." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Descarga
 

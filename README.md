@@ -8,7 +8,7 @@ English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 in a minute: the console boot animation, one interface with your own apps on Home, a guided tour, screens laid out as on your desk, Task View on the controller, the session menu outside a session, per-game profiles and the controller waking the PC." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 
@@ -77,10 +77,6 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - Steam goes to the tray when you go back to the PC, the desk layout comes back exactly as it was (portrait monitors too), and slow Playnite starts no longer end the session
 
 All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
-
-## Roadmap
-
-**Next:** [Tako](https://github.com/lippdev/tako-launcher) as a launcher and a local API for it, Hydra and AnyFSE, a support link · **Later:** record the last 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), more TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Exploring:** Linux and macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [and more](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). The full plan is in the [PRD](docs/PRD.md) (Portuguese).
 
 ## More
 

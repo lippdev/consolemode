@@ -8,7 +8,7 @@ Transforme seu PC Windows em um **console de jogos** com um clique: foque na TV,
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=vers%C3%A3o&color=brightgreen)
 ![Licença](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.7.gif" alt="O Console Mode 1.7 em um minuto: a abertura de console, uma interface só com os seus aplicativos no Início, o tour guiado, as telas dispostas como na sua mesa, a visão de tarefas pelo controle, o menu da sessão fora da sessão, os perfis por jogo e o controle acordando o PC." width="800">
+https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 
@@ -77,10 +77,6 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - A Steam vai para a bandeja ao voltar ao PC, o layout da mesa volta idêntico (monitores em retrato também) e o Playnite demorando para abrir não encerra mais a sessão
 
 Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
-
-## Roadmap
-
-**Próximos:** o [Tako](https://github.com/lippdev/tako-launcher) como iniciador e uma API local para ele, Hydra e AnyFSE, um link de apoio ao projeto · **Depois:** gravar os últimos 30 s ([#77](https://github.com/lippdev/consolemode/issues/77)), mais TVs (LG webOS, Samsung, HDMI-CEC [#75](https://github.com/lippdev/consolemode/issues/75)) · **Explorando:** Linux e macOS ([#74](https://github.com/lippdev/consolemode/issues/74)), [e mais](https://github.com/lippdev/consolemode/issues?q=is%3Aopen+label%3Aroadmap). O plano completo está no [PRD](docs/PRD.md).
 
 ## Mais
 
