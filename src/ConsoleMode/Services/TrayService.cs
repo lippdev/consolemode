@@ -23,7 +23,7 @@ public sealed class TrayService : IDisposable
         _vm = vm;
         _icon = new TaskbarIcon
         {
-            ToolTipText = "Console Mode"
+            ToolTipText = "Console Mode Legacy"
         };
 
         var iconPath = AppPaths.IconPath;

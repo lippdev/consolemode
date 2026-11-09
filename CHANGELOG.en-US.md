@@ -4,6 +4,13 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.7.0-legacy]
+**Legacy** is Console Mode 1.6.2, with both interfaces (Desktop and Console), published next to 1.7.0 for those who prefer the old interface. It is frozen: no new features and no fixes.
+### Changes
+- Keeps the settings only the current version has (added apps, per-game profiles, the opening, the Task View shortcut...) and saves them back untouched: switching to Legacy and back to the current version loses nothing.
+- It never checks for updates or offers the current version; the update settings are gone from both interfaces. To go back to the current version, install it over this one.
+- It shows as **Console Mode Legacy** in the window title, the tray, Settings and the installer.
+
 ## [1.6.2]
 ### What's new
 - Minimize to the system tray: with the new option in Settings (also in the Console interface, under System), minimizing the window takes Console Mode off the taskbar and leaves just its icon in the hidden icons; one click on the icon opens it again. Off by default. (#150)

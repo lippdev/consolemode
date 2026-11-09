@@ -22,7 +22,7 @@
 AppId={{6C1C3E8B-4F0E-4E0B-9C62-3A7E1D0C5B21}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
+AppVerName={#AppName} {#AppVersion} Legacy
 AppPublisher=lippdev
 AppPublisherURL=https://github.com/lippdev/consolemode
 AppSupportURL=https://github.com/lippdev/consolemode/issues
@@ -38,7 +38,7 @@ OutputDir={#OutputDir}
 OutputBaseFilename=ConsoleMode-Setup-{#Arch}
 SetupIconFile=..\assets\icon.ico
 UninstallDisplayIcon={app}\{#AppExe}
-UninstallDisplayName={#AppName}
+UninstallDisplayName={#AppName} Legacy
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

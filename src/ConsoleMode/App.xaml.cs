@@ -78,7 +78,7 @@ public partial class App : Application
             AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
             ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
-                         $"rtss-cli={AppPaths.HasRtssCli}");
+                         $"rtss-cli={AppPaths.HasRtssCli}, edição={AppEdition.Name} {UpdateService.CurrentVersion}");
 
             ViewModel = new MainViewModel();
             _window = new MainWindow(ViewModel);

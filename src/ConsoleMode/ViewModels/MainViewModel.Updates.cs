@@ -129,7 +129,8 @@ public partial class MainViewModel
     /// <summary>Startup check: quiet on failure, respects "ignorar esta versão".</summary>
     private async Task CheckForUpdatesOnStartupAsync()
     {
-        if (!CheckUpdates) return;
+        // Legacy is frozen: there is nothing to update to, and it must not keep offering the current app.
+        if (!AppEdition.ChecksForUpdates || !CheckUpdates) return;
         await CheckForUpdatesAsync(manual: false);
     }
 
