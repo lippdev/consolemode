@@ -13,8 +13,9 @@ name: Release
 # on GitHub creates the tag on the commit that was built, and winget.yml then sends it to winget.
 #
 # "legacy": a branch built next to this one (release/1.7-legacy: 1.6.2's interfaces, frozen) and attached to
-# the same release as ConsoleMode-Legacy-*.exe. Those names don't start like the ones the update check and
-# winget look for, so nobody is updated to Legacy.
+# the same release as ConsoleModeLegacy-*.exe. GitHub lists a release's files by name, so those come after the
+# current version's; and they don't start like the ones the update check and winget look for, so nobody is
+# updated to Legacy.
 on:
   push:
     tags:
@@ -33,7 +34,7 @@ on:
         type: boolean
         default: false
       legacy:
-        description: "Legacy: branch to build and attach as ConsoleMode-Legacy-*.exe (e.g. release/1.7-legacy). Empty: none."
+        description: "Legacy: branch to build and attach as ConsoleModeLegacy-*.exe (e.g. release/1.7-legacy). Empty: none."
         required: false
         default: ""
 
@@ -89,16 +90,16 @@ jobs:
       - name: Name the files Legacy
         shell: pwsh
         run: |
-          Rename-Item -LiteralPath "dist/ConsoleMode-Setup-x64.exe" -NewName "ConsoleMode-Legacy-Setup-x64.exe"
-          Rename-Item -LiteralPath "dist/ConsoleMode-Portable-x64.exe" -NewName "ConsoleMode-Legacy-Portable-x64.exe"
+          Rename-Item -LiteralPath "dist/ConsoleMode-Setup-x64.exe" -NewName "ConsoleModeLegacy-Setup-x64.exe"
+          Rename-Item -LiteralPath "dist/ConsoleMode-Portable-x64.exe" -NewName "ConsoleModeLegacy-Portable-x64.exe"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ConsoleMode-Legacy-${{ steps.version.outputs.version }}
+          name: ConsoleModeLegacy-${{ steps.version.outputs.version }}
           path: |
-            dist/ConsoleMode-Legacy-Setup-x64.exe
-            dist/ConsoleMode-Legacy-Portable-x64.exe
+            dist/ConsoleModeLegacy-Setup-x64.exe
+            dist/ConsoleModeLegacy-Portable-x64.exe
           if-no-files-found: error
 
   build:
@@ -204,8 +205,8 @@ jobs:
               ""
               "Prefer the old interface? **Console Mode Legacy** is 1.6.2 as it was, with the Desktop and Console interfaces. It opens with the settings you already have and keeps the ones only the current version uses, so you can switch back and forth. It is frozen: no new features, no fixes, and it never offers an update. To come back, install the current version over it."
               ""
-              '- **Legacy installer:** `ConsoleMode-Legacy-Setup-x64.exe`'
-              '- **Legacy portable:** `ConsoleMode-Legacy-Portable-x64.exe`'
+              '- **Legacy installer:** `ConsoleModeLegacy-Setup-x64.exe`'
+              '- **Legacy portable:** `ConsoleModeLegacy-Portable-x64.exe`'
             )
           }
           $releaseNotes += @(
@@ -287,14 +288,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          gh run download $env:GITHUB_RUN_ID --repo $env:GITHUB_REPOSITORY --name "ConsoleMode-Legacy-$($env:VERSION)" --dir dist
-          foreach ($name in "ConsoleMode-Legacy-Setup-x64.exe", "ConsoleMode-Legacy-Portable-x64.exe") {
+          gh run download $env:GITHUB_RUN_ID --repo $env:GITHUB_REPOSITORY --name "ConsoleModeLegacy-$($env:VERSION)" --dir dist
+          foreach ($name in "ConsoleModeLegacy-Setup-x64.exe", "ConsoleModeLegacy-Portable-x64.exe") {
             if (-not (Test-Path -LiteralPath (Join-Path "dist" $name))) { throw "The Legacy build did not bring $name" }
           }
           # A multi-line value for the release step below.
           "files<<LIST" >> $env:GITHUB_OUTPUT
-          "dist/ConsoleMode-Legacy-Setup-x64.exe" >> $env:GITHUB_OUTPUT
-          "dist/ConsoleMode-Legacy-Portable-x64.exe" >> $env:GITHUB_OUTPUT
+          "dist/ConsoleModeLegacy-Setup-x64.exe" >> $env:GITHUB_OUTPUT
+          "dist/ConsoleModeLegacy-Portable-x64.exe" >> $env:GITHUB_OUTPUT
           "LIST" >> $env:GITHUB_OUTPUT
 
       - name: Publish GitHub release
