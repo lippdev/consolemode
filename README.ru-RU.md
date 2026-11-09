@@ -8,7 +8,7 @@
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F&color=brightgreen)
 ![License](https://img.shields.io/github/license/lippdev/consolemode)
 
-<img src="assets/console-mode-1.6-short.gif" alt="Обзор Console Mode 1.6: один щелчок переносит игру на телевизор, меню сеанса поверх игры с открытыми окнами, встроенный файловый менеджер ControlFS, интерфейс «Консоль» с вкладками «Главная», «Сеанс» и «Система» и выбранные вами сочетания на геймпаде." width="800">
+<img src="assets/console-mode-1.7.gif" alt="Console Mode 1.7 за минуту: заставка в духе консоли, единый интерфейс с вашими приложениями на главной, обзор при первом запуске, экраны как на вашем столе, представление задач с геймпада, меню сеанса вне сеанса, профили для игр и пробуждение ПК геймпадом." width="800">
 
 ## Скачать
 
