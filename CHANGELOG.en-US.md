@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- Settings: `config.json` keeps the settings this version doesn't know instead of dropping them on save. It is what lets you switch between the current version and **Legacy** (the old interface, published next to 1.7.0) without losing anything on either side. (#201)
 
 ## [1.7.0-beta.4]
 ### What's new

@@ -875,6 +875,7 @@ public partial class MainViewModel : ObservableObject
         var auto = audioId == ConsoleEngine.AudioOnConnectId;
         var config = new AppConfig
         {
+            OtherSettings = _loadedConfig.OtherSettings,
             AppLanguage = SelectedLanguage?.Value ?? LocalizationService.Language,
             // Listing failed: keep the saved screens instead of wiping them.
             FocusMonitor = _loadedConfig.FocusMonitor,

@@ -6,6 +6,29 @@ namespace ConsoleMode.Tests;
 
 public class AppConfigTests
 {
+    // The Legacy build (1.6.2's interfaces) shares config.json and has settings this version dropped.
+    [Fact]
+    public void Settings_of_another_build_survive_a_save()
+    {
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+        var config = System.Text.Json.JsonSerializer.Deserialize<AppConfig>(
+            """{ "version": 2, "uiMode": "desktop", "tourDone": true, "parkPointer": false }""", options)!;
+        Assert.False(config.ParkPointer);
+
+        config.HdrEnable = true;
+        using var saved = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(config, options));
+        Assert.Equal("desktop", saved.RootElement.GetProperty("uiMode").GetString());
+        Assert.True(saved.RootElement.GetProperty("tourDone").GetBoolean());
+        Assert.True(saved.RootElement.GetProperty("hdrEnable").GetBoolean());
+        // Nothing extra in a config of its own.
+        Assert.Null(new AppConfig().OtherSettings);
+        Assert.DoesNotContain("otherSettings", System.Text.Json.JsonSerializer.Serialize(new AppConfig(), options));
+    }
+
     [Fact]
     public void Copy_for_a_session_swaps_only_the_monitor_fields()
     {
