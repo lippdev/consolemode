@@ -3,8 +3,34 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+
+## [1.7.0]
+### Novidades
+- **Uma interface só, com cara de console**: o Console Mode passa a ter apenas a interface Console, que também funciona com mouse e teclado. O Início mostra seus iniciadores numa fileira, com os logos oficiais, sobre a arte dos seus jogos; a fonte é a Inter, o fundo padrão é a Aurora e a barra de título acompanha. Na primeira abertura, um tour guiado passa por tudo e avança sozinho. Quem prefere a interface antiga tem a **Legacy**, no fim desta lista. (#162, #164, #165, #169, #182, #184, #194)
+- **Seus aplicativos no Início**: qualquer `.exe` (RetroArch, outro launcher…) vira um bloco pelo **+**, com o ícone e o nome do programa e argumentos opcionais; se ele for só um iniciador que abre o programa de verdade e fecha, a sessão passa a acompanhar esse programa. **☰** (OPTIONS no PlayStation) ou o botão direito do mouse no bloco tira o app do Início. (#161, #185, #198)
+- **Perfis por jogo**: cada jogo da Steam lembra a própria resolução, HDR, limite de FPS e saída de áudio, salvos pelo menu da sessão com o jogo rodando. (#170)
+- **Menu da sessão fora do modo console**: com o Console Mode aberto (mesmo só na bandeja), o atalho do menu abre o Menu da sessão sem iniciar nenhum launcher ou jogo, para usar o PC do sofá: janelas abertas, volume, tela, áudio, ControlFS, JoyChromium e o mouse pelo controle. Desliga em Sistema → Controle. (#185)
+- **Atalho para a visão de tarefas**: um atalho do controle que faz o mesmo que Win + Tab, já ligado com **Select + X**. Com controle Xbox quem move a seleção é o Windows; com controle PlayStation, o Console Mode. (#188)
+- **Navegador (JoyChromium)** no menu da sessão, logo abaixo do ControlFS: abre por cima do jogo, usa-se com o controle e se instala por ali mesmo se faltar. (#175, #181)
+- **A mesa volta inteira**: os ícones da área de trabalho voltam ao lugar depois da sessão, o ponteiro do mouse sai do caminho quando o iniciador aparece e volta para onde estava, e se o app fechar ou o PC desligar no meio de uma sessão, a próxima abertura restaura telas, áudio e o resto. (#167, #177, #178)
+- **Acordar o PC pelo controle**: Sistema → Controle mostra se o adaptador sem fio Xbox, o Bluetooth ou o controle no cabo podem acordar o PC da suspensão e, em **Ativar**, liga isso para eles. Junto com **Entrar ao conectar um controle**, o botão central acorda o PC direto no modo console. (#168)
+- **Abertura e sons**: ao abrir, o logo do Console Mode "liga" com um som de entrada (de vez em quando, de surpresa, vem uma abertura inspirada no Xbox 360 ou no PS4); mover, confirmar, voltar e trocar de aba têm sons novos. Sistema → App escolhe o estilo e desliga a abertura ou os sons. (#183, #184)
+- **Escala de console**: a interface e o Menu da sessão ocupam sempre a mesma proporção da tela, com o Windows em 100 %, 150 % ou 200 % e em 1080p, 1440p ou 4K. (#185)
+- Avisos na tela de jogo entram deslizando pela direita, mostram quanto tempo falta e saem pelo mesmo lado; as listas de opções esmaecem nas bordas quando há mais itens e mostram onde você está. (#185)
+- Bateria do controle no menu da sessão e na barra de cima, e um relatório de diagnóstico para copiar em Sistema. (#159, #160)
+- O aviso de atualização mostra o destaque da versão no idioma do app, quando há changelog nele. (#158)
+- **Console Mode Legacy**, para quem prefere a interface antiga: na mesma release, `ConsoleMode-Legacy-Setup-x64.exe` e `ConsoleMode-Legacy-Portable-x64.exe` são o Console Mode 1.6.2 como era, com as interfaces Desktop e Console e o controle da TV. Abre com os ajustes que você já tem e guarda os que só esta versão usa, então dá para ir e voltar sem perder nada. Está congelada: sem novas funções, sem correções, e nunca oferece atualização. Para voltar, instale a versão atual por cima. (#200, #202)
+### Mudanças
+- Início: clicar num iniciador (ou apertar A nele) só escolhe o que vai abrir; quem começa é **Jogar agora**. (#193)
+- A interface Desktop sai do app: tudo o que ela fazia está na aba Sistema. Ela continua na **Legacy**. (#184)
+- Controle da TV (Google TV / Android TV pela rede) fica fora da 1.7: a categoria **TV** some da aba Sistema e a sessão não liga mais a TV nem a coloca em espera. Os ajustes de quem já configurou ficam guardados, e na **Legacy** ele continua funcionando. (#195)
 ### Correções
-- Ajustes: o `config.json` guarda de volta os ajustes que esta versão não conhece em vez de descartá-los ao salvar. É o que deixa trocar entre a versão atual e a **Legacy** (a interface antiga, publicada junto da 1.7.0) sem perder nada dos dois lados. (#201)
+- Playnite: abrir um jogo não encerra mais a sessão quando o Playnite esconde a própria janela ("Minimizar após iniciar o jogo", que o tema Selene liga). (#191)
+- Telas: quando o Windows troca o nome das telas no meio da sessão, a resolução escolhida vai para a TV e a volta ao PC liga e desliga as telas certas. (#191)
+- Sistema e Sessão: depois de escolher uma opção numa lista, ou de fechá-la com B, o foco fica na mesma linha. (#196)
+- Saída de áudio **A que aparecer ao conectar**: funciona também quando a saída da TV já estava ligada antes da sessão. (#180)
+- Controles: um analógico que aparece fora do centro desde o início não deixa mais o menu "subindo sozinho". (#180)
+- Ajustes: o `config.json` guarda de volta os ajustes que esta versão não conhece em vez de descartá-los ao salvar; é o que deixa trocar entre esta versão e a Legacy sem perder nada dos dois lados. (#201)
 
 ## [1.7.0-beta.4]
 ### Novidades
