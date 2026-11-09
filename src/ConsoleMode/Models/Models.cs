@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using ConsoleMode.Services;
 
@@ -7,6 +8,11 @@ public sealed class AppConfig
 {
     /// <summary>2 = monitor fields hold <see cref="MonitorInfo.StableId"/>; 0/1 = GDI names (\\.\DISPLAYn).</summary>
     public int Version { get; set; }
+    /// <summary>
+    /// Settings this version doesn't have: the Legacy build's (which interface it shows, its tour) or a newer
+    /// version's. Kept as they came and saved back, so switching between builds loses nothing on either side.
+    /// </summary>
+    [JsonExtensionData] public Dictionary<string, JsonElement>? OtherSettings { get; set; }
     /// <summary>Empty until the user (or the installer) picks one; the app then follows Windows.</summary>
     public string AppLanguage { get; set; } = "";
     public string FocusMonitor { get; set; } = "";
