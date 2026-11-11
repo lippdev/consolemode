@@ -342,6 +342,12 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam par
 
 ## 3c. Controle da TV: Google TV / Android TV (issue #75)
 
+### Volta na 1.7.1 (#207)
+
+- [ ] Sistema mostra de novo a categoria **TV**; o direcional e o mouse chegam nela e nas outras sem buracos. Resultado: ______
+- [ ] Com a TV configurada na 1.6 (ou no Legacy): o `config.json` mantém o bloco `tv`, a sessão liga a TV e troca a entrada, e a volta a coloca em espera se a opção estiver ligada (o log tem "TV: ligar" / "TV: desligar"). Resultado: ______
+- [ ] Com um **Comando de entrada** próprio (ex.: `am start -n com.smartdevice.livetv/skyworth.skyworthlivetv.osd.ui.mainActivity.LiveTvScreenActivity` numa Coocaa/Skyworth): a TV vai para a entrada do PC. Resultado: ______
+
 Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuração USB** (ou "Depuração pela rede") ativada nas Opções do desenvolvedor; Ajustes → TV → *Google TV / Android TV* com o IP e a entrada HDMI do PC.
 
 - [ ] **Testar agora** na primeira vez: a TV pede "Permitir depuração"; com "Sempre permitir" + "Permitir", a TV acorda e vai para a entrada do PC. O status mostra sucesso. Resultado: ______
@@ -648,11 +654,6 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] A (ou ✕), Voltar e um clique em Próximo agem na hora, e a parada nova começa a barra do zero. B (ou ○) e Pular tutorial fecham o tour e a barra para. Resultado: ______
 - [ ] Com o app em segundo plano (Alt + Tab para outra janela), a parada não avança; ao voltar, ela conta o tempo de novo. Resultado: ______
 - [ ] Com controle de PS5: o tour avança sozinho mesmo que os botões não respondam nele. Anotar se ✕ e ○ funcionam no tour. Resultado: ______
-
-## Controle da TV fora da 1.7 (#195)
-
-- [ ] Sistema não mostra mais a categoria **TV**; o direcional e o mouse andam pelas outras categorias sem buracos. Resultado: ______
-- [ ] Com uma Android TV que estava configurada na 1.6: uma sessão não liga a TV nem troca a entrada, e a volta não a coloca em espera (o log não tem linhas "TV: ligar" / "TV: desligar"). O `config.json` continua com o bloco `tv` como estava. Resultado: ______
 
 ## Remover um app pelo bloco da Início (#198)
 

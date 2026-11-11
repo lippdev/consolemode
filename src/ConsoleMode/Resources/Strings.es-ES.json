@@ -416,7 +416,7 @@
   "ConsoleTourQuickSettingsTitle": "Ajustes rápidos",
   "ConsoleTourQuickSettingsBody": "Salida de audio, resolución, HDR y límite de FPS de la próxima sesión, a un botón de distancia. Al volver al PC, todo vuelve a como estaba.",
   "ConsoleTourSystemTitle": "Todos los ajustes",
-  "ConsoleTourSystemBody": "La pestaña Sistema reúne todos los ajustes, por categoría: pantalla de juego, qué pasa al entrar, mando, extras y la aplicación. {0} abre y cierra esta pestaña desde cualquier sitio.",
+  "ConsoleTourSystemBody": "La pestaña Sistema reúne todos los ajustes, por categoría: pantalla de juego, qué pasa al entrar, mando, TV, extras y la aplicación. {0} abre y cierra esta pestaña desde cualquier sitio.",
   "ConsoleTourShortcutsTitle": "Atajos del mando",
   "ConsoleTourShortcutsBody": "Elige aquí los atajos que funcionan incluso con esta ventana cerrada: uno para entrar en el modo consola, otro para abrir el menú de la sesión sobre el juego y otro para volver al PC. Un atajo sin combinación no hace nada.",
   "ConsoleTourDoneTitle": "Todo listo",

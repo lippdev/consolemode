@@ -29,7 +29,7 @@ Console Mode hat eine einzige Oberfläche, gestaltet wie die einer Konsole: Sie 
 
 Unter **System → Controller** wählst du das Tastenlayout: **Automatisch**, **Xbox** oder **PlayStation**. Vorschau und Tastenbeschriftungen richten sich nach dieser Wahl, die beim Schließen der App gespeichert wird. Das ändert nur die angezeigten Symbole; die Eingaben des Controllers behalten ihre bisherige Belegung.
 
-Die Registerkarte **System** enthält alle Einstellungen, darunter Controller-Tastenkombinationen, Playnite, benutzerdefinierte FPS, das Layout des FPS-Zählers, die Argumente der eigenen App, den Diagnosebericht und den Datenordner. Die Werte bleiben auch nach einem Neustart der App erhalten.
+Die Registerkarte **System** enthält alle Einstellungen, darunter Controller-Tastenkombinationen, Playnite, Android TV, benutzerdefinierte FPS, das Layout des FPS-Zählers, die Argumente der eigenen App, den Diagnosebericht und den Datenordner. Die Werte bleiben auch nach einem Neustart der App erhalten.
 
 Öffne die Aktion, deren Tastenkombination du einrichten willst, wähle **Festlegen** oder **Ändern**, halte die gewünschte Kombination auf einem Controller gedrückt und lass die Tasten los. **Entfernen** deaktiviert diese Tastenkombination. Während der Aufnahme navigieren die Controller-Tasten nicht durch die Oberfläche; mit **Abbrechen** oder **Esc** beendest du die Aufnahme. Außerhalb der Aufnahme verlässt du den Editor mit **B**. Die Felder für Adresse und benutzerdefinierte FPS nehmen Tastatureingaben an.
 
@@ -53,6 +53,29 @@ Ein Wechsel des Hauptbildschirms kann Windows dazu bringen, die Desktopsymbole n
 ```
 
 `start`, `stop` und `show` tun genau das, was der passende `consolemode://`-Link tut, und antworten, sobald die App fertig ist (`ok:false` mit einem `error`, wenn der Konsolenmodus nicht gestartet ist oder die Wiederherstellung nicht abgeschlossen wurde). `status` liest nur. Verbinden können sich nur der angemeldete Benutzer und LocalSystem; nichts wird ins Netzwerk freigegeben.
+
+## Fernsehersteuerung
+
+Unter System → **Fernseher** kann die App beim Start des Konsolenmodus den Fernseher einschalten und auf den HDMI-Eingang des PCs wechseln und ihn optional wieder in den Standby versetzen, nachdem der Schreibtisch wiederhergestellt ist. Ein Fernseher, der nicht antwortet, blockiert den Konsolenmodus nie: Die App protokolliert das und wartet wie gewohnt auf den Spielbildschirm.
+
+Mit der Voreinstellung **Nicht steuern** wird nichts gesendet und Start und Wiederherstellung dauern nicht länger. Ist ein Weg ausgewählt, läuft der Fernseher-Schritt beim Start des Konsolenmodus zuerst und ist auf **30 Sekunden** begrenzt (der schlimmste Fall, wenn der Fernseher nicht antwortet und Wake-on-LAN versucht wird); der optionale Standby bei der Wiederherstellung ist auf **15 Sekunden** begrenzt. Ein Fernseher, der schon an ist, antwortet meist in ein bis zwei Sekunden.
+
+Die meisten PC-Grafikkarten können kein HDMI-CEC senden, deshalb spricht die App stattdessen über das Netzwerk mit dem Fernseher:
+
+### Google TV / Android TV
+
+TCL, Sony, Hisense, Philips und andere Fernseher mit Google TV oder Android TV, über ADB (das Android-Debugging-Protokoll). Auf dem PC musst du nichts installieren.
+
+1. Auf dem Fernseher: **Einstellungen → System → Info** (About), drücke 7-mal auf **Android TV OS-Build**, um die Entwickleroptionen freizuschalten.
+2. **Einstellungen → System → Entwickleroptionen**: Schalte **USB-Debugging** ein (bei manchen Fernsehern **Netzwerk-Debugging** / **ADB über Netzwerk**).
+3. Wähle in Console Mode *Google TV / Android TV (Netzwerk)*, gib die IP-Adresse des Fernsehers ein (Einstellungen → Netzwerk auf dem Fernseher; reserviere sie im Router) und den HDMI-Eingang, den der PC nutzt.
+4. Drücke **Jetzt testen**. Der Fernseher fragt „USB-Debugging zulassen?“ (Allow debugging from this computer?): Setze das Häkchen bei **Von diesem Computer immer zulassen** (Always allow) und drücke **Zulassen** (Allow).
+
+Der ADB-Schlüssel des PCs wird verschlüsselt für deinen Windows-Benutzer gespeichert (DPAPI), daher fragt der Fernseher nur einmal. Wird der Datenordner zu einem anderen Windows-Benutzer oder PC kopiert, lässt sich der Schlüssel dort nicht lesen: Die App erstellt einen neuen und der Fernseher fragt erneut „USB-Debugging zulassen?“.
+
+Zum Aufwecken sendet die App die Android-Aufwecktaste und danach die Taste **HDMI 1-4**. Wenn dein Fernseher diese Taste ignoriert, trage unter **Eingangsbefehl** einen beliebigen Android-Shell-Befehl ein, der den Eingang des PCs öffnet. Wenn der Fernseher im Standby aus dem Netzwerk verschwindet, trage seine **MAC-Adresse** ein, damit die App zuerst Wake-on-LAN sendet (die Option „Über Netzwerk einschalten“ / „Über WLAN einschalten“ (Wake on network / Wake on Wi-Fi) des Fernsehers muss an sein).
+
+„Kabelloses Debugging“ (Wireless debugging) mit Kopplungscode (Android-11-Smartphones und neuer) ist ein anderes, per TLS geschütztes Protokoll und wird nicht unterstützt: Verwende USB- oder Netzwerk-Debugging.
 
 ## Optionale Extras
 

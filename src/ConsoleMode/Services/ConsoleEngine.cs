@@ -93,8 +93,8 @@ public sealed partial class ConsoleEngine
 
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
         // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
-        State.Tv = TvControlService.IsAvailable ? config.Tv : null;
-        if (State.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
+        State.Tv = config.Tv;
+        if (config.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
 
         // Read the screens fresh: the row the window shows can be stale (the TV was switched off,
         // or the last restore disconnected it), and a stale "active" would skip turning it on.
