@@ -44,6 +44,7 @@ Los atajos del mando los eliges tú: al principio no hay ninguno activado, el re
 - **Resolución y frecuencia de actualización** por pantalla, **HDR**, **VRR** y **límite de FPS** (RTSS) mientras juegas
 - **Contador de FPS** sobre el juego (RTSS) en una tarjeta de tres tamaños: solo FPS, compacto (uso de CPU, GPU y RAM), detallado (relojes, temperatura y memoria de la GPU) o tu propia disposición
 - El audio va a la TV (o a cualquier salida) y vuelve después
+- [Enciende la TV y la cambia a la entrada del PC](docs/GUIDE.es-ES.md#control-de-la-tv) (Google TV / Android TV por la red), y puede ponerla en reposo después
 - Abre **Steam Big Picture**, **Playnite a pantalla completa** o el **modo Xbox**, y envía Steam a la bandeja al volver al PC
 - **Menú de la sesión** sobre el juego: cambia o cierra las ventanas abiertas, ajusta volumen, resolución, audio, FPS y HDR, oculta el puntero del ratón o muévelo con el mando, y explora tus archivos con [ControlFS](https://github.com/nextestudios/ControlFS) y la web con [JoyChromium](https://github.com/lippdev/joychromium)
 - Una interfaz al estilo de las consolas, hecha para la TV, que también funciona con ratón y teclado (pantalla completa, mandos de Xbox y PlayStation, pestañas con LB/RB, un fondo de pantalla propio o tus portadas de Steam de fondo), con un recorrido guiado la primera vez que la abres
