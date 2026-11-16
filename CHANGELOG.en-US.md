@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- TV: an optional **Command when going back to the PC** is sent to the TV when the desk comes back, before standby, to take it to its Home screen or another input instead of only turning it off (asked by PLEXX-DE, issue #209). (#213)
 ### Changes
 - TV control (Google TV / Android TV over the network) is back: the **TV** category returns to the System tab and sessions again turn the TV on, switch it to the PC's input (also with your own **Input command**) and, if chosen, put it in standby on the way back. Anyone who set it up in 1.6 finds it as they left it. (#208)
 

@@ -547,6 +547,13 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Comando na TV ao voltar ao PC (#213, issue #209)
+
+- [ ] Android TV configurada, **Comando ao voltar ao PC** = `input keyevent 3`, espera desligada: ao voltar ao PC a TV vai para a tela inicial e continua ligada. O log tem "TV: voltar ao PC (androidTv) ok". Resultado: ______
+- [ ] O mesmo com a espera ligada: a TV vai para a tela inicial e depois entra em espera. Resultado: ______
+- [ ] Comando vazio e espera ligada: igual à 1.6 (só a espera). Comando vazio e espera desligada: nada é enviado (nenhuma linha "TV: voltar ao PC" no log). Resultado: ______
+- [ ] Com o comando de outra entrada (ex.: o `am start …` da Skyworth do PLEXX-DE para a HDMI dele), a TV troca para ela ao voltar ao PC. Resultado: ______
+
 ## Interface Console no estilo console (1.7.0)
 
 ### Início

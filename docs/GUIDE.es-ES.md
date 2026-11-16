@@ -75,6 +75,8 @@ La clave ADB del PC se guarda cifrada para tu usuario de Windows (DPAPI), así q
 
 Para encenderla se usa la tecla de activación de Android y después la tecla **HDMI 1-4**. Si tu TV ignora esa tecla, rellena **Comando de la entrada (avanzado)** con cualquier comando de shell de Android que abra la entrada del PC. Si la TV se desconecta de la red en reposo, rellena su **Dirección MAC** para que la aplicación envíe antes Wake-on-LAN (la opción de la TV "Activar por red" / "Activar por Wi-Fi" (Wake on network / Wake on Wi-Fi) tiene que estar activada).
 
+Cuando vuelve el escritorio, el **Comando al volver al PC** (opcional) se envía primero a la TV, por ejemplo `input keyevent 3` para su pantalla de inicio o el comando de otra entrada; después, el reposo, si está activado.
+
 La "Depuración inalámbrica" con código de emparejamiento (móviles con Android 11 o posterior) es otro protocolo, envuelto en TLS, y no es compatible: usa la depuración USB / por red.
 
 ## Extras opcionales

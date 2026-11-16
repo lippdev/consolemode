@@ -183,6 +183,7 @@
   "TvHdmiDescription": "The TV's HDMI port the PC is plugged into.",
   "TvInputCommandCard": "Input command (advanced)",
   "TvInputCommandDescription": "Only if the TV ignores the HDMI key: an Android shell command that switches to the PC's input. Empty = the HDMI key chosen above.",
+  "TvRestoreCommandCard": "Command when going back to the PC (advanced)",
   "TvTurnOffCard": "Put the TV in standby on restore",
   "TvTurnOffDescription": "After the desk screens are back.",
   "TvTestCard": "Test the TV",

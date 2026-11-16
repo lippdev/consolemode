@@ -183,6 +183,7 @@
   "TvHdmiDescription": "Puerto HDMI de la TV donde está conectado el PC.",
   "TvInputCommandCard": "Comando de la entrada (avanzado)",
   "TvInputCommandDescription": "Solo si la TV ignora la tecla HDMI: un comando de shell de Android que cambia a la entrada del PC. Vacío = la tecla HDMI elegida arriba.",
+  "TvRestoreCommandCard": "Comando al volver al PC (avanzado)",
   "TvTurnOffCard": "Poner la TV en reposo al restaurar",
   "TvTurnOffDescription": "Después de que vuelvan las pantallas del escritorio.",
   "TvTestCard": "Probar la TV",

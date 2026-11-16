@@ -75,6 +75,8 @@ Der ADB-Schlüssel des PCs wird verschlüsselt für deinen Windows-Benutzer gesp
 
 Zum Aufwecken sendet die App die Android-Aufwecktaste und danach die Taste **HDMI 1-4**. Wenn dein Fernseher diese Taste ignoriert, trage unter **Eingangsbefehl** einen beliebigen Android-Shell-Befehl ein, der den Eingang des PCs öffnet. Wenn der Fernseher im Standby aus dem Netzwerk verschwindet, trage seine **MAC-Adresse** ein, damit die App zuerst Wake-on-LAN sendet (die Option „Über Netzwerk einschalten“ / „Über WLAN einschalten“ (Wake on network / Wake on Wi-Fi) des Fernsehers muss an sein).
 
+Wenn der Schreibtisch zurückkommt, geht zuerst der **Befehl bei der Rückkehr zum PC** (optional) an den Fernseher, zum Beispiel `input keyevent 3` für seinen Startbildschirm oder der Befehl eines anderen Eingangs; danach der Standby, falls eingeschaltet.
+
 „Kabelloses Debugging“ (Wireless debugging) mit Kopplungscode (Android-11-Smartphones und neuer) ist ein anderes, per TLS geschütztes Protokoll und wird nicht unterstützt: Verwende USB- oder Netzwerk-Debugging.
 
 ## Optionale Extras

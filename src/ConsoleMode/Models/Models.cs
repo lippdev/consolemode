@@ -189,6 +189,13 @@ public sealed class TvControlConfig
     /// <summary>Put the TV in standby after the desk is restored. Off by default.</summary>
     public bool TurnOffOnRestore { get; set; }
 
+    /// <summary>Android TV: shell command sent when the desk is back, before standby (Home screen, another input…).</summary>
+    public string RestoreCommand { get; set; } = "";
+
+    /// <summary>Something to send the TV when going back to the PC.</summary>
+    [JsonIgnore]
+    public bool HasRestoreStep => TurnOffOnRestore || !string.IsNullOrWhiteSpace(RestoreCommand);
+
     [JsonIgnore]
     public bool IsEnabled => !string.IsNullOrWhiteSpace(Provider) && Provider != None;
 }

@@ -384,7 +384,7 @@ public sealed partial class ConsoleEngine
             Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
             Audio.ClearCache();
-            if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
+            if (State.Tv is { IsEnabled: true, HasRestoreStep: true } tv) Tv.Restore(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
             // Only once the screens are back: a restore that threw or left them wrong is tried again on the next start.
             if (!restore.Success)

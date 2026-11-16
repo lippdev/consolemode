@@ -83,6 +83,8 @@ A chave ADB deste PC fica guardada criptografada para o seu usuário do Windows 
 
 Para acordar, o app usa a tecla de despertar do Android e depois a tecla **HDMI 1-4**. Se a sua TV ignorar essa tecla, preencha **Comando da entrada** com qualquer comando de shell do Android que abra a entrada do PC. Se a TV sai da rede em espera, informe o **endereço MAC** para o app mandar Wake-on-LAN antes (a opção "Ligar pela rede" / "Wake on Wi-Fi" da TV precisa estar ativa).
 
+Quando a mesa volta, o **Comando ao voltar ao PC** (opcional) vai primeiro para a TV, por exemplo `input keyevent 3` para a tela inicial dela ou o comando de outra entrada; depois vem a espera, se **Colocar a TV em espera ao restaurar** estiver ligado.
+
 A "Depuração sem fio" com código de pareamento (Android 11+ em celulares) é outro protocolo, com TLS, e não é suportada: use a depuração USB / pela rede.
 
 ## Extras opcionais
