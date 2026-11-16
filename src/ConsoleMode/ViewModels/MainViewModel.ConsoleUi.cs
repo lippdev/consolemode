@@ -182,6 +182,7 @@ public partial class MainViewModel
             case "betas": BetaUpdates = !BetaUpdates; break;
             case "closest": CloseSteamOnRestore = !CloseSteamOnRestore; break;
             case "desktopicons": RestoreDesktopIcons = !RestoreDesktopIcons; break;
+            case "hidedesktopicons": HideDesktopIcons = !HideDesktopIcons; break;
             case "parkpointer": ParkPointer = !ParkPointer; break;
             case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
             // The FPS counter (RTSS): what it shows, one item at a time.

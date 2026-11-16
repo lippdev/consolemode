@@ -106,6 +106,9 @@ public sealed class AppConfig
     /// <summary>Put the desktop icons back where they were after the session (issue #30).</summary>
     public bool RestoreDesktopIcons { get; set; } = true;
 
+    /// <summary>Hide the desktop icons while the session runs and show them again after it (issue #210). Off by default.</summary>
+    public bool HideDesktopIcons { get; set; }
+
     /// <summary>Move the mouse pointer to a corner of the game screen once the launcher is up, and back afterwards (issue #172).</summary>
     public bool ParkPointer { get; set; } = true;
 
@@ -448,6 +451,8 @@ public sealed class ConsoleRuntimeState
     public string? BackupAudioId { get; set; }
     /// <summary>The desktop icons read before the session; null when they aren't restored.</summary>
     public List<DesktopIcon>? DesktopIcons { get; set; }
+    /// <summary>The session hid the desktop icons (they were showing): the restore shows them again.</summary>
+    public bool DesktopIconsHidden { get; set; }
     /// <summary>JoyChromium was opened from the session menu this session (it goes back to a window with the desk).</summary>
     public bool JoyChromiumOpened { get; set; }
     /// <summary>Park the pointer this session; how many times it was parked, when, and where it was before.</summary>

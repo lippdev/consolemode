@@ -15,6 +15,8 @@ public sealed class SessionJournal
     public string? BackupAudioId { get; set; }
     /// <summary>The desktop icons before the session; null when they aren't restored.</summary>
     public List<DesktopIcon>? DesktopIcons { get; set; }
+    /// <summary>The session hid the desktop icons: an interrupted one still shows them again.</summary>
+    public bool DesktopIconsHidden { get; set; }
     /// <summary>Where the pointer was before the session; null when it isn't parked.</summary>
     public int? PointerX { get; set; }
     public int? PointerY { get; set; }

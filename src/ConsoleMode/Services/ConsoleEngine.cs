@@ -84,6 +84,9 @@ public sealed partial class ConsoleEngine
         // Before any screen changes: Windows may reshuffle the icons once the primary moves.
         State.DesktopIcons = config.RestoreDesktopIcons ? DesktopIcons.Read() : null;
         if (State.DesktopIcons is not null) AppLog.Write($"Ícones da área de trabalho: {State.DesktopIcons.Count} posições salvas");
+        // The clean look of a console (issue #210): only icons that were showing are hidden, so only those come back.
+        State.DesktopIconsHidden = config.HideDesktopIcons && DesktopIcons.SetHidden(true) == true;
+        if (State.DesktopIconsHidden) AppLog.Write("Ícones da área de trabalho: escondidos durante a sessão");
 
         // Also before the screens change: where the pointer goes back to (issue #172).
         State.ParkPointer = config.ParkPointer;
@@ -124,6 +127,7 @@ public sealed partial class ConsoleEngine
                 FullscreenMode = config.FullscreenMode,
                 BackupAudioId = audioBefore,
                 DesktopIcons = State.DesktopIcons,
+                DesktopIconsHidden = State.DesktopIconsHidden,
                 PointerX = State.PointerBefore?.X,
                 PointerY = State.PointerBefore?.Y
             });
@@ -378,6 +382,10 @@ public sealed partial class ConsoleEngine
                     AppLog.Write($"Restauração do setup: {issue}");
             }
             Audio.Restore(State.BackupAudioId);
+            if (State.DesktopIconsHidden)
+                AppLog.Write(DesktopIcons.SetHidden(false) is null
+                    ? "Ícones da área de trabalho: não foi possível mostrar de novo"
+                    : "Ícones da área de trabalho: visíveis de novo");
             if (State.DesktopIcons is { Count: > 0 } icons) RestoreDesktopIconsLater(icons);
             ReturnPointer();
             Rtss.Restore(State);
@@ -441,6 +449,7 @@ public sealed partial class ConsoleEngine
             State.HdrMonitor = null;
             State.VrrApplied = false;
             State.DesktopIcons = null;
+            State.DesktopIconsHidden = false;
             State.JoyChromiumOpened = false;
             State.ParkPointer = false;
             State.PointerParks = 0;
@@ -578,6 +587,7 @@ public sealed partial class ConsoleEngine
         State.BackupAudioId = journal.BackupAudioId
                               ?? (File.Exists(AppPaths.BackupAudioFile) ? File.ReadAllText(AppPaths.BackupAudioFile).Trim() : null);
         State.DesktopIcons = journal.DesktopIcons;
+        State.DesktopIconsHidden = journal.DesktopIconsHidden;
         State.PointerBefore = journal.PointerBefore;
         // It was parked before the crash, or may have been: put it back if its old spot is on a screen again.
         State.PointerParks = journal.PointerBefore is null ? 0 : 1;

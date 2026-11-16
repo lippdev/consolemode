@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### What's new
+- **Hide desktop icons during the session** (System, off by default): the icons disappear while the session runs, so the TV looks clean like a console, and come back when you go back to the PC. Icons that were already hidden stay hidden, and if the app or the PC goes down mid-session, the next start shows them again (asked by PLEXX-DE, issue #210). (#214)
 
 ## [1.7.0]
 ### What's new

@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- **Esconder os ícones da área de trabalho na sessão** (Sistema, desligado por padrão): os ícones somem enquanto a sessão roda, para a TV ficar limpa como num console, e voltam ao voltar ao PC. Ícones que já estavam escondidos continuam assim, e se o app ou o PC cair no meio, a próxima abertura os mostra de novo (pedido do PLEXX-DE, issue #210). (#214)
 
 ## [1.7.0]
 ### Novidades
