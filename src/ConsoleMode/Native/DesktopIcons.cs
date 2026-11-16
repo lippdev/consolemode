@@ -54,6 +54,15 @@ internal static class DesktopIcons
     /// desktop's IFolderView2 (FWF_NOICONS). True when it changed them, false when they already were that way,
     /// null when the desktop couldn't be reached.
     /// </summary>
+    /// <summary>Whether the desktop icons are hidden now; null when the desktop couldn't be reached. Changes nothing.</summary>
+    public static bool? IsHidden() => OnSta<bool?>(() =>
+    {
+        using var desktop = DesktopView.Open();
+        if (desktop?.View is not IFolderView2 view) return null;
+        Marshal.ThrowExceptionForHR(view.GetCurrentFolderFlags(out var flags));
+        return (flags & FwfNoIcons) != 0;
+    }, null);
+
     public static bool? SetHidden(bool hide) => OnSta<bool?>(() =>
     {
         using var desktop = DesktopView.Open();

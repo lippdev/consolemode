@@ -84,9 +84,10 @@ public sealed partial class ConsoleEngine
         // Before any screen changes: Windows may reshuffle the icons once the primary moves.
         State.DesktopIcons = config.RestoreDesktopIcons ? DesktopIcons.Read() : null;
         if (State.DesktopIcons is not null) AppLog.Write($"Ícones da área de trabalho: {State.DesktopIcons.Count} posições salvas");
-        // The clean look of a console (issue #210): only icons that were showing are hidden, so only those come back.
-        State.DesktopIconsHidden = config.HideDesktopIcons && DesktopIcons.SetHidden(true) == true;
-        if (State.DesktopIconsHidden) AppLog.Write("Ícones da área de trabalho: escondidos durante a sessão");
+        // The clean look of a console (issue #210): only icons that are showing get hidden, so only those come back.
+        // Decided here, hidden only once the journal says so (below): a crash in between can never leave them hidden
+        // with nothing to bring them back, and showing icons that are already showing changes nothing.
+        State.DesktopIconsHidden = config.HideDesktopIcons && DesktopIcons.IsHidden() == false;
 
         // Also before the screens change: where the pointer goes back to (issue #172).
         State.ParkPointer = config.ParkPointer;
@@ -139,6 +140,11 @@ public sealed partial class ConsoleEngine
         }
 
         State.IsActive = true;
+
+        if (State.DesktopIconsHidden)
+            AppLog.Write(DesktopIcons.SetHidden(true) is null
+                ? "Ícones da área de trabalho: não foi possível esconder"
+                : "Ícones da área de trabalho: escondidos durante a sessão");
 
         State.BackupAudioId = audioBefore;
         if (!string.IsNullOrWhiteSpace(State.BackupAudioId))
