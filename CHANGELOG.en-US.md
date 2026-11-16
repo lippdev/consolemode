@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Fixes
+- Game screen resolution: a TV left at @59 Hz when @60 is asked for (the "60 Hz" of TVs, 59.94) counts as in the mode asked for. Before, Console Mode re-applied the mode twice at the start of every session, the TV going blank each time, and logged that it couldn't; per-game profiles re-applied it too. The log now says which mode the screen ended up in. (#212)
 
 ## [1.7.0]
 ### What's new

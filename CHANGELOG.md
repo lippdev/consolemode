@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Correções
+- Resolução da tela de jogo: uma TV que fica em @59 Hz quando se pede @60 (o "60 Hz" de TV, 59,94) conta como no modo pedido. Antes o Console Mode reaplicava o modo mais duas vezes no início de toda sessão, com a TV apagando a cada vez, e registrava que não tinha conseguido; o perfil por jogo também reaplicava. O log agora diz em que modo a tela ficou. (#212)
 
 ## [1.7.0]
 ### Novidades
