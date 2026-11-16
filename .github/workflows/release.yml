@@ -16,6 +16,11 @@ name: Release
 # the same release as ConsoleModeLegacy-*.exe. GitHub lists a release's files by name, so those come after the
 # current version's; and they don't start like the ones the update check and winget look for, so nobody is
 # updated to Legacy.
+#
+# Publishing a draft creates its tag, and that tag push starts this workflow again. The "guard" job stops that
+# run: the release is out already, with the files that were tested, and winget.yml sends it to winget. (On 1.7.0
+# the second run rebuilt and replaced the installer and the portable after publishing, dropped the Legacy part
+# of the notes, and winget rejected the submission made a moment before for a hash that no longer matched.)
 on:
   push:
     tags:
@@ -44,6 +49,29 @@ permissions:
   actions: read
 
 jobs:
+  # A pushed tag whose release is already published (a draft that was just published) has nothing left to do.
+  guard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: Is the release already published?
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          skip=false
+          if [ "$EVENT_NAME" = "push" ] && [ "$(gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft 2>/dev/null)" = "false" ]; then
+            skip=true
+            echo "A release $TAG já está publicada (veio de um rascunho): nada a fazer."
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+
   # The Legacy build: the branch's own code, tests and publish script, with the version of this release.
   legacy:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.legacy != ''
@@ -103,9 +131,9 @@ jobs:
           if-no-files-found: error
 
   build:
-    needs: legacy
+    needs: [guard, legacy]
     # Without Legacy that job is skipped, and a skipped job would skip this one too.
-    if: ${{ !cancelled() && (needs.legacy.result == 'success' || needs.legacy.result == 'skipped') }}
+    if: ${{ !cancelled() && needs.guard.result == 'success' && needs.guard.outputs.skip != 'true' && (needs.legacy.result == 'success' || needs.legacy.result == 'skipped') }}
     runs-on: windows-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
