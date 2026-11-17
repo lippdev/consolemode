@@ -547,6 +547,14 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Esconder os ícones da área de trabalho na sessão (#214, issue #210)
+
+- [ ] Ligado, numa sessão de verdade na TV: os ícones não aparecem na TV em nenhum momento depois que a sessão começa (nem atrás do iniciador) e voltam nas telas da mesa ao voltar ao PC. Resultado: ______
+- [ ] Ligado, com os ícones já escondidos antes (botão direito → Exibir → Mostrar ícones desmarcado): continuam escondidos depois da sessão. Resultado: ______
+- [ ] Junto com **Devolver os ícones ao lugar**: os ícones voltam visíveis e nas posições de antes. Resultado: ______
+- [ ] Fechar o Console Mode à força no meio da sessão e abrir de novo: os ícones aparecem de novo (log "Ícones da área de trabalho: visíveis de novo"). Resultado: ______
+- [ ] Desligado (padrão): nada muda nos ícones. Resultado: ______
+
 ## Resolução da TV a 59/60 Hz (#212)
 
 - [ ] TV como tela de jogo com 2560x1440 @ 60 Hz em Sistema: a sessão começa e a TV muda de resolução **uma vez só** (sem apagar duas ou três vezes). O log tem "Telas: ... em 2560x1440@59 (pedido 2560x1440@60)" ou "@60", e nenhum "Não foi possível aplicar". Resultado: ______

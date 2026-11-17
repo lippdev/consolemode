@@ -113,6 +113,8 @@
   "CloseSteamDescription": "When you leave Big Picture, Steam receives a normal window-close request so it can move to the tray without exiting the process. If a game is running or its state cannot be checked, the window is left unchanged.",
   "RestoreIconsCard": "Put desktop icons back in place",
   "RestoreIconsDescription": "Saves where the desktop icons are before the session and puts them back when you return to the PC, in case Windows reshuffles them while the main display changes. Does nothing when auto arrange is on.",
+  "HideIconsCard": "Hide desktop icons during the session",
+  "HideIconsDescription": "Hides the desktop icons while the session runs, so the TV looks clean like a console, and shows them again when you go back to the PC. If they were already hidden, they stay that way.",
   "ParkPointerCard": "Move the mouse pointer out of the way",
   "ParkPointerDescription": "When the launcher shows up on the TV, moves the pointer to the bottom-right corner of the game screen so it doesn't sit in the middle of the picture. Going back to the PC puts it back where it was.",
   "GameProfilesCard": "Per-game profiles",

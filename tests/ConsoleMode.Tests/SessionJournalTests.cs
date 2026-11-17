@@ -20,6 +20,7 @@ public class SessionJournalTests : IDisposable
             FullscreenMode = "joyChromium",
             BackupAudioId = "{0.0.0.00000000}.{abc}",
             DesktopIcons = [new DesktopIcon("Lixeira", 10, 20), new DesktopIcon("Steam", 10, 110)],
+            DesktopIconsHidden = true,
             PointerX = -400,
             PointerY = 300
         };
@@ -31,6 +32,7 @@ public class SessionJournalTests : IDisposable
         Assert.Equal("joyChromium", read.FullscreenMode);
         Assert.Equal(written.BackupAudioId, read.BackupAudioId);
         Assert.Equal(written.DesktopIcons, read.DesktopIcons);
+        Assert.True(read.DesktopIconsHidden);
         Assert.Equal((-400, 300), read.PointerBefore);
     }
 
@@ -41,6 +43,7 @@ public class SessionJournalTests : IDisposable
         Assert.Null(read.DesktopIcons);
         Assert.Null(read.PointerBefore);
         Assert.Null(read.BackupAudioId);
+        Assert.False(read.DesktopIconsHidden);
     }
 
     [Theory]

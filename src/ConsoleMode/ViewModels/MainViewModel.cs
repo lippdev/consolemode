@@ -358,6 +358,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = config.ConsoleBackgroundImage ?? "";
             CloseSteamOnRestore = config.CloseSteamOnRestore;
             RestoreDesktopIcons = config.RestoreDesktopIcons;
+            HideDesktopIcons = config.HideDesktopIcons;
             ParkPointer = config.ParkPointer;
             LoadGameProfiles(config.GameProfiles);
             RefreshHomeButtonHint();
@@ -922,6 +923,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleBackgroundImage = ConsoleBackgroundImage,
             CloseSteamOnRestore = CloseSteamOnRestore,
             RestoreDesktopIcons = RestoreDesktopIcons,
+            HideDesktopIcons = HideDesktopIcons,
             ParkPointer = ParkPointer,
             GameProfiles = [.. _gameProfiles],
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,

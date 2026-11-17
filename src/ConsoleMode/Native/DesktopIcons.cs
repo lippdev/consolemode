@@ -49,6 +49,31 @@ internal static class DesktopIcons
         return moved;
     }, -1);
 
+    /// <summary>
+    /// Hides or shows the desktop icons, as right click → View → Show desktop icons does (issue #210), through the
+    /// desktop's IFolderView2 (FWF_NOICONS). True when it changed them, false when they already were that way,
+    /// null when the desktop couldn't be reached.
+    /// </summary>
+    /// <summary>Whether the desktop icons are hidden now; null when the desktop couldn't be reached. Changes nothing.</summary>
+    public static bool? IsHidden() => OnSta<bool?>(() =>
+    {
+        using var desktop = DesktopView.Open();
+        if (desktop?.View is not IFolderView2 view) return null;
+        Marshal.ThrowExceptionForHR(view.GetCurrentFolderFlags(out var flags));
+        return (flags & FwfNoIcons) != 0;
+    }, null);
+
+    public static bool? SetHidden(bool hide) => OnSta<bool?>(() =>
+    {
+        using var desktop = DesktopView.Open();
+        if (desktop?.View is not IFolderView2 view) return null;
+        Marshal.ThrowExceptionForHR(view.GetCurrentFolderFlags(out var flags));
+        var hidden = (flags & FwfNoIcons) != 0;
+        if (hidden == hide) return false;
+        Marshal.ThrowExceptionForHR(view.SetCurrentFolderFlags(FwfNoIcons, hide ? FwfNoIcons : 0));
+        return true;
+    }, null);
+
     private static T OnSta<T>(Func<T> work, T fallback)
     {
         var result = fallback;
@@ -170,6 +195,7 @@ internal static class DesktopIcons
     private const uint SvgioAllView = 2;
     private const uint SvsiPositionItem = 0x80;
     private const uint ShgdnForParsing = 0x8000;
+    private const uint FwfNoIcons = 0x1000;
     // STRRET: a UINT and a union whose biggest member is WCHAR[MAX_PATH]; padded for 64-bit.
     private const int StrretSize = 8 + 260 * 2;
 
@@ -245,6 +271,35 @@ internal static class DesktopIcons
         void _SelectItem();
         [PreserveSig] int SelectAndPositionItems(uint cidl, [MarshalAs(UnmanagedType.LPArray)] nint[] apidl,
             [MarshalAs(UnmanagedType.LPArray)] Point[] apt, uint dwFlags);
+    }
+
+    // IFolderView's slots, then IFolderView2's up to the folder flags.
+    [ComImport, Guid("1AF3A467-214F-4298-908E-06B03E0B39F9"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IFolderView2
+    {
+        void _GetCurrentViewMode();
+        void _SetCurrentViewMode();
+        void _GetFolder();
+        void _Item();
+        void _ItemCount();
+        void _Items();
+        void _GetSelectionMarkedItem();
+        void _GetFocusedItem();
+        void _GetItemPosition();
+        void _GetSpacing();
+        void _GetDefaultSpacing();
+        void _GetAutoArrange();
+        void _SelectItem();
+        void _SelectAndPositionItems();
+        void _SetGroupBy();
+        void _GetGroupBy();
+        void _SetViewProperty();
+        void _GetViewProperty();
+        void _SetTileViewProperties();
+        void _SetExtendedTileViewProperties();
+        void _SetText();
+        [PreserveSig] int SetCurrentFolderFlags(uint dwMask, uint dwFlags);
+        [PreserveSig] int GetCurrentFolderFlags(out uint pdwFlags);
     }
 
     [ComImport, Guid("000214E6-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

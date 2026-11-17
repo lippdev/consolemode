@@ -44,4 +44,12 @@ public class DesktopIconLayoutTests
     [Fact]
     public void Settings_from_older_versions_restore_the_icons() =>
         Assert.True(System.Text.Json.JsonSerializer.Deserialize<ConsoleMode.Models.AppConfig>("{}")!.RestoreDesktopIcons);
+
+    // Issue #210: hiding the icons during the session is a choice, never a surprise after an update.
+    [Fact]
+    public void The_icons_are_hidden_only_when_asked_for()
+    {
+        Assert.False(new ConsoleMode.Models.AppConfig().HideDesktopIcons);
+        Assert.False(System.Text.Json.JsonSerializer.Deserialize<ConsoleMode.Models.AppConfig>("{}")!.HideDesktopIcons);
+    }
 }

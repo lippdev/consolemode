@@ -113,6 +113,8 @@
   "CloseSteamDescription": "Al salir de Big Picture, Steam recibe una solicitud normal para cerrar la ventana y pasar a la bandeja sin finalizar el proceso. Si hay un juego en ejecución o no se puede comprobar su estado, la ventana no se modifica.",
   "RestoreIconsCard": "Devolver los iconos del escritorio a su sitio",
   "RestoreIconsDescription": "Guarda la posición de los iconos del escritorio antes de la sesión y los vuelve a colocar al volver al PC, por si Windows los reordena al cambiar la pantalla principal. No hace nada si la organización automática está activada.",
+  "HideIconsCard": "Ocultar los iconos del escritorio en la sesión",
+  "HideIconsDescription": "Oculta los iconos del escritorio mientras dura la sesión, para que la TV se vea limpia como una consola, y los vuelve a mostrar al volver al PC. Si ya estaban ocultos, siguen así.",
   "ParkPointerCard": "Apartar el puntero del ratón",
   "ParkPointerDescription": "Cuando el iniciador aparece en la TV, lleva el puntero a la esquina inferior derecha de la pantalla de juego para que no quede en medio de la imagen. Al volver al PC, el puntero vuelve a donde estaba.",
   "GameProfilesCard": "Perfiles por juego",

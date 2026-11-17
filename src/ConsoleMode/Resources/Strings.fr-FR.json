@@ -113,6 +113,8 @@
   "CloseSteamDescription": "Quand vous quittez Big Picture, Steam reçoit une demande normale de fermeture de fenêtre pour qu'il passe dans la zone de notification sans quitter le processus. Si un jeu est en cours ou si son état ne peut pas être vérifié, la fenêtre n'est pas modifiée.",
   "RestoreIconsCard": "Remettre les icônes du bureau à leur place",
   "RestoreIconsDescription": "Enregistre la position des icônes du bureau avant la session et les remet en place au retour au PC, au cas où Windows les mélange en changeant d'écran principal. Sans effet si la réorganisation automatique est activée.",
+  "HideIconsCard": "Masquer les icônes du bureau pendant la session",
+  "HideIconsDescription": "Masque les icônes du bureau pendant la session, pour que la TV reste nette comme une console, et les réaffiche au retour sur le PC. Si elles étaient déjà masquées, elles le restent.",
   "ParkPointerCard": "Écarter le pointeur de la souris",
   "ParkPointerDescription": "Quand le lanceur apparaît sur la TV, le pointeur est déplacé dans le coin inférieur droit de l'écran de jeu pour ne pas rester au milieu de l'image. Au retour sur le PC, il revient là où il était.",
   "GameProfilesCard": "Profils par jeu",

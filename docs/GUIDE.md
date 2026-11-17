@@ -43,7 +43,7 @@ Open the shortcut action you want to configure, choose **Set** or **Change**, ho
 
 When returning from Big Picture, **Send Steam to the tray when going back to the PC** closes the client window while keeping Steam running. With the option off, the desktop client is left open. Steam windows are left alone when a game is running or its state cannot be checked.
 
-Changing the main display can make Windows reshuffle the desktop icons. **Put desktop icons back in place** (on by default) saves where they are before the session and puts them back after the desk is restored. It does nothing when the desktop's **Auto arrange icons** is on, since Windows lays them out itself then.
+Changing the main display can make Windows reshuffle the desktop icons. **Put desktop icons back in place** (on by default) saves where they are before the session and puts them back after the desk is restored. It does nothing when the desktop's **Auto arrange icons** is on, since Windows lays them out itself then. **Hide desktop icons during the session** (off by default) hides them while the session runs, for a clean console look, and shows them again when you go back to the PC; icons that were already hidden stay hidden, and an interrupted session shows them again on the next start.
 
 **Move the mouse pointer out of the way** (on by default): when the launcher shows up on the TV, the pointer goes to the bottom-right corner of the game screen, and again a few seconds later because Steam recenters it while Big Picture opens. Going back to the PC puts it back where it was. Hiding the pointer altogether is still a choice in the session menu.
 
