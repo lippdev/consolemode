@@ -14,6 +14,9 @@ public class DisplayModeMatchTests
     // A different rate or size is not the mode asked for.
     [InlineData(2560, 1440, 60, 2560, 1440, 50, false)]
     [InlineData(1920, 1080, 120, 1920, 1080, 60, false)]
+    // A screen at @60 when @59 was picked (a separate mode in the list) is not there yet.
+    [InlineData(2560, 1440, 59, 2560, 1440, 60, false)]
+    [InlineData(3840, 2160, 23, 3840, 2160, 24, false)]
     [InlineData(2560, 1440, 60, 3840, 2160, 60, false)]
     [InlineData(2560, 1440, 60, 2560, 1600, 60, false)]
     // 0 = any (a mode saved without a rate, or only a rate).
