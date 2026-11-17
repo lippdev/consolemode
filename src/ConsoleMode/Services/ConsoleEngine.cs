@@ -93,8 +93,8 @@ public sealed partial class ConsoleEngine
 
         // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
         // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
-        State.Tv = TvControlService.IsAvailable ? config.Tv : null;
-        if (State.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
+        State.Tv = config.Tv;
+        if (config.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
 
         // Read the screens fresh: the row the window shows can be stale (the TV was switched off,
         // or the last restore disconnected it), and a stale "active" would skip turning it on.
@@ -384,7 +384,7 @@ public sealed partial class ConsoleEngine
             Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
             Audio.ClearCache();
-            if (State.Tv is { IsEnabled: true, TurnOffOnRestore: true } tv) Tv.TurnOff(tv);
+            if (State.Tv is { IsEnabled: true, HasRestoreStep: true } tv) Tv.Restore(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
             // Only once the screens are back: a restore that threw or left them wrong is tried again on the next start.
             if (!restore.Success)

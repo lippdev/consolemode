@@ -119,6 +119,16 @@ public sealed class TvControlTests
         Assert.Equal(key, AdbProtocol.HdmiKey(input));
     }
 
+    [Fact]
+    public void Going_back_to_the_pc_sends_the_users_command_then_standby()
+    {
+        Assert.Empty(AdbProtocol.RestoreCommands("", standby: false));
+        Assert.Empty(AdbProtocol.RestoreCommands("   ", standby: false));
+        Assert.Equal(["input keyevent 223"], AdbProtocol.RestoreCommands(null, standby: true));
+        Assert.Equal(["input keyevent 3"], AdbProtocol.RestoreCommands(" input keyevent 3 ", standby: false));
+        Assert.Equal(["input keyevent 3", "input keyevent 223"], AdbProtocol.RestoreCommands("input keyevent 3", standby: true));
+    }
+
     [Theory]
     [InlineData("AA:BB:CC:DD:EE:FF")]
     [InlineData("aa-bb-cc-dd-ee-ff")]

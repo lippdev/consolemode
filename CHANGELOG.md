@@ -3,6 +3,10 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Novidades
+- TV: um **Comando ao voltar ao PC** opcional vai para a TV quando a mesa volta, antes da espera, para levá-la à tela inicial ou a outra entrada em vez de só desligar (pedido do PLEXX-DE, issue #209). (#213)
+### Mudanças
+- O controle da TV (Google TV / Android TV pela rede) volta: a categoria **TV** reaparece na aba Sistema e a sessão volta a ligar a TV, trocar para a entrada do PC (inclusive com um **Comando de entrada** próprio) e, se escolhido, colocá-la em espera na volta. Quem já tinha configurado na 1.6 encontra tudo como deixou. (#208)
 ### Correções
 - Resolução da tela de jogo: uma TV que fica em @59 Hz quando se pede @60 (o "60 Hz" de TV, 59,94) conta como no modo pedido. Antes o Console Mode reaplicava o modo mais duas vezes no início de toda sessão, com a TV apagando a cada vez, e registrava que não tinha conseguido; o perfil por jogo também reaplicava. O log agora diz em que modo a tela ficou. (#212)
 
