@@ -416,7 +416,7 @@
   "ConsoleTourQuickSettingsTitle": "Réglages rapides",
   "ConsoleTourQuickSettingsBody": "Sortie audio, résolution, HDR et limite d'IPS de la prochaine session, à une touche près. De retour sur le PC, tout redevient comme avant.",
   "ConsoleTourSystemTitle": "Tous les réglages",
-  "ConsoleTourSystemBody": "L'onglet Système réunit tous les réglages, par catégorie : écran de jeu, ce qui se passe à l'entrée, manette, extras et l'application. {0} ouvre et ferme cet onglet de partout.",
+  "ConsoleTourSystemBody": "L'onglet Système réunit tous les réglages, par catégorie : écran de jeu, ce qui se passe à l'entrée, manette, TV, extras et l'application. {0} ouvre et ferme cet onglet de partout.",
   "ConsoleTourShortcutsTitle": "Raccourcis de la manette",
   "ConsoleTourShortcutsBody": "Choisissez ici les raccourcis qui marchent même fenêtre fermée : un pour entrer en mode console, un pour ouvrir le menu de session par-dessus le jeu et un pour revenir au PC. Un raccourci sans combinaison ne fait rien.",
   "ConsoleTourDoneTitle": "Tout est prêt",

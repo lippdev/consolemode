@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Changes
+- TV control (Google TV / Android TV over the network) is back: the **TV** category returns to the System tab and sessions again turn the TV on, switch it to the PC's input (also with your own **Input command**) and, if chosen, put it in standby on the way back. Anyone who set it up in 1.6 finds it as they left it. (#208)
 
 ## [1.7.0]
 ### What's new

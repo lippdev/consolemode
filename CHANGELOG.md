@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Mudanças
+- O controle da TV (Google TV / Android TV pela rede) volta: a categoria **TV** reaparece na aba Sistema e a sessão volta a ligar a TV, trocar para a entrada do PC (inclusive com um **Comando de entrada** próprio) e, se escolhido, colocá-la em espera na volta. Quem já tinha configurado na 1.6 encontra tudo como deixou. (#208)
 
 ## [1.7.0]
 ### Novidades

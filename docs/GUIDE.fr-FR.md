@@ -29,7 +29,7 @@ Console Mode a une seule interface, conçue comme celle d'une console : elle occ
 
 Dans **Système → Manette**, choisissez la disposition des boutons : **Automatique**, **Xbox** ou **PlayStation**. L'aperçu et les libellés des raccourcis suivent ce choix, qui est enregistré à la fermeture de l'application. Seuls les symboles affichés changent ; les entrées de la manette gardent leur correspondance actuelle.
 
-L'onglet **Système** réunit tous les réglages, y compris les raccourcis manette, Playnite, les FPS personnalisés, la disposition du compteur d'IPS, les arguments de l'application personnalisée, le rapport de diagnostic et le dossier de données. Les valeurs sont conservées après un redémarrage de l'application.
+L'onglet **Système** réunit tous les réglages, y compris les raccourcis manette, Playnite, Android TV, les FPS personnalisés, la disposition du compteur d'IPS, les arguments de l'application personnalisée, le rapport de diagnostic et le dossier de données. Les valeurs sont conservées après un redémarrage de l'application.
 
 Ouvrez l'action de raccourci à configurer, choisissez **Définir** ou **Modifier**, maintenez la combinaison voulue sur une manette, puis relâchez les boutons. **Supprimer** désactive ce raccourci. Pendant la capture, les boutons de la manette ne naviguent pas dans l'interface ; utilisez **Annuler** ou **Échap** pour arrêter la capture. Hors capture, **B** quitte l'éditeur. Les champs d'adresse et de FPS personnalisés acceptent la saisie au clavier.
 
@@ -53,6 +53,29 @@ Les liens `consolemode://` s'envoient sans attendre de réponse. Les outils qui 
 ```
 
 `start`, `stop` et `show` font exactement ce que fait le lien `consolemode://` correspondant, puis répondent une fois l'application stabilisée (`ok:false` avec un `error` si le mode console n'a pas démarré ou si la restauration n'a pas abouti). `status` se contente de lire. Seuls l'utilisateur connecté et LocalSystem peuvent se connecter ; rien n'est exposé sur le réseau.
+
+## Contrôle de la TV
+
+Système → **TV** peut allumer la TV et la basculer sur l'entrée HDMI du PC au démarrage du mode console, et en option la remettre en veille une fois le bureau restauré. Une TV qui ne répond pas ne bloque jamais le mode console : l'application le note dans le journal et attend l'écran de jeu comme d'habitude.
+
+Avec la valeur par défaut, **Ne pas la contrôler**, rien n'est envoyé et rien ne s'ajoute au démarrage ni à la restauration. Avec une méthode choisie, l'étape TV s'exécute en premier au démarrage du mode console et dure au plus **30 secondes** (le pire cas, quand la TV ne répond pas et que le Wake-on-LAN est tenté) ; la mise en veille facultative à la restauration dure au plus **15 secondes**. Une TV déjà allumée répond en général en une ou deux secondes.
+
+La plupart des cartes graphiques de PC ne savent pas envoyer de HDMI-CEC, donc l'application parle à la TV par le réseau :
+
+### Google TV / Android TV
+
+TCL, Sony, Hisense, Philips et les autres TV sous Google TV ou Android TV, via ADB (le protocole de débogage d'Android). Rien à installer sur le PC.
+
+1. Sur la TV : **Paramètres → Système → À propos** (Settings → System → About), appuyez 7 fois sur **Build de l'OS Android TV** (Android TV OS build) pour débloquer les options pour les développeurs.
+2. **Paramètres → Système → Options pour les développeurs** (Developer options) : activez le **Débogage USB** (USB debugging) (sur certaines TV, **Débogage réseau** / **ADB via le réseau**).
+3. Dans Console Mode, choisissez *Google TV / Android TV (réseau)*, saisissez l'adresse IP de la TV (Paramètres → Réseau sur la TV ; réservez-la dans votre box ou routeur) et l'entrée HDMI utilisée par le PC.
+4. Appuyez sur **Tester maintenant**. La TV demande « Autoriser le débogage depuis cet ordinateur ? » (Allow debugging from this computer?) : cochez **Toujours autoriser** (Always allow) et appuyez sur **Autoriser** (Allow).
+
+La clé ADB du PC est stockée chiffrée pour votre utilisateur Windows (DPAPI), donc la TV ne pose la question qu'une fois. Si le dossier de données est copié vers un autre utilisateur Windows ou un autre PC, la clé n'y est pas lisible : l'application en crée une nouvelle et la TV redemande « Autoriser le débogage ? ».
+
+Le réveil utilise la touche de réveil d'Android, puis la touche **HDMI 1-4**. Si votre TV ignore cette touche, renseignez dans **Commande d'entrée (avancé)** n'importe quelle commande shell Android qui ouvre l'entrée du PC. Si la TV disparaît du réseau en veille, indiquez son **Adresse MAC** pour que l'application envoie d'abord un Wake-on-LAN (l'option « Réveil par le réseau » / « Réveil par Wi-Fi » de la TV doit être activée).
+
+Le « Débogage sans fil » (Wireless debugging) avec code d'association (téléphones Android 11+) est un autre protocole, encapsulé en TLS, et n'est pas pris en charge : utilisez le débogage USB / réseau.
 
 ## Extras facultatifs
 

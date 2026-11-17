@@ -416,7 +416,7 @@
   "ConsoleTourQuickSettingsTitle": "Schnelleinstellungen",
   "ConsoleTourQuickSettingsBody": "Audioausgabe, Auflösung, HDR und FPS-Limit für die nächste Sitzung, nur einen Tastendruck entfernt. Zurück am PC ist alles wieder wie vorher.",
   "ConsoleTourSystemTitle": "Alle Einstellungen",
-  "ConsoleTourSystemBody": "Der Tab System enthält alle Einstellungen, nach Kategorie: Spielbildschirm, was beim Start passiert, Controller, Extras und die App. {0} öffnet und schließt diesen Tab von überall.",
+  "ConsoleTourSystemBody": "Der Tab System enthält alle Einstellungen, nach Kategorie: Spielbildschirm, was beim Start passiert, Controller, TV, Extras und die App. {0} öffnet und schließt diesen Tab von überall.",
   "ConsoleTourShortcutsTitle": "Controller-Kürzel",
   "ConsoleTourShortcutsBody": "Wähle hier die Kürzel, die auch bei geschlossenem Fenster funktionieren: eines für den Konsolenmodus, eines für das Sitzungsmenü über dem Spiel und eines für die Rückkehr zum PC. Ein Kürzel ohne Kombination bewirkt nichts.",
   "ConsoleTourDoneTitle": "Alles bereit",

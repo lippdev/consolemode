@@ -416,7 +416,7 @@
   "ConsoleTourQuickSettingsTitle": "Ajustes rápidos",
   "ConsoleTourQuickSettingsBody": "Saída de áudio, resolução, HDR e limite de FPS da próxima sessão, a um botão de distância. Quando você volta ao PC, tudo volta ao que era.",
   "ConsoleTourSystemTitle": "Todas as configurações",
-  "ConsoleTourSystemBody": "A aba Sistema reúne todos os ajustes, por categoria: tela de jogo, o que acontece ao entrar, controle, extras e o app. {0} abre e fecha esta aba de qualquer lugar.",
+  "ConsoleTourSystemBody": "A aba Sistema reúne todos os ajustes, por categoria: tela de jogo, o que acontece ao entrar, controle, TV, extras e o app. {0} abre e fecha esta aba de qualquer lugar.",
   "ConsoleTourShortcutsTitle": "Atalhos do controle",
   "ConsoleTourShortcutsBody": "Escolha aqui os atalhos que funcionam mesmo com esta janela fechada: um para entrar no modo console, um para abrir o menu da sessão por cima do jogo e um para voltar ao PC. Atalho sem combinação definida não faz nada.",
   "ConsoleTourDoneTitle": "Tudo pronto",
