@@ -183,6 +183,7 @@
   "TvHdmiDescription": "Der HDMI-Anschluss des Fernsehers, an den der PC angeschlossen ist.",
   "TvInputCommandCard": "Eingangsbefehl (erweitert)",
   "TvInputCommandDescription": "Nur verwenden, wenn der Fernseher die HDMI-Taste ignoriert: ein Android-Shell-Befehl, der zum PC-Eingang wechselt. Leer lassen = die oben ausgewählte HDMI-Taste verwenden.",
+  "TvRestoreCommandCard": "Befehl bei der Rückkehr zum PC (erweitert)",
   "TvTurnOffCard": "Fernseher beim Wiederherstellen in den Standby versetzen",
   "TvTurnOffDescription": "Nachdem die Desktop-Bildschirme wiederhergestellt wurden.",
   "TvTestCard": "Fernseher testen",

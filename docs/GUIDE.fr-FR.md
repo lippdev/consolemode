@@ -75,6 +75,8 @@ La clé ADB du PC est stockée chiffrée pour votre utilisateur Windows (DPAPI),
 
 Le réveil utilise la touche de réveil d'Android, puis la touche **HDMI 1-4**. Si votre TV ignore cette touche, renseignez dans **Commande d'entrée (avancé)** n'importe quelle commande shell Android qui ouvre l'entrée du PC. Si la TV disparaît du réseau en veille, indiquez son **Adresse MAC** pour que l'application envoie d'abord un Wake-on-LAN (l'option « Réveil par le réseau » / « Réveil par Wi-Fi » de la TV doit être activée).
 
+Quand le bureau revient, la **Commande au retour sur le PC** (facultative) est envoyée d'abord à la TV, par exemple `input keyevent 3` pour son écran d'accueil ou la commande d'une autre entrée ; ensuite la veille, si elle est activée.
+
 Le « Débogage sans fil » (Wireless debugging) avec code d'association (téléphones Android 11+) est un autre protocole, encapsulé en TLS, et n'est pas pris en charge : utilisez le débogage USB / réseau.
 
 ## Extras facultatifs

@@ -83,6 +83,8 @@ The PC's ADB key is stored encrypted for your Windows user (DPAPI), so the TV on
 
 Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignores that key, set **Input command** to any Android shell command that opens the PC's input. If the TV drops off the network in standby, fill in its **MAC address** so the app sends Wake-on-LAN first (the TV's "Wake on network" / "Wake on Wi-Fi" option must be on).
 
+When the desk comes back, **Command when going back to the PC** (optional) is sent to the TV first, for example `input keyevent 3` for its Home screen or the command of another input; then standby, if **Put the TV in standby on restore** is on.
+
 "Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
 ## Optional extras
