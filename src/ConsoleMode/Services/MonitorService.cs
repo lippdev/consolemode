@@ -339,8 +339,13 @@ public sealed class MonitorService
             Thread.Sleep(400);
         }
 
+        // What it really is in: the "@59" of a TV asked for "@60" is said, and a real failure says where it stayed.
+        var now = NativeWindows.GetCurrentDisplayMode(focusMonitor);
+        var shown = now is null ? "sem modo atual" : $"{now.Width}x{now.Height}@{now.Frequency}";
         if (!IsCurrentMode(focusMonitor, mode.Width, mode.Height, mode.Frequency))
-            AppLog.Write($"Não foi possível aplicar {mode.Width}x{mode.Height}@{mode.Frequency} em {focusMonitor}");
+            AppLog.Write($"Não foi possível aplicar {mode.Width}x{mode.Height}@{mode.Frequency} em {focusMonitor} (ficou em {shown})");
+        else
+            AppLog.Write($"Telas: {focusMonitor} em {shown} (pedido {mode.Width}x{mode.Height}@{mode.Frequency})");
 
         SetPrimary(focusMonitor);
         Thread.Sleep(300);
@@ -416,11 +421,8 @@ public sealed class MonitorService
     private bool IsCurrentMode(string name, int width, int height, int frequency)
     {
         var current = NativeWindows.GetCurrentDisplayMode(name);
-        if (current is null) return false;
-        if (width > 0 && current.Width != width) return false;
-        if (height > 0 && current.Height != height) return false;
-        if (frequency > 0 && current.Frequency != frequency) return false;
-        return true;
+        return current is not null
+               && DisplayModeMatch.IsSame(width, height, frequency, current.Width, current.Height, current.Frequency);
     }
 
     private bool RestorePrimaryWithRetry(string monitorName, Dictionary<string, string>? spec, int maxAttempts = 3)

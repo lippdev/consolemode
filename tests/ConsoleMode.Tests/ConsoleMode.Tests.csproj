@@ -42,6 +42,7 @@
     <Compile Include="../../src/ConsoleMode/Services/HardwareStats.cs" Link="HardwareStats.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
+    <Compile Include="../../src/ConsoleMode/Services/DisplayModeMatch.cs" Link="DisplayModeMatch.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMapping.cs" Link="ControllerMapping.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerShortcuts.cs" Link="ControllerShortcuts.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerBattery.cs" Link="ControllerBattery.cs" />

@@ -138,6 +138,18 @@ public static class AdbProtocol
     /// <summary>Key code for "HDMI n" (1-4).</summary>
     public static int HdmiKey(int input) => KeyTvInputHdmi1 + Math.Clamp(input, 1, 4) - 1;
 
+    /// <summary>
+    /// What the TV gets when the desk comes back (issue #209): the user's command first (the TV's Home screen,
+    /// another HDMI input…), then standby if that is on. Empty when there is nothing to send.
+    /// </summary>
+    public static IReadOnlyList<string> RestoreCommands(string? restoreCommand, bool standby)
+    {
+        var commands = new List<string>();
+        if (!string.IsNullOrWhiteSpace(restoreCommand)) commands.Add(restoreCommand.Trim());
+        if (standby) commands.Add($"input keyevent {KeySleep}");
+        return commands;
+    }
+
     private static void WriteLittleEndian(BigInteger value, Span<byte> destination)
     {
         destination.Clear();

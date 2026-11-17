@@ -20,12 +20,10 @@ public partial class MainViewModel
     [ObservableProperty] private string _tvMacAddress = "";
     [ObservableProperty] private string _tvInputCommand = "";
     [ObservableProperty] private bool _tvTurnOffOnRestore;
+    [ObservableProperty] private string _tvRestoreCommand = "";
     [ObservableProperty] private bool _isTestingTv;
 
     private string TvProvider => SelectedTvProvider?.Value ?? TvControlConfig.None;
-
-    /// <summary>The System → TV category shows only while the feature is in (<see cref="TvControlService.IsAvailable"/>).</summary>
-    public bool IsTvControlAvailable => TvControlService.IsAvailable;
 
     public bool IsTvEnabled => TvProvider != TvControlConfig.None;
     public bool IsTvAndroid => TvProvider == TvControlConfig.AndroidTv;
@@ -53,6 +51,7 @@ public partial class MainViewModel
     partial void OnTvMacAddressChanged(string value) => SaveQuietly();
     partial void OnTvInputCommandChanged(string value) => SaveQuietly();
     partial void OnTvTurnOffOnRestoreChanged(bool value) => SaveQuietly();
+    partial void OnTvRestoreCommandChanged(string value) => SaveQuietly();
 
     /// <summary>Part of <see cref="BuildLocalizedOptions"/>: the names follow the interface language.</summary>
     private void BuildTvOptions()
@@ -80,6 +79,7 @@ public partial class MainViewModel
         TvMacAddress = tv.MacAddress ?? "";
         TvInputCommand = tv.InputCommand ?? "";
         TvTurnOffOnRestore = tv.TurnOffOnRestore;
+        TvRestoreCommand = tv.RestoreCommand ?? "";
     }
 
     private TvControlConfig BuildTvConfig() => new()
@@ -89,7 +89,8 @@ public partial class MainViewModel
         MacAddress = TvMacAddress.Trim(),
         HdmiInput = int.TryParse(SelectedTvHdmiInput?.Value, out var hdmi) ? hdmi : 1,
         InputCommand = TvInputCommand.Trim(),
-        TurnOffOnRestore = TvTurnOffOnRestore
+        TurnOffOnRestore = TvTurnOffOnRestore,
+        RestoreCommand = TvRestoreCommand.Trim()
     };
 
     /// <summary>Turns the TV on and switches the input now; the first time, pairs with the TV.</summary>

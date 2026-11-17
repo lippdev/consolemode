@@ -21,10 +21,17 @@ public sealed class AndroidTvController : ITvController
         await adb.ShellAsync(inputCommand, ct);
     }
 
-    public async Task TurnOffAsync(TvControlConfig config, CancellationToken ct)
+    public async Task RestoreAsync(TvControlConfig config, CancellationToken ct)
     {
+        var commands = AdbProtocol.RestoreCommands(config.RestoreCommand, config.TurnOffOnRestore);
+        if (commands.Count == 0) return;
         await using var adb = await ConnectAsync(config, TimeSpan.FromSeconds(5), wakeOnLan: false, ct);
-        await adb.ShellAsync($"input keyevent {AdbProtocol.KeySleep}", ct);
+        for (var i = 0; i < commands.Count; i++)
+        {
+            // A moment between the user's command and standby, or the TV may drop the second while it switches.
+            if (i > 0) await Task.Delay(1000, ct);
+            await adb.ShellAsync(commands[i], ct);
+        }
     }
 
     private static Task<AdbClient> ConnectAsync(TvControlConfig config, TimeSpan approvalTimeout, bool wakeOnLan, CancellationToken ct)

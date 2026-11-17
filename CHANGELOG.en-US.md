@@ -5,6 +5,11 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 ## [Unreleased]
 ### What's new
 - **Hide desktop icons during the session** (System, off by default): the icons disappear while the session runs, so the TV looks clean like a console, and come back when you go back to the PC. Icons that were already hidden stay hidden, and if the app or the PC goes down mid-session, the next start shows them again (asked by PLEXX-DE, issue #210). (#214)
+- TV: an optional **Command when going back to the PC** is sent to the TV when the desk comes back, before standby, to take it to its Home screen or another input instead of only turning it off (asked by PLEXX-DE, issue #209). (#213)
+### Changes
+- TV control (Google TV / Android TV over the network) is back: the **TV** category returns to the System tab and sessions again turn the TV on, switch it to the PC's input (also with your own **Input command**) and, if chosen, put it in standby on the way back. Anyone who set it up in 1.6 finds it as they left it. (#208)
+### Fixes
+- Game screen resolution: a TV left at @59 Hz when @60 is asked for (the "60 Hz" of TVs, 59.94) counts as in the mode asked for. Before, Console Mode re-applied the mode twice at the start of every session, the TV going blank each time, and logged that it couldn't; per-game profiles re-applied it too. The log now says which mode the screen ended up in. (#212)
 
 ## [1.7.0]
 ### What's new

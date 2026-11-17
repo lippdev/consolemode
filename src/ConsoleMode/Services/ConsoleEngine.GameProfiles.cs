@@ -85,7 +85,8 @@ public sealed partial class ConsoleEngine
         if (mode is { Width: > 0, Height: > 0 })
         {
             var current = NativeWindows.GetCurrentDisplayMode(focus);
-            if (current is null || current.Width != mode.Width || current.Height != mode.Height || current.Frequency != mode.Frequency)
+            // A TV at @59 for a profile saved at @60 is already there: re-applying would only blank it.
+            if (current is null || !DisplayModeMatch.IsSame(mode.Width, mode.Height, mode.Frequency, current.Width, current.Height, current.Frequency))
                 Try("resolução", () =>
                 {
                     Monitors.ApplyFocusMode(focus, mode);
