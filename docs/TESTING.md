@@ -547,6 +547,12 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Resolução da TV a 59/60 Hz (#212)
+
+- [ ] TV como tela de jogo com 2560x1440 @ 60 Hz em Sistema: a sessão começa e a TV muda de resolução **uma vez só** (sem apagar duas ou três vezes). O log tem "Telas: ... em 2560x1440@59 (pedido 2560x1440@60)" ou "@60", e nenhum "Não foi possível aplicar". Resultado: ______
+- [ ] O mesmo com 3840x2160 @ 60 e com "Não alterar": nada muda para pior. Resultado: ______
+- [ ] Perfil por jogo salvo com @60: abrir o jogo com a TV já em @59 não faz a TV piscar. Resultado: ______
+
 ## Comando na TV ao voltar ao PC (#213, issue #209)
 
 - [ ] Android TV configurada, **Comando ao voltar ao PC** = `input keyevent 3`, espera desligada: ao voltar ao PC a TV vai para a tela inicial e continua ligada. O log tem "TV: voltar ao PC (androidTv) ok". Resultado: ______
