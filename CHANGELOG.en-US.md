@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
-- Controller battery: on Bluetooth pads, the corner of the screen shows the same value as Windows Settings → Bluetooth. Some pads sent Windows a fixed value through the other path (an Amazon Luna pad always showed 10 % while at 90 %; reported by PLEXX-DE, issue #224). PlayStation pads still read the battery from the pad itself. (#NNN)
+- Controller battery: on Bluetooth pads, the corner of the screen shows the same value as Windows Settings → Bluetooth. Some pads sent Windows a fixed value through the other path (an Amazon Luna pad always showed 10 % while at 90 %; reported by PLEXX-DE, issue #224). PlayStation pads still read the battery from the pad itself. (#225)
 
 ## [1.7.1-beta.3]
 ### Fixes
