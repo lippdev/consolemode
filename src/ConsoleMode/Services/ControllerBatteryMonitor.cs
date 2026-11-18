@@ -71,9 +71,37 @@ public static class ControllerBatteryMonitor
             _loggedBluetoothError = true;
         }
 
-        var all = ControllerBattery.Combine(SonyHidReader.ReadBatteries(), wgi, xinput, bluetooth);
-        lock (Gate) _snapshot = all;
+        var sony = SonyHidReader.ReadBatteries();
+        var all = ControllerBattery.Combine(sony, wgi, xinput, bluetooth);
+        lock (Gate)
+        {
+            _snapshot = all;
+            _sources = [.. sony, .. bluetooth, .. wgi.Select(w => w.Item1), .. xinput];
+        }
         return all;
+    }
+
+    private static IReadOnlyList<BatteryReading> _sources = [];
+
+    /// <summary>
+    /// For the controller test: what every source said at the last refresh, and which reading is shown, so a pad whose
+    /// sources disagree (issue #224) is visible at a glance.
+    /// </summary>
+    public static string DescribeSources()
+    {
+        IReadOnlyList<BatteryReading> sources, shown;
+        lock (Gate)
+        {
+            sources = _sources;
+            shown = _snapshot;
+        }
+        if (sources.Count == 0) return "Bateria: nenhuma fonte";
+        return string.Join(Environment.NewLine, sources.Select(r =>
+        {
+            var ids = r.VendorId == 0 ? "" : $" ({r.VendorId:X4}:{r.ProductId:X4})";
+            var used = shown.Contains(r) ? " ← mostrada" : "";
+            return $"Bateria {r.Source}: {r.Name}{ids} {ControllerBattery.Format(r)}{(r.Charging ? ", carregando" : "")}{used}";
+        }));
     }
 
     private static readonly HashSet<string> LoggedBluetooth = [];

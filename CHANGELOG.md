@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Mudanças
+- **Testar controle** mostra mais: o botão Xbox (Guide) quando ele chega, os botões de controles de outras marcas com o código HID de cada um, e a bateria que cada fonte informa e qual aparece na tela. Ajuda a resolver controles que não funcionam direito a partir do diagnóstico copiado. (#NNN)
 ### Correções
 - Controle: o botão central de controles de outras marcas (Amazon Luna, 8BitDo, Stadia…) passa a abrir o Console Mode como o botão Xbox, quando o controle declara esse botão do jeito padrão do HID. Antes só os botões Xbox e PS funcionavam, e esses controles precisavam de um atalho com dois botões (relatado pelo PLEXX-DE, issue #217). (#226)
 - Bateria do controle: nos controles Bluetooth, o canto da tela mostra o mesmo valor das Configurações do Windows → Bluetooth. Alguns controles mandavam ao Windows um valor fixo pelo outro caminho (um Amazon Luna aparecia sempre com 10 % estando em 90 %; relatado pelo PLEXX-DE, issue #224). Os controles PlayStation continuam lendo a bateria pelo próprio controle. (#225)

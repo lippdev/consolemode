@@ -547,6 +547,13 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Testar controle: Guide, códigos HID e bateria (#NNN)
+
+- [ ] Controle Xbox: em Testar controle, segurar o botão Xbox faz a linha "XInput #0" mostrar "(Guide)". Resultado: ______
+- [ ] Controle de outra marca (Amazon Luna, 8BitDo…): aparecem linhas "HID <vid:pid> …" por coleção, com "botão central = …" ou "sem botão central padrão", e cada botão segurado aparece em "apertado: …" com o código (ex.: "Button 13", "Consumer 0x223 (AC Home)"). Copiar diagnóstico leva essas linhas. Resultado: ______
+- [ ] A lista de dispositivos termina com "Bateria <fonte>: …" de cada fonte e "← mostrada" na que aparece no canto da tela. Resultado: ______
+- [ ] Fechar o Testar controle: o log não mostra erro, e o atalho do botão central continua funcionando depois. Resultado: ______
+
 ## Botão central de outras marcas (#226, issue #217)
 
 - [ ] Controle que não é Xbox nem PlayStation (Amazon Luna, 8BitDo, Stadia…), com o atalho para abrir o Console Mode no botão Xbox (padrão): o log tem "Controle: lendo o botão central pelo HID (<vid:pid>, …)" e segurar o botão central com o app na bandeja abre o modo console. Resultado: ______
