@@ -547,7 +547,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
-## Nomes das categorias do Sistema (#NNN, issue #219)
+## Nomes das categorias do Sistema (#221, issue #219)
 
 - [ ] Idioma alemão, janela pequena (~1100 px) e tela cheia na TV: em Sistema, "Beim Starten des Konsolenmodus" e "Tastenkombination, Hilfe und Daten" aparecem inteiros, sem "…". O mesmo em francês ("Autres applications du développeur"). Resultado: ______
 - [ ] Português e inglês: as categorias continuam numa linha só, a barra verde fica alinhada com o nome, e as opções à direita continuam legíveis (os valores longos quebram em duas linhas como antes). Resultado: ______

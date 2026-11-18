@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Correções
-- Sistema: os nomes das categorias à esquerda não são mais cortados em alemão e francês. A coluna ficou mais larga, e um nome que ainda não couber passa para uma segunda linha (relatado pelo PLEXX-DE, issue #219). (#NNN)
+- Sistema: os nomes das categorias à esquerda não são mais cortados em alemão e francês. A coluna ficou mais larga, e um nome que ainda não couber passa para uma segunda linha (relatado pelo PLEXX-DE, issue #219). (#221)
 
 ## [1.7.1-beta.2]
 ### Correções

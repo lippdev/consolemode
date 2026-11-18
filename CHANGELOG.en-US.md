@@ -4,7 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
-- System: the category names on the left are no longer cut off in German and French. The column is wider, and a name that still doesn't fit goes on to a second line (reported by PLEXX-DE, issue #219). (#NNN)
+- System: the category names on the left are no longer cut off in German and French. The column is wider, and a name that still doesn't fit goes on to a second line (reported by PLEXX-DE, issue #219). (#221)
 
 ## [1.7.1-beta.2]
 ### Fixes
