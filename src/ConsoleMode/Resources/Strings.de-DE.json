@@ -164,7 +164,7 @@
   "CheckNow": "Jetzt suchen",
   "NotifyUpdatesCard": "Bei einer neuen Version benachrichtigen",
   "NotifyUpdatesDescription": "Prüft beim Start der App die GitHub-Releases.",
-  "BetaUpdatesCard": "Testversionen erhalten (Alpha und Beta)",
+  "BetaUpdatesCard": "Testversionen erhalten (Beta)",
   "BetaUpdatesDescription": "Erhalte Vorabversionen, um beim Testen zu helfen. Sie können Fehler enthalten. Wenn du diese Option deaktivierst, wechselst du nicht zur stabilen Version zurück: Du erhältst die nächste stabile Version, sobald sie erscheint.",
   "BetaUpdatesWarning": "Testversionen können auf manchen Systemen Probleme verursachen. Wenn etwas nicht mehr funktioniert, lade die stabile Version von der Releases-Seite herunter und sende uns über die Feedback-Schaltfläche eine Rückmeldung.",
   "HelpDataSection": "Tastenkombination, Hilfe und Daten",

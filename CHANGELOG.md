@@ -3,6 +3,8 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Mudanças
+- **Receber versões de teste** agora traz só as betas. As versões alpha, como as da futura 2.0, são testes fechados e não chegam mais pela atualização do app, nem com a opção ligada. (#NNN)
 
 ## [1.7.1-beta.3]
 ### Correções

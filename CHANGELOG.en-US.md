@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Changes
+- **Receive test versions** now brings betas only. Alpha versions, like those of the upcoming 2.0, are closed tests and no longer arrive through the app's updates, even with the option on. (#NNN)
 
 ## [1.7.1-beta.3]
 ### Fixes

@@ -164,7 +164,7 @@
   "CheckNow": "Vérifier maintenant",
   "NotifyUpdatesCard": "M'avertir quand une nouvelle version est disponible",
   "NotifyUpdatesDescription": "Vérifie les versions publiées sur GitHub au démarrage de l'application.",
-  "BetaUpdatesCard": "Recevoir les versions de test (alpha et bêta)",
+  "BetaUpdatesCard": "Recevoir les versions de test (bêta)",
   "BetaUpdatesDescription": "Recevez les versions en avant-première pour aider à les tester. Elles peuvent contenir des bugs. Désactiver cette option ne revient pas à la version stable : vous recevrez la prochaine version stable à sa sortie.",
   "BetaUpdatesWarning": "Les versions de test peuvent échouer sur certaines configurations. En cas de problème, téléchargez la version stable sur la page des versions et signalez-le-nous avec le bouton de commentaires.",
   "HelpDataSection": "Raccourci, aide et données",

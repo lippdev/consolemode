@@ -68,6 +68,8 @@ public static partial class UpdateService
             // Old releases were tagged "release"/"app"; fall back to the version in the title.
             var version = SemVer.TryFind(tag) ?? SemVer.TryFind(name);
             if (version is null || version.CompareTo(current) <= 0) continue;
+            // Alphas (the 2.0 ones included) are never offered, test channel or not.
+            if (!UpdateChannel.IsOfferedLabel(version.PreLabel)) continue;
             if (bestVersion is not null && version.CompareTo(bestVersion) <= 0) continue;
 
             var (assetUrl, assetName, assetDigest) = PickAsset(release);
@@ -226,6 +228,9 @@ public static partial class UpdateService
         }
 
         public bool IsPrerelease => _pre.Length > 0;
+
+        /// <summary>The first pre-release identifier ("beta" in 1.7.1-beta.2), empty for a stable version.</summary>
+        public string PreLabel => _pre.Length > 0 ? _pre[0] : "";
 
         [GeneratedRegex(@"(\d+)\.(\d+)(?:\.(\d+))?(?:-([0-9A-Za-z.\-]+))?")]
         private static partial Regex Pattern();

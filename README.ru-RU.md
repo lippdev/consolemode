@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 - **`ConsoleMode-Portable-x64.exe`**: один exe-файл, который хранит данные рядом с собой.
 - Или через winget: `winget install lippdev.ConsoleMode`
 
-Хотите опробовать новинки раньше всех? Включите «Система» → «Приложение» → «Получать тестовые версии (альфа и бета)».
+Хотите опробовать новинки раньше всех? Включите «Система» → «Приложение» → «Получать тестовые версии (бета)».
 
 Windows 10 или 11, а также [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) или приложение Xbox. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) необязателен: он нужен для ограничения FPS и счётчика FPS.
 
