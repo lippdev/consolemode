@@ -494,9 +494,10 @@
                         </Style>
                     </Grid.Resources>
                     <!-- Categories on the left (moving over one shows its options), only that category's options on the right -->
-                    <Grid ColumnSpacing="48">
+                    <Grid ColumnSpacing="40">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="340"/>
+                            <!-- Wide enough for the longest names (German, French: ~34 characters); longer ones wrap to a second line (issue #219) -->
+                            <ColumnDefinition Width="400"/>
                             <!-- Capped here, not on the list: the options stay right next to the categories on a wide TV -->
                             <ColumnDefinition Width="*" MaxWidth="1100"/>
                         </Grid.ColumnDefinitions>
@@ -506,7 +507,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.GameScreenSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 0), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -516,7 +517,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.EnteringConsoleSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 1), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -526,7 +527,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.ControllerSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 2), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -536,7 +537,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -546,7 +547,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -556,7 +557,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -566,7 +567,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -576,7 +577,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" FontSize="20" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
