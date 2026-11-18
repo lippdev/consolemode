@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Mudanças
-- **Receber versões de teste** agora traz só as betas. As versões alpha, como as da futura 2.0, são testes fechados e não chegam mais pela atualização do app, nem com a opção ligada. (#NNN)
+- **Receber versões de teste** agora traz só as betas. As versões alpha, como as da futura 2.0, são testes fechados e não chegam mais pela atualização do app, nem com a opção ligada. (#223)
 
 ## [1.7.1-beta.3]
 ### Correções
