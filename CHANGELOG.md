@@ -3,6 +3,9 @@
 Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CHANGELOG.en-US.md`. Antes de publicar uma versão, adicione uma seção `## [VERSÃO]` com o changelog daquela versão **nos dois arquivos**. O workflow publica as duas seções correspondentes à tag na mesma release e falha se faltar alguma.
 
 ## [Unreleased]
+### Correções
+- Início: voltar de outra aba com LB/RB (ou Page Up/Page Down) não troca mais o iniciador escolhido pela Steam. A página que some deixava o foco no primeiro bloco, e o foco escolhe o iniciador (relatado pelo PLEXX-DE, issue #217). (#NNN)
+- **Entrar ao conectar um controle**: ligar o controle podia não começar a sessão e deixar um erro no log, porque a checagem lia a janela fora da thread da interface (visto no log da issue #217). (#NNN)
 
 ## [1.7.1-beta.1]
 ### Novidades

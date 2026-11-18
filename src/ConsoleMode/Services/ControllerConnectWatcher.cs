@@ -40,14 +40,29 @@ public sealed class ControllerConnectWatcher : IDisposable
     /// <summary>Call when a session ends, so the pad waking up doesn't start another one.</summary>
     public void QuietFor(TimeSpan span) => _quietUntil = DateTime.UtcNow + span;
 
+    /// <summary>
+    /// Raised on a Windows.Gaming.Input thread. CanTrigger reads the window (AppWindow), which only the UI thread may
+    /// touch (it threw RPC_E_WRONG_THREAD, issue #217), so the decision is made there.
+    /// </summary>
     private void OnAdded(object? sender, RawGameController controller)
     {
         var now = DateTime.UtcNow;
-        var can = CanTrigger?.Invoke() ?? false;
-        AppLog.Write($"Controle conectado: {controller.DisplayName}; auto-start {(ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can) ? "sim" : "não")}; " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
-        _dispatcher.TryEnqueue(() => PresenceChanged?.Invoke());
-        if (!ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can)) return;
-        _dispatcher.TryEnqueue(() => Connected?.Invoke());
+        var name = controller.DisplayName;
+        var devices = ControllerInput.DescribeDevices().ReplaceLineEndings(" | ");
+        _dispatcher.TryEnqueue(() =>
+        {
+            bool can;
+            try { can = CanTrigger?.Invoke() ?? false; }
+            catch (Exception ex)
+            {
+                AppLog.Write($"Controles: não deu para ver se a sessão deve começar: {ex.Message}");
+                can = false;
+            }
+            var trigger = ControllerConnectPolicy.ShouldTrigger(now, _startedAt, _quietUntil, can);
+            AppLog.Write($"Controle conectado: {name}; auto-start {(trigger ? "sim" : "não")}; {devices}");
+            PresenceChanged?.Invoke();
+            if (trigger) Connected?.Invoke();
+        });
     }
 
     private void OnRemoved(object? sender, RawGameController controller)

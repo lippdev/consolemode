@@ -34,6 +34,9 @@ public sealed partial class ConsoleHomeView : UserControl
     /// Click fires. That click picks it and leaves the focus where it is; A or Enter at any other moment is not one.
     /// </summary>
     private bool _launchPointerDown;
+
+    /// <summary>The arriving focus left another tab's page, or nothing (see PickFocusedLauncher).</summary>
+    private bool _focusFromOtherPage;
     private int _shownTab;
     private static readonly Windows.UI.ViewManagement.UISettings Ui = new();
 
@@ -49,6 +52,9 @@ public sealed partial class ConsoleHomeView : UserControl
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
         Root.PreviewKeyDown += OnKeyDown;
+        // Where the arriving focus comes from, for PickFocusedLauncher (GotFocus doesn't say).
+        Root.GettingFocus += (_, e) => _focusFromOtherPage =
+            e.OldFocusedElement is not { } old || IsInside(old, SessionPanel) || IsInside(old, SettingsPanel);
         // The focused card grows a little, like the Xbox home; on the Home row it also picks the launcher.
         Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); };
         Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
@@ -1018,10 +1024,14 @@ public sealed partial class ConsoleHomeView : UserControl
     private void OnClockTick(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args) =>
         ClockText.Text = DateTime.Now.ToString("HH:mm");
 
-    /// <summary>Like a console's game row: the launcher under the focus is the one that opens.</summary>
+    /// <summary>
+    /// Like a console's game row: the launcher under the focus is the one that opens. Not when the focus comes from
+    /// another tab's page: switching back with LB/RB or Page Up/Down, the page that hides drops the focus on the first
+    /// tile (Steam), and that must not change the pick (issue #217).
+    /// </summary>
     private void PickFocusedLauncher(object source)
     {
-        if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
+        if (!_focusFromOtherPage && source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
     }
 
     /// <summary>A panel over the page (a picker, the tour, the editor...): the tile menu waits for it to close.</summary>

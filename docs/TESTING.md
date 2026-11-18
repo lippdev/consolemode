@@ -547,6 +547,12 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Iniciador escolhido ao trocar de aba (#NNN, issue #217)
+
+- [ ] Início com Playnite escolhido: RB (ou Page Down) para Sessão e LB (ou Page Up) de volta. O Playnite continua escolhido na Início e em Sistema → Ao entrar no modo console → Abrir. O mesmo indo até Sistema e voltando. Resultado: ______
+- [ ] Andar pela fileira com o direcional ainda troca o iniciador, e descer da barra de abas até um bloco também escolhe esse bloco. Resultado: ______
+- [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: ligar o controle começa a sessão, e o log tem "Controle conectado: …; auto-start sim" sem nenhum "Unhandled". Com a janela aberta: "auto-start não", também sem erro. Resultado: ______
+
 ## Esconder os ícones da área de trabalho na sessão (#214, issue #210)
 
 - [ ] Ligado, numa sessão de verdade na TV: os ícones não aparecem na TV em nenhum momento depois que a sessão começa (nem atrás do iniciador) e voltam nas telas da mesa ao voltar ao PC. Resultado: ______
