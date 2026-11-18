@@ -179,4 +179,31 @@ public class ControllerMappingTests
     [InlineData(0x00, false)]
     public void Only_the_documented_sony_report_ids_are_known(byte id, bool known) =>
         Assert.Equal(known, ControllerMapping.IsKnownSonyReport(id));
+
+    [Theory]
+    [InlineData(0x01, 0x85, true)]    // Generic Desktop: System Main Menu
+    [InlineData(0x0C, 0x223, true)]   // Consumer: AC Home
+    [InlineData(0x01, 0x86, false)]   // System App Menu
+    [InlineData(0x0C, 0x40, false)]   // Consumer: Menu
+    [InlineData(0x09, 0x0D, false)]   // a plain button
+    public void The_centre_button_is_found_by_its_standard_usage(ushort page, ushort id, bool home) =>
+        Assert.Equal(home, ControllerMapping.IsHomeUsage(page, id));
+
+    [Theory]
+    [InlineData(0x0171, true)]   // Amazon Luna (issue #217)
+    [InlineData(0x2DC8, true)]   // 8BitDo
+    [InlineData(ControllerMapping.NintendoVendorId, true)]
+    [InlineData(ControllerMapping.MicrosoftVendorId, false)] // XInput reports the Guide button
+    [InlineData(ControllerMapping.SonyVendorId, false)]      // SonyHidReader reads the PS button
+    public void The_centre_button_is_read_from_hid_except_on_xbox_and_playstation_pads(ushort vendor, bool reads) =>
+        Assert.Equal(reads, ControllerMapping.ReadsHomeFromHid(vendor));
+
+    [Theory]
+    [InlineData(0x01, 0x85, "Generic Desktop 0x85 (System Main Menu)")]
+    [InlineData(0x0C, 0x223, "Consumer 0x223 (AC Home)")]
+    [InlineData(0x09, 13, "Button 13")]
+    [InlineData(0x0C, 0xE9, "Consumer 0x0E9")]
+    [InlineData(0xFF00, 0x01, "page 0xFF00 usage 0x01")]
+    public void Usages_have_readable_names(ushort page, ushort id, string name) =>
+        Assert.Equal(name, ControllerMapping.DescribeUsage(page, id));
 }

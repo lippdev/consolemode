@@ -131,6 +131,7 @@ public sealed class ShortcutPicker : StackPanel
         _error.Visibility = Visibility.Collapsed;
         _capture = new ShortcutCapture();
         SonyHidReader.Acquire();
+        HidHomeButtonReader.Acquire();
         _vm.BeginShortcutCapture();
         _value.Text = LocalizationService.Get("ShortcutPressButtons");
         Refresh();
@@ -143,6 +144,7 @@ public sealed class ShortcutPicker : StackPanel
         _capture = null;
         _timer.Stop();
         SonyHidReader.Release();
+        HidHomeButtonReader.Release();
         _vm.EndShortcutCapture();
         Refresh();
     }

@@ -8,7 +8,8 @@ namespace ConsoleMode.Services;
 /// (zero = fire on press). Used for the shortcuts the user picked (see ControllerShortcuts):
 /// enter console mode from the tray, open the session menu and restore the desk, all of
 /// which work without focus. XInputGetStateEx (ordinal 100) is the only entry point that
-/// reports the Guide button; PlayStation pads are read through SonyHidReader.
+/// reports the Guide button; PlayStation pads are read through SonyHidReader, and other brands' centre button
+/// through HidHomeButtonReader.
 /// </summary>
 public sealed class ControllerHoldWatcher : IDisposable
 {
@@ -60,6 +61,7 @@ public sealed class ControllerHoldWatcher : IDisposable
     {
         if (_timer.IsRunning) return;
         SonyHidReader.Acquire();
+        HidHomeButtonReader.Acquire();
         _heldSince = null;
         // A combo already held when the watch starts must be released first.
         _fired = true;
@@ -68,7 +70,11 @@ public sealed class ControllerHoldWatcher : IDisposable
 
     public void Stop()
     {
-        if (_timer.IsRunning) SonyHidReader.Release();
+        if (_timer.IsRunning)
+        {
+            SonyHidReader.Release();
+            HidHomeButtonReader.Release();
+        }
         _timer.Stop();
         _heldSince = null;
         _fired = false;
@@ -98,6 +104,7 @@ public sealed class ControllerHoldWatcher : IDisposable
     {
         var held = new Dictionary<string, ushort>(StringComparer.OrdinalIgnoreCase);
         foreach (var (path, buttons) in SonyHidReader.ReadStates()) held[$"sony:{path}"] = buttons;
+        foreach (var (path, buttons) in HidHomeButtonReader.ReadStates()) held[$"home:{path}"] = buttons;
         if (_unavailable) return held;
         try
         {
@@ -118,6 +125,8 @@ public sealed class ControllerHoldWatcher : IDisposable
     {
         // Test each physical Sony pad separately; combining their masks creates impossible chords.
         if (ControllerShortcuts.IsHeldOnAnyDevice(mask, SonyHidReader.ReadStates().Values)) return true;
+        // Other brands' centre button, read from HID as Guide alone (their other buttons come through XInput).
+        if (ControllerShortcuts.IsHeldOnAnyDevice(mask, HidHomeButtonReader.ReadStates().Values)) return true;
         if (_unavailable) return false;
         try
         {

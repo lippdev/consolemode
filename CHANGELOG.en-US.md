@@ -4,6 +4,7 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
+- Controller: the centre button of other brands' pads (Amazon Luna, 8BitDo, Stadia…) now opens Console Mode like the Xbox button, when the pad declares that button the standard HID way. Before, only the Xbox and PS buttons worked, and those pads needed a two-button shortcut (reported by PLEXX-DE, issue #217). (#NNN)
 - Controller battery: on Bluetooth pads, the corner of the screen shows the same value as Windows Settings → Bluetooth. Some pads sent Windows a fixed value through the other path (an Amazon Luna pad always showed 10 % while at 90 %; reported by PLEXX-DE, issue #224). PlayStation pads still read the battery from the pad itself. (#225)
 
 ## [1.7.1-beta.3]

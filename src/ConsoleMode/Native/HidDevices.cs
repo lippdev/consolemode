@@ -69,6 +69,60 @@ internal static class HidDevices
         }
     }
 
+    /// <summary>
+    /// Opens a collection to read its input reports, shared, so XInput, Steam and the game keep reading it too. Null when
+    /// Windows doesn't let anyone else read it (keyboards and mice are kept by the system) or it has no input report.
+    /// </summary>
+    public static HidReader? OpenForRead(HidInfo info)
+    {
+        if (info.InputReportLength == 0) return null;
+        var handle = CreateFile(info.Path, GenericRead, FileShareRead | FileShareWrite, 0, OpenExisting, FileFlagOverlapped, 0);
+        if (handle.IsInvalid) { handle.Dispose(); return null; }
+        if (!HidD_GetPreparsedData(handle, out var preparsed)) { handle.Dispose(); return null; }
+        return new HidReader(handle, preparsed, info);
+    }
+
+    /// <summary>The usages among <paramref name="wanted"/> that a collection declares as input buttons.</summary>
+    public static IReadOnlyList<(ushort Page, ushort Id)> DeclaredButtons(string path, IEnumerable<(ushort Page, ushort Id)> wanted)
+    {
+        using var handle = CreateFile(path, 0, FileShareRead | FileShareWrite, 0, OpenExisting, 0, 0);
+        if (handle.IsInvalid || !HidD_GetPreparsedData(handle, out var preparsed)) return [];
+        try
+        {
+            var found = new List<(ushort, ushort)>();
+            var caps = new byte[ButtonCapsSize * 8];
+            foreach (var (page, id) in wanted)
+            {
+                ushort length = 8;
+                if (HidP_GetSpecificButtonCaps(HidpInput, page, 0, id, caps, ref length, preparsed) == HidpStatusSuccess && length > 0)
+                    found.Add((page, id));
+            }
+            return found;
+        }
+        finally
+        {
+            HidD_FreePreparsedData(preparsed);
+        }
+    }
+
+    /// <summary>
+    /// Every button usage pressed in one input report (any page), or null when the report isn't one this parse
+    /// applies to (another report id): the caller keeps the state it had.
+    /// </summary>
+    internal static IReadOnlyList<(ushort Page, ushort Id)>? PressedButtons(nint preparsed, byte[] report, int length)
+    {
+        var list = new UsageAndPage[64];
+        uint count = (uint)list.Length;
+        var status = HidP_GetUsagesEx(HidpInput, 0, list, ref count, preparsed, report, (uint)length);
+        if (status != HidpStatusSuccess) return null;
+        var pressed = new (ushort, ushort)[count];
+        for (var i = 0; i < count; i++) pressed[i] = (list[i].UsagePage, list[i].Usage);
+        return pressed;
+    }
+
+    /// <summary>Releases the preparsed data an <see cref="HidReader"/> holds.</summary>
+    internal static void Free(nint preparsed) => HidD_FreePreparsedData(preparsed);
+
     /// <summary>The device node behind a collection's interface path (0 when Windows doesn't know it).</summary>
     public static uint DevNodeOf(string interfacePath)
     {
@@ -133,6 +187,11 @@ internal static class HidDevices
     private static readonly DevPropKey DevPKeyFriendlyName = new() { FmtId = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), Pid = 14 };
     private static readonly DevPropKey DevPKeyDeviceDesc = new() { FmtId = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), Pid = 2 };
 
+    private const uint GenericRead = 0x80000000;
+    private const uint FileFlagOverlapped = 0x40000000;
+    private const int HidpInput = 0;
+    /// <summary>sizeof(HIDP_BUTTON_CAPS): the same 72 bytes on x86 and x64.</summary>
+    private const int ButtonCapsSize = 72;
     private const uint FileShareRead = 0x1;
     private const uint FileShareWrite = 0x2;
     private const uint OpenExisting = 3;
@@ -143,6 +202,13 @@ internal static class HidDevices
     private const int CrBufferSmall = 0x1A;
     private const uint DevPropTypeByte = 0x03;
     private const uint DevPropTypeString = 0x12;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct UsageAndPage
+    {
+        public ushort Usage;
+        public ushort UsagePage;
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     private struct DevPropKey
@@ -208,6 +274,12 @@ internal static class HidDevices
     [DllImport("hid.dll")]
     private static extern int HidP_GetCaps(nint preparsed, out HidpCaps caps);
 
+    [DllImport("hid.dll")]
+    private static extern int HidP_GetSpecificButtonCaps(int reportType, ushort usagePage, ushort linkCollection, ushort usage, byte[] buttonCaps, ref ushort length, nint preparsed);
+
+    [DllImport("hid.dll")]
+    private static extern int HidP_GetUsagesEx(int reportType, ushort linkCollection, [Out] UsageAndPage[] usages, ref uint length, nint preparsed, byte[] report, uint reportLength);
+
     [DllImport("setupapi.dll", CharSet = CharSet.Unicode)]
     private static extern nint SetupDiGetClassDevs(ref Guid classGuid, nint enumerator, nint parent, uint flags);
 
@@ -237,4 +309,31 @@ internal static class HidDevices
 
     [DllImport("cfgmgr32.dll")]
     private static extern int CM_Get_DevNode_PropertyW(uint devInst, ref DevPropKey key, out uint type, byte[]? buffer, ref uint size, uint flags);
+}
+
+/// <summary>A HID collection open for reading, with its parsed descriptor. Dispose closes both.</summary>
+internal sealed class HidReader : IDisposable
+{
+    private nint _preparsed;
+
+    public HidReader(SafeFileHandle handle, nint preparsed, HidInfo info)
+    {
+        Handle = handle;
+        _preparsed = preparsed;
+        Info = info;
+    }
+
+    public SafeFileHandle Handle { get; }
+    public HidInfo Info { get; }
+
+    /// <summary>Pressed buttons in one report (see HidDevices.PressedButtons); null for a report it can't parse.</summary>
+    public IReadOnlyList<(ushort Page, ushort Id)>? Pressed(byte[] report, int length) =>
+        _preparsed == 0 ? null : HidDevices.PressedButtons(_preparsed, report, length);
+
+    public void Dispose()
+    {
+        Handle.Dispose();
+        var preparsed = Interlocked.Exchange(ref _preparsed, 0);
+        if (preparsed != 0) HidDevices.Free(preparsed);
+    }
 }
