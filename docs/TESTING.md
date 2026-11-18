@@ -547,7 +547,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
-## Iniciador escolhido ao trocar de aba (#NNN, issue #217)
+## Iniciador escolhido ao trocar de aba (#218, issue #217)
 
 - [ ] Início com Playnite escolhido: RB (ou Page Down) para Sessão e LB (ou Page Up) de volta. O Playnite continua escolhido na Início e em Sistema → Ao entrar no modo console → Abrir. O mesmo indo até Sistema e voltando. Resultado: ______
 - [ ] Andar pela fileira com o direcional ainda troca o iniciador, e descer da barra de abas até um bloco também escolhe esse bloco. Resultado: ______

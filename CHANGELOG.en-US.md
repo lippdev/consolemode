@@ -4,8 +4,8 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 ### Fixes
-- Home: coming back from another tab with LB/RB (or Page Up/Page Down) no longer switches the chosen launcher to Steam. The page that hides left the focus on the first tile, and the focus picks the launcher (reported by PLEXX-DE, issue #217). (#NNN)
-- **Enter when a controller connects**: turning the controller on could fail to start the session and leave an error in the log, because the check read the window off the UI thread (seen in the log of issue #217). (#NNN)
+- Home: coming back from another tab with LB/RB (or Page Up/Page Down) no longer switches the chosen launcher to Steam. The page that hides left the focus on the first tile, and the focus picks the launcher (reported by PLEXX-DE, issue #217). (#218)
+- **Enter when a controller connects**: turning the controller on could fail to start the session and leave an error in the log, because the check read the window off the UI thread (seen in the log of issue #217). (#218)
 
 ## [1.7.1-beta.1]
 ### What's new
