@@ -31,7 +31,7 @@ public partial class MainViewModel
     private object[] ConsoleTourArgs(ConsoleTourStop stop) => stop switch
     {
         ConsoleTourStop.Tabs => [HintLb, HintRb],
-        ConsoleTourStop.Launchers => [HintMenu],
+        ConsoleTourStop.Launchers => [HintConfirm, HintMenu],
         ConsoleTourStop.Play => [HintConfirm, HintMenu],
         ConsoleTourStop.Screens => [HintConfirm],
         ConsoleTourStop.System => [HintAlt],

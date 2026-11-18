@@ -49,8 +49,8 @@ public sealed partial class ConsoleHomeView : UserControl
         Unloaded += (_, _) => { _navigator?.Dispose(); _navigator = null; _clock?.Stop(); };
         // Preview (tunnelling): a ScrollViewer would otherwise swallow the arrows to scroll the page.
         Root.PreviewKeyDown += OnKeyDown;
-        // The focused card grows a little, like the Xbox home; on the Home row it also picks the launcher.
-        Root.GotFocus += (_, e) => { ScaleTile(e.OriginalSource, 1.07f); PickFocusedLauncher(e.OriginalSource); };
+        // The focused card grows a little, like the Xbox home. On the Home row the focus only points at a launcher: A or a click marks it.
+        Root.GotFocus += (_, e) => ScaleTile(e.OriginalSource, 1.07f);
         Root.LostFocus += (_, e) => ScaleTile(e.OriginalSource, 1f);
         // System tab: remember the option in use, so closing a picker lands back on it.
         SettingsRows.GotFocus += (_, e) =>
@@ -1017,12 +1017,6 @@ public sealed partial class ConsoleHomeView : UserControl
 
     private void OnClockTick(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args) =>
         ClockText.Text = DateTime.Now.ToString("HH:mm");
-
-    /// <summary>Like a console's game row: the launcher under the focus is the one that opens.</summary>
-    private void PickFocusedLauncher(object source)
-    {
-        if (source is Button { DataContext: LaunchTile tile }) ViewModel.SelectLaunchTileCommand.Execute(tile);
-    }
 
     /// <summary>A panel over the page (a picker, the tour, the editor...): the tile menu waits for it to close.</summary>
     private bool IsOverlayOpen() =>

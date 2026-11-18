@@ -256,7 +256,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:LaunchTile">
-                                <!-- The focus picks the launcher (ConsoleHomeView.ScaleTile); A or a click picks it too and Play now opens it. -->
+                                <!-- The focus only points at a tile (it grows); A or a click marks the launcher (the check and the bar) and Play now opens it. -->
                                 <StackPanel Spacing="18" Opacity="{x:Bind Opacity, Mode=OneWay}">
                                     <StackPanel.OpacityTransition><ScalarTransition Duration="0:0:0.14"/></StackPanel.OpacityTransition>
                                     <Button Style="{StaticResource LaunchTileButton}" Background="{x:Bind Background}"
