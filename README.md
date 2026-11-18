@@ -20,7 +20,7 @@ Get **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, the
 
 On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? The same release has **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` or `ConsoleModeLegacy-Portable-x64.exe`): 1.6.2 as it was, sharing your settings with the current version. It is frozen: no fixes and no updates.
 
-Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (alpha and beta)".
+Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (beta)".
 
 Windows 10 or 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) or the Xbox app. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) is optional, for the FPS limit and the FPS counter.
 

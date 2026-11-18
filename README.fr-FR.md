@@ -18,7 +18,7 @@ Récupérez la dernière version stable sur **[la page des versions](https://git
 - **`ConsoleMode-Portable-x64.exe`** : un seul exe qui garde ses données à côté de lui.
 - Ou avec winget : `winget install lippdev.ConsoleMode`
 
-Envie d'essayer la suite avant tout le monde ? Activez Système → Application → « Recevoir les versions de test (alpha et bêta) ».
+Envie d'essayer la suite avant tout le monde ? Activez Système → Application → « Recevoir les versions de test (bêta) ».
 
 Windows 10 ou 11, plus [Steam](https://store.steampowered.com/) (Big Picture), [Playnite](https://playnite.link/) ou l'application Xbox. [RTSS](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) est facultatif, pour la limite de FPS et le compteur de FPS.
 
