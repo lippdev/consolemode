@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Correções
-- Início: voltar de outra aba com LB/RB (ou Page Up/Page Down) não troca mais o iniciador escolhido pela Steam. A página que some deixava o foco no primeiro bloco, e o foco escolhe o iniciador (relatado pelo PLEXX-DE, issue #217). (#218)
+- Início: passar por um iniciador só aponta para ele; **A** (✕ no PlayStation) ou um clique marca o que abre. Antes o foco já trocava a escolha, e voltar de outra aba com LB/RB (ou Page Up/Page Down) deixava o foco na Steam e a escolhia no lugar da sua (relatado pelo PLEXX-DE, issue #217). (#218)
 - **Entrar ao conectar um controle**: ligar o controle podia não começar a sessão e deixar um erro no log, porque a checagem lia a janela fora da thread da interface (visto no log da issue #217). (#218)
 
 ## [1.7.1-beta.1]

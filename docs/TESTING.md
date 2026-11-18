@@ -547,10 +547,10 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
-## Iniciador escolhido ao trocar de aba (#218, issue #217)
+## Marcar o iniciador com A, não com o foco (#218, issue #217)
 
 - [ ] Início com Playnite escolhido: RB (ou Page Down) para Sessão e LB (ou Page Up) de volta. O Playnite continua escolhido na Início e em Sistema → Ao entrar no modo console → Abrir. O mesmo indo até Sistema e voltando. Resultado: ______
-- [ ] Andar pela fileira com o direcional ainda troca o iniciador, e descer da barra de abas até um bloco também escolhe esse bloco. Resultado: ______
+- [ ] Andar pela fileira com o direcional (ou o mouse por cima) só aumenta o bloco focado: o selo ✓, a barra e o título grande ficam no marcado. A (ou um clique) num bloco o marca e leva o foco ao Jogar agora; o Jogar agora abre o marcado. Resultado: ______
 - [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: ligar o controle começa a sessão, e o log tem "Controle conectado: …; auto-start sim" sem nenhum "Unhandled". Com a janela aberta: "auto-start não", também sem erro. Resultado: ______
 
 ## Esconder os ícones da área de trabalho na sessão (#214, issue #210)
@@ -580,7 +580,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Os iniciadores aparecem numa fileira no topo (Steam Big Picture, Playnite se instalado, modo Xbox), cada um com sua cor e ícone; o que abre hoje tem o selo ✓ verde no canto e uma barra verde embaixo, e os outros ficam mais apagados.
 - [ ] Logos oficiais nos blocos: Steam Big Picture com o logo da Steam, Playnite com o do Playnite e modo Xbox com o do app Xbox, nítidos na TV 4K (sem serrilhado nem borrão). Aplicativo personalizado mostra o ícone do `.exe` escolhido e troca ao escolher outro; Playnite troca ao escolher outra pasta. Sem a Steam ou o app Xbox instalado, o bloco mostra o ícone genérico de antes, sem bloco vazio. Resultado: ______
 - [ ] Com o controle, subir do Jogar agora chega na fileira; o bloco focado cresce e ganha o contorno branco, sem cortar nos vizinhos nem no topo.
-- [ ] Andar pela fileira já troca o iniciador, sem apertar A: o selo, a barra e o título grande embaixo seguem o foco, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
+- [ ] Andar pela fileira não troca o iniciador (desde a 1.7.1, #218): só A ou um clique marca; o selo, a barra e o título grande ficam no marcado, e a escolha aparece igual em Sistema → Ao entrar no modo console → Abrir e no modo PC.
 - [ ] A num iniciador (ou um clique) abre direto aquele iniciador, como o Jogar agora. Sem tela de jogo escolhida, A só escolhe e não abre nada.
 - [ ] Fonte Inter: os textos da interface Console e do menu da sessão usam a Inter (o "a" e o "g" de dois andares mudam de cara em relação à Segoe), em negrito de verdade no título e no Jogar agora, sem aparência borrada de negrito sintético. Conferir também no **portátil**: se a fonte não carregar, o app cai na Segoe UI sem quebrar. O modo PC continua com a Segoe UI.
 - [ ] Russo: o cirílico aparece na Inter, sem misturar fontes no meio da palavra.

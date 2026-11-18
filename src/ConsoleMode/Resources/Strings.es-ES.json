@@ -411,7 +411,7 @@
   "ConsoleTourTabsTitle": "Tres pestañas",
   "ConsoleTourTabsBody": "Inicio, Sesión y Sistema. Cambia de pestaña con {0} y {1} en el mando, Re Pág y Av Pág en el teclado o haciendo clic en su nombre.",
   "ConsoleTourLaunchersTitle": "Qué se abre",
-  "ConsoleTourLaunchersBody": "Cada bloque es un lanzador: Steam Big Picture, Playnite, el modo Xbox o una aplicación tuya. Pasa por encima del que quieras: queda marcado y es lo que se abre al jugar. En una aplicación tuya, {0} o el botón derecho del ratón la quita de Inicio.",
+  "ConsoleTourLaunchersBody": "Cada bloque es un lanzador: Steam Big Picture, Playnite, el modo Xbox o una aplicación tuya. {0} en el que quieras (o un clic) lo marca: es lo que se abre al jugar. Pasar por encima solo lo señala. En una aplicación tuya, {1} o el botón derecho del ratón la quita de Inicio.",
   "ConsoleTourPlayTitle": "Jugar",
   "ConsoleTourPlayBody": "{0} aquí, o {1} desde cualquier parte de Inicio, entra en el modo consola: la pantalla de juego pasa a ser la principal, las demás se apagan y el lanzador se abre en ella. El nombre y la línea de debajo muestran qué se abre, dónde vas a jugar y qué cambia.",
   "ConsoleTourScreensTitle": "Tus pantallas",

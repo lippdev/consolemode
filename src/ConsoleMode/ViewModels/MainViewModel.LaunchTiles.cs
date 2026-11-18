@@ -168,7 +168,6 @@ public partial class MainViewModel
         foreach (var tile in LaunchTiles) tile.IsSelected = !tile.IsAdd && ReferenceEquals(tile.Option, SelectedLaunch);
     }
 
-    [RelayCommand]
     private void SelectLaunchTile(LaunchTile? tile)
     {
         if (tile is not null && !tile.IsAdd && !ReferenceEquals(SelectedLaunch, tile.Option)) SelectedLaunch = tile.Option;

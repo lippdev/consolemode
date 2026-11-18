@@ -411,7 +411,7 @@
   "ConsoleTourTabsTitle": "Drei Tabs",
   "ConsoleTourTabsBody": "Startseite, Sitzung und System. Wechsle die Tabs mit {0} und {1} am Controller, Bild auf und Bild ab auf der Tastatur oder per Klick auf den Namen.",
   "ConsoleTourLaunchersTitle": "Was sich öffnet",
-  "ConsoleTourLaunchersBody": "Jede Kachel ist ein Launcher: Steam Big Picture, Playnite, der Xbox-Modus oder eine eigene App. Geh auf den, den du willst: Er wird markiert und öffnet sich, wenn du spielst. Bei einer eigenen App entfernt {0} oder ein Rechtsklick sie von der Startseite.",
+  "ConsoleTourLaunchersBody": "Jede Kachel ist ein Launcher: Steam Big Picture, Playnite, der Xbox-Modus oder eine eigene App. {0} auf dem gewünschten (oder ein Klick) markiert ihn: Er öffnet sich, wenn du spielst. Nur darauf zu gehen zeigt bloß auf ihn. Bei einer eigenen App entfernt {1} oder ein Rechtsklick sie von der Startseite.",
   "ConsoleTourPlayTitle": "Spielen",
   "ConsoleTourPlayBody": "{0} hier, oder {1} von überall auf der Startseite, startet den Konsolenmodus: Der Spielbildschirm wird zum Hauptbildschirm, die anderen gehen aus und der Launcher öffnet sich darauf. Der Name und die Zeile darunter zeigen, was sich öffnet, wo du spielst und was sich ändert.",
   "ConsoleTourScreensTitle": "Deine Bildschirme",
