@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+
+## [1.7.1-beta.2]
 ### Fixes
 - Home: moving over a launcher only points at it; **A** (✕ on PlayStation) or a click marks the one that opens. Before, the focus already changed the pick, and coming back from another tab with LB/RB (or Page Up/Page Down) left the focus on Steam and picked it instead of yours (reported by PLEXX-DE, issue #217). (#218)
 - **Enter when a controller connects**: turning the controller on could fail to start the session and leave an error in the log, because the check read the window off the UI thread (seen in the log of issue #217). (#218)
