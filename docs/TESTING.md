@@ -547,7 +547,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
-## Botão central de outras marcas (#NNN, issue #217)
+## Botão central de outras marcas (#226, issue #217)
 
 - [ ] Controle que não é Xbox nem PlayStation (Amazon Luna, 8BitDo, Stadia…), com o atalho para abrir o Console Mode no botão Xbox (padrão): o log tem "Controle: lendo o botão central pelo HID (<vid:pid>, …)" e segurar o botão central com o app na bandeja abre o modo console. Resultado: ______
 - [ ] Se o log disser "…mas o Windows não deixa ler esse dispositivo" ou não falar do botão central: anotar o vid:pid e mandar o diagnóstico do Teste de controle. Resultado: ______

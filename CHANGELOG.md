@@ -4,7 +4,7 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 ### Correções
-- Controle: o botão central de controles de outras marcas (Amazon Luna, 8BitDo, Stadia…) passa a abrir o Console Mode como o botão Xbox, quando o controle declara esse botão do jeito padrão do HID. Antes só os botões Xbox e PS funcionavam, e esses controles precisavam de um atalho com dois botões (relatado pelo PLEXX-DE, issue #217). (#NNN)
+- Controle: o botão central de controles de outras marcas (Amazon Luna, 8BitDo, Stadia…) passa a abrir o Console Mode como o botão Xbox, quando o controle declara esse botão do jeito padrão do HID. Antes só os botões Xbox e PS funcionavam, e esses controles precisavam de um atalho com dois botões (relatado pelo PLEXX-DE, issue #217). (#226)
 - Bateria do controle: nos controles Bluetooth, o canto da tela mostra o mesmo valor das Configurações do Windows → Bluetooth. Alguns controles mandavam ao Windows um valor fixo pelo outro caminho (um Amazon Luna aparecia sempre com 10 % estando em 90 %; relatado pelo PLEXX-DE, issue #224). Os controles PlayStation continuam lendo a bateria pelo próprio controle. (#225)
 
 ## [1.7.1-beta.3]
