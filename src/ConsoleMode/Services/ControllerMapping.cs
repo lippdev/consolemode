@@ -5,6 +5,36 @@ public static class ControllerMapping
 {
     public const ushort SonyVendorId = 0x054C;
     public const ushort NintendoVendorId = 0x057E;
+    public const ushort MicrosoftVendorId = 0x045E;
+
+    /// <summary>A HID usage: page and id, as the device descriptor declares it.</summary>
+    public readonly record struct HidUsage(ushort Page, ushort Id);
+
+    /// <summary>
+    /// The standard HID usages of a controller's centre button (Home, Guide, Luna, Stadia…): Generic Desktop "System Main
+    /// Menu" and Consumer "AC Home". A pad that declares one of them gets its centre button read as Guide, so the
+    /// controller shortcut works with any brand that follows the standard (issue #217), not only Xbox and PlayStation.
+    /// </summary>
+    public static readonly IReadOnlyList<HidUsage> HomeUsages = [new(0x01, 0x85), new(0x0C, 0x0223)];
+
+    public static bool IsHomeUsage(ushort page, ushort id) => HomeUsages.Contains(new HidUsage(page, id));
+
+    /// <summary>
+    /// Whose centre button is read from HID: everyone but Microsoft (XInput already reports the Guide button of Xbox
+    /// pads) and Sony (SonyHidReader reads the PS button with the rest of the pad).
+    /// </summary>
+    public static bool ReadsHomeFromHid(ushort vendorId) => vendorId is not (MicrosoftVendorId or SonyVendorId);
+
+    /// <summary>The name of a usage for logs and diagnostics: "Generic Desktop 0x85 (System Main Menu)".</summary>
+    public static string DescribeUsage(ushort page, ushort id) => (page, id) switch
+    {
+        (0x01, 0x85) => "Generic Desktop 0x85 (System Main Menu)",
+        (0x0C, 0x0223) => "Consumer 0x223 (AC Home)",
+        (0x09, _) => $"Button {id}",
+        (0x01, _) => $"Generic Desktop 0x{id:X2}",
+        (0x0C, _) => $"Consumer 0x{id:X3}",
+        _ => $"page 0x{page:X2} usage 0x{id:X2}"
+    };
 
     /// <summary>HID button indexes of L1/R1 (LB/RB): 4 and 5 on Sony, Nintendo and generic pads.</summary>
     public const int HidShoulderLeft = 4;

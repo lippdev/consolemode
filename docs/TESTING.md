@@ -547,6 +547,13 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Botão central de outras marcas (#226, issue #217)
+
+- [ ] Controle que não é Xbox nem PlayStation (Amazon Luna, 8BitDo, Stadia…), com o atalho para abrir o Console Mode no botão Xbox (padrão): o log tem "Controle: lendo o botão central pelo HID (<vid:pid>, …)" e segurar o botão central com o app na bandeja abre o modo console. Resultado: ______
+- [ ] Se o log disser "…mas o Windows não deixa ler esse dispositivo" ou não falar do botão central: anotar o vid:pid e mandar o diagnóstico do Teste de controle. Resultado: ______
+- [ ] Gravar um atalho novo (Sistema → Controle) apertando só o botão central desse controle: fica gravado como o botão Xbox. Resultado: ______
+- [ ] Controle Xbox e controle PlayStation: o botão Xbox/PS continua funcionando como antes, e o teclado e o mouse não são lidos (nenhuma linha de botão central para eles no log). Resultado: ______
+
 ## Bateria dos controles Bluetooth (#225, issue #224)
 
 - [ ] Controle Bluetooth que não é PlayStation (Amazon Luna, Xbox por Bluetooth, 8BitDo…): a bateria no canto da tela é a mesma de Configurações → Bluetooth (pode levar até 30 s para atualizar). O log tem "Controle: bateria pelo Bluetooth do Windows: <nome> (<vid:pid>) <n>%" uma vez. Resultado: ______
