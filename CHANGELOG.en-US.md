@@ -3,12 +3,14 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
-### Changes
-- **Receive test versions** now brings betas only. Alpha versions, like those of the upcoming 2.0, are closed tests and no longer arrive through the app's updates, even with the option on. (#223)
-- **Test controller** shows more: the Xbox (Guide) button when it arrives, other brands' pads' buttons with the HID usage of each, and the battery each source reports and which one shows on screen. Helps sort out pads that misbehave from the copied diagnostics. (#227)
+
+## [1.7.1-beta.4]
 ### Fixes
 - Controller: the centre button of other brands' pads (Amazon Luna, 8BitDo, Stadia…) now opens Console Mode like the Xbox button, when the pad declares that button the standard HID way. Before, only the Xbox and PS buttons worked, and those pads needed a two-button shortcut (reported by PLEXX-DE, issue #217). (#226)
 - Controller battery: on Bluetooth pads, the corner of the screen shows the same value as Windows Settings → Bluetooth. Some pads sent Windows a fixed value through the other path (an Amazon Luna pad always showed 10 % while at 90 %; reported by PLEXX-DE, issue #224). PlayStation pads still read the battery from the pad itself. (#225)
+### Changes
+- **Receive test versions** now brings betas only. Alpha versions, like those of the upcoming 2.0, are closed tests and no longer arrive through the app's updates, even with the option on. (#223)
+- **Test controller** shows more: the Xbox (Guide) button when it arrives, other brands' pads' buttons with the HID usage of each, and the battery each source reports and which one shows on screen. Helps sort out pads that misbehave from the copied diagnostics. (#227)
 
 ## [1.7.1-beta.3]
 ### Fixes
