@@ -243,7 +243,13 @@ public sealed class ControllerInput : IDisposable
             held[(int)ControllerAction.Down] |= (b & XInputDpadDown) != 0 || state.Gamepad.sThumbLY < -StickThreshold;
             held[(int)ControllerAction.Left] |= (b & XInputDpadLeft) != 0 || state.Gamepad.sThumbLX < -StickThreshold;
             held[(int)ControllerAction.Right] |= (b & XInputDpadRight) != 0 || state.Gamepad.sThumbLX > StickThreshold;
-            diag?.AppendLine($"XInput #{i}: buttons=0x{b:X4} LX={state.Gamepad.sThumbLX} LY={state.Gamepad.sThumbLY}");
+            if (diag is not null)
+            {
+                // XInputGetState never has the Guide button; the shortcuts read it with XInputGetStateEx, so show that.
+                var withGuide = ControllerHoldWatcher.ReadButtonsWithGuide(i) ?? b;
+                var guide = (withGuide & ControllerHoldWatcher.GuideButton) != 0 ? " (Guide)" : "";
+                diag.AppendLine($"XInput #{i}: buttons=0x{withGuide:X4}{guide} LX={state.Gamepad.sThumbLX} LY={state.Gamepad.sThumbLY}");
+            }
         }
         return count;
     }

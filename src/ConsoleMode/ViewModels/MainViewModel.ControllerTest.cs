@@ -22,7 +22,8 @@ public partial class MainViewModel
     {
         IsPickerOpen = false;
         IsRolePanelOpen = false;
-        ControllerDevicesText = ControllerInput.DescribeDevices();
+        StartControllerTestReaders();
+        ControllerDevicesText = DescribeControllerTestDevices();
         ControllerSampleText = "";
         _controllerTestTimer ??= _dispatcher.CreateTimer();
         _controllerTestTimer.Interval = TimeSpan.FromMilliseconds(50);
@@ -36,23 +37,65 @@ public partial class MainViewModel
     private void CloseControllerTest()
     {
         _controllerTestTimer?.Stop();
+        StopControllerTestReaders();
         IsControllerTestOpen = false;
+    }
+
+    private bool _controllerTestReading;
+
+    /// <summary>
+    /// While the test is open: every HID collection of the pads is read (to show which usage each button sends) and the
+    /// battery is read once right away, so the list shows what each source says.
+    /// </summary>
+    private void StartControllerTestReaders()
+    {
+        if (_controllerTestReading) return;
+        _controllerTestReading = true;
+        HidHomeButtonReader.AcquireDiagnostics();
+        _ = Task.Run(() =>
+        {
+            try { ControllerBatteryMonitor.Refresh(); }
+            catch (Exception ex) { AppLog.Write($"Teste de controle: bateria: {ex.Message}"); }
+        });
+    }
+
+    private void StopControllerTestReaders()
+    {
+        if (!_controllerTestReading) return;
+        _controllerTestReading = false;
+        HidHomeButtonReader.ReleaseDiagnostics();
+    }
+
+    /// <summary>The device list and the battery of each source.</summary>
+    private static string DescribeControllerTestDevices() =>
+        ControllerInput.DescribeDevices() + Environment.NewLine + ControllerBatteryMonitor.DescribeSources();
+
+    /// <summary>The live sample, with what the pads' HID collections declare and the usages pressed right now.</summary>
+    private static string SampleControllerTest()
+    {
+        var sample = ControllerInput.SampleDiagnostics();
+        var hid = HidHomeButtonReader.Describe();
+        return hid.Length == 0 ? sample : sample + Environment.NewLine + hid;
     }
 
     /// <summary>The desktop expander binds IsControllerTestOpen two-way: start/stop the timer with it.</summary>
     partial void OnIsControllerTestOpenChanged(bool value)
     {
         if (value && _controllerTestTimer?.IsRunning != true) OpenControllerTest();
-        else if (!value) _controllerTestTimer?.Stop();
+        else if (!value)
+        {
+            _controllerTestTimer?.Stop();
+            StopControllerTestReaders();
+        }
     }
 
     private int _controllerTestTicks;
 
     private void OnControllerTestTick(DispatcherQueueTimer sender, object args)
     {
-        ControllerSampleText = ControllerInput.SampleDiagnostics();
+        ControllerSampleText = SampleControllerTest();
         // The device list changes rarely; refresh it about once a second.
-        if (++_controllerTestTicks % 20 == 0) ControllerDevicesText = ControllerInput.DescribeDevices();
+        if (++_controllerTestTicks % 20 == 0) ControllerDevicesText = DescribeControllerTestDevices();
     }
 
     [RelayCommand]

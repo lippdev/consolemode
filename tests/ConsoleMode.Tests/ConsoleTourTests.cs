@@ -5,6 +5,8 @@ using ConsoleMode.Services;
 
 namespace ConsoleMode.Tests;
 
+// Sets the app language (shared state): never in parallel with the other tests that do.
+[Collection("App language")]
 public class ConsoleTourTests
 {
     [Fact]

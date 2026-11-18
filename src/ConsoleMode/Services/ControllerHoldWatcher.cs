@@ -121,6 +121,23 @@ public sealed class ControllerHoldWatcher : IDisposable
         return held;
     }
 
+    /// <summary>
+    /// The buttons of one XInput slot as the shortcuts see them, Guide included (XInputGetStateEx); null when the slot
+    /// is empty or XInput 1.4 isn't there. For the controller test.
+    /// </summary>
+    public static ushort? ReadButtonsWithGuide(uint slot)
+    {
+        if (_unavailable) return null;
+        try
+        {
+            return XInputGetStateEx(slot, out var state) == 0 ? state.Gamepad.wButtons : null;
+        }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        {
+            return null;
+        }
+    }
+
     private static bool IsHeld(ushort mask)
     {
         // Test each physical Sony pad separately; combining their masks creates impossible chords.
