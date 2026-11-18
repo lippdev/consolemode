@@ -195,6 +195,57 @@ public class ControllerBatteryTests
         return report;
     }
 
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(90, 90)]
+    [InlineData(100, 100)]
+    public void Bluetooth_level_is_the_percentage_windows_shows(byte level, int expected) =>
+        Assert.Equal(expected, ControllerBattery.FromBluetooth(level));
+
+    [Fact]
+    public void Bluetooth_level_out_of_range_shows_nothing() =>
+        Assert.Null(ControllerBattery.FromBluetooth(0xFF));
+
+    [Fact]
+    public void Bluetooth_replaces_windows_gaming_input_for_the_same_pad()
+    {
+        // Issue #224: an Amazon Luna pad read 10 % through Windows.Gaming.Input while Settings → Bluetooth said 90 %.
+        var wgiLuna = (Reading("luna-wgi", 10, ControllerBattery.SourceWgi) with { VendorId = 0x0171, ProductId = 0x0419 }, false);
+        var btLuna = Reading("luna-bt", 90, ControllerBattery.SourceBluetooth) with { VendorId = 0x0171, ProductId = 0x0419 };
+        var wgiOther = (Reading("other", 70, ControllerBattery.SourceWgi) with { VendorId = 0x045E, ProductId = 0x0B13 }, false);
+        var xinput = Reading("xinput0", 65, ControllerBattery.SourceXInput, approximate: true);
+
+        var all = ControllerBattery.Combine([], [wgiLuna, wgiOther], [xinput], [btLuna]);
+        Assert.Equal(["luna-bt", "other"], all.Select(r => r.Id));
+        Assert.Equal(90, all[0].Percent);
+    }
+
+    [Fact]
+    public void Bluetooth_alone_hides_the_rough_xinput_reading_of_the_same_pad()
+    {
+        var btLuna = Reading("luna-bt", 90, ControllerBattery.SourceBluetooth) with { VendorId = 0x0171, ProductId = 0x0419 };
+        var xinput = Reading("xinput0", 30, ControllerBattery.SourceXInput, approximate: true);
+        Assert.Equal(["luna-bt"], ControllerBattery.Combine([], [], [xinput], [btLuna]).Select(r => r.Id));
+    }
+
+    [Fact]
+    public void Sony_hid_still_wins_over_bluetooth_for_playstation_pads()
+    {
+        var hid = Reading("ds", 40, ControllerBattery.SourceSony);
+        var btSony = Reading("ds-bt", 90, ControllerBattery.SourceBluetooth) with { VendorId = ControllerMapping.SonyVendorId, ProductId = 0x0CE6 };
+        Assert.Equal(["ds"], ControllerBattery.Combine([hid], [], [], [btSony]).Select(r => r.Id));
+        // Without the HID reading (not read yet), the Bluetooth one shows.
+        Assert.Equal(["ds-bt"], ControllerBattery.Combine([], [], [], [btSony]).Select(r => r.Id));
+    }
+
+    [Fact]
+    public void A_wgi_reading_without_ids_is_never_replaced()
+    {
+        var wgi = (Reading("pad", 50, ControllerBattery.SourceWgi), false);
+        var bt = Reading("bt", 90, ControllerBattery.SourceBluetooth) with { VendorId = 0x0171, ProductId = 0x0419 };
+        Assert.Equal(["bt", "pad"], ControllerBattery.Combine([], [wgi], [], [bt]).Select(r => r.Id));
+    }
+
     private static BatteryReading Reading(string id, int percent, string source, bool approximate = false) =>
         new(id, id, percent, false, approximate, source);
 }

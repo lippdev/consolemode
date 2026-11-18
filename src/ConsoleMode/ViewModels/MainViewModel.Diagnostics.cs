@@ -118,6 +118,8 @@ public partial class MainViewModel
             };
             if (Gamepad.FromGameController(raw) is not null) type += " (gamepad)";
             var battery = batteries.FirstOrDefault(b => b.Id == raw.NonRoamableId)
+                ?? batteries.FirstOrDefault(b => b.Source == ControllerBattery.SourceBluetooth
+                    && b.VendorId == raw.HardwareVendorId && b.ProductId == raw.HardwareProductId)
                 ?? batteries.FirstOrDefault(b => b.Source == (raw.HardwareVendorId == ControllerMapping.SonyVendorId
                     ? ControllerBattery.SourceSony
                     : ControllerBattery.SourceXInput));

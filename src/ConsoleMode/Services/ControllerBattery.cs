@@ -1,7 +1,12 @@
 namespace ConsoleMode.Services;
 
-/// <summary>One pad's battery. <paramref name="Approximate"/>: XInput only gives four steps (shown with "~").</summary>
-public sealed record BatteryReading(string Id, string Name, int Percent, bool Charging, bool Approximate, string Source);
+/// <summary>
+/// One pad's battery. <paramref name="Approximate"/>: XInput only gives four steps (shown with "~").
+/// <paramref name="VendorId"/>/<paramref name="ProductId"/>: the pad's USB/Bluetooth ids when the source knows them (0 otherwise),
+/// so the Bluetooth reading can stand in for another source's reading of the same pad.
+/// </summary>
+public sealed record BatteryReading(string Id, string Name, int Percent, bool Charging, bool Approximate, string Source,
+    ushort VendorId = 0, ushort ProductId = 0);
 
 /// <summary>
 /// Pure battery logic (issue #70): turns what Windows.Gaming.Input, XInput and the Sony HID
@@ -13,6 +18,12 @@ public static class ControllerBattery
     public const string SourceSony = "hid";
     public const string SourceWgi = "wgi";
     public const string SourceXInput = "xinput";
+    public const string SourceBluetooth = "bluetooth";
+
+    /// <summary>
+    /// The level Windows keeps for a Bluetooth device (what Settings → Bluetooth shows), 0..100; null when it is out of range.
+    /// </summary>
+    public static int? FromBluetooth(byte level) => level <= 100 ? level : null;
 
     // XInput BATTERY_TYPE_* and BATTERY_LEVEL_*.
     public const byte XInputTypeDisconnected = 0x00;
@@ -103,18 +114,33 @@ public static class ControllerBattery
     /// when Windows.Gaming.Input reported no non-Sony pad (they would be the same Xbox pads twice).
     /// </summary>
     /// <param name="wgi">Readings with whether each comes from a Sony pad.</param>
+    /// <param name="bluetooth">
+    /// What Windows' Bluetooth stack says (issue #224): the same number as Settings → Bluetooth. It replaces
+    /// Windows.Gaming.Input's reading of the same pad (same vendor and product id), which some pads fill with a fixed
+    /// value (an Amazon Luna pad read 10 % for days). The Sony HID value still wins for PlayStation pads.
+    /// </param>
     public static IReadOnlyList<BatteryReading> Combine(
         IEnumerable<BatteryReading> sonyHid,
         IEnumerable<(BatteryReading Reading, bool Sony)> wgi,
-        IEnumerable<BatteryReading> xinput)
+        IEnumerable<BatteryReading> xinput,
+        IEnumerable<BatteryReading>? bluetooth = null)
     {
         var result = sonyHid.ToList();
         var hasSony = result.Count > 0;
-        var fromWgi = wgi.Where(w => !(w.Sony && hasSony)).ToList();
+        var fromBluetooth = (bluetooth ?? []).Where(b => !(hasSony && b.VendorId == ControllerMapping.SonyVendorId)).ToList();
+        var fromWgi = wgi
+            .Where(w => !(w.Sony && hasSony))
+            .Where(w => !fromBluetooth.Any(b => SamePad(b, w.Reading)))
+            .ToList();
+        result.AddRange(fromBluetooth);
         result.AddRange(fromWgi.Select(w => w.Reading));
-        if (!fromWgi.Any(w => !w.Sony)) result.AddRange(xinput);
+        if (fromBluetooth.Count == 0 && !fromWgi.Any(w => !w.Sony)) result.AddRange(xinput);
         return result;
     }
+
+    /// <summary>Two readings of the same model of pad (ids known on both sides).</summary>
+    private static bool SamePad(BatteryReading a, BatteryReading b) =>
+        a.VendorId != 0 && a.VendorId == b.VendorId && a.ProductId == b.ProductId;
 
     /// <summary>What the header shows when several pads report: the emptiest one.</summary>
     public static BatteryReading? Lowest(IEnumerable<BatteryReading> readings) =>

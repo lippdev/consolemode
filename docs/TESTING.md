@@ -547,6 +547,13 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Com a sessão ativa e a opção ligada, minimizar e reabrir pela bandeja continua funcionando; o atalho do controle para abrir o app também traz a janela de volta.
 - [ ] Fechar no X (sem sessão ativa) continua fechando o app, com a opção ligada ou desligada.
 
+## Bateria dos controles Bluetooth (#NNN, issue #224)
+
+- [ ] Controle Bluetooth que não é PlayStation (Amazon Luna, Xbox por Bluetooth, 8BitDo…): a bateria no canto da tela é a mesma de Configurações → Bluetooth (pode levar até 30 s para atualizar). O log tem "Controle: bateria pelo Bluetooth do Windows: <nome> (<vid:pid>) <n>%" uma vez. Resultado: ______
+- [ ] Diagnóstico (Copiar diagnóstico / relatório de feedback): o controle Bluetooth mostra a mesma bateria. Resultado: ______
+- [ ] DualSense ou DualShock 4 por Bluetooth: a bateria continua a do próprio controle (sem "~"), como antes. Resultado: ______
+- [ ] Controle com fio ou com receptor USB: a bateria continua como antes (ou não aparece, sem bateria). Resultado: ______
+
 ## Nomes das categorias do Sistema (#221, issue #219)
 
 - [ ] Idioma alemão, janela pequena (~1100 px) e tela cheia na TV: em Sistema, "Beim Starten des Konsolenmodus" e "Tastenkombination, Hilfe und Daten" aparecem inteiros, sem "…". O mesmo em francês ("Autres applications du développeur"). Resultado: ______
