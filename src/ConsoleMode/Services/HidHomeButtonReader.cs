@@ -133,7 +133,13 @@ public static class HidHomeButtonReader
         var pads = all.Where(i => i.IsGameController && ControllerMapping.ReadsHomeFromHid(i.VendorId))
             .Select(i => (i.VendorId, i.ProductId)).ToHashSet();
         bool diagnostics;
-        lock (Gate) diagnostics = _diagnosticUsers > 0;
+        lock (Gate)
+        {
+            diagnostics = _diagnosticUsers > 0;
+            // A collection opened for the test by a scan that raced its closing: close it now.
+            if (!diagnostics)
+                foreach (var c in Open.Values.Where(c => c.HomeUsage is null)) c.Stop?.Cancel();
+        }
         foreach (var info in all)
         {
             if (!pads.Contains((info.VendorId, info.ProductId))) continue;
@@ -158,11 +164,21 @@ public static class HidHomeButtonReader
                     AppLog.Write($"Controle: botão central em {info.VendorId:X4}:{info.ProductId:X4} ({collection.HomeUsage}), mas o Windows não deixa ler esse dispositivo");
                 continue;
             }
+            var stop = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            lock (Gate)
+            {
+                // The test may have closed since this scan started: then a collection without a centre button isn't wanted.
+                if (collection.HomeUsage is null && _diagnosticUsers == 0)
+                {
+                    stop.Dispose();
+                    reader.Dispose();
+                    continue;
+                }
+                collection.Stop = stop;
+                Open[info.Path] = collection;
+            }
             if (collection.HomeUsage is not null)
                 AppLog.Write($"Controle: lendo o botão central pelo HID ({info.VendorId:X4}:{info.ProductId:X4}, {collection.HomeUsage})");
-            var stop = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            collection.Stop = stop;
-            lock (Gate) Open[info.Path] = collection;
             _ = Task.Run(async () =>
             {
                 await ReadLoopAsync(reader, collection, stop.Token);
