@@ -4,6 +4,22 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.7.1]
+### Novidades
+- O controle de TVs Google TV e Android TV pela rede voltou. A sessão pode ligar a TV e trocar para a entrada do PC. Na volta, ela pode executar um comando para abrir a tela inicial ou outra entrada antes de entrar em espera. (#208, #213)
+- A opção **Esconder os ícones da área de trabalho na sessão** oculta os ícones durante a sessão e restaura a visibilidade anterior ao voltar ao PC. (#214)
+### Correções
+- A escolha do iniciador fica marcada ao trocar de aba com o controle ou teclado. Use **A** (✕ no PlayStation) ou clique para mudar a seleção. (#218)
+- **Entrar ao conectar um controle** volta a iniciar a sessão quando o controle é ligado e o app está na bandeja. (#218)
+- O indicador de bateria dos controles Bluetooth usa o valor mostrado pelo Windows em Configurações → Bluetooth, quando disponível. (#225)
+- Os nomes das categorias em Sistema aparecem por inteiro em alemão e francês. (#221)
+- A tela de jogo reconhece 59,94 Hz como o modo de 60 Hz das TVs e aplica o modo de 59 Hz quando ele é escolhido explicitamente. (#212, #215)
+### Mudanças
+- O atalho para iniciar a sessão também reconhece botões centrais que seguem o padrão HID. **Testar controle** mostra o botão Guide, os códigos dos botões HID e as leituras de bateria por fonte. (#226, #227)
+- **Receber versões de teste** passa a oferecer apenas betas. (#223)
+### Limitação conhecida
+- O botão central do Amazon Luna ainda pode falhar como atalho de início. O caso será retomado na 2.0. Enquanto isso, use **Select + Y** ou **Entrar ao conectar um controle**. (#217)
+
 ## [1.7.1-beta.4]
 ### Correções
 - Controle: o botão central de controles de outras marcas (Amazon Luna, 8BitDo, Stadia…) passa a abrir o Console Mode como o botão Xbox, quando o controle declara esse botão do jeito padrão do HID. Antes só os botões Xbox e PS funcionavam, e esses controles precisavam de um atalho com dois botões (relatado pelo PLEXX-DE, issue #217). (#226)

@@ -4,6 +4,22 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.7.1]
+### What's new
+- Network control for Google TV and Android TV is back. A session can turn the TV on and switch to the PC input. On return, it can run a command to open the Home screen or switch inputs before putting the TV in standby. (#208, #213)
+- **Hide desktop icons during the session** hides the icons while the session runs and restores their prior visibility when you return to the PC. (#214)
+### Fixes
+- The selected launcher stays selected when you change tabs with a controller or keyboard. Press **A** (✕ on PlayStation) or click to change the selection. (#218)
+- **Enter when a controller connects** starts a session again when you turn on the controller while the app is in the tray. (#218)
+- The battery indicator for Bluetooth controllers uses the reading from Windows Settings → Bluetooth when available. (#225)
+- System category names are fully visible in German and French. (#221)
+- The game screen treats 59.94 Hz as the 60 Hz TV mode and applies the 59 Hz mode when explicitly selected. (#212, #215)
+### Changes
+- The shortcut to start a session also recognizes centre buttons that follow the HID standard. **Test controller** shows the Guide button, HID button codes, and battery readings by source. (#226, #227)
+- **Receive test versions** now offers betas only. (#223)
+### Known limitation
+- The Amazon Luna centre button can still fail to start a session. We’ll revisit it in 2.0. In the meantime, use **Select + Y** or **Enter when a controller connects**. (#217)
+
 ## [1.7.1-beta.4]
 ### Fixes
 - Controller: the centre button of other brands' pads (Amazon Luna, 8BitDo, Stadia…) now opens Console Mode like the Xbox button, when the pad declares that button the standard HID way. Before, only the Xbox and PS buttons worked, and those pads needed a two-button shortcut (reported by PLEXX-DE, issue #217). (#226)
