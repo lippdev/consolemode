@@ -12,13 +12,13 @@ https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 
-Get **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, the latest stable version:
+Get **[1.7.1](https://github.com/lippdev/consolemode/releases/tag/v1.7.1)**, the latest stable version:
 
 - **`ConsoleMode-Setup-x64.exe`** (recommended): per-user install, no admin, updates itself.
 - **`ConsoleMode-Portable-x64.exe`**: a single exe that keeps its data next to it.
 - Or with winget: `winget install lippdev.ConsoleMode`
 
-On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? The same release has **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` or `ConsoleModeLegacy-Portable-x64.exe`): 1.6.2 as it was, sharing your settings with the current version. It is frozen: no fixes and no updates.
+On 1.6? The app offers the update and keeps your settings. Prefer the old interface, with its Desktop mode? Download **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` or `ConsoleModeLegacy-Portable-x64.exe`) from the [1.7.0 release](https://github.com/lippdev/consolemode/releases/tag/v1.7.0). Legacy is based on 1.6.2 and shares your settings with the current version. It no longer receives fixes or updates.
 
 Want to try what comes next before everyone else? Turn on System → App → "Receive test versions (beta)".
 
@@ -46,7 +46,8 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - Per-screen **resolution and refresh rate**, **HDR**, **VRR** and an **FPS limit** (RTSS) while you play
 - **FPS counter** over the game (RTSS) on a card in three sizes: FPS only, compact (CPU, GPU and RAM usage), detailed (clocks, GPU temperature and memory) or your own layout
 - Audio goes to the TV (or any output) and comes back afterwards
-- [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can put it in standby afterwards
+- [Turns the TV on and switches it to the PC's input](docs/GUIDE.md#tv-control) (Google TV / Android TV over the network), and can run a command before putting it in standby when you return to the PC
+- Hides the **desktop icons** during a session if you enable the option and restores their previous visibility when you return to the PC
 - Launches **Steam Big Picture**, **Playnite fullscreen** or **Xbox** mode, and sends Steam to the tray when you go back to the PC
 - **Session menu** over the game: switch or close the open windows, change volume, resolution, audio, FPS and HDR, hide the mouse pointer or drive it with the controller, and browse your files with [ControlFS](https://github.com/nextestudios/ControlFS) and the web with [JoyChromium](https://github.com/lippdev/joychromium)
 - A console-style interface made for the TV that also works with the mouse and the keyboard (full screen, Xbox and PlayStation pads, LB/RB tabs, its own wallpaper or your Steam covers as the background), with a guided tour the first time you open it
@@ -55,6 +56,14 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - Puts the **desktop icons** and the **mouse pointer** back where they were, can let the controller **wake the PC**, and restores the desk on the next start if a session was cut short
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
 - English, Portuguese, Spanish, German, French and Russian
+
+## What's new in 1.7.1
+
+- **Google TV and Android TV control is back:** turn on the TV and switch to the PC input when a session starts, then optionally run a command before standby when you return.
+- **Hide desktop icons during a session:** the app restores their previous visibility when you return to the PC.
+- **Controller improvements:** Windows battery readings for Bluetooth controllers when available, support for HID centre buttons, and more details in **Test controller**.
+- **Session fixes:** launcher selection survives tab changes, controller connect-to-start works again from the tray, and TV modes at 59 and 59.94 Hz are handled correctly.
+- The in-app test channel offers betas only.
 
 ## What's new in 1.7.0
 
@@ -65,7 +74,7 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - **JoyChromium in the session menu:** the TV browser you drive with the controller opens over the game and installs from there if it is missing
 - **The desk comes back whole:** desktop icons and the mouse pointer return to their places, and if the app or the PC goes down mid-session, the next start restores everything
 - **Wake the PC with the controller**, the controller's battery on screen and the same look at any Windows scale, from 1080p to 4K
-- **Console Mode Legacy** in the same release, for those who prefer the old interface (it also keeps TV control, which is out of 1.7)
+- **Console Mode Legacy** debuted with 1.7.0 for those who prefer the old interface
 
 ## What's new in 1.6
 
@@ -77,7 +86,7 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - **All the project's own code:** displays and audio through Windows' APIs, without the NirSoft tools
 - Steam goes to the tray when you go back to the PC, the desk layout comes back exactly as it was (portrait monitors too), and slow Playnite starts no longer end the session
 
-All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
+All the details in the [release notes](https://github.com/lippdev/consolemode/releases/tag/v1.7.1) and the [changelog](CHANGELOG.en-US.md) · [notas em português](CHANGELOG.md).
 
 ## More
 

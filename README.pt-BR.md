@@ -12,13 +12,13 @@ https://github.com/user-attachments/assets/9f244c06-76e5-4ccb-ab66-e637eae900ec
 
 ## Download
 
-Baixe a **[1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0)**, a versão estável mais recente:
+Baixe a **[1.7.1](https://github.com/lippdev/consolemode/releases/tag/v1.7.1)**, a versão estável mais recente:
 
 - **`ConsoleMode-Setup-x64.exe`** (recomendado): instala por usuário, sem admin, e se atualiza sozinho.
 - **`ConsoleMode-Portable-x64.exe`**: um único exe que guarda os dados ao lado dele.
 - Ou pelo winget: `winget install lippdev.ConsoleMode`
 
-Está na 1.6? O app oferece a atualização e mantém suas configurações. Prefere a interface antiga, com o modo Desktop? A mesma release tem o **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` ou `ConsoleModeLegacy-Portable-x64.exe`): a 1.6.2 como era, dividindo seus ajustes com a versão atual. Está congelado: sem correções e sem atualizações.
+Está na 1.6? O app oferece a atualização e mantém suas configurações. Prefere a interface antiga, com o modo Desktop? Baixe o **Console Mode Legacy** (`ConsoleModeLegacy-Setup-x64.exe` ou `ConsoleModeLegacy-Portable-x64.exe`) na [release 1.7.0](https://github.com/lippdev/consolemode/releases/tag/v1.7.0). O Legacy é baseado na 1.6.2 e compartilha os ajustes com a versão atual. Ele deixou de receber correções e atualizações.
 
 Quer testar o que vem aí antes de todo mundo? Ligue Sistema → App → "Receber versões de teste (beta)".
 
@@ -46,7 +46,8 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - **Resolução e Hz** por tela, **HDR**, **VRR** e **limite de FPS** (RTSS) enquanto você joga
 - **Contador de FPS** sobre o jogo (RTSS) num card em três tamanhos: apenas FPS, compacto (uso de CPU, GPU e RAM), detalhado (clocks, temperatura da GPU e memória) ou do seu jeito
 - O áudio vai para a TV (ou qualquer saída) e volta depois
-- [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode colocá-la em espera no fim
+- [Liga a TV e troca para a entrada do PC](docs/GUIDE.pt-BR.md#controle-da-tv) (Google TV / Android TV pela rede), e pode executar um comando antes de colocá-la em espera ao voltar ao PC
+- Oculta os **ícones da área de trabalho** durante a sessão se você ativar a opção e restaura a visibilidade anterior ao voltar ao PC
 - Abre **Steam Big Picture**, **Playnite em tela cheia** ou o **Modo Xbox**, e manda a Steam para a bandeja ao voltar ao PC
 - **Menu da sessão** sobre o jogo: troque ou feche as janelas abertas, mude volume, resolução, áudio, FPS e HDR, esconda o cursor do mouse ou mova-o com o controle e navegue pelos seus arquivos com o [ControlFS](https://github.com/nextestudios/ControlFS) e pela web com o [JoyChromium](https://github.com/lippdev/joychromium)
 - Uma interface no estilo dos consoles, feita para a TV, que também funciona com mouse e teclado (tela cheia, controles Xbox e PlayStation, abas no LB/RB, um papel de parede próprio ou as capas da sua Steam como plano de fundo), com um tour guiado na primeira vez que você abre
@@ -55,6 +56,14 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - Devolve os **ícones da área de trabalho** e o **ponteiro do mouse** ao lugar, pode deixar o controle **acordar o PC** e restaura a mesa na próxima abertura se uma sessão for interrompida
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
 - Português, inglês, espanhol, alemão, francês e russo
+
+## Novidades da 1.7.1
+
+- **O controle de Google TV e Android TV voltou:** ligue a TV e troque para a entrada do PC ao iniciar a sessão. Ao voltar, você pode executar um comando antes de colocar a TV em espera.
+- **Oculte os ícones da área de trabalho durante a sessão:** o app restaura a visibilidade anterior ao voltar ao PC.
+- **Melhorias nos controles:** leitura de bateria pelo Windows para controles Bluetooth quando disponível, suporte a botões centrais HID e mais detalhes em **Testar controle**.
+- **Correções na sessão:** a seleção do iniciador é mantida ao trocar de aba, conectar um controle volta a iniciar a sessão com o app na bandeja e os modos de TV a 59 e 59,94 Hz são tratados corretamente.
+- O canal de testes do app oferece apenas betas.
 
 ## Novidades da 1.7.0
 
@@ -65,7 +74,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - **JoyChromium no menu da sessão:** o navegador para a TV que se usa com o controle abre por cima do jogo e se instala por ali mesmo se faltar
 - **A mesa volta inteira:** os ícones da área de trabalho e o ponteiro do mouse voltam ao lugar e, se o app ou o PC cair no meio da sessão, a próxima abertura restaura tudo
 - **Acordar o PC pelo controle**, a bateria do controle na tela e a mesma cara em qualquer escala do Windows, de 1080p a 4K
-- **Console Mode Legacy** na mesma release, para quem prefere a interface antiga (ele também mantém o controle da TV, que ficou fora da 1.7)
+- **Console Mode Legacy** estreou na 1.7.0 para quem prefere a interface antiga
 
 ## Novidades da 1.6
 
@@ -77,7 +86,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - **Só código do projeto:** telas e áudio pelas APIs do Windows, sem as ferramentas da NirSoft
 - A Steam vai para a bandeja ao voltar ao PC, o layout da mesa volta idêntico (monitores em retrato também) e o Playnite demorando para abrir não encerra mais a sessão
 
-Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.0) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
+Todos os detalhes nas [notas da versão](https://github.com/lippdev/consolemode/releases/tag/v1.7.1) e no [changelog](CHANGELOG.md) · [notes in English](CHANGELOG.en-US.md).
 
 ## Mais
 
