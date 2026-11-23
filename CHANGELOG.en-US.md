@@ -4,6 +4,16 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+- The 2.0 interface uses Source Sans 3.
+
+- Settings lists in 2.0 scroll above the footer and follow controller and keyboard selection.
+
+- In 2.0, the focus highlight glides between settings options in the direction of selection.
+
+- On Windows 11, Console Mode 2.0 Alpha can be registered as the Xbox mode home app.
+
+- In 2.0, the minimize, maximize, restore and close buttons are integrated into the top of the app window.
+
 ## [1.7.0]
 ### What's new
 - **One interface, made like a console's**: Console Mode now has only the Console interface, which also works with the mouse and the keyboard. Home shows your launchers in a row, with their official logos, over your game art; the font is Inter, the default background is Aurora and the title bar follows. The first time you open it, a guided tour walks through everything and moves on by itself. If you prefer the old interface, there is **Legacy**, at the end of this list. (#162, #164, #165, #169, #182, #184, #194)

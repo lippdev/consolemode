@@ -4,6 +4,16 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+- A interface da 2.0 usa Source Sans 3.
+
+- As listas de configuração da 2.0 rolam acima do rodapé e acompanham a seleção pelo controle e teclado.
+
+- Na 2.0, o destaque desliza entre as opções de configuração na direção selecionada.
+
+- Na alpha 2.0 para Windows 11, o Console Mode pode ser registrado como tela inicial do modo Xbox.
+
+- Na 2.0, os controles de minimizar, maximizar, restaurar e fechar ficam integrados ao topo da janela.
+
 ## [1.7.0]
 ### Novidades
 - **Uma interface só, com cara de console**: o Console Mode passa a ter apenas a interface Console, que também funciona com mouse e teclado. O Início mostra seus iniciadores numa fileira, com os logos oficiais, sobre a arte dos seus jogos; a fonte é a Inter, o fundo padrão é a Aurora e a barra de título acompanha. Na primeira abertura, um tour guiado passa por tudo e avança sozinho. Quem prefere a interface antiga tem a **Legacy**, no fim desta lista. (#162, #164, #165, #169, #182, #184, #194)

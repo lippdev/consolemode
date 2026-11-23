@@ -1,0 +1,33 @@
+name: Console Mode 2 Alpha Build
+
+on:
+  push:
+    branches: [v2-config]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    if: github.ref == 'refs/heads/v2-config'
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Rust
+        run: rustup default stable-x86_64-pc-windows-msvc
+
+      - name: Build installer
+        shell: powershell
+        run: |
+          $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path -LiteralPath $iscc) -and -not (Get-Command iscc -ErrorAction SilentlyContinue)) {
+              choco install innosetup --yes --no-progress
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          .\build\Publish-ConsoleMode2.ps1 -Target Installer
+
+          cargo test --workspace --release --locked

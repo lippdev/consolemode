@@ -37,3 +37,6 @@ src/**/obj/
 docs/explainer/node_modules/
 docs/explainer/out/
 docs/explainer/.remotion/
+
+# Rust (Console Mode 2)
+/target/

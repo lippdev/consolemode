@@ -1,0 +1,66 @@
+# Console Mode 2: a copy of GPUI's Windows platform (zed-industries/zed, crates/gpui_windows, at
+# 917559da), patched in through [patch] in the workspace Cargo.toml. The only change: windows are
+# redrawn on demand (GPUI's frame waker, as on macOS) instead of on every vsync, so an idle app
+# no longer wakes 60-240 times a second. See CHANGES-CONSOLE-MODE.md. Apache-2.0 (LICENSE-APACHE).
+[package]
+name = "gpui_windows"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "Apache-2.0"
+
+[lib]
+path = "src/gpui_windows.rs"
+doctest = false
+
+[features]
+default = ["gpui/default"]
+test-support = ["gpui/test-support"]
+screen-capture = ["gpui/screen-capture", "scap"]
+
+[target.'cfg(target_os = "windows")'.dependencies]
+accesskit = { version = "0.24.0", features = ["enumn"] }
+accesskit_windows = "0.34"
+anyhow = "1.0.86"
+collections = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553" }
+dunce = "1.0"
+etagere = "0.2"
+futures = "0.3.34"
+gpui = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553", default-features = false }
+gpui_util = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553" }
+image = { version = "0.25.1", default-features = false, features = ["bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpeg", "png", "pnm", "qoi", "rayon", "tga", "tiff", "webp"] }
+itertools = "0.14.0"
+log = { version = "0.4", default-features = false, features = ["std"] }
+parking_lot = "0.12.1"
+rand = { version = "0.9", default-features = false, features = ["std", "std_rng", "os_rng"] }
+raw-window-handle = "0.6"
+scheduler = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553" }
+smallvec = { version = "1.6", features = ["union", "const_new"] }
+uuid = { version = "1.1", features = ["serde", "v5"] }
+windows = { version = "0.62", features = [
+    "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage", "Win32_System_IO", "Win32_System_LibraryLoader", "Win32_System_Ole",
+    "Win32_System_Threading", "Win32_System_Variant", "Win32_UI_Shell", "Win32_UI_Shell_Common",
+    "Win32_UI_Shell_PropertiesSystem", "Win32_UI_WindowsAndMessaging",
+    "Data_Xml_Dom", "UI_Notifications", "UI_ViewManagement", "Wdk_System_SystemServices", "Win32_Graphics_Direct3D11",
+    "Win32_Graphics_Direct3D_Fxc", "Win32_Graphics_DirectComposition", "Win32_Graphics_DirectManipulation",
+    "Win32_Graphics_DirectWrite", "Win32_Graphics_Dwm", "Win32_Graphics_Dxgi_Common", "Win32_Graphics_Hlsl", "Win32_Media",
+    "Win32_Security_Credentials", "Win32_Storage_Packaging_Appx", "Win32_System_DataExchange",
+    "Win32_System_Diagnostics_Debug", "Win32_System_Memory", "Win32_System_Performance",
+    "Win32_System_StationsAndDesktops", "Win32_System_SystemInformation", "Win32_System_SystemServices",
+    "Win32_UI_Controls", "Win32_UI_HiDpi", "Win32_UI_Input_Ime", "Win32_UI_Input_Pointer",
+] }
+windows-core = "0.62"
+windows-numerics = "0.3"
+windows-registry = "0.6.0"
+
+[target.'cfg(target_os = "windows")'.dependencies.scap]
+git = "https://github.com/zed-industries/scap"
+rev = "b5c86ec58dd4b6b7732bf6ac8be03d6b1f190a82"
+default-features = false
+package = "zed-scap"
+version = "0.0.8-zed"
+optional = true
+
+[target.'cfg(target_os = "windows")'.build-dependencies]
+windows-registry = "0.6.0"

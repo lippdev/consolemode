@@ -1,0 +1,15 @@
+[package]
+name = "cm-platform"
+description = "Console Mode 2 platform services (Windows first): app icons, foreground, clock, Steam library."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+gpui.workspace = true
+image.workspace = true
+raw-window-handle.workspace = true
+winreg.workspace = true
+windows = { workspace = true, features = ["ApplicationModel", "Foundation", "Management_Deployment", "Win32_Networking_WinHttp", "Win32_System_Registry", "Win32_System_Memory", "Win32_System_Ole", "Win32_System_WinRT", "Win32_UI_Shell_Common", "Win32_Security_Cryptography"] }
+cm-core.workspace = true

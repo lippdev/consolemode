@@ -1,0 +1,9 @@
+[package]
+name = "sdl-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Phase 0: does SDL3 (static, built from source) read Xbox and PlayStation pads from a background process?
+[dependencies]
+sdl3 = { version = "0.22", features = ["build-from-source-static"] }

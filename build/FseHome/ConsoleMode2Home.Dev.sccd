@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Local AppX development registration. Publishing needs a capability descriptor signed by Microsoft. -->
+<CustomCapabilityDescriptor xmlns="http://schemas.microsoft.com/appx/2016/sccd">
+    <CustomCapabilities>
+        <CustomCapability Name="Microsoft.appCategory.gamingHome_8wekyb3d8bbwe" />
+    </CustomCapabilities>
+    <AuthorizedEntities>
+        <AuthorizedEntity AppPackageFamilyName="lippdev.ConsoleMode2Alpha.Home_8qknpp3d3v6rw"
+            CertificateSignatureHash="0000000000000000000000000000000000000000000000000000000000000000" />
+    </AuthorizedEntities>
+    <Catalog>FFFF</Catalog>
+    <DeveloperModeOnly Value="true" />
+</CustomCapabilityDescriptor>

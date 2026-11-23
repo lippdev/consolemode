@@ -1,0 +1,10 @@
+[package]
+name = "cm-ui"
+description = "Console Mode 2 design system: tokens, console scale, icons and shared pieces (GPUI)."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+gpui.workspace = true

@@ -1,0 +1,36 @@
+# Console Mode 2 Alpha (Rust + GPUI). The 1.x C# app in src/ is not part of this workspace.
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+exclude = ["spikes", "vendor"]
+
+[workspace.package]
+version = "2.0.0-alpha.0"
+edition = "2024"
+publish = false
+license = "AGPL-3.0-only"
+
+[workspace.dependencies]
+# GPUI straight from Zed, pinned (docs/v2/SPIKE-GPUI.md). Bumping it is a deliberate change.
+gpui = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553" }
+gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "917559da35dd4d626205da705b071c800c9c2553" }
+image = "0.25"
+futures = "0.3"
+rodio = "0.23"
+# Static SDL3 for controllers; building it needs CMake on PATH (Visual Studio 2022 ships one).
+sdl3 = { version = "0.22", features = ["build-from-source-static"] }
+raw-window-handle = "0.6"
+winreg = "0.55"
+windows = { version = "0.62", features = ["Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_Pipes", "Win32_System_IO", "Win32_System_LibraryLoader", "Win32_Devices_Display", "Win32_Devices_FunctionDiscovery", "Win32_Media_Audio", "Win32_System_Com", "Win32_System_Com_StructuredStorage", "Win32_System_Variant", "Win32_UI_Shell_PropertiesSystem", "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_UI_WindowsAndMessaging", "Win32_System_Threading", "Win32_System_SystemInformation", "Win32_System_Diagnostics_ToolHelp", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Shell", "Win32_Graphics_Dwm", "Win32_Media_Audio_Endpoints", "Win32_UI_Shell_Common", "Win32_Devices_HumanInterfaceDevice", "Win32_Devices_DeviceAndDriverInstallation", "Win32_Devices_Properties"] }
+cm-core = { path = "crates/cm-core" }
+cm-ui = { path = "crates/cm-ui" }
+cm-platform = { path = "crates/cm-platform" }
+
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 3
+
+# GPUI's Windows platform with on-demand redraws (vendor/gpui_windows/CHANGES-CONSOLE-MODE.md)
+[patch."https://github.com/zed-industries/zed"]
+gpui_windows = { path = "vendor/gpui_windows" }

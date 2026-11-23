@@ -747,3 +747,420 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] Sistema → App → Tutorial abre o tour de novo, do começo. Resultado: ______
 - [ ] O app iniciado escondido mostra o tour só quando a janela é aberta pela bandeja; com uma sessão ativa, nunca. Resultado: ______
 - [ ] Alemão, francês e russo: título e texto do cartão quebram linha sem cortar; os botões cabem. Resultado: ______
+
+## Console Mode 2 Alpha: enumeração somente leitura
+
+- [ ] Executar `cargo run -p cm-platform --example hardware` e conferir telas ativas, desativadas e desconectadas conhecidas pelo Windows; dispositivos sem fonte GDI devem ter nome GDI vazio. Resultado: ______
+- [ ] Comparar `stable_id` byte a byte com `focusMonitor`, `hideMonitors` e chaves de `monitorModes` do config da 1.7, sem alterar o arquivo. Resultado: ______
+- [ ] Conferir primário, posição, resolução, frequência, modos únicos em ordem decrescente e HDR com as configurações do Windows. Campos desconhecidos de telas desconectadas devem aparecer como `None` ou lista vazia. Resultado: ______
+- [ ] Conferir saídas de áudio ativas, desabilitadas e desconectadas, nomes e saída padrão; repetir com uma saída de captura para confirmar que não é listada. Resultado: ______
+- [ ] Confirmar que a execução não altera telas, áudio, registro ou arquivos de configuração. Resultado: ______
+
+## Console Mode 2 Alpha: desk real
+
+Executar somente com autorização do dono, acesso local e uma forma alternativa de recuperar imagem; não executar enquanto o único acesso remoto depender de uma tela virtual.
+
+- [ ] Guardar backup CCD; confirmar que o arquivo persiste após reiniciar o app e que um arquivo truncado/inválido é recusado antes de alterar as telas.
+- [ ] Ativar uma TV conectada mas inativa; confirmar espera limitada, retorno de erro se indisponível e TV como primária, preservando as posições relativas das outras telas.
+- [ ] Desconectar apenas as telas selecionadas (inclusive em múltiplas GPUs e clonagem); confirmar recusa ao tentar desconectar todas as telas ativas.
+- [ ] Aplicar resolução/frequência suportada e conferir o modo efetivo; para modo indisponível, conferir seleção da resolução mais próxima e depois frequência mais próxima.
+- [ ] Conferir screen_rect com coordenadas negativas, rotação e escala/DPI diferentes e posicionar o launcher no retângulo retornado pelo adaptador.
+- [ ] Ativar HDR inicialmente desligado: hdr_on deve retornar true; repetir com HDR já ligado: false. Restaurar somente o HDR ligado pela sessão; verificar erro em tela sem suporte.
+- [ ] Trocar áudio pelos IDs de endpoint e pelos IDs legados, incluindo saída desabilitada; conferir os três papéis (console, multimídia e comunicações) e restauração ao endpoint salvo.
+- [ ] Restaurar backup após foco, desconexão e mudança de modo: conferir todas as telas originalmente ativas, telas originalmente inativas, resolução, frequência, rotação, posição e primária.
+- [ ] Simular recuperação após reiniciar o app, com adaptador do engine instalado; se uma tela do backup estiver ausente ou o driver rejeitar a topologia, conferir erro e manutenção do diário/backup para nova tentativa.
+- [ ] Confirmar que TV em standby físico exige despertar externo se o driver não oferecer um caminho disponível: este desk não usa DDC/CI, cortinas pretas nem fallback de estender todas as telas.
+
+## Console Mode 2 Alpha: Home do modo Xbox no Windows 11
+
+- [ ] Anotar a Home atual em Configurações do Windows → Jogos → Modo Xbox. Registrar a alpha e verificar que o Console Mode aparece no seletor e que a escolha anterior continua ativa.
+- [ ] Selecionar o Console Mode no Windows e entrar no modo Xbox, primeiro com a alpha fechada e depois já na bandeja. A Home deve aparecer em tela cheia com uma única instância do aplicativo.
+- [ ] Em um desktop que oferece o modo Xbox mas omite o seletor de Home, registrar a alpha e entrar pelo Console Mode. Aceitar a confirmação do Windows. Verificar que o controle navega pela alpha em primeiro plano e que repetir a abertura reaproveita a janela.
+- [ ] Abrir o Playnite pela Home, entrar em um jogo e encerrar o launcher. Verificar o retorno à Home. Em seguida, voltar ao PC e verificar tela principal, áudio e área de trabalho.
+- [ ] Com entrada automática desativada, abrir a alpha normalmente no desktop. Ativar a preferência e repetir. Testar também a inicialização na bandeja.
+- [ ] Restaurar a Home anterior no seletor do Windows, remover o registro da alpha e verificar que o executável continua abrindo como aplicativo de desktop.
+- [ ] Testar em um Windows sem suporte à FSE ou sem permissão de registro. Conferir a mensagem no app e repetir a navegação normal pelo desktop.
+
+## Console Mode 2 Alpha: app (bandeja, instância, inicialização)
+
+- [ ] Na 2.0 em janela, arrastar pelo topo, maximizar/restaurar por duplo clique e pelos botões, minimizar e fechar. Conferir o fechamento com a bandeja habilitada e desabilitada e a ausência dos botões em tela cheia.
+
+Executar apenas quando o dono puder testar localmente. Os itens abaixo não foram validados
+fisicamente pelo agente; não iniciar sessão durante acesso remoto do dono.
+
+- [ ] Com a 1.7 aberta, abrir a Alpha em janela normal e confirmar ícone próprio na janela e na bandeja, sem alterar a 1.7.
+- [ ] Abrir a Alpha novamente: apenas uma janela/processo persistente; a primeira janela aparece, inclusive se estava oculta ou minimizada.
+- [ ] Consultar `\\.\pipe\ConsoleMode2Alpha.Control` com uma linha JSON `{"cmd":"status"}`; conferir `ok`, `active`, `launcher` e `focusScreenId` (id configurado). Fora de sessão, `launcher` é vazio.
+- [ ] Enviar `{"cmd":"show"}`; a janela deve aparecer. JSON inválido, comando desconhecido ou `exit` pelo pipe devem responder `ok:false`, sem executar ações.
+- [ ] Em Sistema → Inicialização, ativar Começar na bandeja: fechar a janela deve ocultá-la; Abrir no ícone deve restaurá-la. Desativado, fechar deve encerrar o app.
+- [ ] Abrir com `--tray`: não deve permanecer janela visível nem botão na barra de tarefas; Abrir restaura a janela. Sair remove ícone e processo.
+- [ ] Reiniciar o Explorer: o ícone deve reaparecer. Se a bandeja não puder ser criada, o app deve manter a janela acessível.
+- [ ] Somente com autorização para gravar o registro: alternar Iniciar com o Windows e conferir exclusivamente o valor `ConsoleMode2Alpha` em HKCU Run, com executável entre aspas e `--tray`; desativar remove somente esse valor.
+- [ ] Somente com autorização para gravar o registro: ativar Registrar links consolemode2alpha, conferir HKCU\Software\Classes\consolemode2alpha e testar `consolemode2alpha://show` com Alpha aberta e fechada; desativar remove somente essa classe. Testar executável em caminho com espaços.
+- [ ] Confirmar que nenhuma chave, pipe, mutex, protocolo ou ícone da 1.7 foi substituído. Apenas alternar opções explicitamente grava o registro; abrir a Alpha não registra nada.
+- [ ] Em janela local segura, com sessão configurada e dono presente: `start`/`consolemode2alpha://start` devem jogar o card focado, inclusive fora da aba Início; nova requisição não cria outra sessão.
+- [ ] Durante sessão local segura: `menu`/link/menu da bandeja devem colocar o menu sobre o jogo; `stop`/link/Encerrar sessão devem restaurar o desktop. Fora de sessão, os dois itens de sessão da bandeja ficam desabilitados.
+- [ ] Durante sessão local segura: Sair (ou fechar sem Começar na bandeja) deve pedir restauração e aguardar o término antes de sair. Não matar o processo para este teste.
+
+O pipe usa uma linha JSON UTF-8 de até 4096 bytes e uma resposta JSON. As respostas de
+`start` e `stop` confirmam o recebimento pela UI; consultar `status` depois para observar
+a transição assíncrona da sessão. Os links aceitam show/start/stop/menu; status é só pelo pipe.
+A ACL do pipe permite apenas o usuário atual e LocalSystem, rejeitando clientes remotos.
+
+
+## Console Mode 2 Alpha: apps próprios
+
+- [ ] Preparar uma pasta temporária com `CM2_DATA_DIR` e usar `CM2_SIMULATED_DESK=1` em todos os testes; nunca iniciar sessão no desktop real. Fechar o app ao terminar.
+- [ ] Importar uma cópia da config 1.7: conferir apps, argumentos, processo acompanhado e `customAppId`; salvar/reabrir sem perder campos desconhecidos. Não alterar a config instalada da 1.7.
+- [ ] Conferir apps após os iniciadores e antes de “Adicionar app”, com ícone do executável e descrição do arquivo (ou nome sem extensão), sobre fundo neutro.
+- [ ] A/clique em “Adicionar app” abre o seletor Windows filtrado para `.exe`. Cancelar não altera a fileira; adicionar salva e foca o novo card.
+- [ ] Selecionar arquivo ausente ou não `.exe`: mostrar erro sem adicionar. Tentar jogar um app removido do disco: bloquear antes da sessão.
+- [ ] Y/clique direito abre o menu do app com Jogar, Argumentos, Processo a acompanhar, Mover na fileira e Remover da Início, com o mesmo painel do menu de jogo.
+- [ ] Editar argumentos e processo com teclado e com o teclado na tela (controle/mouse); salvar e reabrir, cancelar sem alterar. Vazio acompanha o próprio executável.
+- [ ] Mover apps entre si, concluir, reabrir e conferir ordem. Os apps não atravessam os iniciadores nem “Adicionar app”.
+- [ ] Remover sem confirmação: ouvir som de voltar e conferir foco no card anterior. Remover o último e reiniciar: não ressuscitar pelo campo legado. Adicionar novamente recupera o app.
+- [ ] Com desktop simulado, abrir um executável inofensivo com argumentos; conferir que o processo indicado mantém a sessão e que fechar respeita a tolerância de saída. Nunca mudar telas/áudio/HDR reais.
+- [ ] Simular falha ao salvar a config: mostrar erro e manter o app/edição/remoção anterior.
+
+## Console Mode 2 Alpha: entrega (atualização, instalador)
+
+Usar uma máquina de teste, ou o PC do dono com cuidado: o instalador da 2.0 **não** pode tocar na 1.7. Nada disto roda sem o dono pedir; não há release da 2.0 publicada ainda.
+
+- [ ] `.\build\Publish-ConsoleMode2.ps1` gera `dist\v2\ConsoleMode2.exe`, `ConsoleMode2Alpha-Setup-x64.exe` e o `.sha256` (e só o exe, com aviso, se o Inno Setup não estiver instalado). Resultado: ______
+- [ ] O `ConsoleMode2.exe` abre sem janela de console; no Explorer (Propriedades → Detalhes) mostra o ícone, "Console Mode 2 Alpha", versão `2.0.0` e copyright. Resultado: ______
+- [ ] Instalar o `Setup` sem a 1.7 no PC: instala em `%LOCALAPPDATA%\Programs\Console Mode 2 Alpha`, sem pedir administrador, com "Console Mode 2 Alpha" no menu Iniciar e `LICENSE.txt` + `THIRD_PARTY_NOTICES.md` na pasta. Resultado: ______
+- [ ] Instalar com a 1.7 já instalada e em uso: a 1.7 continua intacta (pasta, atalho "Console Mode", entrada em Aplicativos instalados, valor de iniciar com o Windows, `consolemode://start` ainda abre a 1.7, `%LOCALAPPDATA%\ConsoleMode`). As duas aparecem separadas em Aplicativos instalados. Resultado: ______
+- [ ] Desinstalar a 2.0 não remove nada da 1.7, e `%LOCALAPPDATA%\ConsoleMode2` (config) continua lá. Desinstalar a 1.7 não remove a 2.0. Resultado: ______
+- [ ] Sistema → Atualizações mostra a versão instalada, o canal "Alpha" e "Procurar atualização". Sem release `v2.*` publicada: "Procurar atualização" responde "Você já está na versão mais recente", sem erro. Resultado: ______
+- [ ] Sem internet: "Procurar atualização" mostra o aviso de que não conseguiu, sem travar a interface; a verificação ao abrir não mostra nada. Resultado: ______
+- [ ] "Procurar atualizações ao abrir" desligado: abrir o app não faz nenhuma conexão (conferir no Monitor de recursos / firewall). Ligado: uma consulta rápida ao abrir, sem aviso quando não há nada. Resultado: ______
+- [ ] Com uma pre-release `v2.*` de teste (versão maior, com `ConsoleMode2Alpha-Setup-x64.exe` e `.sha256`): o aviso aparece, a linha vira "Instalar e reiniciar", o instalador roda em modo silencioso, fecha o app e o abre de novo na versão nova. Resultado: ______
+- [ ] Mesma release com o `.sha256` de outro arquivo (ou o `.exe` adulterado): a atualização é recusada ("não passou na verificação"), nada é instalado e o arquivo baixado é apagado. Resultado: ______
+- [ ] Release `v1.*` ou `v2.*` que não está marcada como pre-release, ou sem o `.sha256`: nunca é oferecida pela 2.0. Resultado: ______
+- [ ] Com a 1.7 (com a opção de pré-lançamentos ligada) e uma release `v2.*`: conferir o aviso da seção "Aviso sobre a 1.7" de `docs/v2/RELEASE.md` e que a 1.7 não baixa nada da 2.0. Resultado: ______
+- [ ] Durante uma sessão ativa, "Instalar e reiniciar" recusa ("Termine a sessão antes de atualizar") e não fecha o app. Resultado: ______
+
+## Console Mode 2 Alpha: extras da sessão
+
+Nada abaixo foi executado de verdade na 2.0: o código compila e as regras puras têm testes, mas RTSS, ponteiro, ícones, Steam e perfis por jogo só se confirmam numa sessão real. Executar somente com autorização do dono e com acesso local, com a 1.7 sem sessão ativa. Antes de cada item, abrir o `ConsoleMode2` e acompanhar o log (`startup.log`).
+
+**RTSS: limite e contador de FPS**
+- [ ] Com RTSS instalado e `rtss-cli.exe` em `ConsoleMode2\tools` (ou na pasta da 1.7): anotar limite e limitador do RTSS, iniciar a sessão com "Limite de FPS" em 60 e conferir no RTSS: 60 e limitador ligado. Ao encerrar, limite e limitador voltam exatamente ao anotado. Resultado: ______
+- [ ] Mesmo teste com o limitador do RTSS desligado e limite 144 antes da sessão: depois da sessão continua desligado, com 144. Resultado: ______
+- [ ] Sem RTSS instalado, ou sem `rtss-cli.exe`: a sessão abre normalmente e o log diz que o limite foi ignorado (nada de erro na tela). Resultado: ______
+- [ ] RTSS fechado antes da sessão: ele é aberto na bandeja, o limite aplicado e, no fim, restaurado. Resultado: ______
+- [ ] "Mostrar FPS na tela" ligado (estilo `compact`): o contador "NN FPS" aparece dentro do jogo e some ao encerrar; o OSD do Afterburner fica escondido durante a sessão e volta depois. Estilo `external`: nada nosso aparece e o Afterburner não é mexido. Resultado: ______
+- [ ] Estilos `stats`, `detailed` e `custom`: CPU e RAM atualizam a cada segundo. **Diferença conhecida da 1.7:** GPU, VRAM, clocks e temperatura ainda não aparecem na 2.0 (a linha some em vez de mostrar valores). Resultado: ______
+- [ ] O `fpsOverlayLayout` do config da 1.7 (posição no canto, cartão, cor, tamanho) é respeitado. Resultado: ______
+- [ ] Matar o `ConsoleMode2` durante a sessão (limite e contador ligados) e abri-lo de novo: a recuperação devolve o limite do RTSS ao de antes e apaga o contador. Resultado: ______
+
+**Ponteiro**
+- [ ] "Estacionar o ponteiro" ligado: quando o iniciador abre, o ponteiro vai para o canto inferior direito da tela de jogo (duas vezes, com ~3 s de intervalo) e, ao encerrar, volta ao lugar de antes. Testar com Big Picture, Playnite, app personalizado e Xbox (neste, ~4 s depois de abrir). Resultado: ______
+- [ ] Tela de jogo à esquerda ou acima da principal (coordenadas negativas): o ponteiro cai dentro dela. Resultado: ______
+- [ ] Desligado nos ajustes: o ponteiro não se mexe. Resultado: ______
+- [ ] Sessão encerrada sem nunca estacionar (iniciador que não abriu): o ponteiro não é movido na volta. Resultado: ______
+
+**Ícones da área de trabalho**
+- [ ] Anotar a disposição dos ícones (organização automática desligada), iniciar uma sessão que desliga a tela principal e encerrar: os ícones voltam aos lugares em até ~8 s, sem atrasar a volta. Resultado: ______
+- [ ] Com a organização automática ligada: o log diz que as posições não foram salvas e nada é mexido. Resultado: ______
+- [ ] Ícones criados ou apagados durante a sessão não são movidos nem recriados. Resultado: ______
+- [ ] "Devolver os ícones da área de trabalho ao lugar" desligado: nada é lido nem movido. Resultado: ______
+- [ ] Matar o app no meio da sessão e reabrir: a recuperação também recoloca os ícones. Resultado: ______
+
+**Steam na volta**
+- [ ] Big Picture como iniciador, "Fechar a Steam ao voltar" ligado, nenhum jogo rodando: ao encerrar, o Big Picture fecha e a janela da Steam vai para a bandeja (o processo continua). Resultado: ______
+- [ ] Mesmo teste com um jogo ainda aberto (RunningAppID diferente de 0): a Steam fica aberta. Resultado: ______
+- [ ] Opção desligada: o Big Picture fecha, a janela da Steam não é tocada. Resultado: ______
+- [ ] Outro iniciador (Playnite, Xbox, app personalizado): a Steam não é tocada. Resultado: ______
+- [ ] **Mudança em relação ao alpha anterior:** o Big Picture agora fecha ao encerrar mesmo com "Fechar a Steam ao voltar" desligado (como na 1.7); só a janela do cliente depende da opção. Resultado: ______
+
+**Perfil por jogo durante a sessão**
+- [ ] Sessão iniciada pelo Big Picture; abrir pela Steam um jogo com perfil (resolução, HDR, FPS, áudio): ao abrir, o perfil é aplicado; ao fechar o jogo, a tela volta como estava quando ele abriu. Resultado: ______
+- [ ] Trocar de um jogo com perfil para outro: o segundo perfil entra e, ao fechar, volta ao estado de antes do segundo jogo. Resultado: ______
+- [ ] Jogo sem perfil (ou perfil vazio): nada muda, o log diz "sem perfil". Resultado: ______
+- [ ] Jogo aberto pelo card da Início (a sessão já começa com o perfil): ao fechar o jogo, volta para a resolução, HDR e FPS da sessão (config), não para os do perfil. **Limitação:** se a resolução da sessão está em "Não mudar", a resolução do perfil não é desfeita ao fechar o jogo. Resultado: ______
+- [ ] HDR do perfil ligando um HDR que estava desligado antes da sessão: ao encerrar a sessão (ou após um crash e a recuperação) o HDR volta a desligado. Resultado: ______
+- [ ] Limite de FPS do perfil: o backup do RTSS continua sendo o do usuário (feito uma vez); no fim da sessão volta o limite original, não o do perfil. Resultado: ______
+- [ ] Encerrar a sessão com o jogo ainda aberto: o perfil é desfeito antes de restaurar as telas. Resultado: ______
+
+**Game Bar**
+- [ ] A 1.7 só usa a Game Bar na tela de ajustes (botão Xbox abre a Game Bar: `HKCU\Software\Microsoft\GameBar\UseNexusForGameBarEnabled`), nunca durante a sessão. A 2.0 tem o módulo (`cm_platform::gamebar`), mas ainda não há ajuste do botão Home para ligá-lo. Quando houver: desligar a opção grava 0, ligar grava 1, e valor ausente conta como ligado. Resultado: ______
+
+## Console Mode 2 Alpha: menu da sessão, tour, sons e Sobre
+
+- [ ] Segurar ☰ por ~1 s durante um jogo abre o menu da sessão por cima, em tela cheia; B fecha e o jogo volta à frente.
+- [ ] Janelas: lista as janelas abertas; A traz uma para a frente; X fecha a selecionada.
+- [ ] Tela e som: troca a saída de áudio; o som passa a sair no aparelho escolhido.
+- [ ] Volume: ← → muda o volume real do Windows (confira no ícone de som da barra de tarefas).
+- [ ] FPS: trocar entre Sem limite / 30 / 60 / 120 / 144 aplica o limite no RTSS na hora; ao encerrar, o limite antigo do RTSS volta.
+- [ ] Visão de tarefas abre a Visão de tarefas do Windows.
+- [ ] Primeira abertura (pasta de dados vazia): o tour aparece, ← → navega, B pula; não aparece de novo na próxima abertura.
+- [ ] Sistema → Sobre → "Ver o tour de novo" mostra o tour outra vez.
+- [ ] Som de abertura toca ao abrir o app (não toca com `--tray` nem quando o "som de abertura" do 1.7 estava desligado).
+- [ ] Sistema → Som: estilo "Suave" troca os sons por tons curtos; o volume dos sons muda de verdade; desligar os sons silencia tudo.
+- [ ] Sistema → Sobre → "Relatar um problema" abre uma issue nova no GitHub já com a versão.
+- [ ] Sistema → Sobre → "Abrir a pasta de registros" abre `%LOCALAPPDATA%\ConsoleMode2` no Explorer, com `consolemode2.log` dentro e horários nas linhas.
+- [ ] Sistema → Sobre → "Licenças" abre o `THIRD_PARTY_NOTICES.md` instalado (sem instalar, abre `docs/v2/THIRD_PARTY_NOTICES.md` do repositório).
+
+## Console Mode 2 Alpha: controle (atalhos, visão de tarefas, mouse)
+
+Não dá para provar no CI: precisa de um controle de verdade (Xbox e PlayStation), de um PC com a 2.0 aberta e de uma sessão. O CI cobre as regras puras (`cargo test --workspace`). A combinação é sempre segurada com **um** controle: botões de controles diferentes não se somam. Para trocar os atalhos: Sistema → Atalhos.
+
+**Atalhos que funcionam com o app na bandeja ou atrás de outras janelas**
+- [ ] Sistema → Atalhos: as quatro linhas (Abrir o Console Mode, Menu da sessão, Voltar ao PC, Visão de tarefas) trocam entre "Desligado" (no menu, "Segurar ☰ (padrão)") e as combinações; cada combinação aparece com os nomes do Xbox e do PlayStation. Resultado: ______
+- [ ] Uma combinação que já é de outro atalho (ou que contém a dele) é pulada ao trocar; nunca dois atalhos ficam com a mesma. Resultado: ______
+- [ ] Um `config.json` copiado da 1.7 mostra os atalhos que ela tinha (`homeShortcut`, `menuShortcut`, `exitShortcut`, `taskViewShortcut`), e salvar no app mantém os mesmos números no arquivo. Resultado: ______
+- [ ] "Abrir o Console Mode" = botão Xbox/PS, app na bandeja (fora de sessão): segurar ~1 s traz a janela para a frente; soltar antes de ~1 s não faz nada. Resultado: ______
+- [ ] O mesmo com o app aberto mas atrás de outra janela: a janela vem para a frente. Com o app já na frente: nada acontece. Resultado: ______
+- [ ] Com o atalho "Desligado": segurar a combinação não abre nada. Resultado: ______
+- [ ] Em sessão, "Menu da sessão" no padrão: segurar ☰ por ~0,8 s abre o menu sobre o jogo; um toque rápido continua sendo do jogo. Segurar Select + Start (ou outra combinação com ☰) **não** abre o menu. Resultado: ______
+- [ ] Em sessão, "Menu da sessão" com uma combinação (ex.: Select + Y): segurar a combinação por ~0,25 s abre o menu; ☰ sozinho deixa de abrir. Resultado: ______
+- [ ] Em sessão, "Voltar ao PC" com uma combinação: segurar por ~1 s encerra a sessão e devolve as telas (igual a "Encerrar sessão"). Fora de sessão não faz nada. Resultado: ______
+- [ ] Segurar uma combinação já apertada antes da sessão começar não dispara nada até soltar e apertar de novo. Resultado: ______
+- [ ] Os atalhos de Abrir e de Voltar não disparam ao mesmo tempo (um só vale fora da sessão, o outro dentro). Resultado: ______
+- [ ] Mexer nos ajustes de atalho com o app na frente: o novo atalho vale em até ~1 s, sem reabrir o app. Resultado: ______
+
+**Visão de tarefas com o controle**
+- [ ] "Visão de tarefas" em Select + X (padrão, como na 1.7): segurar a combinação abre a Visão de tarefas do Windows, também em um jogo e com o app na bandeja. Resultado: ______
+- [ ] Controle **Xbox**: a Visão de tarefas se move sozinha com o direcional (o Windows já entende); o app **não** manda teclas por cima (cada movimento anda uma casa só). Resultado: ______
+- [ ] Controle **PlayStation** com "Visão de tarefas no controle PlayStation" ligado: direcional e analógico esquerdo movem a seleção (segurar repete), A abre a janela escolhida, B fecha. Resultado: ______
+- [ ] Os botões ainda apertados da combinação não contam: só depois de soltar tudo o controle começa a mexer. Resultado: ______
+- [ ] A opção desligada (ou combinação desligada): o controle PlayStation não manda teclas. Resultado: ______
+- [ ] Segurar a combinação de novo com a Visão de tarefas aberta pelo app fecha a Visão de tarefas. Resultado: ______
+- [ ] Fechar a Visão de tarefas pelo mouse, teclado ou Windows + Tab: o controle larga a Visão de tarefas na hora (log: "controle solto (fechada)"). Resultado: ______
+- [ ] Se a Visão de tarefas não abrir (não ficou em primeiro plano): o controle não manda teclas para o jogo atrás (log: "não ficou em primeiro plano"). Resultado: ______
+- [ ] Depois de ~2 min aberta, o controle larga sozinho. Resultado: ______
+- [ ] Enquanto a Visão de tarefas está sendo guiada, o app (se estiver aberto) não reage aos botões. Resultado: ______
+
+**Controle como mouse** (Sistema → Controles → "Usar o controle como mouse")
+- [ ] Desligado (padrão): nenhum controle mexe no ponteiro. Resultado: ______
+- [ ] Ligado, fora de sessão, com o app **atrás** de outra janela ou na bandeja: o analógico esquerdo move o ponteiro, A clica (segurar arrasta, dois toques dão clique duplo), B clica com o botão direito, o analógico direito rola (para cima/baixo e para os lados). Resultado: ______
+- [ ] A velocidade (Lenta, Média, Rápida) muda o quanto o ponteiro anda; na TV 4K e no monitor Full HD o ponteiro cruza a tela em tempo parecido. Resultado: ______
+- [ ] Um analógico gasto, parado um pouco fora do centro, não mexe o ponteiro (zona morta). Resultado: ______
+- [ ] Com o app **na frente**: o controle navega no app e o ponteiro fica parado; A não clica. Ao tirar o app da frente, o ponteiro volta a responder. Resultado: ______
+- [ ] Com o app na bandeja: apertar A/B/direcional **não** abre cards, menus nem inicia nada no app escondido. Resultado: ______
+- [ ] Em sessão, o controle nunca mexe o ponteiro (é do jogo), mesmo com a opção ligada. Resultado: ______
+- [ ] Um botão já apertado ao ligar o modo (o A que acabou de tirar o app da frente) não clica até ser solto. Resultado: ______
+- [ ] Segurar A (arrastando) e trazer o app para a frente: o botão do mouse é solto, nunca fica preso. Resultado: ______
+- [ ] Janela de programa rodando como administrador: o ponteiro não responde ali (UIPI); o app não trava. Resultado: ______
+- [ ] Ao fechar o app com a opção ligada, o ponteiro volta a funcionar só com o mouse físico. Resultado: ______
+
+**Controle conectado entra no modo console** (Sistema → Controles → "Entrar ao conectar o controle")
+- [ ] Ligado, app na bandeja, fora de sessão: ligar um controle (ou acordar um sem fio) traz o app para a frente. Resultado: ______
+- [ ] Desligado (padrão): ligar o controle não faz nada. Resultado: ______
+- [ ] Nos primeiros 15 s depois de abrir o app, controles já ligados não disparam nada. Resultado: ______
+- [ ] Depois de uma sessão encerrar, controles sem fio que reconectam sozinhos em até 30 s não trazem o app de volta. Resultado: ______
+- [ ] Com a janela aberta (mesmo atrás de outras) ou durante uma sessão: ligar um controle não faz nada. Resultado: ______
+- [ ] O log (`%TEMP%\ConsoleMode2-startup.log`) registra "Controle conectado; entrar no modo console: sim/não". Resultado: ______
+
+## Console Mode 2 Alpha: idiomas
+
+Seis idiomas: pt-BR, en-US, es-ES, de-DE, fr-FR, ru-RU (`crates/cm-app/locales`). Sempre com `CM2_DATA_DIR` numa pasta de teste e `CM2_SIMULATED_DESK=1`.
+
+**Escolha do idioma**
+- [ ] Config sem `appLanguage` (vazio) e Windows em português: a interface abre em português. Com o Windows em inglês, alemão, francês, espanhol ou russo: abre no idioma do Windows. Com um idioma que não temos (ex.: japonês): abre em português. Resultado: ______
+- [ ] `appLanguage` com um código salvo (ex.: `ru-RU`) vale mais que o idioma do Windows. Resultado: ______
+- [ ] Sistema → Idioma: cada toque em A passa ao idioma seguinte e **toda** a interface muda na hora, sem reiniciar (abas, hints da barra de baixo, Sessão, Sistema, menu do card, menu da sessão). Resultado: ______
+- [ ] O nome de cada idioma continua na própria língua (Português (Brasil), English, Español, Deutsch, Français, Русский). Resultado: ______
+- [ ] Fechar e abrir o app: o idioma escolhido continua, e `config.json` tem o `appLanguage` certo. Resultado: ______
+- [ ] A lógica não depende do idioma: em cada idioma, "Ver o tour de novo", "Relatar um problema", "Abrir a pasta de registros", "Licenças", Tema, Estilo/Volume dos sons, Limite de FPS, Velocidade e os atalhos do controle fazem o mesmo que em português. Resultado: ______
+
+**Textos**
+- [ ] Início, Sessão e Sistema (todas as categorias) em inglês e em russo: nada em português, o cirílico aparece (sem quadradinhos). Resultado: ______
+- [ ] Alemão e russo (textos mais longos): nenhuma descrição passa da borda direita, nada se sobrepõe aos cards da Início nem às dicas da barra de baixo. Resultado: ______
+- [ ] Tour (Sistema → Sobre → Ver o tour de novo), card menu (Y num jogo ou app próprio), editor de argumentos, tela "Está vendo esta tela?" e menu da sessão: tudo traduzido, botões legíveis. Resultado: ______
+- [ ] Mensagens (toasts): sessão encerrada, "<app> fechou", atualização (procurar, baixar), erros ao salvar apps. Resultado: ______
+- [ ] "Última vez" e "Steam · última vez" em dias e meses (em russo: 1/21 dia, 2–4 dias, 5+ dias; 1 mês, 2–4 meses, 5+ meses). Resultado: ______
+- [ ] Bandeja (botão direito no ícone): Abrir, Menu da sessão, Encerrar sessão e Sair no idioma escolhido, e mudam ao trocar o idioma sem reiniciar. Resultado: ______
+- [ ] O log (`consolemode2.log`) continua em português em qualquer idioma. Resultado: ______
+- [ ] Revisão por nativos de francês e russo (traduzidas por IA; ver o relatório da PR): termos como "Affichage des tâches", "Представление задач", "сеанс" e o tom (vous / вы). Resultado: ______
+
+## Console Mode 2 Alpha: o que faltava da 1.7
+
+Itens portados depois do primeiro corte da 2.0. Sempre com `CM2_DATA_DIR` numa pasta de teste e `CM2_SIMULATED_DESK=1`, a menos que o item diga o contrário. Cada bloco diz o que foi visto num teste ao vivo com controle virtual (ViGEm) e o que só dá para conferir com hardware de verdade.
+
+**Bateria do controle** (barra de cima, menu da sessão e aviso de bateria fraca)
+- [ ] Controle sem fio de verdade (DualSense e Xbox): o nível aparece na barra de cima, ao lado do relógio, em até 30 s depois de conectar, e bate com o que o Windows mostra. Resultado: ______
+- [ ] Ligado por cabo, ou controle sem bateria: nada aparece. Resultado: ______
+- [ ] Dois controles com níveis diferentes: aparece o mais baixo. Resultado: ______
+- [ ] No cabo, carregando: o ícone vira o de carregamento. Resultado: ______
+- [ ] Menu da sessão (segurar ☰ no jogo): o mesmo nível aparece ao lado do relógio. Resultado: ______
+- [ ] Durante uma sessão, com a bateria em 15 % ou menos e sem carregar: um aviso aparece no canto de cima, à direita, da **tela do jogo**, por cima do jogo, sem roubar o foco do jogo. De novo uma vez só em 5 %. Voltar a subir a 16 % e cair de novo não repete o aviso; carregar ou passar de 25 % libera o aviso de novo. Resultado: ______
+- [ ] Fora de uma sessão não aparece aviso (só o ícone vermelho na barra). Resultado: ______
+- [ ] Teste sem controle com bateria fraca: `CM2_FAKE_BATTERY=12` (ou `12,charging`) faz todo controle ligado informar esse nível. Resultado: ______
+
+**Tour do menu da sessão** (visto ao vivo com controle virtual, menu em prévia; o resto precisa de uma sessão de verdade)
+- [ ] Config sem `sessionMenuTourDone`: a primeira vez que o menu abre (segurar ☰ no jogo, ou ☰ na Início), aparece o convite "Primeira vez neste menu?". A faz o tour, B ("Agora não") recusa; depois de recusar ou concluir o convite não volta (`sessionMenuTourDone: true` no `config.json`). Resultado: ______
+- [ ] Cada parada seleciona o botão de que fala (Voltar ao jogo, Janelas, Tela e som, Volume, FPS, Visão de tarefas, Encerrar sessão), o resto do menu escurece e o cartão mostra "n de 7". ◀ volta uma parada (nunca ao convite), A avança, B pula. Resultado: ______
+- [ ] Durante o tour os painéis de Janelas/Volume/FPS não aparecem e clicar nos botões do menu não faz nada. Resultado: ______
+- [ ] Fechar o menu com o tour aberto (☰ de novo, sessão acabando) guarda o tour: ele é oferecido de novo na próxima abertura. Resultado: ______
+- [ ] Y no menu abre o tour direto (sem convite), em qualquer abertura. Dentro de uma sessão com "Menu da sessão" = Select + Y: apertar o Y do atalho para fechar o menu **não** abre o tour. Resultado: ______
+- [ ] Sistema → Sobre → "Tour do menu da sessão" abre o menu numa prévia (fora de uma sessão) com o tour já rodando; as paradas "Tela e som" e "Fechar menu" explicam o que acontece fora de uma sessão. Dentro de uma sessão, o texto de "Encerrar sessão" diz que as telas voltam. Resultado: ______
+- [ ] Em inglês, alemão e russo: os textos do tour cabem no cartão. Resultado: ______
+
+**Abertura (logo sobre a interface ao abrir o app)** (os três estilos foram vistos ao vivo, em janela; o som e a TV só com você)
+- [ ] Ao abrir o app (janela, não bandeja): a abertura aparece por cima da Início por 3 s e some com um fade de 0,4 s. Qualquer botão do controle, clique ou tecla pula na hora. Resultado: ______
+- [ ] Estilo Console Mode ("Liga o PC"): a luz de energia acende e pulsa, a base aparece, a tela se desenha e dá um clarão verde, o `>_` é digitado, o cursor pisca 3 vezes, o nome entra. Resultado: ______
+- [ ] Estilos inspirados no Xbox 360 (fita verde girando num orbe, clarão branco, logo escuro sobre fundo claro) e no PS4 (azul profundo, ondas à deriva, partículas subindo, logo claro). Resultado: ______
+- [ ] Sem estilo escolhido (`introStyle` ausente), de vez em quando (~1 em 8) abre de surpresa um dos dois inspirados; escolher qualquer estilo em Sistema → Aparência → Abertura fixa aquele e acaba com as surpresas. Resultado: ______
+- [ ] "Nenhuma (abre direto)" desliga a abertura (`introAnimation: false`, o estilo continua guardado) e o app abre direto na Início. Resultado: ______
+- [ ] Som da abertura: cada estilo tem o seu som, que toca junto com a abertura, mesmo com "Sons de navegação" desligado; "Som da abertura" desligado = abertura muda; sem abertura, sem som. Ligar o som da abertura nas opções toca o som para você ouvir. Resultado: ______
+- [ ] "Ver a abertura" (Sistema → Aparência → Abertura) toca agora o estilo escolhido, com o som, por cima da tela de configurações. Resultado: ______
+- [ ] Com os efeitos de animação do Windows desligados (Configurações → Acessibilidade → Efeitos visuais): a abertura aparece já pronta (logo inteiro, sem os efeitos de movimento) pelo mesmo tempo. Resultado: ______
+- [ ] App aberto na bandeja (`--tray` ou "Começar na bandeja"): nada aparece e nada toca; ao abrir pela bandeja não há abertura. Resultado: ______
+- [ ] Primeira abertura do app (`tourDone` falso): o tour já está por baixo e aparece quando a abertura sai. Resultado: ______
+
+**Novidades depois de atualizar** (o cartão foi visto ao vivo com um `whatsnew.json` e `lastRunVersion` de teste; a atualização de verdade só com um release)
+- [ ] Atualizar pelo app (Sistema → Atualizações): antes de abrir o instalador o app grava `whatsnew.json` na pasta de dados com as notas da versão baixada. Resultado: ______
+- [ ] Na primeira abertura da versão nova (o instalador reabre o app): depois da abertura, com o app na frente e na Início, aparece o cartão "Atualizado para a versão X" com o primeiro item das notas no idioma da interface (português: o resumo oculto `<!-- summary pt-BR: … -->` ou a seção em português; outros idiomas: o texto em inglês). A abre a página da versão no navegador, B fecha. Resultado: ______
+- [ ] O cartão aparece uma vez só: fechar e abrir de novo o app não mostra nada (`lastRunVersion` no `config.json` é a versão atual e o `whatsnew.json` some). Resultado: ______
+- [ ] Atualizar sem o app ter baixado (instalador rodado à mão, sem `whatsnew.json`): o cartão diz só "Atualizado para a versão X" e "Veja o que mudou nas notas desta versão." com o link da página da versão. Resultado: ______
+- [ ] Primeira execução da 2.0 (sem `lastRunVersion`) e voltar para uma versão mais antiga: nenhum cartão. Resultado: ______
+- [ ] App aberto na bandeja: o cartão espera a janela ficar visível; durante uma sessão ou com a abertura/tour na tela ele espera também. Resultado: ______
+
+**VRR e HDR pelo menu da sessão** (visto ao vivo com a mesa simulada: backup no diário, aplicar, restaurar e o HDR pelo menu; o registro e a tela de verdade só com você)
+- [ ] Sessão → Imagem → VRR ligado, sessão de verdade: ao iniciar, `HKCU\Software\Microsoft\DirectX\UserGpuPreferences` → `DirectXUserGlobalSettings` passa a ter `VRROptimizeEnable=1;` (e o resto do texto continua igual); o log diz "VRR: ligado para a sessão". Em Configurações do Windows → Sistema → Tela → Gráficos, "Taxa de atualização variável" aparece ligada. Resultado: ______
+- [ ] Ao encerrar, o valor volta **exatamente** ao que era (o texto de antes, ou nenhum valor se não existia), e o log diz "VRR: de volta ao que era". Se já estava ligado antes, o app não mexe e não desfaz. Resultado: ______
+- [ ] Matar o app no meio da sessão (Gerenciador de Tarefas) e abrir de novo: a recuperação devolve o VRR junto com as telas (o `session.json` guarda `vrr.previous`). Resultado: ______
+- [ ] VRR desligado em Sessão → Imagem: o valor do registro não muda em nenhum momento. A Início mostra "· VRR" ao lado do HDR na linha da imagem quando está ligado. Resultado: ______
+- [ ] Menu da sessão → Tela e som: com uma sessão e HDR disponível na tela de jogo, a linha "HDR" mostra Ligado/Desligado e o X troca na hora; ao encerrar, o HDR volta ao que era antes da sessão (se estava ligado antes e o menu desligou, volta ligado; se o app ligou e o menu desligou, fica desligado). Resultado: ______
+- [ ] Mesmo teste do HDR com a recuperação depois de um travamento no meio da sessão (o `session.json` guarda `hdrTurnedOff`). Resultado: ______
+
+**Acordar o PC pelo controle** (Sistema → Controles; só a **leitura** foi vista ao vivo, sem permissão de administrador: nesta máquina nenhum adaptador de controle foi achado e a linha mostrou "Indisponível". Ativar de verdade pede o UAC e **não foi testado**)
+- [ ] Abrir Sistema → Controles: a linha "Acordar o PC pelo controle" mostra "Verificando os dispositivos…" por alguns segundos e depois "Indisponível" (nenhum adaptador de controle nem rádio Bluetooth capaz de acordar o PC), "Ativar" (algum ainda não pode) ou "Ligado" (todos podem). Resultado: ______
+- [ ] Com o adaptador sem fio Xbox, o Bluetooth do PC ou um controle no cabo conectado, e "Permitir que este dispositivo acorde o computador" desligado no Gerenciador de Dispositivos: a linha mostra "Ativar". Resultado: ______
+- [ ] Apertar A na linha: o Windows pede permissão de administrador (UAC). Aceitar: o app lê de novo, confirma que os dispositivos agora podem acordar o PC e mostra "Pronto. Suspenda o PC e aperte o botão central do controle para testar."; a linha vira "Ligado" e o Gerenciador de Dispositivos mostra a caixa marcada (aba Gerenciamento de energia). Resultado: ______
+- [ ] Recusar o UAC: aparece "O Windows não recebeu a permissão; nada foi alterado." e nada muda. Resultado: ______
+- [ ] Desconectar o adaptador com o UAC aberto e aceitar: "O dispositivo não foi encontrado na hora de ativar…", sem dizer que deu certo. Resultado: ______
+- [ ] Suspender o PC e apertar o botão central do controle: o PC acorda (com "Entrar ao conectar o controle" ligado, no modo console). Resultado: ______
+- [ ] O log (`consolemode2.log`) registra "Acordar pelo controle: …" com os nomes dos dispositivos e o código de saída. Resultado: ______
+
+**Relatório de diagnóstico ("Relatar um problema")** (o relatório foi gerado e lido ao vivo com `CM2_NO_OPEN=1`, que não abre o navegador; a página da issue só com você)
+- [ ] Sistema → Sobre → "Relatar um problema": aparece "Reunindo as informações do relatório…", em poucos segundos o navegador abre uma nova issue em `lippdev/consolemode` com o título "[2.0 Alpha] " e o corpo com a versão, o Windows e o idioma, e a mensagem diz que o relatório foi copiado e onde foi salvo. **Nada é enviado sozinho**: você revisa e envia na página. Resultado: ______
+- [ ] O relatório está na área de transferência (colar no Bloco de Notas) e em `diagnostico.txt` na pasta de dados, com as seções: Console Mode (versão, Windows, tempo de execução, idioma), Displays (modo, HDR, marcas "game screen", "hidden in console mode", "primary", "off"), Audio outputs (só as ativas, com "Windows default" e "chosen in Console Mode"), Controllers (tipo, VID:PID e a bateria quando há), Programs (Steam, Playnite, RTSS e o iniciador padrão) e as últimas 50 linhas do log. Resultado: ______
+- [ ] Dados privados fora: nenhum caminho mostra o nome do usuário do Windows (`C:\Users\…\AppData…`) e nenhuma chave, token ou senha aparece no log colado. Resultado: ______
+- [ ] Com um DualSense e um controle Xbox conectados, cada um aparece com seu tipo; com bateria, "battery NN%". Resultado: ______
+- [ ] Apertar o botão de novo enquanto o relatório está sendo reunido: "Aguarde, ainda estou trabalhando nisso." Resultado: ______
+- [ ] Sem internet ou sem navegador padrão o relatório ainda é copiado e salvo. Resultado: ______
+
+**Visão de tarefas pelo menu da sessão, guiada pelo controle** (visto ao vivo numa sessão simulada com um DualShock 4 virtual: a Visão de tarefas abriu pelo botão do menu e o controle escolheu a janela e fechou; Xbox e DualSense de verdade só com você)
+- [ ] Segurar ☰ no jogo → botão "Visão de tarefas" → A: o menu fecha, o app sai da frente e a Visão de tarefas do Windows abre por cima do jogo (como o atalho Select + X). Resultado: ______
+- [ ] Com um controle PlayStation (e "Visão de tarefas no controle PlayStation" ligado): o direcional e o analógico escolhem a janela, A abre e B fecha, **sem** o Console Mode reagir aos botões; terminando, o controle volta ao app/jogo (o log diz "Visão de tarefas: aberta pelo controle" e "controle solto"). Resultado: ______
+- [ ] Com um controle Xbox: o Windows já move a Visão de tarefas sozinho; nada do app atrapalha. Resultado: ______
+- [ ] "Visão de tarefas no controle PlayStation" desligado (DS4Windows/Steam): a Visão de tarefas abre pelo menu, mas o controle não é guiado pelo app. Resultado: ______
+- [ ] Abrir pelo menu e fechar com B/Esc volta ao jogo sem deixar o app em primeiro plano. Resultado: ______
+
+**Tela de confirmação em tela cheia na tela do jogo** (vista ao vivo com `CM2_SIMULATED_DESK=1 CM2_SIMULATED_CONFIRM=1`: a tela "Está vendo esta tela?" cobriu a tela inteira, acima da barra de tarefas, e depois de A o app saiu da frente; a troca de tela e a TV de verdade só com você — **cuidado**: só com um setup em que o Windows não pode ficar sem tela, como na 1.7)
+- [ ] Setup novo (ainda não confirmado, ou outra tela/resolução): ao iniciar a sessão com a TV como tela de jogo e a janela do app na outra tela, a pergunta "Está vendo esta tela?" aparece **na TV**, em tela cheia e por cima de tudo, e não na janela do app. Resultado: ______
+- [ ] Com as outras telas ligadas ("Deixar ligadas"), a pergunta vai mesmo assim para a tela de jogo, não para a que o app estava. Resultado: ______
+- [ ] A ("Sim, estou vendo"): a pergunta some, o iniciador abre na TV e o app sai da frente (minimizado), como antes. B ("Não, voltar") ou 15 s sem resposta: as telas voltam como estavam e o app volta para a frente, como janela normal. Resultado: ______
+- [ ] App aberto com `--fullscreen`: a pergunta também vai para a tela de jogo e, depois da sessão, o app volta em tela cheia na tela de antes. Resultado: ______
+- [ ] App na bandeja (escondido): ao iniciar pelo link/atalho, a pergunta aparece na tela de jogo, e depois o app volta para a bandeja/fica escondido como antes. Resultado: ______
+- [ ] O controle responde à pergunta (A/B) sem precisar tocar na janela; o mouse também funciona nos botões. Resultado: ______
+
+## Console Mode 2 Alpha: mapa das telas e listas de opções
+
+- [ ] Sessão → Telas mostra as telas na posição e proporção reais (como nas configurações de tela do Windows); uma tela desligada no Windows aparece à direita, com "Desligada no Windows".
+- [ ] A numa tela abre a lista: Tela de jogo / Desligar na sessão / Deixar ligada; a tela muda de cor na hora (jogo em destaque, desligar tracejada e apagada).
+- [ ] Trocar a tela de jogo: a antiga fica com o papel que a nova tinha; a tela de jogo não pode ser só desligada ou mantida (opções apagadas).
+- [ ] Setas andam entre as telas pela posição; ↓ na última linha de telas vai para "Confirmar a imagem ao iniciar".
+- [ ] Iniciar uma sessão de verdade e conferir que apagou só as telas marcadas para desligar.
+- [ ] Qualquer opção com várias escolhas (Sessão e Sistema) abre uma lista no canto direito da linha: ↑↓ escolhe, A confirma, B fecha; com o mouse, clicar fora fecha. Listas longas rolam.
+- [ ] Atalhos: as combinações que outro atalho já usa aparecem apagadas e não podem ser escolhidas.
+- [ ] Ao andar pelos cards da Início com o controle, os outros cards não tremem.
+
+### 2.0: refino visual (profundidade, fontes e ícones)
+- [ ] Texto sem franjas coloridas (antialias em tons de cinza), na TV e no monitor
+- [ ] Textos pequenos (dicas, notas dos cards, rótulos do Início) mais firmes que antes; títulos e relógio com o corte Display
+- [ ] Ícones dos cards (Steam, Playnite, Xbox, apps próprios) com borda lisa, sem serrilhado, também em 4K / escala 150 %
+- [ ] Cards com sombra e um brilho suave em cima; o focado com sombra maior e um halo
+- [ ] Botões A/B/LB/RB, pílula das abas e chave liga/desliga com relevo (sombra e brilho)
+- [ ] Linha focada em Sessão/Sistema e item focado das listas com relevo; listas e cartões com sombra
+- [ ] Sessão/Sistema: luz suave da cor do tema no canto de cima; cantos escurecendo (vinheta) em todas as telas com fundo
+- [ ] Texto sobre a arte (Início) legível em capas claras, com sombra suave
+- [ ] Desempenho: navegar pelos cards continua liso (sem queda visível)
+
+### 2.0: Início no estilo PS5 (proposta B)
+- [ ] Abas como palavras à esquerda (a atual em branco), LB/RB pequenos; à direita controle/bateria, botões Sessão, Sistema e menu (☰), relógio
+- [ ] Fileira de quadrados arredondados logo abaixo das abas; o focado cresce com anel branco e o nome (e a nota) embaixo
+- [ ] Andar pela fileira: os cards seguintes não tremem; a fileira acompanha o foco
+- [ ] Capas de jogos da Steam (retrato) recortadas no quadrado, com cantos arredondados
+- [ ] Destaque: logo/nome grande, informações, botão "Jogar" (abre) e "…" (opções, só em jogos e apps próprios)
+- [ ] Opções do card (Y) abrem ao lado do card focado
+- [ ] Mouse: clique nas abas, nos botões redondos, no "Jogar", no "…"; setas da fileira e roda do mouse
+- [ ] Dentro de uma categoria do Sistema, clicar na aba "Sistema" (ou em "Sistema ›" no título) volta para a lista
+
+Teste lado a lado com a sua cópia: `CM2_INSTANCE=teste` dá ao app de teste mutex e pipe próprios, e
+`CM2_WINDOW_AT=10000,10000` abre a janela fora da tela (capturável com PrintWindow).
+
+### 2.0: aberturas PS1, PS2, PS3, Xbox e Xbox One
+- [ ] Sistema → Aparência → Abertura lista as 8 opções (Console Mode, PS1–PS4, Xbox, Xbox 360, Xbox One, Nenhuma); "Ver a abertura" mostra a escolhida
+- [ ] PS1: a tela sobe do preto ao branco passando pelo cinza; a logo entra grande em degradê laranja-amarelo, o prompt dela logo depois, o nome em azul embaixo; parado com o som, depois corte seco para o preto e a logo menor em vermelho/amarelo com o nome branco
+- [ ] PS2: torres de cubos de vidro 3D crescendo bloco a bloco na névoa azul, câmera girando devagar; no fim só a logo do Console Mode
+- [ ] PS3: a onda de fios finos aparece no preto, torcendo e brilhando onde os fios se juntam; o fundo vai a um roxo profundo; logo e nome pequenos à direita do meio, em cima da onda
+- [ ] Xbox: fitas grossas de energia verde girando em 3D em volta da esfera preta, estouro, logo do Console Mode verde na esfera e "CONSOLE MODE" espaçado embaixo
+- [ ] Xbox One: preto, depois tudo branco (a esfera colada na câmera); ela recua sobre o fundo verde com chão mais claro, rola revelando "Console Mode" letra a letra e gira mostrando a logo verde na face, com uma sombra no chão
+- [ ] Xbox 360: sala clara, faixas largas e translúcidas verdes/amarelas/brancas girando em 3D em volta de um orbe prateado, fechando até o clarão branco no último golpe do som; depois fundo verde-acinzentado, anel de luz se abrindo, logo no orbe prateado e "Console" verde + "Mode" cinza embaixo
+- [ ] Cada uma com o som real do console, no volume das outras, no ritmo da animação; B/clique pula e o som para junto
+- [ ] Sem estilo escolhido, de vez em quando o app abre de surpresa com uma das 7 inspiradas
+
+### 2.0: menu da sessão — Janelas em miniaturas, Tela com HDR/VRR, Volume com a saída
+- [ ] Janelas: com o botão em foco aparecem as miniaturas das janelas abertas (como Win + Tab), com nome do programa e título
+- [ ] Com o botão Janelas em foco, ↑↓ escolhem a miniatura (anel branco); A traz a janela para a frente; X pede para fechar; ←→ continuam trocando de botão
+- [ ] Miniaturas ao vivo (DWM, como o Alt + Tab): mexem junto com a janela; minimizada mostra o nome; jogo em DirectX aparece; abrir e fechar o menu muitas vezes não aumenta a memória
+- [ ] Tela (numa sessão): tela de jogo e resolução; ↑↓ escolhem HDR ou VRR e A liga/desliga na hora
+- [ ] VRR mudado pelo menu volta ao que era ao encerrar a sessão (e depois de um travamento, pela recuperação)
+- [ ] Tela (fora de sessão): só mostra como está, com o aviso de que HDR e VRR mudam durante uma sessão
+- [ ] Volume: ↑↓ ajusta; X troca a saída de áudio (também clicando na linha); ao encerrar, o áudio volta ao que era
+
+### 2.0: ControlFS e JoyChromium no menu da sessão (botão Apps)
+- [ ] Menu da sessão → Apps (penúltimo botão): duas linhas, "Explorador de arquivos (ControlFS)" e "Navegador (JoyChromium)"; ↑↓ escolhem, A abre
+- [ ] Instalado: a linha diz "Navegue pelos seus arquivos/pela web com o controle"; A fecha o menu e o app abre por cima do jogo, na tela de jogo
+- [ ] ControlFS: abre em tela cheia na tela de jogo (F11 enviado pelo Console Mode; se não pegar, fica maximizado); já aberto, só vem para a frente, sem segunda cópia
+- [ ] JoyChromium: abre em tela cheia (`--tv`) e é levado para a tela de jogo se o Windows abrir em outra
+- [ ] Ao encerrar a sessão com o JoyChromium aberto pelo menu, ele sai da tela cheia e fica aberto em janela (abas mantidas); um JoyChromium aberto por conta própria não é tocado
+- [ ] Nenhum dos dois é fechado pelo Console Mode
+- [ ] Não instalado (desinstale um deles para testar): a linha diz "Não instalado · aperte para baixar e instalar"; nada é baixado sem apertar
+- [ ] A na linha: "Baixando… N%" com a barra, depois "Instalando…", depois "Instalado · aperte para abrir"; o próximo A abre
+- [ ] Sem internet (ou instalação que falha): "Não deu para instalar · aperte para abrir a página de download"; o próximo A abre a página de releases no navegador; reabrindo o menu, a instalação é oferecida de novo
+- [ ] O log registra o download verificado (SHA-256) e o resultado, em português
+- [ ] Sistema → Sobre → Relatar um problema lista ControlFS e JoyChromium em Programas
+- [ ] Tour do menu da sessão tem a parada "Apps"
+
+### 2.0: atalho personalizado do controle (Gravar combinação…)
+- [ ] Sistema → Atalhos: cada atalho tem "Gravar combinação…" no fim da lista
+- [ ] Escolher com A abre o cartão "Segure os botões e depois solte…"; o A que escolheu (ainda apertado) não conta
+- [ ] Segurar botões mostra a combinação ao vivo ("Select + Y (Create + △)"); soltar salva e a linha mostra a combinação nova (antes de "Gravar combinação…")
+- [ ] O atalho gravado funciona (segurar dispara) e fica no config.json nas chaves da 1.7 (`homeShortcut`, `menuShortcut`, `exitShortcut`, `taskViewShortcut`)
+- [ ] B sozinho cancela; Esc/Backspace no teclado e o botão "Cancelar" também; nada muda
+- [ ] Um botão sozinho (ex.: A) é recusado com o aviso de usar dois ou mais botões (ou só o Xbox/PS)
+- [ ] Combinação de outro atalho (ou que contém/está contida nela) é recusada com "… já é o atalho de …"
+- [ ] Dois controles: só o primeiro que apertar é gravado; as combinações não se misturam
+- [ ] Durante a gravação nenhum atalho dispara e o controle não mexe no app; depois, o atalho recém-gravado só dispara depois de soltar e segurar de novo
+## Console Mode 2 Alpha: controle da TV (Google TV / Android TV, como na 1.7.1/1.8)
+
+Pré-condições: TV Google TV / Android TV na mesma rede, com **Depuração USB** (ou "Depuração pela rede") nas Opções do desenvolvedor. Sistema → TV → *Google TV / Android TV (rede)*, endereço IP e entrada HDMI do PC. Testado sem TV: protocolo ADB contra uma TV falsa em 127.0.0.1, chave RSA (CNG) e DPAPI, telas de Sistema → TV fora da tela.
+
+- [ ] Sistema → TV aparece entre Aparência e Inicialização, com "Controle da TV" e "Ao voltar ao PC"; um `config.json` da 1.7.1 com o bloco `tv` chega com os mesmos valores (provedor, IP, MAC, HDMI, comandos, espera).
+- [ ] Endereço, MAC e os dois comandos abrem o teclado na tela com o valor atual; Enter/Salvar grava, Esc/B cancela sem mudar nada; comandos longos aparecem cortados com "…" ao lado da linha.
+- [ ] **Testar a TV** na primeira vez: a TV pede "Permitir depuração" (o nome mostrado é `ConsoleMode2@<PC>`); com "Sempre permitir" + "Permitir", a TV acorda e vai para a entrada do PC; o aviso diz que a TV respondeu. A linha mostra "Testando…" enquanto isso. Resultado: ______
+- [ ] **Testar a TV** de novo: não pede permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
+- [ ] Recusar na TV (ou esperar 60 s): o aviso diz que a TV não autorizou este PC. IP errado: o aviso diz que a TV não respondeu, em poucos segundos. Resultado: ______
+- [ ] TV só com "Depuração sem fio" (pareamento por código): o aviso pede para ativar a Depuração USB / pela rede. Resultado: ______
+- [ ] O arquivo `adbkey` na pasta de dados da 2.0 começa com `dpapi:`; nenhuma linha do log mostra a chave. Copiado para outro usuário do Windows: o log diz "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
+- [ ] **Jogar** com a TV em espera: ela liga e troca para o PC antes de a tela de jogo ser ligada; o log tem `TV: ligar (androidTv) ok em …s`. Resultado: ______
+- [ ] TV fora da tomada: a sessão espera no máximo ~30 s pela TV e segue (log `TV: ligar ... falhou` ou `sem resposta em 30s`). Resultado: ______
+- [ ] TV que some da rede em espera + MAC preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga ("Ligar pela rede" ativo na TV). Resultado: ______
+- [ ] TV que ignora a tecla HDMI: o **Comando da entrada** (ex.: o `am start …` da Skyworth) troca para o PC. Resultado: ______
+- [ ] **Colocar a TV em espera ao restaurar** ligado: ao encerrar, as telas voltam e depois a TV entra em espera. Com **Comando ao voltar ao PC** = `input keyevent 3`: a TV vai para a tela inicial antes da espera (ou fica ligada, com a espera desligada). Log: `TV: voltar ao PC (androidTv) ok`. Resultado: ______
+- [ ] Nada para enviar ao voltar (comando vazio, espera desligada): nenhuma linha `TV: voltar ao PC` no log; "Não controlar": nenhuma linha `TV:` e a sessão não demora mais. Resultado: ______
+- [ ] Travamento no meio da sessão com espera ligada: na próxima abertura, a recuperação devolve as telas e depois coloca a TV em espera (o passo está no `session.json` como `tv`). Resultado: ______
+- [ ] Sessão com `CM2_SIMULATED_DESK=1`: o log diz só "TV ligaria" / "TV ao voltar ao PC", nada é enviado à TV. Resultado: ______
+
+### 2.0: app parado quase sem CPU (quadros sob demanda, som sob demanda)
+- [ ] Gerenciador de Tarefas com o app parado na Início: CPU em 0%
+- [ ] Animações continuam lisas: abertura, troca de card, troca de aba, listas, menu da sessão, passar o mouse
+- [ ] Redimensionar, maximizar, minimizar e voltar: a janela redesenha certo
+- [ ] Depois de ~30 s sem som, o próximo som de navegação ainda toca (a saída é reaberta na hora)
+- [ ] Controle: o primeiro botão depois de uma pausa responde rápido; segurar e navegar continua imediato
+- [ ] Bandeja e `consolemode2alpha://` respondem (podem levar até ¼ s)
