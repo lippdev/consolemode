@@ -2,7 +2,7 @@
 
 Transformez votre PC Windows en **console de jeu** en un clic : la TV passe au premier plan, les autres écrans s'éteignent, le son bascule et votre interface de jeu se lance. Quittez le jeu et votre bureau revient tout seul.
 
-[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · Français · [Русский](README.ru-RU.md)
+[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · Français · [Italiano](README.it-IT.md) · [Русский](README.ru-RU.md)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)

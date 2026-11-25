@@ -2,7 +2,7 @@
 
 Превратите ПК с Windows в **игровую консоль** одним щелчком: фокус на телевизор, остальные экраны отключаются, звук переключается, и запускается ваш игровой интерфейс. Выйдите из игры, и рабочий стол вернётся сам.
 
-[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · Русский
+[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Italiano](README.it-IT.md) · Русский
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F&color=brightgreen)

@@ -2,7 +2,7 @@
 
 Turn your Windows PC into a **game console** with one click: focus the TV, turn off the other screens, switch the audio and launch your game UI. Quit the game and your desk comes back on its own.
 
-English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Русский](README.ru-RU.md)
+English · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Italiano](README.it-IT.md) · [Русский](README.ru-RU.md)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=version&color=brightgreen)

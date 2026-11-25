@@ -2,7 +2,7 @@
 
 Convierte tu PC con Windows en una **consola** con un clic: enfoca la TV, apaga las demás pantallas, cambia el audio y abre la interfaz de tus juegos. Al salir del juego, tu escritorio vuelve solo.
 
-[English](README.md) · [Português (Brasil)](README.pt-BR.md) · Español · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Русский](README.ru-RU.md)
+[English](README.md) · [Português (Brasil)](README.pt-BR.md) · Español · [Deutsch](README.de-DE.md) · [Français](README.fr-FR.md) · [Italiano](README.it-IT.md) · [Русский](README.ru-RU.md)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Versión](https://img.shields.io/github/v/release/lippdev/consolemode?label=versi%C3%B3n&color=brightgreen)

@@ -2,7 +2,7 @@
 
 Mach deinen Windows-PC mit einem Klick zur **Spielkonsole**: Der Fernseher wird zum Hauptbildschirm, die anderen Bildschirme gehen aus, der Ton wechselt und deine Spieleoberfläche startet. Beende das Spiel und dein Schreibtisch-Setup kommt von selbst zurück.
 
-[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · Deutsch · [Français](README.fr-FR.md) · [Русский](README.ru-RU.md)
+[English](README.md) · [Português (Brasil)](README.pt-BR.md) · [Español](README.es-ES.md) · Deutsch · [Français](README.fr-FR.md) · [Italiano](README.it-IT.md) · [Русский](README.ru-RU.md)
 
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)
 ![Version](https://img.shields.io/github/v/release/lippdev/consolemode?label=Version&color=brightgreen)
