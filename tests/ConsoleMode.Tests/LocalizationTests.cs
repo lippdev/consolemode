@@ -41,12 +41,9 @@ public sealed class LocalizationTests
         // Unknown languages read English; a known language in another region maps to its catalog.
         LocalizationService.SetLanguage("ja-JP");
         Assert.Equal(LocalizationService.EnglishUnitedStates, LocalizationService.Language);
-        LocalizationService.SetLanguage("es-MX");
-        Assert.Equal(LocalizationService.SpanishSpain, LocalizationService.Language);
-        Assert.Equal("Elige la pantalla en la que quieres jugar.", LocalizationService.Get("ChooseGameScreen"));
-        LocalizationService.SetLanguage("de-AT");
-        Assert.Equal(LocalizationService.GermanGermany, LocalizationService.Language);
-        Assert.Equal("Wähle den Bildschirm aus, auf dem du spielen möchtest.", LocalizationService.Get("ChooseGameScreen"));
+        LocalizationService.SetLanguage("it-CH");
+        Assert.Equal(LocalizationService.ItalianItaly, LocalizationService.Language);
+        Assert.Equal("Scegli lo schermo su cui vuoi giocare.", LocalizationService.Get("ChooseGameScreen"));
         LocalizationService.SetLanguage(LocalizationService.PortugueseBrazil);
     }
 
@@ -165,12 +162,8 @@ public sealed class LocalizationTests
     [InlineData(null, null, "en-GB", "en-US")]          // then the Windows language
     [InlineData(null, null, "pt-PT", "pt-BR")]
     [InlineData(null, null, "ja-JP", "en-US")]          // unknown languages read English
-    [InlineData(null, null, "de-CH", "de-DE")]
-    [InlineData(null, null, "fr-CA", "fr-FR")]
     [InlineData(null, null, "it-CH", "it-IT")]
-    [InlineData(null, null, "ru-KZ", "ru-RU")]
-    [InlineData(null, null, "es-MX", "es-ES")]
-    [InlineData("es-ES", null, "pt-BR", "es-ES")]
+    [InlineData("it-IT", null, "pt-BR", "it-IT")]
     [InlineData(null, null, null, "en-US")]
     public void Initial_language_follows_saved_choice_then_installer_then_windows(string? saved, string? installer, string? windows, string expected) =>
         Assert.Equal(expected, LocalizationService.ResolveInitial(saved, installer, windows));

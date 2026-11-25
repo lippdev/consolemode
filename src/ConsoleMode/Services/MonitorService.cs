@@ -116,13 +116,6 @@ public sealed class MonitorService
             AppLog.Write($"Restore: telas com outro nome desde o backup: {string.Join(", ", moved.Select(kv => $"{kv.Key} → {kv.Value}"))}");
         AppLog.Write($"Restore: iniciando (primário={ctx.OriginalPrimary}, foco={ctx.FocusMonitor}, focoInativo={ctx.FocusWasInactive}, esconder={string.Join('+', ctx.HideMonitors)})");
 
-        if (ctx.HideStrategy == "turnOff" && ctx.HideMonitors.Count > 0)
-        {
-            foreach (var name in ctx.HideMonitors.Distinct())
-                _backend.PowerOn(name);
-            Thread.Sleep(300);
-        }
-
         // Screens that were on before the session come back; the ones that were off (the TV, usually) stay off.
         var monitorsToVerify = backupSpecs
             .Where(kv => IsBackupSpecActive(kv.Value))
@@ -292,7 +285,6 @@ public sealed class MonitorService
 
         foreach (var name in names)
         {
-            _backend.PowerOn(name);
             _backend.Enable([name]);
         }
         MarkActive(names);
@@ -317,12 +309,6 @@ public sealed class MonitorService
     {
         if (names.Count == 0) return;
         _backend.Disable(names);
-    }
-
-    public void DisableDdc(IReadOnlyList<string> names)
-    {
-        foreach (var name in names)
-            _backend.PowerOff(name);
     }
 
     public void ApplyFocusMode(string focusMonitor, SavedDisplayMode mode)

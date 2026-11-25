@@ -7,7 +7,7 @@ using static ConsoleMode.Native.CcdHelper;
 namespace ConsoleMode.Native;
 
 /// <summary>
-/// Displays through Windows' own APIs (CCD, ChangeDisplaySettingsEx, DDC/CI via dxva2) (issue #91).
+/// Displays through Windows' own APIs (CCD, ChangeDisplaySettingsEx) (issue #91).
 /// Monitors are named by their GDI source (\\.\DISPLAYn), the same names 1.5 saved.
 /// </summary>
 internal static class NativeDisplays
@@ -197,23 +197,6 @@ internal static class NativeDisplays
     /// <summary>Applies every change queued by <see cref="QueueMode"/> at once.</summary>
     public static int ApplyPending() => ChangeDisplaySettingsEx(null, 0, 0, 0, 0);
 
-    /// <summary>DDC/CI power (VCP 0xD6): on, or off (DPM) so it can still be woken over DDC.</summary>
-    public static bool SetPower(string gdiName, bool on)
-    {
-        var hMonitor = FindHMonitor(gdiName);
-        if (hMonitor == 0 || !GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor, out var count) || count == 0) return false;
-        var physical = new PHYSICAL_MONITOR[count];
-        if (!GetPhysicalMonitorsFromHMONITOR(hMonitor, count, physical)) return false;
-        try
-        {
-            var ok = true;
-            foreach (var p in physical) ok &= SetVCPFeature(p.hPhysicalMonitor, 0xD6, on ? 1u : 4u);
-            if (!ok) AppLog.Write($"Telas: DDC/CI {(on ? "ligar" : "desligar")} {gdiName} falhou");
-            return ok;
-        }
-        finally { DestroyPhysicalMonitors(count, physical); }
-    }
-
     /// <summary>Moves the main windows of a process onto a rectangle.</summary>
     public static void MoveProcessWindows(string processName, ScreenRect rect)
     {
@@ -307,13 +290,6 @@ internal static class NativeDisplays
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string monitorDevicePath;
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct PHYSICAL_MONITOR
-    {
-        public nint hPhysicalMonitor;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string szPhysicalMonitorDescription;
-    }
-
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT { public int Left, Top, Right, Bottom; }
 
@@ -344,15 +320,4 @@ internal static class NativeDisplays
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFOEX info);
 
-    [DllImport("dxva2.dll", SetLastError = true)]
-    private static extern bool GetNumberOfPhysicalMonitorsFromHMONITOR(nint hMonitor, out uint count);
-
-    [DllImport("dxva2.dll", SetLastError = true)]
-    private static extern bool GetPhysicalMonitorsFromHMONITOR(nint hMonitor, uint count, [Out] PHYSICAL_MONITOR[] monitors);
-
-    [DllImport("dxva2.dll", SetLastError = true)]
-    private static extern bool SetVCPFeature(nint hPhysicalMonitor, byte code, uint value);
-
-    [DllImport("dxva2.dll", SetLastError = true)]
-    private static extern bool DestroyPhysicalMonitors(uint count, PHYSICAL_MONITOR[] monitors);
 }

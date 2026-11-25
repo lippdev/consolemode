@@ -5,7 +5,7 @@ using Microsoft.Win32;
 namespace ConsoleMode.Services;
 
 /// <summary>
-/// Single display commands through Windows' own APIs: CCD, ChangeDisplaySettingsEx and DDC/CI
+/// Single display commands through Windows' own APIs: CCD, ChangeDisplaySettingsEx
 /// (issue #91). <see cref="MonitorService"/> keeps the orchestration (retries, waits, fallbacks).
 /// </summary>
 internal sealed class DisplayBackend
@@ -115,8 +115,6 @@ internal sealed class DisplayBackend
     public void Disable(IReadOnlyList<string> names) => NativeDisplays.Disable(names);
     public void SetPrimary(string name) => CcdHelper.SetPrimary(name);
     public int SetPositions(IReadOnlyDictionary<string, (int X, int Y)> positions) => CcdHelper.SetPositions(positions);
-    public void PowerOn(string name) => NativeDisplays.SetPower(name, on: true);
-    public void PowerOff(string name) => NativeDisplays.SetPower(name, on: false);
 
     public void SetMode(string name, int width, int height, int frequency, string? colors, int? x, int? y, bool primary)
     {

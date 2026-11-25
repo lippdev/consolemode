@@ -165,7 +165,6 @@ public partial class MainViewModel : ObservableObject
             HideStrategies.Clear();
             HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyDisconnect"), Value = "disconnect" });
             HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyBlack"), Value = "blackCurtain" });
-            HideStrategies.Add(new ComboOption { Text = LocalizationService.Get("StrategyTurnOff"), Value = "turnOff" });
             SelectedHideStrategy = HideStrategies.FirstOrDefault(x => x.Value == hideValue) ?? HideStrategies[0];
 
             RebuildLaunchOptions(launchValue);

@@ -26,7 +26,6 @@ public partial class App : Application
     private EventWaitHandle? _startSignal;
     private EventWaitHandle? _stopSignal;
     private EventWaitHandle? _menuSignal;
-    private ControlPipeService? _control;
     private readonly List<RegisteredWaitHandle> _signalWaits = [];
 
     public static MainWindow? MainWindowInstance { get; private set; }
@@ -52,11 +51,8 @@ public partial class App : Application
     {
         var cliArgs = Environment.GetCommandLineArgs().Skip(1).ToList();
         bool HasArg(string name) => cliArgs.Any(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
-        // consolemode://start|stop|show arrives as the only argument (ProtocolService).
-        var protocolAction = cliArgs.Select(ProtocolService.ParseAction).FirstOrDefault(a => a is not null);
-        var autoStart = HasArg(ShortcutService.StartArgument) || protocolAction == ProtocolService.StartAction;
-        var stopRequest = HasArg(ShortcutService.StopArgument) || protocolAction == ProtocolService.StopAction;
-        var menuRequest = protocolAction == ProtocolService.MenuAction;
+        var autoStart = HasArg(ShortcutService.StartArgument);
+        var stopRequest = HasArg(ShortcutService.StopArgument);
         // --tray: launched with Windows; stay in the tray until the user opens the window.
         var trayOnly = !autoStart && HasArg(StartupService.TrayArgument);
 
@@ -64,7 +60,7 @@ public partial class App : Application
         if (!isFirstInstance)
         {
             // Hand the request to the running instance (tray) instead of fighting over the screens.
-            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : menuRequest ? MenuSignalName : ShowSignalName);
+            if (!trayOnly) SignalRunningInstance(autoStart ? StartSignalName : stopRequest ? StopSignalName : ShowSignalName);
             Exit();
             return;
         }
@@ -77,7 +73,6 @@ public partial class App : Application
                 ConfigService.Load().AppLanguage, StartupService.ReadInstallerLanguage(), CultureInfo.CurrentUICulture.Name));
             ControllerInput.Warmup();
             AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
-            ProtocolService.EnsureRegistered();
             AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}");
 
             ViewModel = new MainViewModel();
@@ -85,11 +80,6 @@ public partial class App : Application
             MainWindowInstance = _window;
             _tray = new TrayService(_window, ViewModel);
             ListenForSignals();
-            // same requests as consolemode:// links, plus a status reply (see ControlPipeService)
-            _control = new ControlPipeService(ViewModel, _window.DispatcherQueue,
-                requestStart: () => _startSignal?.Set(),
-                requestStop: () => _stopSignal?.Set(),
-                requestShow: () => _showSignal?.Set());
             WatchGuideButton();
 
             // A stop request with nothing running just opens the window.

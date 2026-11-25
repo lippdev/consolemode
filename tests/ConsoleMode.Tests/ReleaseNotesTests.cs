@@ -77,7 +77,7 @@ public sealed class ReleaseNotesTests
             Notas em português: CHANGELOG.md
             """;
         Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.PortugueseBrazil));
-        Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.SpanishSpain));
+        Assert.Equal("Session menu over the game. (#46)", ReleaseNotes.FirstLine(englishOnly, LocalizationService.ItalianItaly));
     }
 
     private const string WithSummaries = """
@@ -106,7 +106,7 @@ public sealed class ReleaseNotesTests
         Assert.Equal("Minimize to the system tray: a new option in Settings. (#150)",
             ReleaseNotes.FirstLine(WithSummaries, LocalizationService.EnglishUnitedStates));
         Assert.Equal("Minimize to the system tray: a new option in Settings. (#150)",
-            ReleaseNotes.FirstLine(WithSummaries, LocalizationService.GermanGermany));
+            ReleaseNotes.FirstLine(WithSummaries, LocalizationService.ItalianItaly));
     }
 
     [Fact]

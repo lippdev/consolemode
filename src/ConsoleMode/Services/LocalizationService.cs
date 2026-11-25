@@ -10,11 +10,7 @@ public static class LocalizationService
 {
     public const string PortugueseBrazil = "pt-BR";
     public const string EnglishUnitedStates = "en-US";
-    public const string SpanishSpain = "es-ES";
-    public const string GermanGermany = "de-DE";
-    public const string FrenchFrance = "fr-FR";
     public const string ItalianItaly = "it-IT";
-    public const string RussianRussia = "ru-RU";
 
     /// <summary>A UI language: its culture code and how it names itself in the language picker.</summary>
     public sealed record LanguageInfo(string Code, string NativeName);
@@ -28,11 +24,7 @@ public static class LocalizationService
     [
         new(PortugueseBrazil, "Português (Brasil)"),
         new(EnglishUnitedStates, "English (United States)"),
-        new(SpanishSpain, "Español"),
-        new(GermanGermany, "Deutsch"),
-        new(FrenchFrance, "Français"),
-        new(ItalianItaly, "Italiano"),
-        new(RussianRussia, "Русский")
+        new(ItalianItaly, "Italiano")
     ];
 
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Catalogs =

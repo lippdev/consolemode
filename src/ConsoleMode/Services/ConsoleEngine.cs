@@ -165,10 +165,6 @@ public sealed partial class ConsoleEngine
                 case "blackCurtain":
                     ShowCurtains(config.HideMonitors);
                     break;
-                case "turnOff":
-                    Monitors.DisableDdc(config.HideMonitors);
-                    Thread.Sleep(400);
-                    break;
             }
             config = FollowFocusRename(saved, config);
         }
