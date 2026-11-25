@@ -3,6 +3,8 @@
 English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Before publishing a version, add a `## [VERSION]` section to **both** files: the workflow publishes the section matching the tag from each one and fails if either is missing.
 
 ## [Unreleased]
+### Changes
+- Lean edition: removed TV control (Google TV / Android TV), the FPS limit and counter (RTSS), per-game profiles, the local control API and `consolemode://` links, DDC/CI panel power-off, and the Spanish, German, French and Russian languages.
 
 ## [1.7.2]
 ### What's new

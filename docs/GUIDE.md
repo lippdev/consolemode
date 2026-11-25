@@ -2,7 +2,7 @@
 
 Details that don't fit in the [README](../README.md).
 
-English · [Português (Brasil)](GUIDE.pt-BR.md) · [Español](GUIDE.es-ES.md) · [Deutsch](GUIDE.de-DE.md) · [Français](GUIDE.fr-FR.md) · [Русский](GUIDE.ru-RU.md)
+English · [Português (Brasil)](GUIDE.pt-BR.md)
 
 ## Modes and restore
 
@@ -13,7 +13,7 @@ English · [Português (Brasil)](GUIDE.pt-BR.md) · [Español](GUIDE.es-ES.md) �
 | **Xbox mode** | Manual — use *Restore now*, the tray menu, or reopen the window |
 | **Custom app** | Automatic restore when the app (or the process you chose to watch) closes |
 
-If the app closes or the PC shuts down in the middle of a session, the next time Console Mode opens (also at Windows sign-in, if it starts with Windows) it restores everything the session changed: displays, audio, RTSS, desktop icons and the pointer, and says so.
+If the app closes or the PC shuts down in the middle of a session, the next time Console Mode opens (also at Windows sign-in, if it starts with Windows) it restores everything the session changed: displays, audio, desktop icons and the pointer, and says so.
 
 **Custom app** opens any `.exe` you pick (RetroArch, another launcher…) from its own folder, with optional arguments, and moves its window to the game screen. The session ends a few seconds after that process closes. You can add as many as you like: each one is a tile on Home with its program's icon (**+ Add app** at the end of the row), and System changes or removes the selected one. If the exe only starts another program and exits (a launcher stub), Console Mode follows that program by itself; **Process to watch** is only needed when it guesses wrong (type the real program's process name there). If the watched process never shows up, the session stays until you end it (hold Start + Select, the session menu or the tray).
 
@@ -21,9 +21,9 @@ If the app closes or the PC shuts down in the middle of a session, the next time
 
 You can also restore anytime from the tray (*Restore setup* / *Show window*). With black overlays, **ESC** dismisses the curtains.
 
-The session menu has two ways out. **Back to the PC** ends the session and puts screens, resolution, HDR, audio and the FPS limit back as they were; the app stays in the tray. **Exit Console Mode** does the same and then closes the app, so the controller shortcuts stop until you open it again. The first time the menu opens, it offers a tour that explains each option; to see it later, press **Y** (△ on PlayStation) or **F1** in the menu, or use **System → App → Session menu tour**.
+The session menu has two ways out. **Back to the PC** ends the session and puts screens, resolution, HDR and audio back as they were; the app stays in the tray. **Exit Console Mode** does the same and then closes the app, so the controller shortcuts stop until you open it again. The first time the menu opens, it offers a tour that explains each option; to see it later, press **Y** (△ on PlayStation) or **F1** in the menu, or use **System → App → Session menu tour**.
 
-The menu also works **outside console mode**, to use the PC from the couch without starting anything: with Console Mode open (even just in the tray), the menu shortcut, the tray icon or `consolemode://menu` opens it on the game screen, if it is on, or on the primary one. There you can switch windows, change the volume, resolution, audio output and HDR, open ControlFS and JoyChromium, hide the pointer and drive the mouse with the controller. What you change stays that way until changed again, since there is no session to undo; the FPS limit and counter only show in a session. If the shortcut gets in the way in a game, turn off **System → Controller → Session menu outside console mode** (the tray still opens the menu).
+The menu also works **outside console mode**, to use the PC from the couch without starting anything: with Console Mode open (even just in the tray), the menu shortcut or the tray icon opens it on the game screen, if it is on, or on the primary one. There you can switch windows, change the volume, resolution, audio output and HDR, open ControlFS and JoyChromium, hide the pointer and drive the mouse with the controller. What you change stays that way until changed again, since there is no session to undo. If the shortcut gets in the way in a game, turn off **System → Controller → Session menu outside console mode** (the tray still opens the menu).
 
 The **Task View shortcut** does from the controller what Win + Tab does: it opens Windows' Task View with all your open windows, in a session or not. While it is open, the D-pad or the left stick picks a window (holding repeats), **A** opens it and **B** closes the view; the shortcut again closes it too. It comes on as **Select + X**; change it or turn it off in **System → Controller → Controller shortcut for Task View** (the Xbox button alone works too, held, if it isn't the open-Console-Mode shortcut). The first three times, a notice shows the buttons before the view opens, since nothing shows on top of it. With an Xbox controller, Windows itself moves the selection; with a PlayStation controller, which Windows doesn't understand there, Console Mode does (turn off **Move around Task View with a PlayStation controller** if you use DS4Windows or Steam Input and moves repeat).
 
@@ -31,13 +31,13 @@ The **Task View shortcut** does from the controller what Win + Tab does: it open
 
 Console Mode has one interface, made like a console's: it fills the screen and works with an Xbox or PlayStation controller, the mouse or the keyboard (click a tab or use Page Up / Page Down; Enter and Esc work as A and B). The first time you open it, a guided tour walks through the tabs, the launchers, the play button, the screens, the quick settings and the controller shortcuts; each stop moves on by itself once there has been time to read it (the bar under the card shows how long is left), **A** goes on at once, **B** skips it. To see it again: **System → App → Tutorial**. While the app loads it shows an opening with its logo and an entrance sound; any button skips it, now and then it is, as a surprise, one inspired by the Xbox 360 or the PS4, with that console's sound; **System → App** picks a style (which ends the surprises), plays it right away, and turns it off, or just its sound.
 
-**Home** puts your launchers in a row at the top (Steam Big Picture, Playnite, Xbox mode): **A** on one picks what opens, and **Play now** below starts it. The **+** tile at the end adds an app of your own; on one of those, **☰** (OPTIONS on PlayStation) or a right click opens its menu, with **Remove from Home**. The line under the name says where you will play and what changes (audio, resolution, FPS, HDR, VRR); the round button next to Play now opens **Session**, with the screens and quick settings.
+**Home** puts your launchers in a row at the top (Steam Big Picture, Playnite, Xbox mode): **A** on one picks what opens, and **Play now** below starts it. The **+** tile at the end adds an app of your own; on one of those, **☰** (OPTIONS on PlayStation) or a right click opens its menu, with **Remove from Home**. The line under the name says where you will play and what changes (audio, resolution, HDR, VRR); the round button next to Play now opens **Session**, with the screens and quick settings.
 
 The **System** tab lists its categories on the left (Gaming display, When entering console mode, Controller, TV, Optional extras, App, Shortcut, help, and data, More apps from the developer). Moving over a category shows its options on the right; **A** or right goes into them, and **B** or left goes back to the categories.
 
 In **System → Controller**, choose the button layout: **Automatic**, **Xbox** or **PlayStation**. The preview and shortcut labels follow the choice, which is saved when you close the app. This changes the displayed symbols; the controller's inputs keep their existing mapping.
 
-The **System** tab holds every setting, including controller shortcuts, Playnite, Android TV, custom FPS, the FPS counter's layout, the custom app's arguments, the diagnostics report and the data folder. The values stay saved after restarting the app.
+The **System** tab holds every setting, including controller shortcuts, Playnite, the custom app's arguments, the diagnostics report and the data folder. The values stay saved after restarting the app.
 
 Open the shortcut action you want to configure, choose **Set** or **Change**, hold the desired combination on one controller and release the buttons. **Remove** disables that shortcut. During capture, controller buttons do not navigate the interface; use **Cancel** or **Esc** to stop capture. Outside capture, **B** leaves the editor. Address and custom FPS fields accept keyboard input.
 
@@ -49,43 +49,6 @@ Changing the main display can make Windows reshuffle the desktop icons. **Put de
 
 **Wake the PC with the controller** lets the Xbox Wireless Adapter, the Bluetooth radio or a wired controller wake the PC from sleep with the controller's center button. **Turn on** asks Windows for administrator permission and ticks *Allow this device to wake the computer* on those devices. It can't wake a PC that is shut down or hibernating, and some PCs cut power to Bluetooth while asleep. Together with **Enter when a controller connects**, the PC wakes straight into console mode.
 
-**Per-game profiles** give each Steam game its own resolution, HDR, FPS limit and audio output. With the game running, open the session menu and pick **Game profile → Save the current settings for…**: whatever the game screen uses at that moment is saved. Next time that game starts during a session, Console Mode applies it, and when the game closes the screen goes back to how it was. The game is detected from Steam, whether it was opened from Big Picture, Playnite or the Xbox app. The saved profiles are listed in System → When entering console mode → **Per-game profiles**, where you can delete them.
-
-## Local control API
-
-`consolemode://` links fire and forget. Tools that need an answer — a remote-control agent running as a Windows service, a Stream Deck plugin showing whether console mode is on — can use the named pipe `\\.\pipe\ConsoleMode.Control` while the app is running: send one JSON line, get one back.
-
-```
-→ {"cmd":"status"}          // or "start", "stop", "show"
-← {"ok":true,"active":true,"restoring":false,"mode":"xboxMode","version":"1.5.0"}
-```
-
-`start`, `stop` and `show` do exactly what the matching `consolemode://` link does, then reply once the app has settled (`ok:false` with an `error` if console mode didn't start or the restore didn't finish). `status` only reads. Only the signed-in user and LocalSystem can connect; nothing is exposed to the network.
-
-## TV control
-
-System → **TV** can turn the TV on and switch it to the PC's HDMI input when console mode starts, and optionally put it back in standby after the desk is restored. A TV that doesn't answer never blocks console mode: the app logs it and waits for the game screen as usual.
-
-With the default, **Don't control it**, nothing is sent and nothing is added to starting or restoring. With a route selected, the TV step runs first when console mode starts and is capped at **30 seconds** (the worst case, when the TV doesn't answer and Wake-on-LAN is tried); the optional standby on restore is capped at **15 seconds**. A TV that is already on usually answers in about a second or two.
-
-Most PC graphics cards can't send HDMI-CEC, so the app talks to the TV over the network instead:
-
-### Google TV / Android TV
-
-TCL, Sony, Hisense, Philips and other TVs running Google TV or Android TV, through ADB (the Android debugging protocol). Nothing to install on the PC.
-
-1. On the TV: **Settings → System → About**, press **Android TV OS build** 7 times to unlock Developer options.
-2. **Settings → System → Developer options**: turn on **USB debugging** (on some TVs, **Network debugging** / **ADB over network**).
-3. In Console Mode, pick *Google TV / Android TV*, enter the TV's IP (Settings → Network on the TV; reserve it in your router) and the HDMI input the PC uses.
-4. Press **Test now**. The TV asks "Allow debugging from this computer?": tick **Always allow** and press **Allow**.
-
-The PC's ADB key is stored encrypted for your Windows user (DPAPI), so the TV only asks once. If the data folder is copied to another Windows user or PC, the key can't be read there: the app creates a new one and the TV asks "Allow debugging?" again.
-
-Waking uses the Android wake-up key, then the **HDMI 1-4** key. If your TV ignores that key, set **Input command** to any Android shell command that opens the PC's input. If the TV drops off the network in standby, fill in its **MAC address** so the app sends Wake-on-LAN first (the TV's "Wake on network" / "Wake on Wi-Fi" option must be on).
-
-When the desk comes back, **Command when going back to the PC** (optional) is sent to the TV first, for example `input keyevent 3` for its Home screen or the command of another input; then standby, if **Put the TV in standby on restore** is on.
-
-"Wireless debugging" with a pairing code (Android 11+ phones) is a different, TLS-wrapped protocol and isn't supported: use USB / network debugging.
 
 ## Optional extras
 
@@ -97,15 +60,10 @@ Enable HDR on the focus monitor while console mode is active. It is turned back 
 
 Console Mode can toggle the Windows VRR optimize setting. For best results, also enable VRR / G-SYNC / FreeSync in your **GPU control panel** (NVIDIA or AMD).
 
-### FPS limit (RTSS)
-
-Cap the global frame rate while console mode runs (helpful on a 60 Hz TV). Requires RTSS installed and running. The previous limit is restored when you exit.
-
 ## Limitations
 
 - Multi-monitor layouts vary; on some setups restore may need a second try from the tray
 - Xbox mode does not detect when fullscreen ends — restore manually
-- The FPS limit is global (RTSS limitation), not per display
 - The WinUI 3 build currently requires Windows to compile (`net8.0-windows`)
 
 ## Troubleshooting
@@ -131,7 +89,7 @@ Confirm that the focus monitor supports the feature and that HDR is enabled in W
 Requires [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Windows application development** workload, or the .NET 8 SDK plus the Windows App SDK.
 
 ```powershell
-# Downloads rtss-cli, then builds both packages
+# Builds both packages
 .\build\Publish-ConsoleMode.ps1 -Version 1.4.0
 ```
 

@@ -33,14 +33,13 @@ Xbox mode, and restores the desk setup afterwards.
 ## Conventions
 
 - **Every user-facing string** goes in every catalog in `src/ConsoleMode/Resources/`
-  (`Strings.pt-BR.json`, `en-US`, `es-ES`, `de-DE`, `fr-FR`, `it-IT`, `ru-RU`), translated.
+  (`Strings.pt-BR.json`, `en-US`, `it-IT`), translated.
   The localization tests fail when keys or `{0}` placeholders don't match, or when a sentence
   is left in English.
 - **Changelog**: add user-visible changes under `## [Unreleased]` in both
   `CHANGELOG.md` (Portuguese) and `CHANGELOG.en-US.md`, ending the item with the PR number.
 - **Docs come in pairs**: `README.md` / `README.pt-BR.md`, `docs/GUIDE.md` / `docs/GUIDE.pt-BR.md`.
-  The `README.<code>.md` and `docs/GUIDE.<code>.md` translations (es-ES, de-DE, fr-FR, ru-RU) are leaner
-  (no version numbers, "What's new" or roadmap): update them too when you change a section they carry.
+  `README.it-IT.md` is leaner (no version numbers, "What's new" or roadmap): update it too when you change a section it carries.
   Adding a language: follow `docs/TRANSLATING.md`.
 - **Commits and PR titles**: Conventional Commits in English (`fix: …`, `feat: …`, `docs: …`),
   one topic per PR. `AppLog` messages are written in Portuguese, like the existing ones.

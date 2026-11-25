@@ -56,7 +56,7 @@ Pré-condições: interface Console ativa (Ajustes → Interface → Console, ou
 
 ### Navegação pelo controle (direcional e analógico)
 
-- [ ] Em Sessão, com o foco num ajuste rápido à direita (ex.: "Limite de FPS"), **cima** sobe para uma tela (a mais próxima), não fica parado. Resultado: ______
+- [ ] Em Sessão, com o foco num ajuste rápido à direita (ex.: "HDR"), **cima** sobe para uma tela (a mais próxima), não fica parado. Resultado: ______
 - [ ] Em Sessão, **baixo** das telas vai para o ajuste rápido mais próximo; esquerda/direita andam só dentro da própria fileira e param nas pontas. Resultado: ______
 - [ ] Ao trocar de aba com LB/RB o foco cai no primeiro item (Início: Jogar agora; Sessão: primeira tela; Sistema: primeira linha), com o anel branco visível. Resultado: ______
 - [ ] Em Início, baixo de Jogar agora vai para "Setup atual"; cima volta; cima de Jogar agora vai ao botão Modo desktop do topo. Resultado: ______
@@ -135,27 +135,13 @@ Pré-condições: PC com adaptador sem fio Xbox, Bluetooth ou controle no cabo; 
 - [ ] Suspender o PC (Iniciar → Energia → Suspender) e apertar o botão Xbox/PS: o PC acorda. Anote a conexão (adaptador Xbox, Bluetooth, cabo) e o modelo do controle. Resultado: ______
 - [ ] Com **Entrar ao conectar um controle** ligado e o app na bandeja: acordar pelo controle já entra no modo console. Resultado: ______
 - [ ] Teclado e mouse não aparecem na lista e não são alterados. Resultado: ______
-## 1b3. Perfis por jogo (issue #69)
-
-Pré-condições: dois jogos da Steam instalados (de preferência um que aceite outra resolução sem reiniciar); RTSS instalado para o limite de FPS; sessão ativa.
-
-- [ ] Sem jogo rodando, o menu da sessão **não** mostra a linha "Perfil do jogo". Com um jogo aberto (pelo Big Picture), em até ~5 s a linha aparece com "<jogo>: sem perfil". Resultado: ______
-- [ ] No menu, trocar resolução, HDR, FPS e saída de áudio; depois **Perfil do jogo → Salvar os ajustes atuais**: a linha passa a "<jogo>: perfil salvo" e Ajustes → **Perfis por jogo** lista o jogo com o resumo certo. Resultado: ______
-- [ ] Fechar o jogo: a resolução, o HDR, o FPS e o áudio voltam ao que eram quando o jogo abriu. O log mostra `Perfil por jogo: … fechou; voltando a tela de antes`. Resultado: ______
-- [ ] Abrir o mesmo jogo de novo: o perfil é aplicado sozinho (log `aplicando o perfil de …`) e desfeito ao fechar. Resultado: ______
-- [ ] Abrir **outro** jogo sem perfil: nada muda. Trocar direto de um jogo com perfil para outro: o primeiro é desfeito antes. Resultado: ______
-- [ ] Jogo aberto pelo **Playnite** ou pelo **app Xbox** (jogo da Steam): o perfil também vale. Resultado: ______
-- [ ] **Voltar ao PC** com o jogo ainda aberto e perfil aplicado: a mesa volta exatamente como antes da sessão (resolução, HDR, FPS, áudio). Resultado: ______
-- [ ] A saída de áudio do perfil desconectada (fone desligado): o resto do perfil é aplicado e o log diz que a saída não está ativa. Resultado: ______
-- [ ] Apagar: pelo menu da sessão (Perfil do jogo → Apagar), em Ajustes (botão **Apagar**) e na aba Sistema → Ao entrar no modo console → Perfis por jogo. Sem perfis, a linha da aba Sistema fica desativada. Resultado: ______
-
 ## 1c. Menu da sessão (atalho sugerido: Select + Y)
 
 ### Tela cheia estilo Steam (Shift+Tab), prévia e janelas
 
 - [ ] O menu cobre a **tela inteira** do monitor do jogo (ou o principal, na prévia), com o jogo escurecido e desfocado por trás: painel lateral à esquerda com as opções e, no meio, o bloco "Janelas". Resultado: ______
-- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu (prévia), com o selo "Prévia · fora da sessão". O link `consolemode://menu` e o item da bandeja também abrem. Resultado: ______
-- [ ] Na prévia: o FPS não aparece, "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Volume, saída de áudio, resolução e HDR valem de verdade (não há sessão para desfazê-los). Resultado: ______
+- [ ] Com o atalho do menu definido e **sem** sessão ativa, segurar o atalho abre o menu (prévia), com o selo "Prévia · fora da sessão". O item da bandeja também abre. Resultado: ______
+- [ ] Na prévia: "Voltar ao PC" vira "Fechar menu" e só fecha o menu, e "Sair do Console Mode" fecha o app sem restaurar nada. Volume, saída de áudio, resolução e HDR valem de verdade (não há sessão para desfazê-los). Resultado: ______
 - [ ] O painel lateral entra deslizando pela esquerda com as linhas em cascata, as janelas sobem e aparecem, e ao fechar (B, Esc ou o atalho) tudo some em ~0,2 s. Com as animações do Windows desligadas, abre e fecha sem movimento. Resultado: ______
 - [ ] A linha/card em foco ganha contorno branco e cresce um pouco; há som ao mover, confirmar e voltar. Resultado: ______
 - [ ] Direcional entre o painel lateral e o grid de janelas (esquerda/direita) e dentro de cada um (cima/baixo) nunca fica "morto"; com o seletor (resolução, áudio, FPS) aberto o foco não escapa para trás. Resultado: ______
@@ -183,14 +169,12 @@ Pré-condições: sessão ativa com Big Picture (ou jogo borderless) na tela; co
 - [ ] **Volume:** ◀/▶ na linha muda de 5 em 5 e o Windows reflete; A alterna mudo. O valor inicial é o atual do Windows. Resultado: ______
 - [ ] **Resolução:** abre a lista com a atual marcada; escolher outra aplica na TV, o Big Picture continua aberto e a sessão não se encerra sozinha. Ao restaurar no fim, a resolução original volta. Resultado: ______
 - [ ] **Saída de áudio:** lista só saídas ativas; escolher troca o som na hora e o "ao conectar" não desfaz. Resultado: ______
-- [ ] **Limite de FPS** (só com RTSS): trocar o limite vale no jogo; "Sem limite" desliga o limitador; ao restaurar, o RTSS volta ao que era antes da sessão. Resultado: ______
 - [ ] **HDR:** alternar liga/desliga na TV; ao restaurar, o HDR volta ao estado de antes da sessão (inclusive se você desligou um que estava ligado). Resultado: ______
 - [ ] "Gravar os últimos 30 s" aparece desativado com "em breve". Resultado: ______
 - [ ] **Voltar ao PC** restaura e o app fica na bandeja; **Sair do Console Mode** restaura e fecha o app. Resultado: ______
 - [ ] Start + Select continua restaurando direto, sem abrir o menu. Resultado: ______
 - [ ] Com **PlayStation**: D-pad/✕/○ funcionam no menu (a janela toma o primeiro plano). Resultado: ______
 - [ ] Jogo em **tela cheia exclusiva**: o menu não aparece por cima (limitação documentada); Select + Y não quebra nada. Resultado: ______
-- [ ] `start consolemode://menu` no cmd abre o menu; fora da sessão, não faz nada. Resultado: ______
 
 ### Tour guiado do menu
 
@@ -199,7 +183,7 @@ Pré-condição para o convite: `SessionMenuTourDone` ausente ou `false` no `con
 - [ ] **Convite na primeira vez**: ao abrir o menu (sessão ou prévia), depois que as linhas terminam de entrar, aparece um cartão centralizado "Primeira vez neste menu?", com "Agora não" (B) e "Fazer o tour" (A, em foco). A dica do convite mostra o botão certo (Y no Xbox, △ no PlayStation). Resultado: ______
 - [ ] **Agora não** (ou B): o cartão some, o foco volta para "Voltar ao jogo" e o convite **não** aparece mais ao reabrir o menu (`SessionMenuTourDone: true` no config). Resultado: ______
 - [ ] **Fechar o menu com o convite aberto** (pelo atalho): o convite aparece de novo na próxima abertura. Resultado: ______
-- [ ] **Paradas**: A avança por Voltar ao jogo → Explorador de arquivos → Volume → Tela e som → FPS (só com RTSS e fora da prévia) → Janelas → Voltar ao PC (ou "Fechar menu" na prévia) → Sair do Console Mode. Cada parada escurece o resto do menu, contorna na cor de destaque só as linhas certas (resolução e áudio juntas e o HDR à parte quando as linhas de FPS estão entre eles) e mostra "n de N". Resultado: ______
+- [ ] **Paradas**: A avança por Voltar ao jogo → Explorador de arquivos → Volume → Tela e som → Janelas → Voltar ao PC (ou "Fechar menu" na prévia) → Sair do Console Mode. Cada parada escurece o resto do menu, contorna na cor de destaque só as linhas certas (resolução e áudio juntas e o HDR à parte quando as linhas de FPS estão entre eles) e mostra "n de N". Resultado: ______
 - [ ] **Balão**: fica à direita do painel lateral, na altura das linhas destacadas, sem sair da tela; na parada Janelas fica sobre o painel lateral. Os textos não ficam cortados a 1080p nem a 4K com escala. Resultado: ______
 - [ ] **Rolagem**: numa tela em que o painel lateral precisa rolar (1080p com escala de 125%+), as paradas Voltar ao PC e Sair do Console Mode rolam o painel até as linhas e o destaque acompanha. Resultado: ______
 - [ ] **Textos das saídas**: em sessão, "Voltar ao PC" explica que restaura e o app fica na bandeja, e "Sair do Console Mode" que também fecha o app; na prévia, "Fechar menu" diz que só fecha o menu. Resultado: ______
@@ -268,15 +252,6 @@ Onde aparece: no cabeçalho do menu da sessão (depois de "controle Xbox detecta
 - [ ] Bateria fraca na sessão: com um controle em 15 % ou menos, aparece um aviso no canto da TV ("Bateria do controle fraca"), sem tirar o foco do jogo; não repete a cada 30 s. Aparece de novo só em 5 % ou menos, ou depois de carregar. Fora da sessão não há aviso. Log: `Controle: bateria fraca (...)`. Resultado: ______
 - [ ] Leitor de tela (Narrador) no indicador: lê "Bateria do controle: 65%" (e ", carregando"). Resultado: ______
 
-## 2. Links `consolemode://`
-
-- [ ] `start consolemode://start` no `cmd` com o app **fechado**: abre e entra no modo console. Resultado: ______
-- [ ] `consolemode://start` com o app **aberto**: entra no modo console sem abrir segunda instância (só um `ConsoleMode.exe` no Gerenciador de Tarefas). Resultado: ______
-- [ ] `consolemode://stop` durante a sessão: restaura a mesa. Com sessão inativa: só mostra a janela. Resultado: ______
-- [ ] `consolemode://show`: traz a janela para frente (da bandeja também). Resultado: ______
-- [ ] Versão **instalada**: o instalador registra o protocolo; desinstalar remove `HKCU\Software\Classes\consolemode`. Resultado: ______
-- [ ] Versão **portátil** movida de pasta: ao abrir, o registro passa a apontar para o novo caminho (log `Protocolo: consolemode:// registrado`). Resultado: ______
-
 ## 3. Interface Console
 
 Pré-condições: Ajustes → Interface = **Automático** (padrão).
@@ -303,7 +278,7 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Ao abrir, o foco está em **Jogar agora** (anel grosso). Resultado: ______
 - [ ] D-pad e analógico esquerdo movem o foco: Jogar → cartões de ajustes → cartões de telas → "Modo desktop", e de volta. Segurar uma direção repete. Resultado: ______
 - [ ] **A** num cartão de tela abre o painel "O que a tela X faz?" com foco em "Jogar aqui"; A escolhe; **B** fecha sem mudar. Resultado: ______
-- [ ] **A** num cartão de ajuste rápido cicla o valor (Abrir, Áudio, Resolução, HDR, VRR, FPS) e o resumo no topo acompanha. Resultado: ______
+- [ ] **A** num cartão de ajuste rápido cicla o valor (Abrir, Áudio, Resolução, HDR, VRR) e o resumo no topo acompanha. Resultado: ______
 - [ ] **Start/Options** com foco em qualquer lugar inicia a sessão; **Y/△** abre "Todos os ajustes" (interface Desktop). Resultado: ______
 - [ ] As dicas do rodapé mostram A/B/☰/Y com Xbox e ✕/○/OPTIONS/△ com PlayStation. Resultado: ______
 - [ ] Teclado: setas, Enter e Esc fazem o mesmo que D-pad, A e B. Resultado: ______
@@ -328,7 +303,7 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 
 Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam para a bandeja ao voltar ao PC" **ligado** (padrão); nenhum jogo aberto.
 
-- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, `consolemode://stop`, tray → Restaurar): o **Big Picture fecha**, a janela principal some e a **Steam continua em execução na bandeja**. Resultado: ______
+- [ ] Voltar ao PC por cada caminho (botão "Voltar ao PC", menu da sessão, atalho do controle, tray → Restaurar): o **Big Picture fecha**, a janela principal some e a **Steam continua em execução na bandeja**. Resultado: ______
 - [ ] Sair pelo próprio Big Picture (Sair → Sair do Big Picture): a mesa volta e a Steam permanece na bandeja. Resultado: ______
 - [ ] O processo da Steam continua no Gerenciador de Tarefas; clicar no ícone da bandeja reabre o cliente sem login nem reinício. Resultado: ______
 - [ ] Com um **jogo da Steam rodando**: a Steam fica aberta e o log mostra `Steam: mantida aberta (jogo em execução, id …)`; o Big Picture ainda é fechado. Resultado: ______
@@ -341,39 +316,13 @@ Pré-condições: lançador = Steam Big Picture; Ajustes → "Mandar a Steam par
 - [ ] Janelas de jogo, chat/popups da Steam e outros aplicativos não recebem o pedido de fechamento da janela principal. Resultado: ______
 - [ ] Se o Big Picture demorar a fechar (travado), a restauração da mesa continua e termina normalmente (o log mostra `Big Picture ainda aberto`). Resultado: ______
 
-## 3c. Controle da TV: Google TV / Android TV (issue #75)
-
-### Volta na 1.7.1 (#207)
-
-- [ ] Sistema mostra de novo a categoria **TV**; o direcional e o mouse chegam nela e nas outras sem buracos. Resultado: ______
-- [ ] Com a TV configurada na 1.6 (ou no Legacy): o `config.json` mantém o bloco `tv`, a sessão liga a TV e troca a entrada, e a volta a coloca em espera se a opção estiver ligada (o log tem "TV: ligar" / "TV: desligar"). Resultado: ______
-- [ ] Com um **Comando de entrada** próprio (ex.: `am start -n com.smartdevice.livetv/skyworth.skyworthlivetv.osd.ui.mainActivity.LiveTvScreenActivity` numa Coocaa/Skyworth): a TV vai para a entrada do PC. Resultado: ______
-
-Pré-condições: TV Google TV / Android TV na mesma rede do PC, com **Depuração USB** (ou "Depuração pela rede") ativada nas Opções do desenvolvedor; Ajustes → TV → *Google TV / Android TV* com o IP e a entrada HDMI do PC.
-
-- [ ] **Testar agora** na primeira vez: a TV pede "Permitir depuração"; com "Sempre permitir" + "Permitir", a TV acorda e vai para a entrada do PC. O status mostra sucesso. Resultado: ______
-- [ ] **Testar agora** de novo: não pede mais permissão; com a TV em espera, ela liga e troca a entrada. Resultado: ______
-- [ ] Recusar o pedido na TV (ou esperar 60 s): o status explica que a TV não autorizou este PC. Resultado: ______
-- [ ] IP errado / TV fora da rede: o status diz que a TV não respondeu, em poucos segundos. Resultado: ______
-- [ ] TV acessível pela rede, mas sem responder ao teste ADB: o status informa o limite de 90 s e o botão **Testar agora** volta a ficar disponível. Resultado: ______
-- [ ] **Jogar agora** com a TV em espera: ela liga, troca para o PC e o modo console segue normal. O log tem `TV: ligar (androidTv) ok`. Resultado: ______
-- [ ] Com a TV desligada da tomada: o modo console não trava; o log tem `TV: ligar ... falhou` e o fluxo segue (a TV não aparece, o app avisa como antes). Resultado: ______
-- [ ] TV que some da rede em espera + **MAC** preenchido: o log mostra `enviando Wake-on-LAN` e a TV liga (com "Ligar pela rede" ativo na TV). Resultado: ______
-- [ ] **Colocar a TV em espera ao restaurar** ligado: ao sair do Big Picture, a mesa volta e depois a TV entra em espera. Desligado (padrão): a TV continua ligada. Resultado: ______
-- [ ] TV que ignora a tecla HDMI: preencher **Comando da entrada** faz a troca funcionar. Resultado: ______
-- [ ] Escolher "Não controlar": os campos somem e nada é enviado à TV, e **Jogar agora** não demora mais do que antes (nenhuma linha `TV:` no log). Resultado: ______
-- [ ] O arquivo `adbkey.pem` na pasta de dados começa com `dpapi:` (não com `-----BEGIN`). Copiar a pasta de dados para outro usuário do Windows: o log mostra "chave ADB de outro usuário/PC; criando outra" e a TV pede permissão de novo. Resultado: ______
-- [ ] TV desligada da tomada: **Jogar agora** espera no máximo ~30 s pela TV e segue (o log mostra o tempo). Resultado: ______
-
 ## 3d. Configurações no modo Console
 
-- [ ] Em Sistema, as configurações do modo PC também estão disponíveis: caminho do Playnite, fechar a Steam, Android TV, FPS personalizado, atalhos, diagnóstico do controle, tutorial e pasta de dados. Resultado: ______
+- [ ] Em Sistema, as configurações do modo PC também estão disponíveis: caminho do Playnite, fechar a Steam, atalhos, diagnóstico do controle, tutorial e pasta de dados. Resultado: ______
 - [ ] Configurar, alterar e remover os atalhos de abrir o app, menu da sessão e voltar ao PC; uma combinação em conflito mostra o mesmo erro do modo PC. Durante a captura, os botões não navegam nem iniciam uma sessão. Resultado: ______
 - [ ] Na captura, apertar e soltar B/○ sozinho cancela sem alterar o atalho; B/○ de novo fecha o editor e devolve o foco à configuração. B/○ junto com outro botão ainda pode ser salvo como combinação, mas B/○ sozinho não é um atalho válido. Teclado e mouse também conseguem abrir e fechar o editor sem acionar opções atrás dele. Resultado: ______
 - [ ] Alterar uma configuração no modo Console, trocar para PC e reabrir o app: o valor permanece igual nas duas interfaces. Resultado: ______
 - [ ] Selecionar e limpar o caminho do Playnite; cancelar o seletor mantém o valor anterior. Resultado: ______
-- [ ] Configurar a Android TV no modo Console: endereço, MAC opcional, entrada HDMI, comando da entrada e espera ao restaurar; Testar agora mostra o resultado e libera o botão após erro ou timeout. Resultado: ______
-- [ ] Selecionar FPS personalizado e digitar o limite; o modo PC mostra o mesmo valor. Sem RTSS disponível, a configuração respeita a mesma indisponibilidade das duas interfaces. Resultado: ______
 - [ ] Copiar o diagnóstico do controle, abrir a pasta de dados e rever o tutorial no modo Console; ao voltar, o foco continua em uma opção visível. Resultado: ______
 - [ ] Passar o mouse sobre categorias, opções, abas e cards: o realce aparece e some suavemente (sem cinza brusco), e o texto não fica apagado ao clicar; clicar afunda o item de leve. Trocar de categoria acende a barra verde e o nome com transição. Resultado: ______
 - [ ] Desativar uma opção (ex.: atalho de toque curto sem atalho Home) a deixa esmaecida e sem realce. Menu da sessão: as mesmas linhas e cards continuam legíveis no tema claro. Resultado: ______
@@ -444,7 +393,6 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 ### Outras estratégias
 
 - [ ] "Cortinas pretas": as telas da mesa ficam pretas e voltam ao restaurar. Resultado: ______
-- [ ] "Desligar por DDC/CI" (monitor com DDC/CI ligado no menu dele): as telas da mesa apagam e voltam a acender ao restaurar. Resultado: ______
 
 ### Aplicativo personalizado
 
@@ -501,43 +449,6 @@ Pré-condições: 1.6 instalada por cima da 1.5, com a configuração da 1.5 (te
 - [ ] Reduza a altura da janela e confirme que o editor rola até **Voltar**, sem esconder os cartões.
 - [ ] Feche o editor durante uma captura e confirme que ela para; reabra-o e confirme que nenhum botão fica preso em captura.
 
-## Contador de FPS (RTSS)
-
-Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Display" ligado; MSI Afterburner aberto com o OSD dele ligado.
-
-- [ ] Sem o RTSS instalado, a linha "Contador de FPS" não aparece no menu da sessão e o cartão em Ajustes fica desabilitado.
-- [ ] Na prévia (menu aberto fora de uma sessão), a linha não aparece.
-- [ ] Config nova: o estilo é "Afterburner (não mexer)" e o OSD do Afterburner aparece normal na sessão.
-- [ ] Em sessão, A na linha "Contador de FPS" abre a lista de ajustes do contador. A em "Estilo" alterna Afterburner → Desligado → Apenas FPS → Compacto → Detalhado → Personalizado → Afterburner, e o jogo muda na hora; a lista continua aberta com o foco na mesma linha.
-- [ ] Na lista do contador, Tamanho, Posição, Fundo em card e Cor mudam o contador na hora; com Personalizado aparecem "Tudo em uma linha" e os itens (com ✓ nos ligados), e A liga/desliga cada um. B fecha a lista e volta para a linha do contador. Os ajustes ficam salvos e aparecem iguais em Ajustes.
-- [ ] Desligado: nada na tela, nem o nosso nem o do Afterburner (no máximo um piscar rápido do Afterburner de vez em quando).
-- [ ] Compacto / Detalhado / Personalizado: só o nosso aparece; o do Afterburner fica escondido.
-- [ ] Afterburner: o nosso some e o do Afterburner volta em até 1 s.
-- [ ] Ajustes → Contador de FPS → Personalizado: marcar/desmarcar API, FPS e tempo de quadro, "Tudo em uma linha" e a cor muda o contador no jogo na hora (com a sessão ativa).
-- [ ] Personalizado sem nenhum item marcado ainda mostra o FPS.
-- [ ] Com o RTSS fechado, ligar Compacto abre o RTSS e o contador aparece.
-- [ ] Voltar ao PC: o nosso some e o do Afterburner volta.
-- [ ] A escolha e o layout ficam salvos para a próxima sessão.
-- [ ] Com Compacto (ou outro estilo nosso) já salvo em Ajustes, iniciar a sessão: o contador aparece e o do Afterburner some sem precisar mexer na linha do menu.
-
-### Card, tamanhos e dados do PC (1.6.1)
-
-- [ ] Apenas FPS / Compacto / Detalhado aparecem dentro de um card escuro, translúcido e de cantos arredondados, com uma folga em volta do texto; o card acompanha o tamanho do texto (não cobre a tela toda nem o OSD de outro programa).
-- [ ] Posição "A do RTSS": o card fica na posição do OSD escolhida no RTSS.
-- [ ] Posição em cada um dos quatro cantos: o contador vai para aquele canto da tela, com e sem o card, e não sai da tela nos cantos da direita e de baixo.
-- [ ] "Fundo em card" desligado: o texto volta a ficar direto sobre o jogo, sem fundo.
-- [ ] Tamanho Pequeno / Médio / Grande muda o tamanho de todo o contador na hora; no Grande o texto continua nítido e as unidades (FPS, %, GHz) ficam alinhadas na base dos números.
-- [ ] Compacto: uma linha com FPS, CPU %, GPU % e RAM %; os números não fazem o texto "pular" quando mudam de 2 para 3 dígitos.
-- [ ] Detalhado: FPS, tempo de quadro e API na primeira linha; CPU (uso e clock), GPU (uso, clock e °C), VRAM (usada / total) e RAM (usada / total) em linhas alinhadas.
-- [ ] Os valores batem com o Gerenciador de Tarefas (CPU %, velocidade, GPU %, memória dedicada, temperatura da GPU) e atualizam a cada ~1 s.
-- [ ] No primeiro segundo os valores aparecem como "--" e depois são preenchidos.
-- [ ] Notebook com GPU integrada + dedicada: os dados de GPU são da placa que está rodando o jogo.
-- [ ] GPU cujo driver não informa temperatura ou clock: esses itens simplesmente não aparecem (sem "0 MHz").
-- [ ] Personalizado: marcar/desmarcar cada item do PC (uso/clock da CPU, RAM, VRAM, uso/clock/temperatura da GPU) muda o contador na hora; com "Tudo em uma linha" ligado, fica tudo numa linha.
-- [ ] Config salva na 1.6.0 com "Compacto": depois de atualizar, aparece "Apenas FPS" e o jogo mostra só o FPS.
-- [ ] Voltar ao PC com Compacto/Detalhado: o contador some e não volta sozinho segundos depois.
-- [ ] Uso de CPU do Console Mode com Detalhado ligado continua baixo (Gerenciador de Tarefas, < 1%).
-
 ## Minimizar para a bandeja
 
 - [ ] Ajustes → "Minimizar para a bandeja" vem desligado; minimizar deixa a janela na barra de tarefas, como antes.
@@ -592,14 +503,6 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 
 - [ ] TV como tela de jogo com 2560x1440 @ 60 Hz em Sistema: a sessão começa e a TV muda de resolução **uma vez só** (sem apagar duas ou três vezes). O log tem "Telas: ... em 2560x1440@59 (pedido 2560x1440@60)" ou "@60", e nenhum "Não foi possível aplicar". Resultado: ______
 - [ ] O mesmo com 3840x2160 @ 60 e com "Não alterar": nada muda para pior. Resultado: ______
-- [ ] Perfil por jogo salvo com @60: abrir o jogo com a TV já em @59 não faz a TV piscar. Resultado: ______
-
-## Comando na TV ao voltar ao PC (#213, issue #209)
-
-- [ ] Android TV configurada, **Comando ao voltar ao PC** = `input keyevent 3`, espera desligada: ao voltar ao PC a TV vai para a tela inicial e continua ligada. O log tem "TV: voltar ao PC (androidTv) ok". Resultado: ______
-- [ ] O mesmo com a espera ligada: a TV vai para a tela inicial e depois entra em espera. Resultado: ______
-- [ ] Comando vazio e espera ligada: igual à 1.6 (só a espera). Comando vazio e espera desligada: nada é enviado (nenhuma linha "TV: voltar ao PC" no log). Resultado: ______
-- [ ] Com o comando de outra entrada (ex.: o `am start …` da Skyworth do PLEXX-DE para a HDMI dele), a TV troca para ela ao voltar ao PC. Resultado: ______
 
 ## Interface Console no estilo console (1.7.0)
 
@@ -611,7 +514,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] A num iniciador (ou um clique) só marca aquele iniciador, sem abrir nada; com A o foco desce para o Jogar agora, e é ele que abre.
 - [ ] Fonte Inter: os textos da interface Console e do menu da sessão usam a Inter (o "a" e o "g" de dois andares mudam de cara em relação à Segoe), em negrito de verdade no título e no Jogar agora, sem aparência borrada de negrito sintético. Conferir também no **portátil**: se a fonte não carregar, o app cai na Segoe UI sem quebrar. O modo PC continua com a Segoe UI.
 - [ ] Russo: o cirílico aparece na Inter, sem misturar fontes no meio da palavra.
-- [ ] A linha embaixo do título mostra a resolução da tela de jogo e depois áudio, FPS, HDR e VRR quando ligados, separados por "·", e atualiza ao mudar cada um.
+- [ ] A linha embaixo do título mostra a resolução da tela de jogo e depois áudio, HDR e VRR quando ligados, separados por "·", e atualiza ao mudar cada um.
 - [ ] Sem tela de jogo escolhida, o texto pede para escolher a tela e Jogar agora fica desativado.
 - [ ] O botão redondo ao lado de Jogar agora abre a aba Sessão.
 - [ ] Com capas da Steam como fundo, as capas aparecem mais à direita e o lado esquerdo e a parte de baixo ficam escuros; o texto continua legível. Com imagem própria e sem fundo também.
@@ -629,7 +532,6 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Atalhos (Controle): abrir o editor e voltar devolve o foco para a linha do atalho.
 - [ ] Teste do controle (Atalho, ajuda e dados): ao fechar, o foco volta para a linha.
 - [ ] Fundo, imagem do fundo e sons da interface ficam em App; Fechar a Steam ao voltar ao PC fica em Ao entrar no modo console.
-- [ ] Campos de texto da TV e do FPS personalizado continuam aceitando digitação e as setas movem o cursor neles.
 
 ### Visual geral
 - [ ] Blocos e linhas sem borda fina, cantos mais arredondados, Jogar agora em formato de pílula; o contorno branco do foco aparece em tudo, inclusive no menu da sessão.
@@ -642,7 +544,7 @@ Pré-requisito: RivaTuner Statistics Server instalado, com "Show On-Screen Displ
 - [ ] Ligar o HDR no Windows e clicar em **Atualizar**: a tela passa a "HDR on".
 - [ ] Áudio: lista as saídas, com a padrão do Windows e a escolhida no app marcadas; com "Ao conectar", nenhuma vem como escolhida.
 - [ ] Controles: com um Xbox e um DualSense ligados, os dois aparecem (Xbox / PlayStation); sem nenhum, "(none)".
-- [ ] Programas: Steam, Playnite, RTSS e ControlFS com caminho e versão quando instalados, e "not found" quando não; "Launches" mostra o iniciador escolhido.
+- [ ] Programas: Steam, Playnite e ControlFS com caminho e versão quando instalados, e "not found" quando não; "Launches" mostra o iniciador escolhido.
 - [ ] Log: as últimas ~50 linhas do `consolemode.log` aparecem no fim.
 - [ ] Nenhum caminho mostra o nome do usuário do Windows (`C:\Users\…\`), nem com Playnite instalado em `%LOCALAPPDATA%`.
 - [ ] **Copiar relatório** mostra o aviso de copiado e o texto colado no Bloco de Notas é igual ao da tela.
@@ -683,7 +585,6 @@ Pré-condições: a opção **Tirar o ponteiro do mouse do caminho** ligada (é 
 - [ ] Com uma soundbar ou receiver que liga junto com a TV: o áudio vai para a soundbar, não para a TV. Resultado: ______
 - [ ] Controle que fazia o menu "subir sozinho": o menu fica parado; se o log mostrar `analógico fora do centro desde o início`, o direcional e os botões continuam navegando. Anote o modelo do controle. Resultado: ______
 - [ ] Controle normal: o analógico navega como antes (na primeira leitura ele está no centro). Resultado: ______
-- [ ] Aba Sessão em espanhol, francês e russo: as legendas dos ajustes rápidos aparecem inteiras, em até duas linhas. Resultado: ______
 
 ## Barra de título (#182)
 
@@ -741,7 +642,6 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 - [ ] Iniciado escondido (Iniciar com o Windows, `--start`, um controle conectando com o app na bandeja): a janela não aparece sozinha; ao abri-la pela bandeja, ela maximiza. Resultado: ______
 - [ ] Só com mouse e teclado: clicar nas abas, Page Up / Page Down, setas, Enter e Esc navegam em tudo (Início, Sessão, Sistema, listas de opções, editor de atalhos). Resultado: ______
 - [ ] Um `config.json` antigo com `"uiMode": "desktop"` abre normalmente na interface Console; a chave some na próxima gravação. Resultado: ______
-- [ ] Sistema → Extras opcionais, contador de FPS: estilo, tamanho, posição, cor, cartão, itens do jogo e do PC e "uma linha" mudam o contador na sessão; sem RTSS a linha do estilo fica desabilitada, e tamanho/posição/cor só valem com um estilo que desenha, os itens só no estilo personalizado. Resultado: ______
 - [ ] Sistema → Ao entrar no modo console, com Aplicativo personalizado: "Argumentos" e "Processo a acompanhar" aceitam texto (o teclado na tela não é necessário para o resto) e ficam salvos ao reabrir. Resultado: ______
 - [ ] Sistema → Atalho, ajuda e dados: "Diagnóstico → Copiar relatório" põe o relatório na área de transferência e mostra o aviso; a versão do app aparece no fim da lista. Resultado: ______
 - [ ] Sistema: com o foco numa linha, a descrição dela aparece embaixo da lista (até 3 linhas); no trilho das categorias, some. Em alemão, francês e russo o texto não estoura. Resultado: ______
@@ -772,7 +672,7 @@ Pré-condições: um `config.json` sem `consoleTourDone` (vale para quem atualiz
 
 - [ ] Aviso de início de sessão (com o atalho do menu definido) e de bateria fraca: entra deslizando da borda direita da TV, sem aparecer em outra tela ao lado; o fundo em volta do card é transparente (sem retângulo preto); a barrinha verde esvazia e o aviso sai deslizando para a direita. O jogo não perde o foco em nenhum momento. Resultado: ______
 
-- [ ] Menu fora do modo console: com o atalho do menu definido e o Console Mode só na bandeja, segurar o atalho abre o Menu da sessão na tela de jogo (ou na principal, com a TV desligada), com o selo "Fora da sessão" e sem limite/contador de FPS. Resultado: ______
+- [ ] Menu fora do modo console: com o atalho do menu definido e o Console Mode só na bandeja, segurar o atalho abre o Menu da sessão na tela de jogo (ou na principal, com a TV desligada), com o selo "Fora da sessão". Resultado: ______
 - [ ] Fora da sessão, **Controlar o mouse com o controle** move o ponteiro e clica; com a janela do Console Mode em primeiro plano o controle volta a navegar a interface (o mouse espera); com o menu aberto, também. **Ocultar o cursor** some com a seta. Começar uma sessão desliga os dois; fechar o Console Mode traz o cursor de volta. Resultado: ______
 - [ ] Sistema → Controle → **Menu da sessão fora do modo console** desligado: o atalho não abre o menu fora da sessão (abre numa sessão), o ícone da bandeja continua abrindo; desligar com o mouse do controle ligado o desliga. Resultado: ______
 

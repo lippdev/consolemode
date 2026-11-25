@@ -5,6 +5,13 @@ This is a fork of [lippdev/consolemode](https://github.com/lippdev/consolemode).
 release, merges it here and opens a PR from `sync/vX`. Keep it current: it is what the agent knows
 about what we changed.
 
+## Lean edition (branch `alt/lean`)
+
+This branch deliberately diverges from upstream and is **not** part of the keeper's sync flow. It removes
+TV control, RTSS (FPS limit and counter), per-game profiles, the local control API, `consolemode://` links,
+DDC/CI power-off and the es/de/fr/ru catalogs, and is meant to be redesigned further. Merging upstream into it
+will conflict heavily; do it by hand, not with the keeper.
+
 ## What we changed
 
 - **Italian**: `src/ConsoleMode/Resources/Strings.it-IT.json` (a catalog with every key of

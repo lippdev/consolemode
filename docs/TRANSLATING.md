@@ -1,12 +1,12 @@
 # Translating Console Mode
 
-Console Mode speaks English, Português (Brasil), Español, Deutsch, Français, Italiano and Русский. Thanks for helping it speak yours, or for fixing a line that reads wrong in your language.
+Console Mode speaks English, Português (Brasil) and Italiano. Thanks for helping it speak yours, or for fixing a line that reads wrong in your language.
 
 You don't need Windows or a build environment: every text the app shows lives in one JSON file per language, and the tests that check it run on any OS.
 
 ## Fix or improve an existing translation
 
-1. Open `src/ConsoleMode/Resources/Strings.<code>.json` for your language (for example `Strings.de-DE.json`).
+1. Open `src/ConsoleMode/Resources/Strings.<code>.json` for your language (for example `Strings.it-IT.json`).
 2. Change the **values**, never the keys. To find a text, search for it in `Strings.en-US.json`, then look up the same key in your file.
 3. Open a pull request. If you'd rather not touch Git, [open a feedback issue](https://github.com/lippdev/consolemode/issues/new?template=feedback.yml) with the key (or a screenshot), the current text and your suggestion.
 
@@ -31,7 +31,7 @@ A translated `README.<code>.md` and `docs/GUIDE.<code>.md` are welcome too, in a
 - **Keep it short.** Much of the app is read from the couch on a TV and laid out in cards and menu rows; a text much longer than the English may be cut. If your language runs long, prefer the shorter wording.
 - **Talk to the player** the way games and consoles in your language do (in most languages, informally). Keep one tone across the whole file.
 - **Use the official names** of things outside the app as they appear in your language: Windows settings, Steam, Big Picture, Xbox, PlayStation buttons (✕ ○ □ △), HDR, VRR.
-- **Don't translate** product names: Console Mode, Steam Big Picture, Playnite, RTSS, ControlFS, the `Console Mode 1 Click` shortcut.
+- **Don't translate** product names: Console Mode, Steam Big Picture, Playnite, ControlFS, the `Console Mode 1 Click` shortcut.
 
 ## Checking your work
 
