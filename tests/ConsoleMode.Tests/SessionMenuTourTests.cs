@@ -9,30 +9,28 @@ public class SessionMenuTourTests
     [Fact]
     public void The_offered_tour_starts_with_the_invite_and_ends_on_the_two_ways_out()
     {
-        var stops = SessionMenuTour.Stops(invite: true, fpsRows: true);
+        var stops = SessionMenuTour.Stops(invite: true);
         Assert.Equal(SessionTourStop.Invite, stops[0]);
         Assert.Equal([SessionTourStop.BackToPc, SessionTourStop.Exit], stops.TakeLast(2));
-        Assert.Contains(SessionTourStop.Fps, stops);
     }
 
     [Fact]
-    public void Asked_for_it_skips_the_invite_and_without_fps_rows_the_fps_stop()
+    public void Asked_for_it_skips_the_invite()
     {
-        var stops = SessionMenuTour.Stops(invite: false, fpsRows: false);
+        var stops = SessionMenuTour.Stops(invite: false);
         Assert.DoesNotContain(SessionTourStop.Invite, stops);
-        Assert.DoesNotContain(SessionTourStop.Fps, stops);
         Assert.Equal(SessionTourStop.BackToGame, stops[0]);
     }
 
     [Fact]
     public void Progress_counts_the_real_stops_only()
     {
-        var offered = SessionMenuTour.Stops(invite: true, fpsRows: true);
+        var offered = SessionMenuTour.Stops(invite: true);
         Assert.Null(SessionMenuTour.Progress(offered, 0));
         Assert.Equal((1, offered.Count - 1), SessionMenuTour.Progress(offered, 1));
         Assert.Equal((offered.Count - 1, offered.Count - 1), SessionMenuTour.Progress(offered, offered.Count - 1));
 
-        var asked = SessionMenuTour.Stops(invite: false, fpsRows: false);
+        var asked = SessionMenuTour.Stops(invite: false);
         Assert.Equal((1, asked.Count), SessionMenuTour.Progress(asked, 0));
         Assert.Null(SessionMenuTour.Progress(asked, -1));
         Assert.Null(SessionMenuTour.Progress(asked, asked.Count));

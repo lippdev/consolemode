@@ -76,7 +76,7 @@ public partial class MainViewModel
     {
         if (!IsSessionMenuOpen || IsSessionTourOpen || IsSessionMenuBusy) return;
         IsSessionPickerOpen = false;
-        _sessionTourStops = SessionMenuTour.Stops(invite, IsFpsMenuAvailable || IsFpsOverlayAvailable);
+        _sessionTourStops = SessionMenuTour.Stops(invite);
         SessionTourIndex = 0;
         AppLog.Write(invite ? "Menu da sessão: tour oferecido" : "Menu da sessão: tour iniciado");
     }

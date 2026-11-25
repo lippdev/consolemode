@@ -43,12 +43,7 @@ public partial class MainViewModel
     [ObservableProperty] private bool _sessionHdrOn;
     [ObservableProperty] private string _sessionModeText = "";
     [ObservableProperty] private string _sessionAudioText = "";
-    [ObservableProperty] private string _sessionFpsText = "";
-    [ObservableProperty] private string _sessionOverlayText = "";
 
-    public bool IsFpsMenuAvailable => Engine.Rtss.IsReady && !IsSessionMenuPreview;
-    /// <summary>The FPS counter only needs RTSS itself (no rtss-cli); like the limit, it is a session thing.</summary>
-    public bool IsFpsOverlayAvailable => Engine.Rtss.IsInstalled && !IsSessionMenuPreview;
     public bool IsSessionMenuLive => !IsSessionMenuPreview;
 
     /// <summary>"Back to the PC" in a session; "Close menu" in the preview, where there is no desk to restore.</summary>
@@ -70,8 +65,6 @@ public partial class MainViewModel
 
     partial void OnIsSessionMenuPreviewChanged(bool value)
     {
-        OnPropertyChanged(nameof(IsFpsMenuAvailable));
-        OnPropertyChanged(nameof(IsFpsOverlayAvailable));
         OnPropertyChanged(nameof(IsSessionMenuLive));
         OnPropertyChanged(nameof(BackToPcText));
     }
@@ -209,11 +202,6 @@ public partial class MainViewModel
         SessionHdrOn = hdr;
         SessionAudioText = audioName;
         VolumePercent = volume ?? -1;
-        SessionFpsText = state.FpsLimit > 0 ? $"{state.FpsLimit} FPS" : LocalizationService.Get("FpsNoLimit");
-        SessionOverlayText = FpsOverlayShortName;
-        OnPropertyChanged(nameof(IsFpsMenuAvailable));
-        OnPropertyChanged(nameof(IsFpsOverlayAvailable));
-        await LoadSessionGameAsync();
     }
 
     /// <summary>Left/Right on the volume row.</summary>
@@ -265,24 +253,11 @@ public partial class MainViewModel
                 var id = SessionAudioId;
                 options = Engine.Audio.GetDevices().Where(d => d.IsActive).Select(d => (d.Name, d.FriendlyId, d.FriendlyId == id));
                 break;
-            case "overlay":
-                title = LocalizationService.Get("FpsOverlayCard");
-                options = OverlayPickerOptions();
-                break;
-            case "fps":
-                title = LocalizationService.Get("FpsCard");
-                options = new[] { (LocalizationService.Get("FpsNoLimit"), "0", state.FpsLimit == 0) }
-                    .Concat(FpsPresets.Select(f => ($"{f} FPS", f.ToString(), state.FpsLimit == f)));
-                break;
-            case "profile" when _sessionGameId > 0:
-                title = LocalizationService.Get("GameProfileRow");
-                options = SessionProfileOptions();
-                break;
             default:
                 return;
         }
         _sessionPickerKey = key;
-        SessionPickerFocusIndex = key == "overlay" ? 0 : -1;
+        SessionPickerFocusIndex = -1;
         SessionPickerTitle = title;
         SessionPickerOptions.Clear();
         foreach (var (text, value, selected) in options) SessionPickerOptions.Add(new PickerItem(text, value, selected));
@@ -293,17 +268,6 @@ public partial class MainViewModel
     private async Task PickSessionOptionAsync(PickerItem? item)
     {
         if (item is null) return;
-        if (_sessionPickerKey == "overlay")
-        {
-            ChangeOverlaySetting(item.Value);   // the counter picker stays open
-            return;
-        }
-        if (_sessionPickerKey == "profile")
-        {
-            IsSessionPickerOpen = false;
-            await PickSessionProfileAsync(item.Value);
-            return;
-        }
         IsSessionPickerOpen = false;
         var key = _sessionPickerKey;
         await RunSessionActionAsync(() =>
@@ -324,10 +288,6 @@ public partial class MainViewModel
                     Engine.Audio.SetOutput(item.Value);
                     state.AudioDeviceId = item.Value;
                     state.AudioWatchComplete = true;   // the auto-switch must not undo a manual choice
-                    break;
-                case "fps":
-                    var result = Engine.Rtss.SetLimit(int.Parse(item.Value), state);
-                    if (!result.Success) throw new InvalidOperationException(result.Message);
                     break;
             }
         });

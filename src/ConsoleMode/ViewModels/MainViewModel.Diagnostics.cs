@@ -91,7 +91,6 @@ public partial class MainViewModel
         {
             FoundApp("Steam", SteamSession.FindSteamExe()),
             FoundApp("Playnite", Engine.Launch.GetPlaynitePath()),
-            FoundApp("RTSS", Engine.Rtss.GetInstallPath()),
             FoundApp("ControlFS", ControlFsService.FindExe())
         }),
         FullscreenMode = config.FullscreenMode,

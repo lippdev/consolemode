@@ -485,7 +485,6 @@ public sealed partial class SessionMenuWindow : Window
         SessionTourStop.ControlFs => [ControlFsRow, JoyChromiumRow],
         SessionTourStop.Volume => [VolumeRow],
         SessionTourStop.Display => [ModeRow, AudioRow, HdrRow],
-        SessionTourStop.Fps => [FpsRow, FpsOverlayRow],
         SessionTourStop.Windows => [WindowsPanel],
         SessionTourStop.BackToPc => [BackToPcRow],
         SessionTourStop.Exit => [ExitRow],

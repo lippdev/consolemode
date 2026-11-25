@@ -86,7 +86,7 @@ public sealed class LocalizationTests
 
     /// <summary>Names that read the same in every language (products, the desktop shortcut).</summary>
     private static readonly HashSet<string> SameInEveryLanguage =
-        ["Brand", "ShortcutName", "LaunchSteam", "FpsOverlayShowApi"];
+        ["Brand", "ShortcutName", "LaunchSteam"];
 
     private static readonly Regex WordPattern = new(@"\p{L}{2,}", RegexOptions.Compiled);
 

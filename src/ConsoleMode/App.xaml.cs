@@ -78,8 +78,7 @@ public partial class App : Application
             ControllerInput.Warmup();
             AppLog.Write("Controles: " + ControllerInput.DescribeDevices().ReplaceLineEndings(" | "));
             ProtocolService.EnsureRegistered();
-            AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}, " +
-                         $"rtss-cli={AppPaths.HasRtssCli}");
+            AppLog.Write($"Startup: exe={Environment.ProcessPath}, args={string.Join(' ', Environment.GetCommandLineArgs().Skip(1))}");
 
             ViewModel = new MainViewModel();
             _window = new MainWindow(ViewModel);

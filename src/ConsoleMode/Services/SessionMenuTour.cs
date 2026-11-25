@@ -10,8 +10,6 @@ public enum SessionTourStop
     Volume,
     /// <summary>Resolution, audio output and HDR together.</summary>
     Display,
-    /// <summary>FPS limit and counter together; only when the menu shows either.</summary>
-    Fps,
     Windows,
     BackToPc,
     Exit
@@ -24,12 +22,11 @@ public enum SessionTourStop
 public static class SessionMenuTour
 {
     /// <summary>The stops, with the invite first when the tour is offered rather than asked for.</summary>
-    public static IReadOnlyList<SessionTourStop> Stops(bool invite, bool fpsRows)
+    public static IReadOnlyList<SessionTourStop> Stops(bool invite)
     {
         var stops = new List<SessionTourStop>();
         if (invite) stops.Add(SessionTourStop.Invite);
         stops.AddRange([SessionTourStop.BackToGame, SessionTourStop.ControlFs, SessionTourStop.Volume, SessionTourStop.Display]);
-        if (fpsRows) stops.Add(SessionTourStop.Fps);
         stops.AddRange([SessionTourStop.Windows, SessionTourStop.BackToPc, SessionTourStop.Exit]);
         return stops;
     }
@@ -50,7 +47,6 @@ public static class SessionMenuTour
         SessionTourStop.ControlFs => "ControlFsCard",
         SessionTourStop.Volume => "VolumeRow",
         SessionTourStop.Display => "SessionTourDisplayTitle",
-        SessionTourStop.Fps => "SessionTourFpsTitle",
         SessionTourStop.Windows => "SessionWindowsCard",
         SessionTourStop.BackToPc => preview ? "CloseMenu" : "BackToPc",
         _ => "ExitConsoleMode"
@@ -67,7 +63,6 @@ public static class SessionMenuTour
         SessionTourStop.ControlFs => "SessionTourControlFsBody",
         SessionTourStop.Volume => "SessionTourVolumeBody",
         SessionTourStop.Display => preview ? "SessionTourDisplayPreviewBody" : "SessionTourDisplayBody",
-        SessionTourStop.Fps => "SessionTourFpsBody",
         SessionTourStop.Windows => "SessionTourWindowsBody",
         SessionTourStop.BackToPc => preview ? "SessionTourCloseMenuBody" : "SessionTourBackToPcBody",
         _ => preview ? "SessionTourExitPreviewBody" : "SessionTourExitBody"

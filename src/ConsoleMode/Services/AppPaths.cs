@@ -49,15 +49,12 @@ public static class AppPaths
 {
     public static string ExeDir { get; private set; } = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
     public static string DataDir { get; private set; } = "";
-    public static string ToolsDir { get; private set; } = "";
-    public static string RtssCliPath { get; private set; } = "";
     public static string ConfigPath { get; private set; } = "";
     public static string BackupMonitorConfig { get; private set; } = "";
     public static string BackupMonitorMeta { get; private set; } = "";
     public static string BackupAudioFile { get; private set; } = "";
     /// <summary>What the running console session changed; left behind only when it never got to its restore.</summary>
     public static string SessionJournalFile { get; private set; } = "";
-    public static string BackupRtssFpsFile { get; private set; } = "";
     public static string MonitorModesCacheFile { get; private set; } = "";
     public static string IconPath { get; private set; } = "";
 
@@ -86,28 +83,16 @@ public static class AppPaths
         ExeDir = ResolveExeDir();
         IsInstalled = File.Exists(Path.Combine(ExeDir, InstalledMarker));
         DataDir = ResolveDataDir(ExeDir);
-        ToolsDir = Path.Combine(DataDir, "tools");
         Directory.CreateDirectory(DataDir);
-        Directory.CreateDirectory(ToolsDir);
 
-        EmbeddedFiles.ExtractTools(ToolsDir);
         EmbeddedFiles.ExtractIcon(Path.Combine(DataDir, "icon.ico"));
 
-        var rtssBeside = Path.Combine(ExeDir, "rtss-cli.exe");
-        var rtssDest = Path.Combine(ToolsDir, "rtss-cli.exe");
-        if (!File.Exists(rtssDest) && File.Exists(rtssBeside))
-        {
-            try { File.Copy(rtssBeside, rtssDest, true); } catch { /* ignore */ }
-        }
-
-        RtssCliPath = FirstExisting(Path.Combine(ToolsDir, "rtss-cli.exe"), Path.Combine(ExeDir, "rtss-cli.exe"));
 
         ConfigPath = Path.Combine(DataDir, "config.json");
         BackupMonitorConfig = Path.Combine(DataDir, "backup_monitores.cfg");
         BackupMonitorMeta = Path.Combine(DataDir, "backup_monitores_meta.json");
         BackupAudioFile = Path.Combine(DataDir, "backup_audio.txt");
         SessionJournalFile = Path.Combine(DataDir, "session.json");
-        BackupRtssFpsFile = Path.Combine(DataDir, "backup_rtss_fps.json");
         MonitorModesCacheFile = Path.Combine(DataDir, "monitor_modes_cache.json");
 
         IconPath = FirstExisting(
@@ -119,13 +104,12 @@ public static class AppPaths
         // Files the PowerShell 1.x build left next to the exe (portable only).
         if (IsInstalled) return;
         MigrateLegacy(ExeDir, "config.json", ConfigPath);
-        foreach (var file in new[] { "backup_monitores.cfg", "backup_monitores_meta.json", "backup_audio.txt", "backup_rtss_fps.json" })
+        foreach (var file in new[] { "backup_monitores.cfg", "backup_monitores_meta.json", "backup_audio.txt" })
         {
             MigrateLegacy(ExeDir, file, Path.Combine(DataDir, file));
         }
     }
 
-    public static bool HasRtssCli => File.Exists(RtssCliPath);
 
     private static string FirstExisting(params string[] paths)
     {

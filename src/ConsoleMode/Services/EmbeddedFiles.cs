@@ -4,15 +4,6 @@ namespace ConsoleMode.Services;
 
 public static class EmbeddedFiles
 {
-    public static void ExtractTools(string toolsDir)
-    {
-        Directory.CreateDirectory(toolsDir);
-        foreach (var name in new[] { "rtss-cli.exe" })
-        {
-            Extract($"ConsoleMode.Tools.{name}", Path.Combine(toolsDir, name));
-        }
-    }
-
     public static string? ExtractIcon(string destPath)
     {
         return Extract("ConsoleMode.Assets.icon.ico", destPath) ? destPath : null;

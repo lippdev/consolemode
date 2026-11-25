@@ -8,7 +8,6 @@ public sealed partial class ConsoleEngine
     public ConsoleRuntimeState State { get; } = new();
     public MonitorService Monitors { get; } = new();
     public AudioService Audio { get; } = new();
-    public RtssService Rtss { get; } = new();
     public LaunchService Launch { get; } = new();
     public VideoFeaturesService Video { get; } = new();
 
@@ -72,11 +71,6 @@ public sealed partial class ConsoleEngine
         State.CachedXboxHandle = 0;
         State.AudioWatchComplete = false;
         State.BigPictureWatchActive = false;
-        State.FpsLimit = config.FpsLimit;
-        State.RtssBackup = null;
-        State.RtssLimitApplied = false;
-        State.GameProfiles = [.. config.GameProfiles];
-        ResetGameProfileState();
         OnUi(NativeWindows.StopBigPictureExitWatch);
 
         // Before any screen changes: Windows may reshuffle the icons once the primary moves.
@@ -221,17 +215,6 @@ public sealed partial class ConsoleEngine
             }
         }
 
-        if (config.FpsLimit > 0 && Rtss.IsReady)
-        {
-            var rtss = Rtss.Enable(config.FpsLimit, State);
-            if (!rtss.Success && !string.IsNullOrWhiteSpace(rtss.Message))
-                AppLog.Write(rtss.Message);
-        }
-
-        if (RtssOverlay.HidesOthers(config.FpsOverlay) && Rtss.IsInstalled
-            && !Rtss.ApplyOverlay(config.FpsOverlay, config.FpsOverlayLayout))
-            AppLog.Write("RTSS: o contador de FPS não pôde ser exibido");
-
         switch (config.FullscreenMode)
         {
             case "bigPicture":
@@ -273,7 +256,6 @@ public sealed partial class ConsoleEngine
         if (mode == "xboxMode")
         {
             TickAudio();
-            TickGameProfile();
             TickPointer();
             return "running";
         }
@@ -282,7 +264,6 @@ public sealed partial class ConsoleEngine
         {
             if (IsCustomAppExit()) return "exit";
             TickAudio();
-            TickGameProfile();
             TickPointer();
             return "running";
         }
@@ -340,7 +321,6 @@ public sealed partial class ConsoleEngine
         }
 
         TickAudio();
-        TickGameProfile();
         TickPointer();
         return "running";
     }
@@ -359,8 +339,6 @@ public sealed partial class ConsoleEngine
         if (!State.IsActive)
         {
             OnUi(BlackCurtain.Close);
-            Rtss.Restore(State);
-            Rtss.SetOverlay("", hideOthers: false);
             return;
         }
 
@@ -387,8 +365,6 @@ public sealed partial class ConsoleEngine
                     : "Ícones da área de trabalho: visíveis de novo");
             if (State.DesktopIcons is { Count: > 0 } icons) RestoreDesktopIconsLater(icons);
             ReturnPointer();
-            Rtss.Restore(State);
-            Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
             Audio.ClearCache();
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
@@ -439,9 +415,6 @@ public sealed partial class ConsoleEngine
             State.CachedXboxHandle = 0;
             State.AudioWatchComplete = false;
             State.BigPictureWatchActive = false;
-            State.FpsLimit = 0;
-            State.RtssBackup = null;
-            State.RtssLimitApplied = false;
             State.HdrApplied = false;
             State.HdrMonitor = null;
             State.VrrApplied = false;
@@ -452,8 +425,6 @@ public sealed partial class ConsoleEngine
             State.PointerParks = 0;
             State.LastPointerPark = null;
             State.PointerBefore = null;
-            // The restore above already put the screen, HDR, FPS and audio back as before the session.
-            ResetGameProfileState();
             OnUi(NativeWindows.StopBigPictureExitWatch);
         }
     }

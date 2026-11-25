@@ -16,7 +16,4 @@ public static class SessionMenuMath
             ? $"{(int)elapsed.TotalHours} h {elapsed.Minutes:00} min"
             : $"{(int)elapsed.TotalMinutes} min";
     }
-
-    /// <summary>RTSS: back up the user's settings only the first time we touch them in a session.</summary>
-    public static bool NeedsRtssBackup(bool limitAlreadyApplied) => !limitAlreadyApplied;
 }

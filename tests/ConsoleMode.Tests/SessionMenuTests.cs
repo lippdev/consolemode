@@ -19,11 +19,4 @@ public class SessionMenuTests
     [InlineData(2, 0, "2 h 00 min")]
     public void Elapsed_reads_like_a_console(int hours, int minutes, string expected) =>
         Assert.Equal(expected, SessionMenuMath.FormatElapsed(new TimeSpan(hours, minutes, 30)));
-
-    [Fact]
-    public void Rtss_backup_happens_only_the_first_time()
-    {
-        Assert.True(SessionMenuMath.NeedsRtssBackup(limitAlreadyApplied: false));
-        Assert.False(SessionMenuMath.NeedsRtssBackup(limitAlreadyApplied: true));
-    }
 }

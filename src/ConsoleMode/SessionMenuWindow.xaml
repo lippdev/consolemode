@@ -280,30 +280,6 @@
                             </Grid>
                         </Button>
 
-                        <Button x:Name="FpsRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="fps"
-                                Visibility="{x:Bind ViewModel.IsFpsMenuAvailable, Mode=OneWay}">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xEC4A;" FontSize="19"/></Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}"/>
-                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionFpsText, Mode=OneWay}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Button>
-
-                        <Button x:Name="FpsOverlayRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="overlay"
-                                Visibility="{x:Bind ViewModel.IsFpsOverlayAvailable, Mode=OneWay}">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE9D9;" FontSize="19"/></Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}"/>
-                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionOverlayText, Mode=OneWay}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Button>
-
                         <Button x:Name="HdrRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.ToggleSessionHdrCommand}">
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -311,19 +287,6 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
                                     <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.SessionHdrOn), Mode=OneWay}"/>
-                                </StackPanel>
-                            </Grid>
-                        </Button>
-
-                        <!-- Per-game profile (issue #69): only while a Steam game runs -->
-                        <Button x:Name="GameProfileRow" Tag="row" Style="{StaticResource SideRow}" Command="{x:Bind ViewModel.OpenSessionPickerCommand}" CommandParameter="profile"
-                                Visibility="{x:Bind ViewModel.IsSessionGameRunning, Mode=OneWay}">
-                            <Grid ColumnSpacing="16">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource RowIcon}"><FontIcon Glyph="&#xE74E;" FontSize="19"/></Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Style="{StaticResource TileLabel}" Text="{x:Bind ViewModel.Texts.GameProfileRow, Mode=OneWay}"/>
-                                    <TextBlock Style="{StaticResource TileValue}" Text="{x:Bind ViewModel.SessionProfileText, Mode=OneWay}"/>
                                 </StackPanel>
                             </Grid>
                         </Button>

@@ -19,14 +19,11 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<MonitorRowViewModel> Monitors { get; } = [];
     public ObservableCollection<ComboOption> HideStrategies { get; } = [];
     public ObservableCollection<ComboOption> LaunchOptions { get; } = [];
-    public ObservableCollection<ComboOption> FpsOptions { get; } = [];
     public ObservableCollection<ComboOption> AudioOptions { get; } = [];
     public ObservableCollection<ComboOption> LanguageOptions { get; } = [];
     public ObservableCollection<string> SummaryItems { get; } = [];
     public LocalizedStrings Texts => LocalizationService.Texts;
 
-    private static readonly int[] FpsPresets = [30, 48, 50, 59, 60, 72, 75, 90, 120, 144];
-    private const int FpsCustomValue = -1;
     private const double LayoutMaxWidth = 1100;
     private const double LayoutMaxHeight = 300;
     private const double TileInset = 6;
@@ -57,12 +54,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _audioHintText = LocalizationService.Get("AudioHint");
     [ObservableProperty] private ComboOption? _selectedHideStrategy;
     [ObservableProperty] private ComboOption? _selectedLaunch;
-    [ObservableProperty] private ComboOption? _selectedFps;
     [ObservableProperty] private ComboOption? _selectedAudio;
     [ObservableProperty] private ComboOption? _selectedLanguage;
-    [ObservableProperty] private string _customFpsText = "60";
-    [ObservableProperty] private bool _showCustomFps;
-    [ObservableProperty] private bool _isFpsAvailable;
     [ObservableProperty] private bool _hdrEnable;
     [ObservableProperty] private bool _vrrEnable;
     [ObservableProperty] private MonitorRowViewModel? _selectedMonitor;
@@ -120,7 +113,6 @@ public partial class MainViewModel : ObservableObject
         Engine.UiInvoker = RunOnUi;
 
         IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
-        IsFpsAvailable = Engine.Rtss.IsReady;
         BuildLocalizedOptions();
 
         var firstRun = !ConfigService.Exists;
@@ -158,7 +150,6 @@ public partial class MainViewModel : ObservableObject
         UpdateSummary();
         RefreshUpdateStrings();
         RefreshControllerWakeText();
-        RefreshGameProfileTexts();
         RefreshConsoleTexts();
     }
 
@@ -166,7 +157,6 @@ public partial class MainViewModel : ObservableObject
     {
         var hideValue = SelectedHideStrategy?.Value ?? "disconnect";
         var launchValue = SelectedLaunch?.Value ?? "bigPicture";
-        var fpsValue = SelectedFps?.Value ?? "0";
         var audioValue = SelectedAudio?.Value ?? "";
         var wasApplying = _applying;
         _applying = true;
@@ -180,25 +170,15 @@ public partial class MainViewModel : ObservableObject
 
             RebuildLaunchOptions(launchValue);
 
-            FpsOptions.Clear();
-            FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsNoLimit"), Value = "0" });
-            foreach (var fps in FpsPresets)
-                FpsOptions.Add(new ComboOption { Text = $"{fps} FPS", Value = fps.ToString() });
-            FpsOptions.Add(new ComboOption { Text = LocalizationService.Get("FpsCustom"), Value = FpsCustomValue.ToString() });
-            SelectedFps = FpsOptions.FirstOrDefault(x => x.Value == fpsValue) ?? FpsOptions[0];
-            ShowCustomFps = SelectedFps.Value == FpsCustomValue.ToString();
-
             if (LanguageOptions.Count == 0)
             {
                 foreach (var language in LocalizationService.SupportedLanguages)
                     LanguageOptions.Add(new ComboOption { Text = language.NativeName, Value = language.Code });
             }
 
-            BuildFpsOverlayOptions();
             BuildAudioOptions(audioValue);
             BuildControllerLayoutOptions();
             BuildIntroStyleOptions();
-            FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
         finally
         {
@@ -358,25 +338,10 @@ public partial class MainViewModel : ObservableObject
             RestoreDesktopIcons = config.RestoreDesktopIcons;
             HideDesktopIcons = config.HideDesktopIcons;
             ParkPointer = config.ParkPointer;
-            LoadGameProfiles(config.GameProfiles);
             RefreshHomeButtonHint();
             SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == config.ControllerLayout) ?? ControllerLayoutOptions[0];
 
-            LoadFpsOverlay(config);
 
-            if (config.FpsLimit > 0 && FpsPresets.Contains(config.FpsLimit))
-            {
-                SelectedFps = FpsOptions.FirstOrDefault(o => o.Value == config.FpsLimit.ToString());
-            }
-            else if (config.FpsLimit > 0)
-            {
-                SelectedFps = FpsOptions.FirstOrDefault(o => o.Value == FpsCustomValue.ToString());
-                CustomFpsText = config.FpsLimit.ToString();
-            }
-            else
-            {
-                SelectedFps = FpsOptions[0];
-            }
         }
         finally
         {
@@ -561,13 +526,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     // Every setting saves as soon as it changes; there is no Save button.
-    partial void OnSelectedFpsChanged(ComboOption? value)
-    {
-        ShowCustomFps = value?.Value == FpsCustomValue.ToString();
-        SettingChanged();
-    }
-
-    partial void OnCustomFpsTextChanged(string value) => SettingChanged();
     partial void OnSelectedAudioChanged(ComboOption? value) => SettingChanged();
     partial void OnSelectedLanguageChanged(ComboOption? value)
     {
@@ -892,9 +850,6 @@ public partial class MainViewModel : ObservableObject
             AudioDeviceId = auto ? "" : audioId,
             AudioDeviceName = auto ? "" : SelectedAudio?.Text ?? "",
             AudioAutoSwitch = auto,
-            FpsLimit = ReadFpsLimit(),
-            FpsOverlay = FpsOverlayStyle,
-            FpsOverlayLayout = ReadFpsOverlayLayout(),
             HdrEnable = HdrEnable,
             VrrEnable = VrrEnable,
             ConsoleTourDone = _loadedConfig.ConsoleTourDone,
@@ -923,7 +878,6 @@ public partial class MainViewModel : ObservableObject
             RestoreDesktopIcons = RestoreDesktopIcons,
             HideDesktopIcons = HideDesktopIcons,
             ParkPointer = ParkPointer,
-            GameProfiles = [.. _gameProfiles],
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
             SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
@@ -966,14 +920,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private int ReadFpsLimit()
-    {
-        if (SelectedFps is null) return 0;
-        if (SelectedFps.Value == FpsCustomValue.ToString())
-            return int.TryParse(CustomFpsText, out var custom) && custom > 0 ? custom : 0;
-        return int.TryParse(SelectedFps.Value, out var fps) ? fps : 0;
-    }
-
     private void UpdateSummary()
     {
         if (_applying) return;
@@ -997,8 +943,6 @@ public partial class MainViewModel : ObservableObject
                 SummaryItems.Add(LocalizationService.Get("SummaryAudio", SelectedAudio.Text));
                 break;
         }
-        var fps = ReadFpsLimit();
-        if (IsFpsAvailable && fps > 0) SummaryItems.Add(LocalizationService.Get("SummaryFps", fps));
         if (HdrEnable) SummaryItems.Add("HDR");
         if (VrrEnable) SummaryItems.Add("VRR");
         UpdateHomeMeta();

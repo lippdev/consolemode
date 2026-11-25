@@ -447,23 +447,6 @@
                                         </StackPanel>
                                     </Grid>
                                 </Button>
-                                <Button Style="{StaticResource ConsoleCard}" Width="208" Height="208" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="fps"
-                                        IsEnabled="{x:Bind ViewModel.IsFpsAvailable, Mode=OneWay}"
-                                        AutomationProperties.Name="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <Border Width="42" Height="42" CornerRadius="21" Background="#26FFFFFF" HorizontalAlignment="Left">
-                                            <FontIcon Glyph="&#xE916;" FontSize="19"/>
-                                        </Border>
-                                        <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="2">
-                                            <TextBlock Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}" FontSize="14" Foreground="#B3FFFFFF" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" MaxLines="2"/>
-                                            <TextBlock Text="{x:Bind ViewModel.SelectedFps.Text, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Button>
                             </StackPanel>
                             </ScrollViewer>
                         </StackPanel>
@@ -658,13 +641,6 @@
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.ParkPointer), Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="profiles"
-                                                IsEnabled="{x:Bind ViewModel.HasGameProfiles, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.GameProfilesDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.GameProfilesCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.GameProfilesCountText, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
                                     </StackPanel>
                                     <StackPanel x:Name="SystemSection2" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 2), Mode=OneWay}">
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="controllerlayout" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.ControllerLayoutDescription, Mode=OneWay}">
@@ -742,112 +718,6 @@
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.VrrCard, Mode=OneWay}"/>
                                                 <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.VrrText, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="fps" AutomationProperties.HelpText="{x:Bind ViewModel.FpsStatusText, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsFpsAvailable, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFps.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <TextBox Header="{x:Bind ViewModel.Texts.FpsCard, Mode=OneWay}" Width="240" PlaceholderText="{x:Bind ViewModel.Texts.FpsPlaceholder, Mode=OneWay}"
-                                            Text="{x:Bind ViewModel.CustomFpsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{x:Bind ViewModel.ShowCustomFps, Mode=OneWay}"/>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="overlay" AutomationProperties.HelpText="{x:Bind ViewModel.FpsOverlayStatusText, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsRtssInstalled, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFpsOverlay.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="overlaysize" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlaySize, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFpsOverlaySize.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="overlayposition" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayPosition, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFpsOverlayPosition.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="overlaycolor" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayColor, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedFpsOverlayColor.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="overlaycard" IsEnabled="{x:Bind ViewModel.IsFpsOverlayDrawn, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.FpsOverlayCardBackgroundDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayCardBackground, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayCard), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <TextBlock Text="{x:Bind ViewModel.Texts.FpsOverlayItems, Mode=OneWay}" FontSize="18" TextWrapping="Wrap" Opacity="0.72" Margin="12,8,0,0"/>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovfps" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowFps, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowFps), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovframetime" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowFrameTime, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowFrameTime), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovapi" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowApi, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowApi), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <TextBlock Text="{x:Bind ViewModel.Texts.FpsOverlayPcItems, Mode=OneWay}" FontSize="18" TextWrapping="Wrap" Opacity="0.72" Margin="12,8,0,0"/>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovcpu" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowCpu, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowCpu), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovcpuclock" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowCpuClock, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowCpuClock), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovram" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowRam, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowRam), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovvram" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowVram, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowVram), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovgpu" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowGpu, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowGpu), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovgpuclock" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowGpuClock, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowGpuClock), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="ovgputemp" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlayShowGpuTemp, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlayShowGpuTemp), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="overlayline" IsEnabled="{x:Bind ViewModel.IsFpsOverlayCustom, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.FpsOverlaySingleLine, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.OverlaySingleLine), Mode=OneWay}"/>
                                             </Grid>
                                         </Button>
                                     </StackPanel>

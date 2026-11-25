@@ -40,10 +40,6 @@ Write-Host "Versao: $Version"
 
 New-Item -ItemType Directory -Path $embedDir, $distDir -Force | Out-Null
 
-if (-not $SkipTools) {
-    & (Join-Path $PSScriptRoot "Get-RtssCli.ps1") -TargetDir $embedDir
-}
-
 function Invoke-Publish([string]$OutDir, [bool]$SingleFile) {
     if (Test-Path -LiteralPath $OutDir) { Remove-Item -LiteralPath $OutDir -Recurse -Force }
     $pubArgs = @(

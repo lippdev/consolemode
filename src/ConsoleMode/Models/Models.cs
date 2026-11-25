@@ -36,10 +36,6 @@ public sealed class AppConfig
     public string AudioDeviceId { get; set; } = "";
     public string AudioDeviceName { get; set; } = "";
     public bool AudioAutoSwitch { get; set; }
-    public int FpsLimit { get; set; }
-    /// <summary>RtssOverlay style: "external" | "off" | "compact" (FPS only) | "stats" | "detailed" | "custom". Applied over the game during a session.</summary>
-    public string FpsOverlay { get; set; } = RtssOverlay.External;
-    public FpsOverlayLayout FpsOverlayLayout { get; set; } = new();
     public Dictionary<string, SavedDisplayMode> MonitorModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool HdrEnable { get; set; }
     public bool VrrEnable { get; set; }
@@ -145,9 +141,6 @@ public sealed class AppConfig
     /// <summary>A version the user chose to skip; newer ones are still announced.</summary>
     public string SkippedUpdateVersion { get; set; } = "";
 
-    /// <summary>Settings applied while a given Steam game runs during a session (issue #69).</summary>
-    public List<GameProfile> GameProfiles { get; set; } = [];
-
     /// <summary>
     /// A copy with other monitor fields and every other setting as it is here. A copy, not a field-by-field
     /// rebuild: a setting added later is carried along without anyone having to remember it.
@@ -164,31 +157,6 @@ public sealed class AppConfig
     [JsonIgnore]
     public string SetupKey =>
         $"{FocusMonitor}|{(MonitorModes.TryGetValue(FocusMonitor, out var mode) ? mode.Key : "current")}";
-}
-
-/// <summary>
-/// One game's own settings, saved from the session menu while it runs. Every field left empty keeps
-/// the session's value. Applied when the game starts, undone when it closes.
-/// </summary>
-public sealed class GameProfile
-{
-    public int SteamAppId { get; set; }
-    public string Name { get; set; } = "";
-    public SavedDisplayMode? Mode { get; set; }
-    public bool? Hdr { get; set; }
-    /// <summary>0 = no limit; null = leave the session's.</summary>
-    public int? FpsLimit { get; set; }
-    public string? AudioDeviceId { get; set; }
-    public string? AudioDeviceName { get; set; }
-}
-
-/// <summary>What the game screen looked like when a game started, to go back to when it closes.</summary>
-public sealed class GameBaseline
-{
-    public SavedDisplayMode? Mode { get; set; }
-    public bool Hdr { get; set; }
-    public int FpsLimit { get; set; }
-    public string? AudioDeviceId { get; set; }
 }
 
 public sealed class SavedDisplayMode
@@ -407,9 +375,6 @@ public sealed class ConsoleRuntimeState
     public nint CachedXboxHandle { get; set; }
     public bool BigPictureWatchActive { get; set; }
     public bool AudioWatchComplete { get; set; }
-    public int FpsLimit { get; set; }
-    public RtssBackup? RtssBackup { get; set; }
-    public bool RtssLimitApplied { get; set; }
     public bool HdrApplied { get; set; }
     public string? HdrMonitor { get; set; }
     public bool VrrApplied { get; set; }
@@ -428,20 +393,6 @@ public sealed class ConsoleRuntimeState
     public int PointerParks { get; set; }
     public DateTime? LastPointerPark { get; set; }
     public (int X, int Y)? PointerBefore { get; set; }
-    /// <summary>Per-game profiles for this session; the session menu updates them as they are saved.</summary>
-    public List<GameProfile> GameProfiles { get; set; } = [];
-    /// <summary>The Steam game running now (0 = none), and the screen as it was when it started.</summary>
-    public int RunningGameId { get; set; }
-    public GameBaseline? GameBaseline { get; set; }
-    /// <summary>A profile changed the screen for the running game; it is undone when the game closes.</summary>
-    public bool GameProfileApplied { get; set; }
-}
-
-public sealed class RtssBackup
-{
-    public int FramerateLimit { get; set; }
-    public bool LimiterEnabled { get; set; }
-    public string SavedAt { get; set; } = "";
 }
 
 public sealed class MonitorBackupMeta

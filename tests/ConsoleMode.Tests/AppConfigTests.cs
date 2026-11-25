@@ -45,20 +45,6 @@ public class AppConfigTests
         Assert.Equal(["id-desk"], config.HideMonitors);
     }
 
-    // The session used to get a field-by-field copy that forgot the FPS counter: the saved style
-    // was never applied when console mode started.
-    [Fact]
-    public void Copy_for_a_session_keeps_the_fps_counter()
-    {
-        var layout = new FpsOverlayLayout { SingleLine = true };
-        var config = new AppConfig { FpsOverlay = RtssOverlay.Compact, FpsOverlayLayout = layout };
-
-        var copy = config.WithMonitors("", [], []);
-
-        Assert.Equal(RtssOverlay.Compact, copy.FpsOverlay);
-        Assert.Same(layout, copy.FpsOverlayLayout);
-    }
-
     [Fact]
     public void Copy_for_a_session_keeps_every_other_setting()
     {

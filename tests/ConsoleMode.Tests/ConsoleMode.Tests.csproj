@@ -38,8 +38,6 @@
     <Compile Include="../../src/ConsoleMode/Services/ConsoleTour.cs" Link="ConsoleTour.cs" />
     <Compile Include="../../src/ConsoleMode/Services/BootIntro.cs" Link="BootIntro.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerMouseMath.cs" Link="ControllerMouseMath.cs" />
-    <Compile Include="../../src/ConsoleMode/Services/RtssOverlay.cs" Link="RtssOverlay.cs" />
-    <Compile Include="../../src/ConsoleMode/Services/HardwareStats.cs" Link="HardwareStats.cs" />
     <Compile Include="../../src/ConsoleMode/Services/AudioNaming.cs" Link="AudioNaming.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DisplayIdentity.cs" Link="DisplayIdentity.cs" />
     <Compile Include="../../src/ConsoleMode/Services/DisplayModeMatch.cs" Link="DisplayModeMatch.cs" />
@@ -60,7 +58,6 @@
     <Compile Include="../../src/ConsoleMode/Services/DesktopIconLayout.cs" Link="DesktopIconLayout.cs" />
     <Compile Include="../../src/ConsoleMode/Services/ControllerWake.cs" Link="ControllerWake.cs" />
     <Compile Include="../../src/ConsoleMode/Services/PackageLogo.cs" Link="PackageLogo.cs" />
-    <Compile Include="../../src/ConsoleMode/Services/GameProfiles.cs" Link="GameProfiles.cs" />
     <Compile Include="../../src/ConsoleMode/Models/Models.cs" Link="Models.cs" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.pt-BR.json" Link="Strings.pt-BR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.pt-BR.json" />
     <EmbeddedResource Include="../../src/ConsoleMode/Resources/Strings.en-US.json" Link="Strings.en-US.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.en-US.json" />
