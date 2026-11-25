@@ -1,0 +1,56 @@
+name: Fork sync
+
+# This repo is a fork of lippdev/consolemode (see FORK.md). The dojo's keeper agent opens a PR from
+# sync/vX when upstream publishes vX. When the CI of that PR finishes, this decides with fixed rules,
+# no AI: a clean sync is merged and released (Release workflow, "publish" ticked); anything else
+# gets the needs-review label and waits for the owner. The rules live in .github/scripts/fork-sync.sh.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Starts the Release workflow.
+  actions: write
+
+concurrency:
+  group: fork-sync
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: github.event.workflow_run.event == 'pull_request' && startsWith(github.event.workflow_run.head_branch, 'sync/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Merge and release a clean sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          UPSTREAM: lippdev/consolemode
+          # What the agent may change on top of the clean merge: the Italian catalog and docs, and the
+          # changelogs the release reads its notes from.
+          ALLOWED_FILES: |
+            src/ConsoleMode/Resources/Strings.it-IT.json
+            README.it-IT.md
+            CHANGELOG.md
+            CHANGELOG.en-US.md
+          # file :: regex every changed line of that file must match (whole line).
+          LINE_RULES: |
+            src/ConsoleMode/ConsoleMode.csproj :: \s*<(Version|AssemblyVersion|FileVersion|InformationalVersion)>[0-9.]+</\1>\s*
+          VERSION_FILE: src/ConsoleMode/ConsoleMode.csproj
+          VERSION_PATTERN: <Version>([^<]+)</Version>
+          RELEASE_WORKFLOW: release.yml
+          RELEASE_INPUTS: |
+            version={version}
+            publish=true
+        run: .github/scripts/fork-sync.sh
