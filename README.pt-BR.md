@@ -55,7 +55,7 @@ Os atalhos do controle são você quem escolhe: nenhum vem ligado, o tour da pri
 - **Perfis por jogo** para os jogos da Steam (resolução, HDR, limite de FPS e áudio) e a bateria do controle na tela
 - Devolve os **ícones da área de trabalho** e o **ponteiro do mouse** ao lugar, pode deixar o controle **acordar o PC** e restaura a mesa na próxima abertura se uma sessão for interrompida
 - Automação com os links `consolemode://start` / `stop` / `menu` (Stream Deck, scripts) e uma [API de controle local](docs/GUIDE.pt-BR.md#api-de-controle-local)
-- Português, inglês, espanhol, alemão, francês e russo
+- Português, inglês, espanhol, alemão, francês, italiano e russo
 
 ## Novidades da 1.7.1
 

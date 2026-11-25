@@ -4,6 +4,10 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+## [1.7.2]
+### What's new
+- Italian language: the app and the installer are now available in Italian.
+
 ## [1.7.1]
 ### What's new
 - Network control for Google TV and Android TV is back. A session can turn the TV on and switch to the PC input. On return, it can run a command to open the Home screen or switch inputs before putting the TV in standby. (#208, #213)

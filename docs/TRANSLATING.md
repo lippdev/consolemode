@@ -1,6 +1,6 @@
 # Translating Console Mode
 
-Console Mode speaks English, Português (Brasil), Español, Deutsch, Français and Русский. Thanks for helping it speak yours, or for fixing a line that reads wrong in your language.
+Console Mode speaks English, Português (Brasil), Español, Deutsch, Français, Italiano and Русский. Thanks for helping it speak yours, or for fixing a line that reads wrong in your language.
 
 You don't need Windows or a build environment: every text the app shows lives in one JSON file per language, and the tests that check it run on any OS.
 

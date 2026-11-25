@@ -167,6 +167,7 @@ public sealed class LocalizationTests
     [InlineData(null, null, "ja-JP", "en-US")]          // unknown languages read English
     [InlineData(null, null, "de-CH", "de-DE")]
     [InlineData(null, null, "fr-CA", "fr-FR")]
+    [InlineData(null, null, "it-CH", "it-IT")]
     [InlineData(null, null, "ru-KZ", "ru-RU")]
     [InlineData(null, null, "es-MX", "es-ES")]
     [InlineData("es-ES", null, "pt-BR", "es-ES")]

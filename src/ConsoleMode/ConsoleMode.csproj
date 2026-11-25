@@ -17,10 +17,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <Platform Condition="'$(Platform)' == ''">x64</Platform>
-    <Version>1.7.1</Version>
-    <AssemblyVersion>1.7.1.0</AssemblyVersion>
-    <FileVersion>1.7.1.0</FileVersion>
-    <InformationalVersion>1.7.1</InformationalVersion>
+    <Version>1.7.2</Version>
+    <AssemblyVersion>1.7.2.0</AssemblyVersion>
+    <FileVersion>1.7.2.0</FileVersion>
+    <InformationalVersion>1.7.2</InformationalVersion>
     <AssemblyTitle>Console Mode</AssemblyTitle>
     <Product>Console Mode</Product>
     <Authors>lippdev</Authors>
@@ -46,6 +46,7 @@
     <EmbeddedResource Include="Resources\Strings.es-ES.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.es-ES.json" />
     <EmbeddedResource Include="Resources\Strings.de-DE.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.de-DE.json" />
     <EmbeddedResource Include="Resources\Strings.fr-FR.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.fr-FR.json" />
+    <EmbeddedResource Include="Resources\Strings.it-IT.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.it-IT.json" />
     <EmbeddedResource Include="Resources\Strings.ru-RU.json" WithCulture="false" LogicalName="ConsoleMode.Localization.Strings.ru-RU.json" />
   </ItemGroup>
 

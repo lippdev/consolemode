@@ -14,7 +14,7 @@ public sealed record UpdateInfo(string Version, string Name, string Notes, strin
 /// </summary>
 public static partial class UpdateService
 {
-    public const string Repository = "lippdev/consolemode";
+    public const string Repository = "1r0n51uv/consolemode";
     public const string SetupAssetPrefix = "ConsoleMode-Setup";
     public const string PortableAssetPrefix = "ConsoleMode-Portable";
 

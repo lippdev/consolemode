@@ -33,7 +33,7 @@ Xbox mode, and restores the desk setup afterwards.
 ## Conventions
 
 - **Every user-facing string** goes in every catalog in `src/ConsoleMode/Resources/`
-  (`Strings.pt-BR.json`, `en-US`, `es-ES`, `de-DE`, `fr-FR`, `ru-RU`), translated.
+  (`Strings.pt-BR.json`, `en-US`, `es-ES`, `de-DE`, `fr-FR`, `it-IT`, `ru-RU`), translated.
   The localization tests fail when keys or `{0}` placeholders don't match, or when a sentence
   is left in English.
 - **Changelog**: add user-visible changes under `## [Unreleased]` in both

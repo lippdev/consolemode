@@ -55,7 +55,7 @@ You pick the controller shortcuts yourself: none is on at first, the tour the ap
 - **Per-game profiles** for Steam games (resolution, HDR, FPS limit and audio) and the controller's battery on screen
 - Puts the **desktop icons** and the **mouse pointer** back where they were, can let the controller **wake the PC**, and restores the desk on the next start if a session was cut short
 - Automation with `consolemode://start` / `stop` / `menu` links (Stream Deck, scripts) and a [local control API](docs/GUIDE.md#local-control-api)
-- English, Portuguese, Spanish, German, French and Russian
+- English, Portuguese, Spanish, German, French, Italian and Russian
 
 ## What's new in 1.7.1
 

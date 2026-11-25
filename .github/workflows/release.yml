@@ -241,7 +241,7 @@ jobs:
             ""
             "---"
             ""
-            "🇧🇷 Notas em português: [CHANGELOG.md](https://github.com/lippdev/consolemode/blob/$tag/CHANGELOG.md)"
+            "🇧🇷 Notas em português: [CHANGELOG.md](https://github.com/1r0n51uv/consolemode/blob/$tag/CHANGELOG.md)"
           )
           if ($summaries.Count -gt 0) { $releaseNotes += @("") + $summaries }
           $releaseNotes = $releaseNotes -join "`n"

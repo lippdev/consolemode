@@ -294,6 +294,7 @@ Pré-condições: Ajustes → Interface = **Automático** (padrão).
 - [ ] Trocar o idioma em Ajustes e voltar para Console: todos os textos, incluindo os cartões, trocam. Resultado: ______
 - [ ] Em alemão, francês e russo (textos mais longos), percorrer Home, Ajustes, menu da sessão e tutorial nas duas interfaces: nenhum botão, cartão ou linha do menu corta o texto ou sobrepõe outro elemento. Resultado: ______
 - [ ] Instalador em alemão, francês e russo: o diálogo de idioma lista os três, as opções de atalho e de iniciar com o Windows aparecem sem caracteres quebrados, e o app abre no idioma escolhido. Resultado: ______
+- [ ] Instalador e app em italiano: o diálogo de idioma lista Italiano, as opções de atalho e de iniciar com o Windows aparecem sem caracteres quebrados, e o app abre em italiano. Percorrer Início, Sessão, Sistema, o menu da sessão e o tutorial, nas interfaces Desktop e Console, procurando textos cortados ou sobrepostos. Resultado: ______
 
 ### Navegação por controle (Xbox **e** PlayStation; a janela precisa estar em primeiro plano)
 - [ ] **Interface Desktop:** D-pad move o foco entre tiles, o seletor de papel, os cards de Ajustes e os ComboBoxes; A abre um ComboBox, D-pad percorre, A escolhe, B fecha; Start abre e fecha Ajustes; Y vai para a interface Console; no tutorial, A avança e B pula. Resultado: ______

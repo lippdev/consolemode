@@ -4,6 +4,10 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+## [1.7.2]
+### Novidades
+- Idioma italiano: o app e o instalador agora estão disponíveis em italiano.
+
 ## [1.7.1]
 ### Novidades
 - O controle de TVs Google TV e Android TV pela rede voltou. A sessão pode ligar a TV e trocar para a entrada do PC. Na volta, ela pode executar um comando para abrir a tela inicial ou outra entrada antes de entrar em espera. (#208, #213)

@@ -24,9 +24,9 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
 AppPublisher=lippdev
-AppPublisherURL=https://github.com/lippdev/consolemode
-AppSupportURL=https://github.com/lippdev/consolemode/issues
-AppUpdatesURL=https://github.com/lippdev/consolemode/releases
+AppPublisherURL=https://github.com/1r0n51uv/consolemode
+AppSupportURL=https://github.com/1r0n51uv/consolemode/issues
+AppUpdatesURL=https://github.com/1r0n51uv/consolemode/releases
 DefaultDirName={localappdata}\Programs\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
@@ -57,6 +57,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [CustomMessages]
@@ -75,6 +76,9 @@ de.LaunchApp=Console Mode öffnen
 fr.OneClickShortcut=Raccourci « Console Mode 1 Click » sur le Bureau (passe en mode console en un clic)
 fr.StartWithWindows=Démarrer avec Windows (reste dans la zone de notification)
 fr.LaunchApp=Ouvrir Console Mode
+it.OneClickShortcut=Collegamento "Console Mode 1 Click" sul desktop (entra in modalità console con un clic)
+it.StartWithWindows=Avvia con Windows (resta nell'area di notifica)
+it.LaunchApp=Apri Console Mode
 ru.OneClickShortcut=Ярлык «Console Mode 1 Click» на рабочем столе (режим консоли в один клик)
 ru.StartWithWindows=Запускать вместе с Windows (в области уведомлений)
 ru.LaunchApp=Открыть Console Mode
@@ -103,6 +107,7 @@ Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Langu
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "es-ES"; Languages: es; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "de-DE"; Languages: de; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "fr-FR"; Languages: fr; Flags: uninsdeletekeyifempty uninsdeletevalue
+Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "it-IT"; Languages: it; Flags: uninsdeletekeyifempty uninsdeletevalue
 Root: HKCU; Subkey: "Software\ConsoleMode"; ValueType: string; ValueName: "Language"; ValueData: "ru-RU"; Languages: ru; Flags: uninsdeletekeyifempty uninsdeletevalue
 ; consolemode://start|stop|show links (ProtocolService registers the same keys at startup).
 Root: HKCU; Subkey: "Software\Classes\consolemode"; ValueType: string; ValueData: "URL:Console Mode"; Flags: uninsdeletekey
