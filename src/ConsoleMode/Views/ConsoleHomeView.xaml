@@ -537,7 +537,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.TvSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 3), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -547,7 +547,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.OptionalExtrasSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 4), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -557,7 +557,7 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.AppSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 5), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
@@ -567,18 +567,8 @@
                                     <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
                                             Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
                                             OpacityTransition="{StaticResource ConsoleFade}"/>
-                                    <TextBlock Text="{x:Bind ViewModel.Texts.HelpDataSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
-                                               OpacityTransition="{StaticResource ConsoleFade}"/>
-                                </Grid>
-                            </Button>
-                            <Button Style="{StaticResource ConsoleCategory}" Tag="7" Click="OnCategoryClick" GotFocus="OnCategoryFocused">
-                                <Grid>
-                                    <Border Width="4" Height="28" CornerRadius="2" HorizontalAlignment="Left" Margin="-14,0,0,0" Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                            Opacity="{x:Bind ViewModel.IndicatorOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
-                                            OpacityTransition="{StaticResource ConsoleFade}"/>
                                     <TextBlock Text="{x:Bind ViewModel.Texts.OtherAppsSection, Mode=OneWay}" FontSize="20" TextWrapping="Wrap" MaxLines="2" LineHeight="24" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 7), Mode=OneWay}"
+                                               Opacity="{x:Bind ViewModel.TabOpacity(ViewModel.SystemCategory, 6), Mode=OneWay}"
                                                OpacityTransition="{StaticResource ConsoleFade}"/>
                                 </Grid>
                             </Button>
@@ -742,34 +732,6 @@
                                         </Button>
                                     </StackPanel>
                                     <StackPanel x:Name="SystemSection3" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 3), Mode=OneWay}">
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="tvprovider" AutomationProperties.HelpText="{x:Bind ViewModel.TvProviderDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvControlCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedTvProvider.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <TextBox Header="{x:Bind ViewModel.Texts.TvHostCard, Mode=OneWay}" PlaceholderText="192.168.0.50" Text="{x:Bind ViewModel.TvHost, Mode=TwoWay}" Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}"/>
-                                        <TextBox Header="{x:Bind ViewModel.Texts.TvMacCard, Mode=OneWay}" PlaceholderText="AA:BB:CC:DD:EE:FF" Text="{x:Bind ViewModel.TvMacAddress, Mode=TwoWay}" Visibility="{x:Bind ViewModel.UsesTvHost, Mode=OneWay}"/>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenPickerCommand}" CommandParameter="tvhdmi" Visibility="{x:Bind ViewModel.UsesTvHdmiInput, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TvHdmiDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvHdmiCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.SelectedTvHdmiInput.Text, Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <TextBox Header="{x:Bind ViewModel.Texts.TvInputCommandCard, Mode=OneWay}" PlaceholderText="input keyevent 243" Text="{x:Bind ViewModel.TvInputCommand, Mode=TwoWay}" Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}"/>
-                                        <!-- Sent when the desk is back, before standby (issue #209) -->
-                                        <TextBox Header="{x:Bind ViewModel.Texts.TvRestoreCommandCard, Mode=OneWay}" PlaceholderText="input keyevent 3" Text="{x:Bind ViewModel.TvRestoreCommand, Mode=TwoWay}" Visibility="{x:Bind ViewModel.IsTvAndroid, Mode=OneWay}"/>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="tvpower" IsEnabled="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TvTurnOffDescription, Mode=OneWay}">
-                                            <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                                                <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvTurnOffCard, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="1" Style="{StaticResource RowValue}" Text="{x:Bind ViewModel.OnOff(ViewModel.TvTurnOffOnRestore), Mode=OneWay}"/>
-                                            </Grid>
-                                        </Button>
-                                        <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.TestTvCommand}" IsEnabled="{x:Bind ViewModel.IsTvEnabled, Mode=OneWay}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.TvTestDescription, Mode=OneWay}">
-                                            <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.TvTestCard, Mode=OneWay}"/>
-                                        </Button>
-                                    </StackPanel>
-                                    <StackPanel x:Name="SystemSection4" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 4), Mode=OneWay}">
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="hdr" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.HdrDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.HdrCard, Mode=OneWay}"/>
@@ -889,7 +851,7 @@
                                             </Grid>
                                         </Button>
                                     </StackPanel>
-                                    <StackPanel x:Name="SystemSection5" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 5), Mode=OneWay}">
+                                    <StackPanel x:Name="SystemSection4" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 4), Mode=OneWay}">
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.CycleSettingCommand}" CommandParameter="background" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.BackgroundDescription, Mode=OneWay}">
                                             <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.BackgroundCard, Mode=OneWay}"/>
@@ -969,7 +931,7 @@
                                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.DataFolderCard, Mode=OneWay}"/>
                                         </Button>
                                     </StackPanel>
-                                    <StackPanel x:Name="SystemSection6" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 6), Mode=OneWay}">
+                                    <StackPanel x:Name="SystemSection5" Spacing="10" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 5), Mode=OneWay}">
                                         <Button Style="{StaticResource ConsoleRow}" Command="{x:Bind ViewModel.OpenControllerTestCommand}" AutomationProperties.HelpText="{x:Bind ViewModel.Texts.ControllerTestDescription, Mode=OneWay}">
                                             <TextBlock Style="{StaticResource RowLabel}" Text="{x:Bind ViewModel.Texts.ControllerTestCard, Mode=OneWay}"/>
                                         </Button>
@@ -991,7 +953,7 @@
                                         <TextBlock FontSize="18" Opacity="0.72" Margin="12,8,0,0"><Run Text="Console Mode"/> <Run Text="{x:Bind ViewModel.AppVersion}"/></TextBlock>
                                     </StackPanel>
                                     <!-- The developer's other apps: cards with their art on top, like the games on a console home -->
-                                    <Grid x:Name="SystemSection7" ColumnSpacing="24" Padding="20,20,20,20" VerticalAlignment="Top" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 7), Mode=OneWay}">
+                                    <Grid x:Name="SystemSection6" ColumnSpacing="24" Padding="20,20,20,20" VerticalAlignment="Top" Visibility="{x:Bind ViewModel.CategoryVisibility(ViewModel.SystemCategory, 6), Mode=OneWay}">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                         <Button Style="{StaticResource ConsoleCard}" Padding="0" Height="320" HorizontalAlignment="Stretch" VerticalContentAlignment="Top"
                                                 Command="{x:Bind ViewModel.OpenLinkCommand}" CommandParameter="https://github.com/nextestudios/ControlFS">

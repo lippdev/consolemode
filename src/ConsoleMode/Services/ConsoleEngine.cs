@@ -1,6 +1,5 @@
 using ConsoleMode.Models;
 using ConsoleMode.Native;
-using ConsoleMode.Services.Tv;
 
 namespace ConsoleMode.Services;
 
@@ -12,7 +11,6 @@ public sealed partial class ConsoleEngine
     public RtssService Rtss { get; } = new();
     public LaunchService Launch { get; } = new();
     public VideoFeaturesService Video { get; } = new();
-    public TvControlService Tv { get; } = new();
 
     public const string AudioOnConnectId = "__on_connect__";
 
@@ -94,11 +92,6 @@ public sealed partial class ConsoleEngine
         State.PointerParks = 0;
         State.LastPointerPark = null;
         State.PointerBefore = config.ParkPointer ? MousePointer.Position() : null;
-
-        // Wake the TV and switch it to the PC first, so the game screen shows up in the fresh
-        // read below (or in EnsureActive's wait). A TV that doesn't answer is only logged.
-        State.Tv = config.Tv;
-        if (config.Tv is { IsEnabled: true } tv) Tv.TurnOn(tv);
 
         // Read the screens fresh: the row the window shows can be stale (the TV was switched off,
         // or the last restore disconnected it), and a stale "active" would skip turning it on.
@@ -398,7 +391,6 @@ public sealed partial class ConsoleEngine
             Rtss.SetOverlay("", hideOthers: false);
             Monitors.ClearCache();
             Audio.ClearCache();
-            if (State.Tv is { IsEnabled: true, HasRestoreStep: true } tv) Tv.Restore(tv);
             AppLog.Write("Stop-ConsoleMode: restauração concluída");
             // Only once the screens are back: a restore that threw or left them wrong is tried again on the next start.
             if (!restore.Success)
@@ -421,7 +413,6 @@ public sealed partial class ConsoleEngine
             State.RestoreInProgress = false;
             State.IsActive = false;
             State.ShouldExit = false;
-            State.Tv = null;
             State.SteamMoved = false;
             State.MoveCount = 0;
             State.HasAppeared = false;

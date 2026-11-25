@@ -184,7 +184,6 @@ public partial class MainViewModel
             case "desktopicons": RestoreDesktopIcons = !RestoreDesktopIcons; break;
             case "hidedesktopicons": HideDesktopIcons = !HideDesktopIcons; break;
             case "parkpointer": ParkPointer = !ParkPointer; break;
-            case "tvpower": TvTurnOffOnRestore = !TvTurnOffOnRestore; break;
             // The FPS counter (RTSS): what it shows, one item at a time.
             case "overlaycard": OverlayCard = !OverlayCard; break;
             case "overlayline": OverlaySingleLine = !OverlaySingleLine; break;
@@ -251,9 +250,7 @@ public partial class MainViewModel
             "hide" => (LocalizationService.Get("HideOtherScreensCard"), HideStrategies.Select(o => (o.Text, o.Value)), SelectedHideStrategy?.Value),
             "language" => (LocalizationService.Get("LanguageCard"), LanguageOptions.Select(o => (o.Text, o.Value)), SelectedLanguage?.Value),
             "controllerlayout" => (LocalizationService.Get("ControllerLayoutCard"), ControllerLayoutOptions.Select(o => (o.Text, o.Value)), SelectedControllerLayout?.Value),
-            "tvprovider" => (LocalizationService.Get("TvControlCard"), TvProviders.Select(o => (o.Text, o.Value)), SelectedTvProvider?.Value),
             "introstyle" => (LocalizationService.Get("IntroStyleCard"), IntroStyleOptions.Select(o => (o.Text, o.Value)), SelectedIntroStyle?.Value),
-            "tvhdmi" => (LocalizationService.Get("TvHdmiCard"), TvHdmiInputs.Select(o => (o.Text, o.Value)), SelectedTvHdmiInput?.Value),
             "overlay" => (LocalizationService.Get("FpsOverlayCard"), FpsOverlayOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlay?.Value),
             "overlaysize" => (LocalizationService.Get("FpsOverlaySize"), FpsOverlaySizeOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlaySize?.Value),
             "overlayposition" => (LocalizationService.Get("FpsOverlayPosition"), FpsOverlayPositionOptions.Select(o => (o.Text, o.Value)), SelectedFpsOverlayPosition?.Value),
@@ -286,9 +283,7 @@ public partial class MainViewModel
             case "hide": SelectedHideStrategy = HideStrategies.FirstOrDefault(o => o.Value == item.Value) ?? SelectedHideStrategy; break;
             case "language": SelectedLanguage = LanguageOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedLanguage; break;
             case "controllerlayout": SelectedControllerLayout = ControllerLayoutOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedControllerLayout; break;
-            case "tvprovider": SelectedTvProvider = TvProviders.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvProvider; break;
             case "introstyle": ChooseIntroStyle(item.Value); break;
-            case "tvhdmi": SelectedTvHdmiInput = TvHdmiInputs.FirstOrDefault(o => o.Value == item.Value) ?? SelectedTvHdmiInput; break;
             case "overlay": SelectedFpsOverlay = FpsOverlayOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlay; break;
             case "overlaysize": SelectedFpsOverlaySize = FpsOverlaySizeOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlaySize; break;
             case "overlayposition": SelectedFpsOverlayPosition = FpsOverlayPositionOptions.FirstOrDefault(o => o.Value == item.Value) ?? SelectedFpsOverlayPosition; break;

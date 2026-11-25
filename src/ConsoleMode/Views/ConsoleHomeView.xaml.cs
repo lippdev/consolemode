@@ -405,8 +405,7 @@ public sealed partial class ConsoleHomeView : UserControl
         3 => SystemSection3,
         4 => SystemSection4,
         5 => SystemSection5,
-        6 => SystemSection6,
-        _ => SystemSection7
+        _ => SystemSection6
     };
 
     private void FocusSystemCategory()

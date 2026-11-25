@@ -198,7 +198,6 @@ public partial class MainViewModel : ObservableObject
             BuildAudioOptions(audioValue);
             BuildControllerLayoutOptions();
             BuildIntroStyleOptions();
-            BuildTvOptions();
             FpsStatusText = LocalizationService.Get(IsFpsAvailable ? "FpsAvailable" : "FpsUnavailable");
         }
         finally
@@ -336,7 +335,6 @@ public partial class MainViewModel : ObservableObject
             IsPlayniteAvailable = Engine.Launch.IsPlayniteAvailable();
             BuildLocalizedOptions();
             SelectedLaunch = LaunchOptions.FirstOrDefault(o => o.Value == LaunchValueOf(config)) ?? LaunchOptions[0];
-            ApplyTv(config.Tv);
             HdrEnable = config.HdrEnable;
             VrrEnable = config.VrrEnable;
             CheckUpdates = config.CheckUpdates;
@@ -927,8 +925,7 @@ public partial class MainViewModel : ObservableObject
             ParkPointer = ParkPointer,
             GameProfiles = [.. _gameProfiles],
             ControllerLayout = SelectedControllerLayout?.Value ?? _loadedConfig.ControllerLayout,
-            SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion,
-            Tv = BuildTvConfig()
+            SkippedUpdateVersion = _loadedConfig.SkippedUpdateVersion
         };
 
         if (Monitors.Count == 0) return config;
