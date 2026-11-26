@@ -776,6 +776,7 @@ Executar somente com autorização do dono, acesso local e uma forma alternativa
 - [ ] Com a alpha selecionada como Home e o Steam Big Picture em modo janela, iniciar uma sessão com **Usar FSE**. Verificar no monitor de jogo as bordas e o foco. Conferir nos eventos de ativação do Windows se a Home da alpha foi iniciada e se houve uma abertura do Xbox. Ao sair, verificar a volta ao desktop.
 
 - [ ] Com o Xbox selecionado como Home, tentar jogar com FSE pelo Steam ou Playnite. A alpha deve orientar a seleção da Home antes de alterar telas, áudio ou entrar na FSE. Repetir com a seleção de Home ausente.
+- [ ] Com a FSE ligada para o launcher e outra Home selecionada, abrir as opções do card. Conferir o estado, abrir **Configurar Home** e voltar. Usar **Jogar sem FSE**, encerrar e confirmar que o mesmo card continua com FSE ligada na próxima sessão. Repetir com um jogo da Steam.
 - [ ] Registrar, selecionar e restaurar a Home com o controle. Conferir o indicador na linha acionada, mover o foco durante a operação e verificar que pressionar A duas vezes não repete a ação.
 
 - [ ] Na Home da 2.0, abrir as opções do Playnite, do Steam Big Picture e de um app próprio. Ligar **Usar FSE** só no Playnite, reabrir a alpha e confirmar que a preferência ficou independente por launcher.

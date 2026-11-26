@@ -145,7 +145,7 @@ fn run(plan: Plan, mut desk: Box<dyn Desk>, journal_path: PathBuf, tx: fmpsc::Un
     plan.hide.retain(|h| !h.eq_ignore_ascii_case(&plan.focus));
 
     // Never overwrite an unfinished (or unreadable) recovery record.
-    if journal_path.exists() {
+    if journal_path.try_exists().unwrap_or(true) {
         return send(Event::Failed(t("Reabra o Console Mode para concluir a restauração da sessão").into()));
     }
 
@@ -471,7 +471,7 @@ fn centered_on(w: &cm_platform::launch::Win, r: (i32, i32, i32, i32)) -> bool {
 /// A session that died mid-way (crash, power): undo it before anything else (1.7's recovery).
 pub fn recover(desk: &mut dyn Desk, journal_path: &std::path::Path) -> bool {
     let Some(j) = session::read_journal(journal_path) else {
-        if journal_path.exists() { log("recuperação: diário ilegível; preservado, novas sessões bloqueadas"); }
+        if journal_path.try_exists().unwrap_or(true) { log("recuperação: diário ilegível; preservado, novas sessões bloqueadas"); }
         return false;
     };
     log(&format!("recuperação: sessão de {} ficou aberta; restaurando", j.launcher));
@@ -507,7 +507,7 @@ mod tests {
     fn journal_with_tv(dir: &Path) -> (PathBuf, Journal) {
         let _ = std::fs::create_dir_all(dir);
         let path = dir.join("session.json");
-        let j = Journal { launcher: "bigPicture".into(), tv: Some(TvRestore { provider: "androidTv".into(), host: "10.0.0.2".into(), restore_command: String::new(), standby: true }), ..Default::default() };
+        let j = Journal { displays_backup: "backup".into(), launcher: "bigPicture".into(), tv: Some(TvRestore { provider: "androidTv".into(), host: "10.0.0.2".into(), restore_command: String::new(), standby: true }), ..Default::default() };
         session::write_journal(&path, &j).unwrap();
         (path, j)
     }
