@@ -30,4 +30,20 @@ jobs:
           }
           .\build\Publish-ConsoleMode2.ps1 -Target Installer
 
-          cargo test --workspace --release --locked
+      - name: Test Rust workspace
+        run: cargo test --workspace --release --locked
+
+      - name: Verify installer alongside stable 1.7.1
+        shell: powershell
+        run: .\build\Test-ConsoleMode2Installer.ps1
+
+      - name: Save tested installer and checksum
+        # On the public repository, binaries are distributed manually via a release draft.
+        if: github.event.repository.private == true
+        uses: actions/upload-artifact@v7
+        with:
+          name: ConsoleMode2Alpha-Windows-x64-${{ github.sha }}
+          path: |
+            dist/v2/ConsoleMode2Alpha-Setup-x64.exe
+            dist/v2/ConsoleMode2Alpha-Setup-x64.exe.sha256
+          if-no-files-found: error

@@ -13,12 +13,18 @@ use gpui::{
 /// Shared text family for the app's headings and body.
 pub const FONT: &str = "Source Sans 3";
 const FONT_BYTES: &[u8] = include_bytes!("../assets/fonts/SourceSans3-Variable.ttf");
+pub const LAUNCHER_TITLE_FONT: &str = "Plus Jakarta Sans";
+const LAUNCHER_TITLE_FONT_BYTES: &[u8] = include_bytes!("../assets/fonts/PlusJakartaSans-Variable.ttf");
 pub const ICON_FONT: &str = "Material Symbols Rounded Filled";
 const ICON_FONT_BYTES: &[u8] = include_bytes!("../assets/fonts/MaterialSymbolsRounded-Filled.ttf");
 
 /// Registers the bundled text and icon fonts. Call once at startup.
 pub fn init(cx: &mut App) {
-    for (family, bytes) in [(FONT, FONT_BYTES), (ICON_FONT, ICON_FONT_BYTES)] {
+    for (family, bytes) in [
+        (FONT, FONT_BYTES),
+        (LAUNCHER_TITLE_FONT, LAUNCHER_TITLE_FONT_BYTES),
+        (ICON_FONT, ICON_FONT_BYTES),
+    ] {
         if let Err(e) = cx.text_system().add_fonts(vec![Cow::Borrowed(bytes)]) {
             eprintln!("font {family}: {e}");
         }
@@ -248,7 +254,7 @@ pub mod motion {
     pub const MODAL_OUT: u64 = 160;
     pub const SMALL: u64 = 160;
     pub const FOCUS: u64 = 240;
-    pub const BACKDROP: u64 = 300;
+    pub const BACKDROP: u64 = 480;
     pub const LAUNCH: u64 = 300;
 
     static REDUCED: AtomicBool = AtomicBool::new(false);

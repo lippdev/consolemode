@@ -199,19 +199,25 @@ pub fn attach(
                     enter_fse_on_open(command, c.config.gaming_home_on_open, c.running.as_ref().is_some_and(|r| r.shell_launcher == cm_core::session::Launcher::Xbox))
                 });
                 if enter_fse {
-                    cx.background_executor().spawn(async move {
-                        if let Err(error) = crate::gaming_home::set_active(true) {
+                    let target = console.clone();
+                    cx.spawn(async move |cx| {
+                        let result = cx.background_executor().spawn(async move { crate::gaming_home::set_active(true) }).await;
+                        if let Err(error) = result {
                             crate::startup_log(&format!("Abrir experiência de tela inteira: {error}"));
+                            let _ = target.update(cx, |c, cx| c.show_toast(crate::i18n::t(error), cx));
                         }
                     }).detach();
                 }
-                let needs_front = matches!(
+                let launcher_owns_home = command == Some(Command::GamingHome)
+                    && console.read_with(cx, |c, _| c.running.as_ref().is_some_and(|run| run.use_fse));
+                let needs_front = !launcher_owns_home && matches!(
                     command,
                     Some(Command::Show | Command::GamingHome | Command::Start | Command::Menu)
                 );
                 console.update(cx, |c, cx| {
                     match command {
-                        Some(Command::Start) if !exiting => c.start_launch(cx),
+                        Some(Command::Start) if !exiting => c.start_from_shell(cx),
+                        Some(Command::GamingHome) if !exiting && c.running.is_none() => c.start_from_gaming_home(cx),
                         Some(Command::Stop | Command::Exit) => {
                             if command == Some(Command::Exit) {
                                 exiting = true;

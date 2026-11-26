@@ -24,16 +24,16 @@ pub fn apply_vrr(desk: &mut dyn Desk, j: &mut Journal, journal_path: &Path) {
     }
     match desk.vrr_write(Some(&video_features::with_vrr(&setting, true))) {
         Ok(()) => log("VRR: ligado para a sessão"),
-        Err(e) => { j.vrr = None; log(&format!("VRR: falha ao ligar: {e}")); }
+        Err(e) => log(&format!("VRR: falha ao ligar: {e}")),
     }
 }
 
 /// Puts the VRR setting back as it was before the session (the exact text, or no value at all).
-pub fn restore_vrr(desk: &mut dyn Desk, j: &Journal) {
-    let Some(b) = &j.vrr else { return };
+pub fn restore_vrr(desk: &mut dyn Desk, j: &Journal) -> bool {
+    let Some(b) = &j.vrr else { return true };
     match desk.vrr_write(b.previous.as_deref()) {
-        Ok(()) => log("VRR: de volta ao que era"),
-        Err(e) => log(&format!("VRR: não foi possível restaurar: {e}")),
+        Ok(()) => { log("VRR: de volta ao que era"); true }
+        Err(e) => { log(&format!("VRR: não foi possível restaurar: {e}")); false }
     }
 }
 
@@ -62,32 +62,41 @@ pub fn vrr_from_menu(desk: &mut dyn Desk, j: &mut Journal, journal_path: &Path, 
 /// HDR turned on or off from the session menu. Tracks what to undo: HDR the session turned on goes back
 /// off; HDR that was on before and the menu turned off goes back on. Returns the state it ended in.
 pub fn hdr_from_menu(desk: &mut dyn Desk, j: &mut Journal, journal_path: &Path, focus: &str, on: bool) -> Option<bool> {
-    let before = desk.hdr_state(focus);
-    if before.is_none() || before == Some(on) { return before; }
-    if on {
-        match desk.hdr_on(focus) {
-            Ok(turned_on) => {
-                // back to how it was, or one more thing the restore turns off again
-                if j.hdr_turned_off == focus { j.hdr_turned_off.clear(); }
-                else if turned_on && j.hdr_turned_on.is_empty() { j.hdr_turned_on = focus.to_string(); }
-            }
-            Err(e) => log(&format!("HDR pelo menu: não ligou: {e}")),
+    let before = desk.hdr_state(focus)?;
+    if before == on { return Some(before); }
+    let original = if j.hdr_turned_on == focus { false }
+        else if j.hdr_turned_off == focus { true } else { before };
+    // When moving away from the original state, persist the undo before touching HDR.
+    // When moving back, retain the existing undo until the change has succeeded.
+    if on != original {
+        let old = j.clone();
+        if on { j.hdr_turned_on = focus.to_string(); } else { j.hdr_turned_off = focus.to_string(); }
+        if let Err(e) = session::write_journal(journal_path, j) {
+            *j = old;
+            log(&format!("HDR pelo menu: não deu para gravar o diário ({e}); não mudou"));
+            return Some(before);
         }
-    } else {
-        // the session's own HDR needs no undo any more; one the user had before does
-        let ours = j.hdr_turned_on == focus;
-        desk.hdr_off(focus);
-        if ours { j.hdr_turned_on.clear(); } else { j.hdr_turned_off = focus.to_string(); }
     }
-    let _ = session::write_journal(journal_path, j);
-    log(&format!("HDR pelo menu: {}", if on { "ligado" } else { "desligado" }));
+    let result = if on { desk.hdr_on(focus).map(|_| ()) } else { desk.hdr_off(focus) };
+    match result {
+        Ok(()) if on == original => {
+            j.hdr_turned_on.clear(); j.hdr_turned_off.clear();
+            if let Err(e) = session::write_journal(journal_path, j) {
+                // The old durable journal still safely restores the original state.
+                log(&format!("HDR pelo menu: não deu para atualizar o diário ({e})"));
+            }
+        }
+        Err(e) => log(&format!("HDR pelo menu: falha: {e}")),
+        _ => {}
+    }
     desk.hdr_state(focus)
 }
 
-/// The restore: HDR the menu turned off comes back on, HDR the session turned on goes off.
-pub fn restore_hdr(desk: &mut dyn Desk, j: &Journal) {
-    if !j.hdr_turned_off.is_empty() { let _ = desk.hdr_on(&j.hdr_turned_off); }
-    if !j.hdr_turned_on.is_empty() { desk.hdr_off(&j.hdr_turned_on); }
+/// Returns whether each HDR undo succeeded, so failed work remains in the journal.
+pub fn restore_hdr(desk: &mut dyn Desk, j: &Journal) -> (bool, bool) {
+    let off = j.hdr_turned_off.is_empty() || desk.hdr_on(&j.hdr_turned_off).map(|_| ()).map_err(|e| log(&format!("HDR: falha ao restaurar: {e}"))).is_ok();
+    let on = j.hdr_turned_on.is_empty() || desk.hdr_off(&j.hdr_turned_on).map_err(|e| log(&format!("HDR: falha ao restaurar: {e}"))).is_ok();
+    (on, off)
 }
 
 #[cfg(test)]
@@ -106,7 +115,7 @@ mod tests {
         fn hide(&mut self, _: &[String]) -> Result<(), String> { Ok(()) }
         fn set_mode(&mut self, _: &str, _: &DisplayMode) -> Result<(), String> { Ok(()) }
         fn hdr_on(&mut self, _: &str) -> Result<bool, String> { self.calls.push("hdr on".into()); let was = self.hdr; self.hdr = true; Ok(!was) }
-        fn hdr_off(&mut self, _: &str) { self.calls.push("hdr off".into()); self.hdr = false; }
+        fn hdr_off(&mut self, _: &str) -> Result<(), String> { self.calls.push("hdr off".into()); self.hdr = false; Ok(()) }
         fn audio_default(&mut self) -> Option<String> { None }
         fn set_audio(&mut self, _: &str) -> Result<(), String> { Ok(()) }
         fn screen_rect(&mut self, _: &str) -> Option<(i32, i32, i32, i32)> { None }
@@ -165,10 +174,10 @@ mod tests {
     }
 
     #[test]
-    fn a_vrr_write_that_fails_leaves_nothing_to_undo() {
+    fn a_vrr_write_that_fails_keeps_the_undo() {
         let (mut desk, mut j, p) = (Fake { vrr_fails: true, ..Default::default() }, Journal::default(), journal_path("vrr-fail"));
         apply_vrr(&mut desk, &mut j, &p);
-        assert!(j.vrr.is_none());
+        assert!(j.vrr.is_some());
     }
 
     #[test]
@@ -181,6 +190,26 @@ mod tests {
         let recovered = session::read_journal(&p).unwrap();
         restore_vrr(&mut desk, &recovered);
         assert_eq!(desk.vrr.as_deref(), Some("A=1;"));
+    }
+
+    #[test]
+    fn hdr_is_not_changed_if_its_undo_cannot_be_written() {
+        let dir = std::env::temp_dir().join(format!("cm2-hdr-denied-{}", std::process::id()));
+        let _ = std::fs::remove_file(&dir);
+        std::fs::write(&dir, "not a directory").unwrap();
+        let mut desk = Fake::default();
+        let mut journal = Journal::default();
+        assert_eq!(hdr_from_menu(&mut desk, &mut journal, &dir.join("session.json"), "TV", true), Some(false));
+        assert!(desk.calls.is_empty());
+        assert!(journal.hdr_turned_on.is_empty());
+        let _ = std::fs::remove_file(dir);
+    }
+
+    #[test]
+    fn failed_vrr_restore_is_reported_for_retry() {
+        let mut desk = Fake { vrr_fails: true, ..Default::default() };
+        let journal = Journal { vrr: Some(VrrBackup { previous: Some("old".into()) }), ..Default::default() };
+        assert!(!restore_vrr(&mut desk, &journal));
     }
 
     #[test]

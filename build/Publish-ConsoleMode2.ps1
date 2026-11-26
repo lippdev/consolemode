@@ -56,11 +56,12 @@ try {
 }
 finally { Pop-Location }
 
-$built = Join-Path $root "target\release\ConsoleMode2.exe"
+$targetDir = if ($env:CARGO_TARGET_DIR) { [IO.Path]::Combine($root, $env:CARGO_TARGET_DIR) } else { Join-Path $root "target" }
+$built = Join-Path $targetDir "release\ConsoleMode2.exe"
 if (-not (Test-Path -LiteralPath $built)) { throw "Build nao gerou $built" }
 $exe = Join-Path $distDir "ConsoleMode2.exe"
 Copy-Item -LiteralPath $built -Destination $exe -Force
-$homeBuilt = Join-Path $root "target\release\ConsoleMode2Home.exe"
+$homeBuilt = Join-Path $targetDir "release\ConsoleMode2Home.exe"
 Copy-Item -LiteralPath $homeBuilt -Destination $distDir -Force
 & (Join-Path $PSScriptRoot "Stage-ConsoleMode2Home.ps1") -InstallRoot $distDir
 Write-Host "OK: $exe"

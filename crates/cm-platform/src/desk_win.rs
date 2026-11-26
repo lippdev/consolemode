@@ -605,11 +605,9 @@ impl WinDesk {
         }
         Ok(true)
     }
-    pub fn hdr_off(&mut self, id: &str) {
-        let _ = (|| -> Result<(), String> {
-            let c = query(QDC_ONLY_ACTIVE_PATHS)?;
-            set_color(resolve(&c, id)?, false)
-        })();
+    pub fn hdr_off(&mut self, id: &str) -> Result<(), String> {
+        let c = query(QDC_ONLY_ACTIVE_PATHS)?;
+        set_color(resolve(&c, id)?, false)
     }
     pub fn audio_default(&mut self) -> Option<String> {
         crate::audio::list_outputs()

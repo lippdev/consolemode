@@ -3,6 +3,8 @@
 use std::ffi::{c_char, c_void};
 use std::sync::{Mutex, OnceLock, atomic::{AtomicBool, AtomicU64, Ordering}};
 
+pub const HOME_REQUIRED: &str = crate::i18n::n("Registre e selecione o Console Mode como Home em Sistema › Inicialização antes de usar FSE");
+
 static TRANSITION: Mutex<()> = Mutex::new(());
 static ENTRY_PENDING: AtomicBool = AtomicBool::new(false);
 static ENTRY_GENERATION: AtomicU64 = AtomicU64::new(0);
@@ -51,16 +53,48 @@ fn api() -> Option<&'static GamingApi> {
 pub fn active() -> Option<bool> { api().map(|api| unsafe { (api.active)() != 0 }) }
 pub fn supported() -> Option<bool> { api().map(|api| unsafe { (api.supported)() != 0 }) }
 
+pub fn can_enter() -> bool {
+    active() == Some(true) || (supported() == Some(true) && api().is_some_and(|api| {
+        api.set.is_some() && api.can_set.is_some_and(|can_set| unsafe { can_set() } != 0)
+    }))
+}
+
 /// Request a change only when the current state is known and differs. Call off the UI thread:
 /// Windows may take several seconds to complete the transition. Never retry the toggle, since
 /// its result can arrive late and a second toggle could undo it.
 pub fn set_active(target: bool) -> Result<(), &'static str> {
     let _transition = TRANSITION.lock().map_err(|_| "Transição do FSE indisponível")?;
+    if target && !cm_platform::fse_win::status().is_ok_and(|s| s.registered && s.selected) {
+        return Err(HOME_REQUIRED);
+    }
+    request_state(target, true)
+}
+
+/// Session transitions leave the launcher in charge of foreground, and wait for Windows.
+pub fn session_state(target: bool) -> Result<(), &'static str> {
+    let _transition = TRANSITION.lock().map_err(|_| "Transição do FSE indisponível")?;
+    let changing = active() != Some(target);
+    request_state(target, false)?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(if target { 60 } else { 10 });
+    while active() != Some(target) {
+        if std::time::Instant::now() >= deadline { return Err("O Windows não confirmou a transição do FSE"); }
+        std::thread::sleep(std::time::Duration::from_millis(200));
+    }
+    if target && changing {
+        // Allow the Windows Home to finish opening before handing focus to the launcher.
+        std::thread::sleep(std::time::Duration::from_millis(1500));
+    }
+    Ok(())
+}
+
+fn request_state(target: bool, track_home: bool) -> Result<(), &'static str> {
     if supported() != Some(true) { return Err("FSE não é suportado neste dispositivo"); }
     let current = active().ok_or("FSE indisponível nesta versão do Windows")?;
     if current == target {
-        if target { ENTRY_GENERATION.fetch_add(1, Ordering::AcqRel); }
-        ENTRY_PENDING.store(target, Ordering::Release);
+        if track_home {
+            if target { ENTRY_GENERATION.fetch_add(1, Ordering::AcqRel); }
+            ENTRY_PENDING.store(target, Ordering::Release);
+        }
         return Ok(());
     }
     let api = api().ok_or("FSE indisponível nesta versão do Windows")?;
@@ -68,13 +102,15 @@ pub fn set_active(target: bool) -> Result<(), &'static str> {
         if unsafe { can_set() } == 0 { return Err("O Windows não permite alterar o FSE agora"); }
         if unsafe { set(i32::from(target)) } < 0 { return Err("O Windows recusou alterar o FSE"); }
     } else {
-        // Older API sets may expose the state but not the explicit setter.
-        cm_platform::launch::start_xbox();
+        // A toggle cannot guarantee the requested state or selected Home.
+        return Err("FSE indisponível nesta versão do Windows");
     }
     // Windows can present a confirmation dialog. Success means the request was accepted,
     // not that the user has already answered it. The shell observes the eventual state.
-    if target { ENTRY_GENERATION.fetch_add(1, Ordering::AcqRel); }
-    ENTRY_PENDING.store(target, Ordering::Release);
+    if track_home {
+        if target { ENTRY_GENERATION.fetch_add(1, Ordering::AcqRel); }
+        ENTRY_PENDING.store(target, Ordering::Release);
+    }
     Ok(())
 }
 

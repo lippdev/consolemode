@@ -23,6 +23,7 @@ pub enum View { Home, CardMenu { sel: usize }, Moving, Guide { sel: usize }, Lau
 
 /// A running console session, as the UI sees it.
 pub struct Running {
+    pub use_fse: bool,
     pub started: std::time::Instant,
     pub commands: std::sync::mpsc::Sender<crate::engine::Command>,
     pub simulated: bool,
@@ -52,6 +53,7 @@ pub struct Launcher {
 pub struct Brand { pub base: (u32, u32), pub glow: (u32, f32), pub glow2: Option<(u32, f32)> }
 
 impl Brand {
+    const CONSOLE_MODE: Brand = Brand { base: (0x103329, 0x081410), glow: (0x56e6a5, 0.22), glow2: Some((0x2aab91, 0.27)) };
     pub const STEAM: Brand = Brand { base: (0x1b2838, 0x0b1017), glow: (0x66c0f4, 0.30), glow2: Some((0x417a9b, 0.25)) };
     pub const PLAYNITE: Brand = Brand { base: (0x24123a, 0x0d0716), glow: (0xe43fd0, 0.30), glow2: Some((0x22d3c5, 0.24)) };
     pub const XBOX: Brand = Brand { base: (0x107c10, 0x063306), glow: (0x9bf00b, 0.24), glow2: None };
@@ -89,12 +91,36 @@ impl Backdrop {
     }
 }
 
-pub enum Item { Launcher(Launcher), Add, Game(Game, Option<(u32, u32)>) }
+struct BackdropTransition {
+    layers: Vec<(Option<Backdrop>, f32)>,
+    started: std::time::Instant,
+}
+
+impl BackdropTransition {
+    fn progress(&self) -> f32 {
+        let elapsed = self.started.elapsed().as_secs_f32() * 1000.;
+        motion::ease_in_out((elapsed / motion::BACKDROP as f32).min(1.))
+    }
+}
+
+pub enum Item { Welcome, Launcher(Launcher), Add, Game(Game, Option<(u32, u32)>) }
 
 impl Item {
+    fn is_welcome(&self) -> bool { matches!(self, Item::Welcome) }
+
+    pub(crate) fn usage_key(&self) -> Option<String> {
+        use cm_core::session::Launcher;
+        match self {
+            Item::Launcher(l) => Some(l.custom_id.as_ref().map_or_else(|| l.kind.mode().into(), |id| format!("custom:{id}"))),
+            Item::Game(..) => Some(Launcher::BigPicture.mode().into()),
+            _ => None,
+        }
+    }
+
     fn background(&self) -> Option<Backdrop> {
         match self {
             Item::Launcher(l) => Some(Backdrop::Brand(l.brand, l.mark.clone())),
+            Item::Welcome => Some(Backdrop::Brand(Brand::CONSOLE_MODE, None)),
             Item::Add => None,
             Item::Game(g, _) => g.hero.clone().map(Backdrop::Art),
         }
@@ -183,6 +209,9 @@ pub struct Console {
     tab_anim: usize,
     tab_dir: f32,
     pub(crate) menu_anim: usize,
+    pub(crate) fse_readiness: Option<crate::overlays::FseReadiness>,
+    pub(crate) fse_probe: Option<gpui::Task<()>>,
+    pub(crate) fse_launch_on_ready: bool,
     /// An overlay playing its exit (card menu, session menu) after the view went back home.
     pub(crate) exiting: Option<View>,
     pub(crate) exit_anim: usize,
@@ -191,7 +220,7 @@ pub struct Console {
     pub(crate) pane_anim: usize,
     pub(crate) pane_dir: f32,
     pub(crate) settings_selection_anim: usize,
-    prev_bg: Option<Backdrop>,
+    backdrop_transition: Option<BackdropTransition>,
     pub(crate) fade: usize,
     /// Row scroll in design units, and where its animation starts.
     pub(crate) scroll: f32,
@@ -217,6 +246,7 @@ impl Console {
         games.sort_by_key(|g| config.game_order.iter().position(|o| *o == id(g)).unwrap_or(usize::MAX));
         // games stay out of the row until the user turns them on in Sistema → Aparência
         if config.show_steam_games { items.append(&mut games); }
+        items.insert(0, Item::Welcome);
         let mut game_opts = HashMap::new();
         for p in &config.game_profiles {
             let mut v = crate::overlays::game_defaults();
@@ -240,8 +270,9 @@ impl Console {
             view: View::Home, session, system, nav: Nav::default(),
             game_opts, pinned, volume: 60, launch_task: None, guide_row: 0, guide_windows: Vec::new(), live_thumbs: Default::default(), session_vrr: None, session_fps: 0, session_hdr: None,
             prev_focus: 0, prev_tab: 0, tab_anim: 0, tab_dir: 1., menu_anim: 0, exiting: None, exit_anim: 0, exit_task: None,
+            fse_readiness: None, fse_probe: None, fse_launch_on_ready: false,
             vol_anim: 0, pane_anim: 0, pane_dir: 1., settings_selection_anim: 0, dropdown: None, dropdown_scroll: gpui::ScrollHandle::new(), dropdown_anim: 0, map_changed: None, map_anim: 0,
-            prev_bg: None, fade: 0, scroll: 0., prev_scroll: 0., scroll_anim: 0, mouse_mode: false, row_view: 1700., focus_handle: cx.focus_handle(), sounds, painted: false, wheel: 0.,
+            backdrop_transition: None, fade: 0, scroll: 0., prev_scroll: 0., scroll_anim: 0, mouse_mode: false, row_view: 1700., focus_handle: cx.focus_handle(), sounds, painted: false, wheel: 0.,
         }
     }
 
@@ -259,6 +290,9 @@ impl Console {
         match p {
             Pad::LB | Pad::RB => return self.set_tab(if p == Pad::LB { (self.tab + 2) % 3 } else { (self.tab + 1) % 3 }, cx),
             _ if self.tab != 0 => return self.settings_press(p, cx),
+            Pad::A if self.items[self.focus].is_welcome() => return self.launch_welcome_pick(cx),
+            Pad::Y if self.items[self.focus].is_welcome() => return self.start_tour(cx),
+            Pad::X if self.items[self.focus].is_welcome() => return self.set_tab(1, cx),
             Pad::Menu | Pad::Y => return self.open_card_menu(cx),
             Pad::A => return self.start_launch(cx),
             _ => {}
@@ -277,9 +311,52 @@ impl Console {
         cx.notify();
     }
 
+    pub(crate) fn start_from_gaming_home(&mut self, cx: &mut Context<Self>) {
+        let key = &self.config.fse_home_launcher;
+        // The configured card may have been removed or its FSE option disabled.
+        if key.is_empty() || !self.config.fse_launchers.contains(key) { return; }
+        let Some(index) = self.items.iter().position(|item| match item {
+            Item::Launcher(launcher) => {
+                let candidate = launcher.custom_id.as_ref().map_or_else(
+                    || launcher.kind.mode().to_owned(), |id| format!("custom:{id}"));
+                candidate == *key
+            }
+            _ => false,
+        }) else { return };
+        self.set_focus(index, cx);
+        self.start_launch(cx);
+    }
+
+    pub(crate) fn start_from_shell(&mut self, cx: &mut Context<Self>) {
+        if self.running.is_none() && matches!(self.items[self.focus], Item::Welcome) {
+            let Some(launcher) = self.items.iter().position(|item| matches!(item, Item::Launcher(_))) else { return };
+            self.set_focus(launcher, cx);
+        }
+        self.start_launch(cx);
+    }
+
     fn set_focus(&mut self, next: usize, cx: &mut Context<Self>) {
         if next == self.focus || next >= self.items.len() { return; }
-        self.prev_bg = self.items[self.focus].background();
+        self.backdrop_transition = if motion::reduced() {
+            None
+        } else {
+            let current = if self.items[self.focus].is_welcome() {
+                Some(Backdrop::Brand(self.welcome_brand(), None))
+            } else {
+                self.items[self.focus].background()
+            };
+            let (mut layers, alpha) = match self.backdrop_transition.take() {
+                Some(transition) if transition.progress() < 1. => {
+                    let alpha = transition.progress();
+                    (transition.layers, alpha)
+                }
+                _ => (Vec::new(), 1.),
+            };
+            if alpha > 0.005 { layers.push((current, alpha)); }
+            // Keep the opaque base and bound the amount of art rendered during rapid navigation.
+            if layers.len() > 5 { layers.remove(1); }
+            Some(BackdropTransition { layers, started: std::time::Instant::now() })
+        };
         self.prev_focus = self.focus;
         self.focus = next;
         self.fade += 1;
@@ -349,7 +426,7 @@ impl Console {
         }
         self.focus = self.focus.min(self.items.len() - 1);
         self.prev_focus = self.focus;
-        self.prev_bg = None;
+        self.backdrop_transition = None;
         self.scroll = 0.;
         self.prev_scroll = 0.;
     }
@@ -405,6 +482,7 @@ impl Console {
         match it {
             Item::Game(g, _) => (g.name.clone(), ago(g.last_played, self.now)),
             Item::Launcher(l) => (l.shown_name().to_string(), t(l.note).to_string()),
+            Item::Welcome => (t("Boas-vindas").into(), String::new()),
             Item::Add => (t("Adicionar app").to_string(), t("qualquer programa").to_string()),
         }
     }
@@ -495,9 +573,9 @@ impl Console {
         if !matches!(self.view, View::Guide { .. }) {
             stage = stage.bg(color::stage());
         }
-        if self.custom_editor.is_some() { let editor = self.custom_editor_view(&ui, cx); return stage.child(self.background(&ui, true)).child(editor).children(self.toast_view(&ui)); }
+        if self.custom_editor.is_some() { let editor = self.custom_editor_view(&ui, cx); return stage.child(self.background(&ui, true, false)).child(editor).children(self.toast_view(&ui)); }
         match self.view {
-            View::Launch { step } => return stage.child(self.background(&ui, false)).child(self.launch_view(&ui, step)).child(self.hints(&ui, cx)),
+            View::Launch { step } => return stage.child(self.background(&ui, false, false)).child(self.launch_view(&ui, step)).child(self.hints(&ui, cx)),
             View::Guide { sel } => { let g = self.guide_view(&ui, sel, true, cx); return stage.child(g).child(self.hints(&ui, cx)).children(self.toast_view(&ui)); }
             View::Confirm => return stage.child(self.confirm_view(&ui, cx)),
             _ => {}
@@ -509,7 +587,7 @@ impl Console {
             el.with_animation(("tab-in", anim), motion::out(motion::TAB), move |el, t| el.opacity(t).left(ui.u(dir * d * (1. - t)))).into_any_element()
         };
         if self.tab == 0 {
-            let bg = self.background(&ui, true);
+            let bg = self.background(&ui, true, window.is_window_active());
             let bg: gpui::AnyElement = if anim == 0 { bg.into_any_element() } else { bg.with_animation(("tab-bg", anim), motion::out(motion::TAB), |el, t| el.opacity(t)).into_any_element() };
             let home = self.home(&ui, cx);
             stage = stage.child(bg).child(enter(home));
@@ -529,12 +607,26 @@ impl Console {
 }
 
 impl Console {
-    fn background(&self, ui: &Ui, shaded: bool) -> Div {
+    fn background(&self, ui: &Ui, shaded: bool, animate: bool) -> Div {
         let mut layer = div().absolute().top_0().left_0().size_full();
-        if let Some(p) = &self.prev_bg { layer = layer.child(p.element(ui)); }
-        if let Some(p) = self.items[self.focus].background() {
-            layer = layer.child(div().absolute().top_0().left_0().size_full().child(p.element(ui))
-                .with_animation(("bg", self.fade), motion::out(motion::BACKDROP), |el, t| el.opacity(t)));
+        let surface = || div().absolute().top_0().left_0().size_full().bg(color::stage());
+        let mut current = surface();
+        if self.items[self.focus].is_welcome() {
+            current = current.child(self.welcome_backdrop(ui, animate));
+        } else if let Some(backdrop) = self.items[self.focus].background() {
+            current = current.child(backdrop.element(ui));
+        }
+        if let Some(transition) = self.backdrop_transition.as_ref().filter(|t| !motion::reduced() && t.progress() < 1.) {
+            for (backdrop, alpha) in &transition.layers {
+                layer = layer.child(surface().opacity(*alpha).children(backdrop.as_ref().map(|bg| bg.element(ui))));
+            }
+            let started = transition.started;
+            layer = layer.child(current.with_animation(("background-fade", self.fade), motion::in_out(motion::BACKDROP), move |el, _| {
+                let elapsed = started.elapsed().as_secs_f32() * 1000.;
+                el.opacity(motion::ease_in_out((elapsed / motion::BACKDROP as f32).min(1.)))
+            }));
+        } else {
+            layer = layer.child(current);
         }
         // a lens vignette: the corners fall off into the dark, like a photo, not a flat picture
         let vignette = ui.vignette();
@@ -545,6 +637,35 @@ impl Console {
             .child(div().absolute().top_0().left_0().size_full().bg(linear_gradient(0., linear_color_stop(color::shade(0.9), 0.), linear_color_stop(color::shade(0.), 0.45))))
             .child(div().absolute().top_0().left_0().size_full().bg(linear_gradient(180., linear_color_stop(color::shade(0.55), 0.), linear_color_stop(color::shade(0.), 0.38))))
             .child(vignette)
+    }
+
+    fn welcome_brand(&self) -> Brand {
+        let mut brand = Brand::CONSOLE_MODE;
+        match self.config.welcome_background.as_str() {
+            "theme" => {
+                brand.base = (0x1b2330, 0x0b1018);
+                brand.glow.0 = match cm_ui::theme() { 1 => 0xf2bf6b, 2 => 0x79d3ad, _ => 0x9cc6f2 };
+                brand.glow2 = Some((brand.glow.0, 0.22));
+            }
+            "midnight" => brand = Brand { base: (0x20243f, 0x0c101d), glow: (0x909eff, 0.20), glow2: Some((0x5e76d2, 0.28)) },
+            _ => {}
+        }
+        brand
+    }
+
+    fn welcome_backdrop(&self, ui: &Ui, animate: bool) -> Div {
+        let brand = self.welcome_brand();
+        let light = ui.light(ui.design.width * 0.72, ui.design.height * 0.48, 1150., hex(brand.glow.0, 0.24));
+        let base = brand_layer(ui, brand, None, 0., 0., 0., 0., gpui::px(0.)).overflow_hidden();
+        if !animate || motion::reduced() || !self.config.welcome_motion || !self.app_in_front || self.view != View::Home {
+            return base.child(light);
+        }
+        let ui = *ui;
+        base.child(light.with_animation("welcome-aurora", gpui::Animation::new(std::time::Duration::from_secs(18)).repeat().with_max_fps(24.), move |el, t| {
+            let phase = t * std::f32::consts::TAU;
+            el.left(ui.u(ui.design.width * 0.72 - 575. + phase.sin() * 110.))
+                .opacity(0.82 + phase.cos() * 0.18)
+        }))
     }
 
     fn top_bar(&self, ui: &Ui, cx: &mut Context<Self>) -> Div {
@@ -593,13 +714,57 @@ impl Console {
     }
 
     fn home(&mut self, ui: &Ui, cx: &mut Context<Self>) -> Div {
-        let hero = self.hero(ui, cx);
+        let hero = if matches!(self.items[self.focus], Item::Welcome) { self.welcome(ui, cx) } else { self.hero(ui, cx) };
         div().absolute().top_0().left_0().size_full().child(self.row(ui, cx)).child(hero)
+    }
+
+    fn welcome_pick(&self) -> Option<(usize, &Launcher, u32)> {
+        self.items.iter().enumerate().filter_map(|(index, item)| {
+            let Item::Launcher(launcher) = item else { return None };
+            let count = item.usage_key().and_then(|key| self.config.launcher_usage.get(&key).copied()).unwrap_or(0);
+            Some((index, launcher, count))
+        }).max_by_key(|(index, _, count)| (*count, std::cmp::Reverse(*index)))
+    }
+
+    fn launch_welcome_pick(&mut self, cx: &mut Context<Self>) {
+        if let Some((index, _, _)) = self.welcome_pick() {
+            self.click_card_focus(index, cx);
+            self.start_launch(cx);
+        }
+    }
+
+    fn welcome(&self, ui: &Ui, cx: &mut Context<Self>) -> Div {
+        let card = |id: &'static str, pad, icon, action, label: SharedString, cx: &mut Context<Self>| {
+            div().id(id).flex_1().min_w_0().flex().items_center().gap(ui.u(16.))
+                .px(ui.u(20.)).py(ui.u(22.)).rounded(ui.u(18.))
+                .bg(color::white(0.065)).border(ui.u(1.)).border_color(color::white(0.16))
+                .hover(|s| s.bg(color::white(0.13))).cursor_pointer()
+                .child(div().flex_none().size(ui.u(54.)).rounded(ui.u(14.)).bg(hex(0x72e5b5, 0.14))
+                    .flex().items_center().justify_center().child(ui.icon(icon, 27., hex(0xa2f5cd, 1.))))
+                .child(div().flex_1().min_w_0().flex().flex_col().gap(ui.u(4.))
+                    .child(div().text_size(ui.u(18.)).text_color(color::mute()).child(action))
+                    .child(div().text_size(ui.u(26.)).font_weight(FontWeight::SEMIBOLD).truncate().child(label)))
+                .child(ui.icon(glyph::CHEVRON_RIGHT, 24., color::mute()))
+                .on_click(cx.listener(move |this, _, _, cx| this.press(pad, cx)))
+        };
+        let mut cards = div().flex().w_full().gap(ui.u(16.));
+        if let Some((_, launcher, count)) = self.welcome_pick() {
+            cards = cards.child(card("welcome-play", Pad::A, glyph::PLAY_ARROW,
+                if count == 0 { t("Jogar") } else { t("Mais usado") }, launcher.shown_name(), cx));
+        }
+        cards = cards
+            .child(card("welcome-tour", Pad::Y, glyph::INFO, t("Primeiros passos"), t("Tour do aplicativo").into(), cx))
+            .child(card("welcome-session", Pad::X, glyph::TUNE, t("Configurar sessão"), self.setup_text(0, 0).into(), cx));
+        div().absolute().left(ui.u(ROW_X)).right(ui.u(96.)).top(ui.u(448.))
+            .max_w(ui.u(1480.)).flex().flex_col().items_start().gap(ui.u(24.))
+            .child(div().text_size(ui.u(56.)).line_height(ui.u(66.)).font_family(cm_ui::LAUNCHER_TITLE_FONT)
+                .font_weight(FontWeight::BOLD).child(t("Seu PC, pronto para jogar.")))
+            .child(cards)
     }
 
     fn hero(&self, ui: &Ui, cx: &mut Context<Self>) -> Div {
         let logo_box = div().h(ui.u(170.)).flex().items_end().mb(ui.u(30.));
-        let word = |text: &str| div().whitespace_nowrap().text_size(ui.u(86.)).font_family(cm_ui::FONT).font_weight(FontWeight::LIGHT).line_height(ui.u(92.)).child(ui.lifted(text.to_string()));
+        let word = |text: &str| div().whitespace_nowrap().text_size(ui.u(86.)).font_family(cm_ui::LAUNCHER_TITLE_FONT).font_weight(FontWeight::BOLD).line_height(ui.u(92.)).child(ui.lifted(text.to_string()));
         let meta_row = |cols: Vec<(String, gpui::AnyElement)>| {
             div().flex().children(cols.into_iter().enumerate().map(|(i, (k, v))| ui.meta(i == 0, &k, v)))
         };
@@ -650,6 +815,7 @@ impl Console {
                 div().child(logo_box.child(logo)).child(meta_row(cols)).child(buttons)
             }
             Item::Launcher(l) => div().child(logo_box.child(word(&l.shown_name()))).child(meta_row(setup(3))).child(buttons).child(sub(l.sub)),
+            Item::Welcome => div(),
             Item::Add => div().child(logo_box.child(word(t("Adicionar app")))).child(buttons)
                 .child(sub(n("Qualquer programa vira um iniciador: emulador, launcher de outra loja, um jogo solto. Ao fechar, suas telas voltam sozinhas."))),
         };
@@ -711,6 +877,11 @@ impl Console {
                     None => ui.icon(glyph::SPORTS_ESPORTS, size * 0.85, color::accent()).into_any_element(),
                 };
                 tile.child(brand_layer(ui, l.brand, None, 0., 0., 0., 0., ui.u(radius(s)))).child(icon)
+            }
+            Item::Welcome => {
+                let size = ui.u(if focused { 96. } else { 61. });
+                tile.child(brand_layer(ui, Brand::CONSOLE_MODE, None, 0., 0., 0., 0., ui.u(radius(s))))
+                    .child(div().relative().font_family("Segoe UI Emoji").text_size(size).line_height(size).child("👋"))
             }
             Item::Add => tile.bg(color::white(0.06)).border(ui.u(2.)).border_dashed().border_color(color::white(0.3))
                 .child(ui.icon(glyph::ADD, if focused { 72. } else { 52. }, color::mute())),
@@ -786,7 +957,13 @@ impl Console {
         let (left, right) = if let Some((l, r)) = self.overlay_hints() {
             (mk(l), mk(r))
         } else if self.tab == 0 {
-            if self.has_card_menu(self.focus) {
+            if matches!(self.items[self.focus], Item::Welcome) {
+                (vec![], mk(vec![
+                    (Pad::Y, Glyph::Text("Y"), t("Tour do aplicativo")),
+                    (Pad::X, Glyph::Text("X"), t("Configurar sessão")),
+                    (Pad::A, Glyph::Text("A"), t("Jogar")),
+                ]))
+            } else if self.has_card_menu(self.focus) {
                 (vec![(Pad::Menu, ui.hint(Glyph::Icon(glyph::MENU), t("Menu"), None))],
                  vec![(Pad::A, ui.hint(Glyph::Text("A"), t("Jogar"), None)), (Pad::Y, ui.hint(Glyph::Text("Y"), t("Opções"), None))])
             } else {

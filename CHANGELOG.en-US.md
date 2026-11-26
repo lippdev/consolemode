@@ -4,6 +4,12 @@ English (US) release notes, mirroring CHANGELOG.md (Brazilian Portuguese). Befor
 
 ## [Unreleased]
 
+- The 2.0 alpha plays the Console Mode startup sound with every opening animation.
+
+- Version 2.0 opens on a welcome dashboard with a session overview and a customizable background.
+
+- In 2.0 Alpha, Steam Big Picture, Playnite and custom apps can use the experimental Windows Full Screen Experience. Under System → Startup, you can register Console Mode, select it as Home and restore your previous Home. The button shows progress during each operation.
+
 - The 2.0 interface uses Source Sans 3.
 
 - Settings lists in 2.0 scroll above the footer and follow controller and keyboard selection.

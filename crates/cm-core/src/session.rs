@@ -95,6 +95,9 @@ pub fn hand_off_target(processes: &[(u32, u32, String)], launched: u32) -> Optio
 pub struct Journal {
     /// Unix seconds.
     pub started_at: u64,
+    /// This session entered FSE from the desktop and must put it back.
+    pub exit_fse: bool,
+    pub fse_home: Option<FseHomeRestore>,
     pub launcher: String,
     /// File (next to the journal) holding the display configuration from before the session.
     pub displays_backup: String,
@@ -142,14 +145,35 @@ pub struct RtssBackup {
 /// a game profile) must not overwrite that backup with our own values (1.7 NeedsRtssBackup).
 pub fn needs_rtss_backup(already_applied: bool) -> bool { !already_applied }
 
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FseHomeRestore {
+    pub previous: Option<String>,
+}
+
 impl Journal {
     pub fn now() -> u64 { SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0) }
+    /// Retain failed restoration steps for the next recovery attempt.
+    pub fn remaining_after_restore(&self, screens: bool, audio: bool, fse: bool, home: bool) -> Self {
+        let mut rest = self.clone();
+        rest.exit_fse = !fse;
+        if home { rest.fse_home = None; }
+        if screens { rest.displays_backup.clear(); }
+        if audio { rest.audio_before.clear(); }
+        rest.rtss = None; rest.rtss_overlay = false; rest.desktop_icons.clear();
+        rest.desktop_icons_hidden = false; rest.pointer = None; rest.vrr = None;
+        rest.hdr_turned_on.clear(); rest.hdr_turned_off.clear(); rest.tv = None;
+        rest
+    }
 }
 
 pub fn write_journal(path: &Path, j: &Journal) -> io::Result<()> {
     if let Some(dir) = path.parent() { fs::create_dir_all(dir)?; }
     let tmp = path.with_extension("json.tmp");
-    fs::write(&tmp, serde_json::to_string_pretty(j).expect("journal serializes"))?;
+    use std::io::Write;
+    let mut file = fs::File::create(&tmp)?;
+    file.write_all(serde_json::to_string_pretty(j).expect("journal serializes").as_bytes())?;
+    file.sync_all()?;
+    drop(file);
     fs::rename(tmp, path)
 }
 
@@ -215,6 +239,23 @@ mod tests {
     }
 
     #[test]
+    fn recovery_keeps_each_failed_step_without_repeating_successes() {
+        let original = Journal { displays_backup: "display.ccd".into(), audio_before: "audio".into(), exit_fse: true,
+            fse_home: Some(FseHomeRestore { previous: Some("previous".into()) }), ..Default::default() };
+        let pending = original.remaining_after_restore(true, false, false, false);
+        assert!(pending.displays_backup.is_empty());
+        assert_eq!(pending.audio_before, "audio");
+        assert!(pending.exit_fse && pending.fse_home.is_some());
+        let pending = pending.remaining_after_restore(true, true, true, false);
+        assert!(pending.audio_before.is_empty());
+        assert!(!pending.exit_fse && pending.fse_home.is_some());
+        assert!(pending.remaining_after_restore(true, true, true, true).fse_home.is_none());
+        let failed_display = original.remaining_after_restore(false, true, true, true);
+        assert_eq!(failed_display.displays_backup, "display.ccd");
+        assert!(failed_display.audio_before.is_empty());
+    }
+
+    #[test]
     fn rtss_is_backed_up_only_once_per_session() {
         assert!(needs_rtss_backup(false));
         assert!(!needs_rtss_backup(true));
@@ -232,7 +273,10 @@ mod tests {
             tv: Some(crate::tv::TvRestore { provider: "androidTv".into(), host: "10.0.0.2".into(), restore_command: "input keyevent 3".into(), standby: true }), ..Default::default()
         };
         write_journal(&p, &j).unwrap();
-        assert_eq!(read_journal(&p), Some(j));
+        assert_eq!(read_journal(&p), Some(j.clone()));
+        let updated = j.remaining_after_restore(true, false, true, true);
+        write_journal(&p, &updated).unwrap();
+        assert_eq!(read_journal(&p), Some(updated));
         delete_journal(&p).unwrap();
         assert_eq!(read_journal(&p), None);
         delete_journal(&p).unwrap(); // twice is fine

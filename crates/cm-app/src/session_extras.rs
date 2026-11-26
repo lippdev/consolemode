@@ -86,7 +86,6 @@ pub struct Side {
     fps_now: u32,
     counter: Counter,
     // per-game profiles
-    hdr_at_start: Option<bool>,
     game: u32,
     baseline: Option<Baseline>,
     profile_applied: bool,
@@ -97,7 +96,7 @@ impl Side {
         let fps_now = cfg.fps_limit;
         Side {
             sim, cfg, data_dir: data_dir.to_path_buf(), xbox, card_game, launched_at: None, parks: 0, last_park: None, rtss: None, rtss_backed_up: false, fps_now,
-            counter: Counter::new(), hdr_at_start: None, game: 0, baseline: None, profile_applied: false,
+            counter: Counter::new(), game: 0, baseline: None, profile_applied: false,
         }
     }
 
@@ -127,7 +126,6 @@ impl Side {
             }
         }
         if self.cfg.park_pointer && !self.sim { j.pointer = os_pointer::position(); }
-        self.hdr_at_start = desk.hdr_state(focus);
     }
 
     /// After the journal is written: hides the desktop icons it says to hide, so a crash, a journal
@@ -257,21 +255,10 @@ impl Side {
             }
         }
         if let Some(on) = hdr {
-            if desk.hdr_state(focus) != Some(on) {
-                if on {
-                    match desk.hdr_on(focus) {
-                        // HDR was off before the session: the restore must turn it off again
-                        Ok(true) if self.hdr_at_start == Some(false) && j.hdr_turned_on.is_empty() => { j.hdr_turned_on = focus.to_string(); let _ = session::write_journal(jp, j); }
-                        Ok(_) => {}
-                        Err(e) => log(&format!("Perfil por jogo: HDR: {e}")),
-                    }
-                } else {
-                    desk.hdr_off(focus);
-                }
-            }
+            crate::video::hdr_from_menu(desk, j, jp, focus, on);
         }
         if let Some(f) = fps.filter(|f| *f != self.fps_now) { self.set_limit(f, j, jp); }
-        if let Some(a) = audio.filter(|a| !a.trim().is_empty()) {
+        if let Some(a) = audio.filter(|a| !a.trim().is_empty() && !j.audio_before.is_empty()) {
             if desk.audio_default().as_deref() != Some(a) {
                 if let Err(e) = desk.set_audio(a) { log(&format!("Perfil por jogo: áudio: {e}")); }
             }

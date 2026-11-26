@@ -773,9 +773,19 @@ Executar somente com autorização do dono, acesso local e uma forma alternativa
 
 ## Console Mode 2 Alpha: Home do modo Xbox no Windows 11
 
+- [ ] Com a alpha selecionada como Home e o Steam Big Picture em modo janela, iniciar uma sessão com **Usar FSE**. Verificar no monitor de jogo as bordas e o foco. Conferir nos eventos de ativação do Windows se a Home da alpha foi iniciada e se houve uma abertura do Xbox. Ao sair, verificar a volta ao desktop.
+
+- [ ] Com o Xbox selecionado como Home, tentar jogar com FSE pelo Steam ou Playnite. A alpha deve orientar a seleção da Home antes de alterar telas, áudio ou entrar na FSE. Repetir com a seleção de Home ausente.
+- [ ] Registrar, selecionar e restaurar a Home com o controle. Conferir o indicador na linha acionada, mover o foco durante a operação e verificar que pressionar A duas vezes não repete a ação.
+
+- [ ] Na Home da 2.0, abrir as opções do Playnite, do Steam Big Picture e de um app próprio. Ligar **Usar FSE** só no Playnite, reabrir a alpha e confirmar que a preferência ficou independente por launcher.
+- [ ] A partir do desktop, abrir cada launcher com **Usar FSE** ligado. Confirmar a entrada no Windows, testar o controle e conferir que o launcher recebe o foco. Encerrar pelo menu da sessão e conferir a volta ao desktop.
+- [ ] Repetir partindo de uma FSE que já estava ativa. Encerrar pelo menu da sessão e confirmar que a FSE continua ativa.
+- [ ] Recusar a entrada no Windows e verificar se a sessão volta ao desktop e restaura as telas e o áudio. Em outra tentativa, encerrar à força com a FSE ativa e reabrir a alpha para validar a recuperação.
+
 - [ ] Anotar a Home atual em Configurações do Windows → Jogos → Modo Xbox. Registrar a alpha e verificar que o Console Mode aparece no seletor e que a escolha anterior continua ativa.
-- [ ] Selecionar o Console Mode no Windows e entrar no modo Xbox, primeiro com a alpha fechada e depois já na bandeja. A Home deve aparecer em tela cheia com uma única instância do aplicativo.
-- [ ] Em um desktop que oferece o modo Xbox mas omite o seletor de Home, registrar a alpha e entrar pelo Console Mode. Aceitar a confirmação do Windows. Verificar que o controle navega pela alpha em primeiro plano e que repetir a abertura reaproveita a janela.
+- [ ] Selecionar o Console Mode como Home e definir o launcher da Home. Pelo Windows, entrar no modo Xbox com a alpha fechada e repetir com ela na bandeja. Verificar que o launcher escolhido abre uma única vez.
+- [ ] Em um desktop que omite o seletor do Windows, usar **Selecionar o Console Mode como Home** na alpha. Conferir se o Windows mantém a escolha após a entrada na FSE. Usar **Restaurar a Home anterior** e verificar a seleção original, inclusive se antes não havia uma Home explícita.
 - [ ] Abrir o Playnite pela Home, entrar em um jogo e encerrar o launcher. Verificar o retorno à Home. Em seguida, voltar ao PC e verificar tela principal, áudio e área de trabalho.
 - [ ] Com entrada automática desativada, abrir a alpha normalmente no desktop. Ativar a preferência e repetir. Testar também a inicialização na bandeja.
 - [ ] Restaurar a Home anterior no seletor do Windows, remover o registro da alpha e verificar que o executável continua abrindo como aplicativo de desktop.
@@ -1101,7 +1111,7 @@ Teste lado a lado com a sua cópia: `CM2_INSTANCE=teste` dá ao app de teste mut
 - [ ] Xbox: fitas grossas de energia verde girando em 3D em volta da esfera preta, estouro, logo do Console Mode verde na esfera e "CONSOLE MODE" espaçado embaixo
 - [ ] Xbox One: preto, depois tudo branco (a esfera colada na câmera); ela recua sobre o fundo verde com chão mais claro, rola revelando "Console Mode" letra a letra e gira mostrando a logo verde na face, com uma sombra no chão
 - [ ] Xbox 360: sala clara, faixas largas e translúcidas verdes/amarelas/brancas girando em 3D em volta de um orbe prateado, fechando até o clarão branco no último golpe do som; depois fundo verde-acinzentado, anel de luz se abrindo, logo no orbe prateado e "Console" verde + "Mode" cinza embaixo
-- [ ] Cada uma com o som real do console, no volume das outras, no ritmo da animação; B/clique pula e o som para junto
+- [ ] Cada estilo reproduz o som de abertura do Console Mode no volume configurado. B ou um clique pula a animação e interrompe o som.
 - [ ] Sem estilo escolhido, de vez em quando o app abre de surpresa com uma das 7 inspiradas
 
 ### 2.0: menu da sessão — Janelas em miniaturas, Tela com HDR/VRR, Volume com a saída

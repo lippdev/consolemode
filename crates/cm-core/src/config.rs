@@ -124,8 +124,15 @@ pub struct Config {
     pub protocol_registered: bool,
     /// Request Windows' gamepad experience when Console Mode opens normally.
     pub gaming_home_on_open: bool,
+    /// Built-in launcher modes or custom app IDs opted into FSE.
+    pub fse_launchers: Vec<String>,
+    /// Launcher opened by Windows Home activation; custom launchers use custom:<id>.
+    pub fse_home_launcher: String,
     /// "lua" | "ambar" | "jade".
     pub theme: String,
+    pub welcome_background: String,
+    pub welcome_motion: bool,
+    pub launcher_usage: BTreeMap<String, u32>,
     /// Recent Steam games in the Home row. Off by default.
     pub show_steam_games: bool,
     /// Steam app ids, in the order the user arranged them; pinned ones; hidden ones.
@@ -201,6 +208,11 @@ impl Default for Config {
             start_in_tray: false,
             protocol_registered: false,
             gaming_home_on_open: false,
+            welcome_background: "aurora".into(),
+            welcome_motion: true,
+            launcher_usage: BTreeMap::new(),
+            fse_launchers: Vec::new(),
+            fse_home_launcher: String::new(),
             theme: "lua".into(),
             show_steam_games: false,
             game_order: Vec::new(),
@@ -398,6 +410,9 @@ mod tests {
     #[test]
     fn gaming_home_on_open_requires_opt_in_and_round_trips() {
         assert!(!Config::default().gaming_home_on_open);
+        assert!(Config::from_json(V17).unwrap().fse_launchers.is_empty());
+        let opted_in = Config { fse_launchers: vec!["bigPicture".into(), "custom:my-app".into()], ..Config::default() };
+        assert_eq!(Config::from_json(&opted_in.to_json()).unwrap().fse_launchers, opted_in.fse_launchers);
         assert!(!Config::from_json(V17).unwrap().gaming_home_on_open);
         let enabled = Config::from_json(r#"{"gamingHomeOnOpen":true}"#).unwrap();
         assert!(enabled.gaming_home_on_open);

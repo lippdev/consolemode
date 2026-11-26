@@ -18,7 +18,7 @@ impl Desk for WinDesk {
     fn hide(&mut self, ids: &[String]) -> Result<(), String> { WinDesk::hide(self, ids) }
     fn set_mode(&mut self, id: &str, m: &DisplayMode) -> Result<(), String> { WinDesk::set_mode(self, id, m) }
     fn hdr_on(&mut self, id: &str) -> Result<bool, String> { WinDesk::hdr_on(self, id) }
-    fn hdr_off(&mut self, id: &str) { WinDesk::hdr_off(self, id) }
+    fn hdr_off(&mut self, id: &str) -> Result<(), String> { WinDesk::hdr_off(self, id) }
     fn audio_default(&mut self) -> Option<String> { WinDesk::audio_default(self) }
     fn set_audio(&mut self, id: &str) -> Result<(), String> { WinDesk::set_audio(self, id) }
     fn screen_rect(&mut self, id: &str) -> Option<(i32, i32, i32, i32)> { WinDesk::screen_rect(self, id) }

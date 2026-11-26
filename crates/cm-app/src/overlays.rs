@@ -22,13 +22,48 @@ use crate::{
 pub(crate) const GAME_OPTS: [(char, &str); 4] =
     [(glyph::HDR_ON, "HDR"), (glyph::ASPECT_RATIO, "Resolução"), (glyph::SPEED, "Limite de FPS"), (glyph::SKIP_NEXT, "Ir direto para o jogo")];
 
-pub fn game_defaults() -> Vec<Value> {
-    vec![
-        Value::Choice(vec!["Igual à sessão", "Ligado", "Desligado"], 0),
-        Value::Choice(vec!["Igual à sessão", "3840 × 2160", "2560 × 1440", "1920 × 1080"], 0),
-        Value::Choice(vec!["Igual à sessão", "30", "60", "120", "Sem limite"], 0),
-        Value::Choice(vec!["Ligado", "Desligado"], 0),
-    ]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum FseReadiness {
+    Ready,
+    Unavailable,
+    HomeUnknown,
+    Unregistered,
+    Unselected,
+}
+
+impl FseReadiness {
+    fn probe() -> Self {
+        if std::env::var_os("CM2_SIMULATED_DESK").is_some() {
+            return Self::Ready;
+        }
+        let can_enter = crate::gaming_home::can_enter();
+        let home = can_enter.then(cm_platform::fse_win::status).and_then(Result::ok);
+        Self::from_status(can_enter, home.as_ref())
+    }
+
+    fn from_status(can_enter: bool, home: Option<&cm_platform::fse_win::Status>) -> Self {
+        if !can_enter {
+            return Self::Unavailable;
+        }
+        match home {
+            None => Self::HomeUnknown,
+            Some(home) if !home.registered => Self::Unregistered,
+            Some(home) if !home.selected => Self::Unselected,
+            Some(_) => Self::Ready,
+        }
+    }
+
+    fn blocked(self) -> bool { self != Self::Ready }
+
+    fn label(self) -> &'static str {
+        match self {
+            Self::Ready => t("FSE pronta para jogar"),
+            Self::Unavailable => t("FSE indisponível no Windows agora"),
+            Self::HomeUnknown => t("Não foi possível verificar a Home do Windows"),
+            Self::Unregistered => t("Console Mode ainda não registrado como Home"),
+            Self::Unselected => t("Console Mode ainda não selecionado como Home"),
+        }
+    }
 }
 
 // card menu items: 0 Jogar · 1..=4 options · 5 Mover · 6 Fixar · 7 Esconder
@@ -183,8 +218,16 @@ impl Console {
             // the opening runs to the end (or rolls back by itself); nothing to cancel half-way
             View::Launch { .. } => {}
             View::CardMenu { sel } => match p {
-                Pad::Up if sel > 0 => { self.view = View::CardMenu { sel: sel - 1 }; self.sounds.play(Sound::Move); }
-                Pad::Down if sel + 1 < self.card_menu_len() => { self.view = View::CardMenu { sel: sel + 1 }; self.sounds.play(Sound::Move); }
+                Pad::Up if sel > 0 => {
+                    self.fse_launch_on_ready = false;
+                    self.view = View::CardMenu { sel: sel - 1 };
+                    self.sounds.play(Sound::Move);
+                }
+                Pad::Down if sel + 1 < self.card_menu_len() => {
+                    self.fse_launch_on_ready = false;
+                    self.view = View::CardMenu { sel: sel + 1 };
+                    self.sounds.play(Sound::Move);
+                }
                 Pad::A => self.menu_activate(sel, cx),
                 Pad::B | Pad::Y | Pad::Menu => { self.close_overlay(cx); self.sounds.play(Sound::Back); }
                 _ => {}
@@ -255,7 +298,7 @@ impl Console {
     }
 
     pub(crate) fn has_card_menu(&self, i: usize) -> bool {
-        !matches!(self.items.get(i), None | Some(Item::Add))
+        !matches!(self.items.get(i), None | Some(Item::Welcome | Item::Add))
     }
 
     pub(crate) fn item_profile_id(&self, i: usize) -> Option<(u32, String)> {
@@ -276,11 +319,50 @@ impl Console {
                 };
                 Some((id, l.name.to_string()))
             }
-            Item::Add => None,
+            Item::Welcome | Item::Add => None,
         }
     }
 
+    fn fse_launcher_key(&self) -> Option<String> {
+        use cm_core::session::Launcher;
+        match &self.items[self.focus] {
+            Item::Launcher(l) if l.kind != Launcher::Xbox => {
+                Some(l.custom_id.as_ref().map_or_else(|| l.kind.mode().into(), |id| format!("custom:{id}")))
+            }
+            Item::Game(..) => Some(Launcher::BigPicture.mode().into()),
+            _ => None,
+        }
+    }
+
+    fn wants_fse(&self) -> bool {
+        self.fse_launcher_key().is_some_and(|key| self.config.fse_launchers.contains(&key))
+    }
+
+    fn fse_menu_index(&self) -> Option<usize> {
+        matches!(&self.items[self.focus], Item::Launcher(l) if l.kind != cm_core::session::Launcher::Xbox)
+            .then(|| self.base_card_menu_len())
+    }
+
+    fn fse_home_menu_index(&self) -> Option<usize> {
+        self.fse_menu_index().filter(|_| self.wants_fse())
+            .map(|index| index + 1)
+    }
+
+    fn configure_fse_index(&self) -> Option<usize> {
+        (self.running.is_none() && self.wants_fse() && self.fse_readiness.is_some_and(FseReadiness::blocked))
+            .then(|| self.card_options_len())
+    }
+
+    fn card_options_len(&self) -> usize {
+        self.base_card_menu_len() + usize::from(self.fse_menu_index().is_some())
+            + usize::from(self.fse_home_menu_index().is_some())
+    }
+
     pub(crate) fn card_menu_len(&self) -> usize {
+        self.card_options_len() + 2 * usize::from(self.configure_fse_index().is_some())
+    }
+
+    fn base_card_menu_len(&self) -> usize {
         if crate::custom_apps::is_custom(&self.items[self.focus]) { return 8; }
         match &self.items[self.focus] {
             Item::Game(..) => MENU_ITEMS,
@@ -289,12 +371,41 @@ impl Console {
                 cm_core::session::Launcher::Playnite => if self.config.playnite_path.is_empty() { 5 } else { 6 },
                 cm_core::session::Launcher::Xbox | cm_core::session::Launcher::Custom { .. } => 4,
             },
-            Item::Add => 0,
+            Item::Welcome | Item::Add => 0,
         }
     }
 
     fn menu_activate(&mut self, sel: usize, cx: &mut Context<Self>) {
         if sel == 0 { return self.start_launch(cx); }
+        self.fse_launch_on_ready = false;
+        if let Some(index) = self.configure_fse_index() {
+            if sel == index { return self.open_gaming_home_settings(cx); }
+            if sel == index + 1 { return self.launch(false, cx); }
+        }
+        if self.fse_home_menu_index() == Some(sel) {
+            if let Some(key) = self.fse_launcher_key() {
+                self.config.fse_home_launcher = key;
+                self.save_config();
+                self.sounds.play(Sound::Confirm);
+            }
+            return;
+        }
+        if self.fse_menu_index() == Some(sel) {
+            if let Some(key) = self.fse_launcher_key() {
+                let entries = &mut self.config.fse_launchers;
+                if let Some(index) = entries.iter().position(|value| *value == key) {
+                    entries.remove(index);
+                    if self.config.fse_home_launcher == key { self.config.fse_home_launcher.clear(); }
+                } else {
+                    entries.push(key.clone());
+                    self.config.fse_home_launcher = key;
+                    self.check_card_fse(cx);
+                }
+                self.save_config();
+                self.sounds.play(Sound::Confirm);
+            }
+            return;
+        }
         let is_game = matches!(self.items[self.focus], Item::Game(..));
         if sel >= 1 && sel <= if is_game { 4 } else { 3 } {
             if let Some((id, name)) = self.item_profile_id(self.focus) {
@@ -439,6 +550,11 @@ impl Console {
             return;
         }
         if sel == GUIDE.len() - 1 {
+            // A launcher session owns only the FSE transition it started.
+            if let Some(run) = self.running.as_ref().filter(|run| run.use_fse) {
+                let _ = run.commands.send(crate::engine::Command::Stop);
+                return self.dismiss_overlay(false, cx);
+            }
             // Encerrar sessão: the engine puts the desk back and sends Ended
             let leaving_home = crate::stage::is_gaming_home() || crate::gaming_home::active() == Some(true);
             self.return_to_pc(cx);
@@ -487,6 +603,8 @@ impl Console {
             return cx.notify();
         }
         if !matches!(old, View::CardMenu { .. }) { return cx.notify(); }
+        self.fse_launch_on_ready = false;
+        self.fse_probe = None;
         self.exiting = Some(old);
         self.exit_anim += 1;
         self.exit_task = Some(cx.spawn(async move |this, cx| {
@@ -501,9 +619,40 @@ impl Console {
             self.view = View::CardMenu { sel: 0 };
             self.exiting = None;
             self.menu_anim += 1;
+            self.fse_launch_on_ready = false;
+            self.fse_readiness = None;
+            self.fse_probe = None;
+            if self.wants_fse() { self.check_card_fse(cx); }
             self.sounds.play(Sound::Confirm);
             cx.notify();
         }
+    }
+
+    fn check_card_fse(&mut self, cx: &mut Context<Self>) {
+        self.fse_readiness = None;
+        let menu = self.menu_anim;
+        let focus = self.focus;
+        self.fse_probe = Some(cx.spawn(async move |this, cx| {
+            let result = cx.background_executor().spawn(async { FseReadiness::probe() }).await;
+            let _ = this.update(cx, |console, cx| {
+                if console.menu_anim != menu || console.focus != focus || console.tab != 0
+                    || !matches!(console.view, View::CardMenu { .. }) || !console.wants_fse()
+                {
+                    return;
+                }
+                console.fse_readiness = Some(result);
+                let launch = std::mem::take(&mut console.fse_launch_on_ready)
+                    && matches!(console.view, View::CardMenu { sel: 0 });
+                if launch {
+                    if let Some(sel) = console.configure_fse_index() {
+                        console.view = View::CardMenu { sel };
+                    } else {
+                        console.launch(true, cx);
+                    }
+                }
+                cx.notify();
+            });
+        }));
     }
 
     pub(crate) fn open_guide(&mut self, cx: &mut Context<Self>) {
@@ -542,6 +691,24 @@ impl Console {
     /// The "opening" screen: the steps check off one by one, then the session menu shows.
     /// Jogar: builds the session plan from the config and the card, and starts the engine.
     pub(crate) fn start_launch(&mut self, cx: &mut Context<Self>) {
+        if self.running.is_none() && self.config.is_session_ready() && self.wants_fse() {
+            if !matches!(self.view, View::CardMenu { .. }) {
+                self.set_tab(0, cx);
+                self.open_card_menu(cx);
+            }
+            match self.fse_readiness {
+                Some(FseReadiness::Ready) => {}
+                Some(_) => return,
+                None => {
+                    self.fse_launch_on_ready = true;
+                    return;
+                }
+            }
+        }
+        self.launch(true, cx);
+    }
+
+    fn launch(&mut self, allow_fse: bool, cx: &mut Context<Self>) {
         if matches!(self.items[self.focus], Item::Add) { return self.add_custom_app(cx); }
         if !self.validate_custom_launch(cx) { return; }
         // a session is already running: Jogar shows its menu
@@ -558,7 +725,7 @@ impl Console {
                 let direct = profile.as_ref().and_then(|p| p.direct_launch) != Some(false);
                 (cm_core::session::Launcher::BigPicture, direct.then_some(g.app_id))
             }
-            Item::Add => return,
+            Item::Welcome | Item::Add => return,
         };
         let mode = profile.as_ref().and_then(|p| p.mode.clone()).or_else(|| c.monitor_modes.get(&c.focus_monitor).cloned());
         let setup_key = format!("{}|{}", c.focus_monitor, mode.as_ref().map(|m| format!("{}x{}@{}", m.width, m.height, m.frequency)).unwrap_or("current".into()));
@@ -566,7 +733,9 @@ impl Console {
         if let Some(fps) = profile.as_ref().and_then(|p| p.fps_limit) {
             extras.fps_limit = fps;
         }
+        let use_fse = allow_fse && self.wants_fse();
         let plan = crate::engine::Plan {
+            use_fse,
             focus: c.focus_monitor.clone(),
             hide: c.hide_monitors.clone(),
             mode,
@@ -578,7 +747,7 @@ impl Console {
             steam_game,
             close_steam_on_restore: c.close_steam_on_restore,
             needs_confirm: c.confirmed_setup != setup_key,
-            card_name: match &self.items[self.focus] { Item::Launcher(l) => l.name.to_string(), Item::Game(g, _) => g.name.clone(), Item::Add => String::new() },
+            card_name: match &self.items[self.focus] { Item::Launcher(l) => l.name.to_string(), Item::Game(g, _) => g.name.clone(), Item::Welcome | Item::Add => String::new() },
             extras,
             tv: c.tv.clone(),
         };
@@ -587,8 +756,9 @@ impl Console {
         let journal = self.paths.data_dir.join("session.json");
         // Capture the immutable session identity for shell status.
         let (shell_focus, shell_launcher) = (plan.focus.clone(), plan.launcher.clone());
+        let usage_key = self.items[self.focus].usage_key();
         let handle = crate::engine::start(plan, desk, journal);
-        self.running = Some(crate::home::Running { started: std::time::Instant::now(), commands: handle.commands, simulated, setup_key, shell_focus, shell_launcher });
+        self.running = Some(crate::home::Running { use_fse, started: std::time::Instant::now(), commands: handle.commands, simulated, setup_key, shell_focus, shell_launcher });
         self.view = View::Launch { step: 0 };
         self.menu_anim += 1;
         self.sounds.play(Sound::Confirm);
@@ -606,7 +776,13 @@ impl Console {
                     match ev {
                         Event::Step(n) => c.view = View::Launch { step: n + 1 },
                         Event::Confirm(_) => { c.view = View::Confirm; c.app_in_front = true; }
-                        Event::Running => {}
+                        Event::Running => {
+                            if let Some(key) = usage_key.as_ref().filter(|_| !simulated) {
+                                let sessions = c.config.launcher_usage.entry(key.clone()).or_default();
+                                *sessions = sessions.saturating_add(1);
+                                c.save_config();
+                            }
+                        }
                         Event::Hdr(state) => c.session_hdr = state,
                         Event::Vrr(state) => c.session_vrr = state,
                         Event::Ended(why) | Event::Failed(why) => {
@@ -695,13 +871,25 @@ impl Console {
         let app = self.custom_entry();
         let defaults = game_defaults();
         let opts = self.item_profile_id(self.focus).and_then(|(id, _)| self.game_opts.get(&id)).unwrap_or(&defaults);
+        let configure_fse = self.configure_fse_index();
         let item = |i: usize, icon: char, label: &'static str, right: gpui::AnyElement, cx: &mut Context<Self>| {
+            let disabled = i == 0 && configure_fse.is_some();
             let mut d = div().id(("menu", i)).flex().items_center().gap(ui.u(14.)).px(ui.u(18.)).py(ui.u(14.)).rounded(ui.u(12.))
-                .border(ui.u(2.)).text_size(ui.u(24.)).cursor_pointer()
-                .child(div().w(ui.u(40.)).child(ui.icon(icon, 28., color::accent())))
+                .border(ui.u(2.)).text_size(ui.u(24.))
+                .child(div().w(ui.u(40.)).child(ui.icon(icon, 28., if disabled { color::mute() } else { color::accent() })))
                 .child(div().flex_1().child(label))
-                .child(right)
-                .on_click(cx.listener(move |this, _, _, cx| { if matches!(this.view, View::CardMenu { .. }) { this.view = View::CardMenu { sel: i }; this.menu_activate(i, cx); cx.notify(); } }));
+                .child(right);
+            d = if disabled {
+                d.text_color(color::mute())
+            } else {
+                d.cursor_pointer().on_click(cx.listener(move |this, _, _, cx| {
+                    if matches!(this.view, View::CardMenu { .. }) {
+                        this.view = View::CardMenu { sel: i };
+                        this.menu_activate(i, cx);
+                        cx.notify();
+                    }
+                }))
+            };
             d = if i == sel { d.bg(ui.focus_fill(0.19, 0.11)).border_color(color::white(0.92)).shadow(ui.raised(ui.lift_md(), 0.2)) } else { d.border_color(gpui::transparent_black()).hover(|s| s.bg(color::white(0.07))) };
             d
         };
@@ -723,8 +911,21 @@ impl Console {
             .child(div().text_size(ui.u(28.)).font_weight(FontWeight::SEMIBOLD).child(SharedString::from(match &self.items[self.focus] { Item::Launcher(l) => l.shown_name().to_string(), Item::Game(g, _) => g.name.clone(), _ => String::new() })))
             .child(steam.child(SharedString::from(subtitle)));
 
+        let wants_fse = self.wants_fse();
+        let mut head = head;
+        if wants_fse {
+            let status = self.fse_readiness.map_or_else(|| t("Verificando FSE…"), FseReadiness::label);
+            head = head.child(div().mt(ui.u(6.)).text_size(ui.u(17.))
+                .text_color(if self.fse_readiness == Some(FseReadiness::Ready) { color::accent() } else { color::mute() })
+                .child(status));
+        }
+        let play = if wants_fse && self.running.is_none() {
+            t("Jogar com FSE")
+        } else {
+            t("Jogar")
+        };
         let mut menu = div().flex().flex_col().child(head)
-            .child(item(0, glyph::PLAY_ARROW, t("Jogar"), div().into_any_element(), cx));
+            .child(item(0, glyph::PLAY_ARROW, play, div().into_any_element(), cx));
         let opt_count = if game.is_some() { GAME_OPTS.len() } else { 3 };
         menu = menu.child(sep());
         if game.is_some() {
@@ -775,6 +976,24 @@ impl Console {
             }
         }
 
+        if let Some(index) = self.fse_menu_index() {
+            let enabled = wants_fse;
+            let state = div().flex().items_center().gap(ui.u(12.))
+                .child(crate::settings::gaming_home_settings::experimental_tag(ui))
+                .child(ui.toggle(enabled));
+            menu = menu.child(sep()).child(item(index, glyph::SETTINGS, t("Usar FSE"), state.into_any_element(), cx));
+        }
+
+        if let Some(index) = self.fse_home_menu_index() {
+            let selected = self.fse_launcher_key().is_some_and(|key| self.config.fse_home_launcher == key);
+            menu = menu.child(item(index, glyph::SETTINGS, t("Abrir pela Home do Windows"), ui.toggle(selected).into_any_element(), cx));
+        }
+        if let Some(index) = self.configure_fse_index() {
+            menu = menu.child(sep())
+                .child(item(index, glyph::SETTINGS, t("Configurar Home"), div().into_any_element(), cx))
+                .child(item(index + 1, glyph::PLAY_ARROW, t("Jogar sem FSE"), div().into_any_element(), cx));
+        }
+
         // beside the held tile and its name, at the row's top
         let card_right = ROW_X - self.scroll + self.focus_right();
         let left = (card_right + 30.).min(ui.design.width - 560. - 70.);
@@ -807,12 +1026,12 @@ impl Console {
             Item::Launcher(l) => div().flex().items_center().gap(ui.u(20.)).text_size(ui.u(64.)).font_family(cm_ui::FONT).font_weight(FontWeight::BOLD)
                 .children(l.icon.clone().map(|i: Arc<RenderImage>| img(ImageSource::Render(crate::home::sharp(&i, ui, 72.))).size(ui.u(72.))))
                 .child(l.shown_name()).into_any_element(),
-            Item::Add => div().into_any_element(),
+            Item::Welcome | Item::Add => div().into_any_element(),
         }
     }
 
     fn item_name(&self) -> String {
-        match &self.items[self.focus] { Item::Game(g, _) => g.name.clone(), Item::Launcher(l) => l.shown_name().to_string(), Item::Add => String::new() }
+        match &self.items[self.focus] { Item::Game(g, _) => g.name.clone(), Item::Launcher(l) => l.shown_name().to_string(), Item::Welcome | Item::Add => String::new() }
     }
 
     /// Current session setup from Sessão (so the screens tell the truth about it), in Portuguese
@@ -860,7 +1079,7 @@ impl Console {
     }
 
     pub(crate) fn guide_view(&self, ui: &Ui, sel: usize, entering: bool, cx: &mut Context<Self>) -> gpui::AnyElement {
-        let via = match &self.items[self.focus] { Item::Game(..) => "Steam Big Picture".to_string(), Item::Launcher(l) => l.shown_name().to_string(), Item::Add => String::new() };
+        let via = match &self.items[self.focus] { Item::Game(..) => "Steam Big Picture".to_string(), Item::Launcher(l) => l.shown_name().to_string(), Item::Welcome | Item::Add => String::new() };
         let hdr = if matches!(self.session[1].rows[2].value, Value::Toggle(true)) { " · HDR" } else { "" };
         let meta = div().flex().mt(ui.u(26.))
             .child(match &self.running {
@@ -962,4 +1181,39 @@ impl Console {
             ),
         })
     }
+}
+
+#[cfg(test)]
+mod fse_readiness_tests {
+    use super::FseReadiness;
+    use cm_platform::fse_win::Status;
+
+    #[test]
+    fn readiness_requires_windows_support_registration_and_selection() {
+        let mut home = Status {
+            compatible_build: true,
+            developer_mode: true,
+            package_files: true,
+            registered: false,
+            selected: false,
+            can_restore_home: false,
+            running_as_home: false,
+        };
+        assert_eq!(FseReadiness::from_status(false, Some(&home)), FseReadiness::Unavailable);
+        assert_eq!(FseReadiness::from_status(true, None), FseReadiness::HomeUnknown);
+        assert_eq!(FseReadiness::from_status(true, Some(&home)), FseReadiness::Unregistered);
+        home.registered = true;
+        assert_eq!(FseReadiness::from_status(true, Some(&home)), FseReadiness::Unselected);
+        home.selected = true;
+        assert_eq!(FseReadiness::from_status(true, Some(&home)), FseReadiness::Ready);
+    }
+}
+
+pub fn game_defaults() -> Vec<Value> {
+    vec![
+        Value::Choice(vec!["Igual à sessão", "Ligado", "Desligado"], 0),
+        Value::Choice(vec!["Igual à sessão", "3840 × 2160", "2560 × 1440", "1920 × 1080"], 0),
+        Value::Choice(vec!["Igual à sessão", "30", "60", "120", "Sem limite"], 0),
+        Value::Choice(vec!["Ligado", "Desligado"], 0),
+    ]
 }

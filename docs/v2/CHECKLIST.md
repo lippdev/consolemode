@@ -1,6 +1,11 @@
 # Console Mode 2 Alpha — checklist da migração
 
-Tudo local (branch `v2-config`), nada no GitHub. Atualizado em 2026-11-16.
+Alpha interna para Windows x64 na branch `v2-config` do GitHub. Atualizado em 26/11/2026.
+
+## Resultado dos testes
+
+- O teste local confirmou o registro da Home e o aviso quando o Windows repõe o Xbox como Home. Falta comprovar a abertura direta de um launcher em um Windows que mantenha a Home da alpha. A FSE é experimental e opcional.
+- O roteiro [Teste em casa](TESTE-EM-CASA.md) registra o que foi observado com Steam, Playnite, controle virtual e mesa simulada. Os testes físicos abaixo continuam pendentes.
 
 ## Feito
 
@@ -45,11 +50,11 @@ Tudo local (branch `v2-config`), nada no GitHub. Atualizado em 2026-11-16.
 - [x] Atualizações próprias da 2.0 (canal separado) e instalador local
 - [x] Avisos de terceiros e guia de release
 
-## Falta portar da 1.7
+## Recursos portados da 1.7
 - [x] Bateria do controle na interface (barra de cima, menu da sessão e aviso de bateria fraca; lida pelo SDL3)
 - [x] Controle acordar o PC (ControllerWake): leitura testada ao vivo; ativar (UAC) igual à 1.7, ainda sem teste ao vivo
 - [x] Tour do menu da sessão (SessionMenuTour; chave `sessionMenuTourDone` da 1.7)
-- [x] Animação de abertura (BootIntro): os três estilos da 1.7 e mais PS1, PS2, PS3, Xbox e Xbox One (sons reais dos consoles, cortados no tamanho de cada uma), `introAnimation`/`introSound`/`introStyle` da 1.7, escolha e prévia em Sistema → Aparência
+- [x] Animação de abertura (BootIntro): os três estilos da 1.7 e mais PS1, PS2, PS3, Xbox e Xbox One (som de abertura do Console Mode em todos os estilos), `introAnimation`/`introSound`/`introStyle` da 1.7, escolha e prévia em Sistema → Aparência
 - [x] VRR / recursos de vídeo (VideoFeaturesService): VRR na sessão com backup no diário e restauração (também na recuperação), HDR pelo menu da sessão
 - [x] Notas da versão ao atualizar (ReleaseNotes): cartão uma vez, com o primeiro item das notas do release ou só a versão e o link
 - [x] Relatório de diagnóstico/feedback dentro do app: reúne versão, Windows, telas, áudio, controles, programas e o fim do log (sem dados privados), copia e salva, e abre a issue; nada é enviado sozinho
@@ -69,5 +74,5 @@ Tudo local (branch `v2-config`), nada no GitHub. Atualizado em 2026-11-16.
 
 ## Depois
 - [ ] Linux (KDE Plasma Wayland / CachyOS)
-- [ ] Decidir como publicar a 2.0 (repositório separado ou não), sem afetar a 1.7.1
-- [ ] Workflow de alpha e pre-release, só quando você pedir
+- [x] Build e testes de Windows na branch dedicada da alpha. Distribuição interna por rascunho.
+- [ ] Validar o canal de atualização antes de uma pré-release pública.

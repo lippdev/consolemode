@@ -4,6 +4,12 @@ Notas em português do Brasil; a versão em inglês (Estados Unidos) fica em `CH
 
 ## [Unreleased]
 
+- A alpha 2.0 usa o som de abertura do Console Mode em todos os estilos visuais.
+
+- A 2.0 abre na tela de boas-vindas, com um resumo da sessão e um fundo personalizável.
+
+- Na alpha 2.0, Steam Big Picture, Playnite e apps próprios podem usar a FSE experimental do Windows. Em Sistema → Inicialização, você pode registrar o Console Mode, selecioná-lo como Home e restaurar a Home anterior. A operação em andamento aparece no próprio botão.
+
 - A interface da 2.0 usa Source Sans 3.
 
 - As listas de configuração da 2.0 rolam acima do rodapé e acompanham a seleção pelo controle e teclado.

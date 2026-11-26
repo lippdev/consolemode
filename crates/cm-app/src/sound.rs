@@ -10,27 +10,13 @@ const TAB: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/tab.wa
 const CONFIRM: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/confirm.wav");
 const BACK: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/back.wav");
 const BOOT: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/boot.wav");
-const BOOT_X360: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/bootx360.wav");
-const BOOT_PS4: &[u8] = include_bytes!("../../../src/ConsoleMode/Assets/Sounds/bootps4.wav");
-// 2.0's own (crates/cm-app/assets/sounds), cut to the length of their opening: see THIRD_PARTY_NOTICES.md
-const BOOT_PS1: &[u8] = include_bytes!("../assets/sounds/bootps1.wav");
-const BOOT_PS2: &[u8] = include_bytes!("../assets/sounds/bootps2.wav");
-const BOOT_PS3: &[u8] = include_bytes!("../assets/sounds/bootps3.wav");
-const BOOT_XBOX: &[u8] = include_bytes!("../assets/sounds/bootxbox.wav");
-const BOOT_XONE: &[u8] = include_bytes!("../assets/sounds/bootxone.wav");
 
 #[derive(Clone, Copy)]
-pub enum Sound { Move, Tab, Confirm, Back, Boot, BootX360, BootPs4, BootPs1, BootPs2, BootPs3, BootXbox, BootXone }
+pub enum Sound { Move, Tab, Confirm, Back, Boot }
 
 impl Sound {
     /// The opening's sounds have their own switch (`introSound`): they play even with the navigation sounds off.
-    fn is_boot(self) -> bool { matches!(self, Sound::Boot | Sound::BootX360 | Sound::BootPs4 | Sound::BootPs1 | Sound::BootPs2 | Sound::BootPs3 | Sound::BootXbox | Sound::BootXone) }
-
-    /// Each opening style has its own entrance sound (1.7 BootIntro.Sound).
-    pub fn boot_of(style: &str) -> Sound {
-        use cm_core::boot_intro::{PS1, PS2, PS3, PS4, X360, XBOX, XONE};
-        match style { X360 => Sound::BootX360, PS4 => Sound::BootPs4, PS1 => Sound::BootPs1, PS2 => Sound::BootPs2, PS3 => Sound::BootPs3, XBOX => Sound::BootXbox, XONE => Sound::BootXone, _ => Sound::Boot }
-    }
+    fn is_boot(self) -> bool { matches!(self, Sound::Boot) }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -98,8 +84,7 @@ impl Sounds {
             self.keep_open_for(Duration::from_millis(ms));
             return;
         }
-        let bytes = match s { Sound::Move => MOVE, Sound::Tab => TAB, Sound::Confirm => CONFIRM, Sound::Back => BACK, Sound::Boot => BOOT, Sound::BootX360 => BOOT_X360, Sound::BootPs4 => BOOT_PS4,
-            Sound::BootPs1 => BOOT_PS1, Sound::BootPs2 => BOOT_PS2, Sound::BootPs3 => BOOT_PS3, Sound::BootXbox => BOOT_XBOX, Sound::BootXone => BOOT_XONE };
+        let bytes = match s { Sound::Move => MOVE, Sound::Tab => TAB, Sound::Confirm => CONFIRM, Sound::Back => BACK, Sound::Boot => BOOT };
         let Ok(src) = rodio::Decoder::new(Cursor::new(bytes)) else { return };
         self.keep_open_for(src.total_duration().unwrap_or(Duration::from_secs(10)));
         if s.is_boot() {
@@ -125,12 +110,9 @@ pub fn gain(volume: u8) -> f32 { let v = volume.min(100) as f32 / 100.; v * v * 
 mod tests {
     use super::*;
     #[test]
-    fn every_opening_sound_decodes_and_lasts_as_long_as_its_opening() {
-        for (style, bytes) in [("ps1", BOOT_PS1), ("ps2", BOOT_PS2), ("ps3", BOOT_PS3), ("xbox", BOOT_XBOX), ("xone", BOOT_XONE)] {
-            let d = rodio::Decoder::new(Cursor::new(bytes)).unwrap().total_duration().unwrap();
-            let shown = cm_core::boot_intro::minimum_shown(Some(style));
-            assert!(d <= shown + Duration::from_millis(100) && d + Duration::from_millis(900) >= shown, "{style}: {d:?} vs {shown:?}");
-        }
+    fn opening_sound_decodes() {
+        let sound = rodio::Decoder::new(Cursor::new(BOOT)).unwrap();
+        assert!(sound.total_duration().is_some_and(|duration| !duration.is_zero()));
     }
     #[test]
     fn gain_curve() {

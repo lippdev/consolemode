@@ -19,20 +19,22 @@ pub enum Value {
     /// Opens something (chevron); `Some` shows a value before the chevron.
     Link(Option<&'static str>),
     Info(&'static str),
+    DisabledLink,
+    Pending(&'static str),
 }
 
 impl Value {
-    pub(crate) fn is_interactive(&self) -> bool { !matches!(self, Self::Info(_)) }
+    pub(crate) fn is_interactive(&self) -> bool { matches!(self, Self::Toggle(_) | Self::Choice(_, _) | Self::Link(_)) }
 
     pub fn activate(&mut self) {
         match self {
             Value::Toggle(on) => *on = !*on,
             Value::Choice(opts, i) => *i = (*i + 1) % opts.len(),
-            Value::Link(_) | Value::Info(_) => {}
+            Value::Link(_) | Value::Info(_) | Value::DisabledLink | Value::Pending(_) => {}
         }
     }
     pub fn text(&self) -> Option<&'static str> {
-        match self { Value::Choice(o, i) => Some(o[*i]), Value::Link(v) => *v, Value::Info(v) => Some(v), Value::Toggle(_) => None }
+        match self { Value::Choice(o, i) => Some(o[*i]), Value::Link(v) => *v, Value::Info(v) | Value::Pending(v) => Some(v), Value::Toggle(_) | Value::DisabledLink => None }
     }
 }
 
@@ -134,6 +136,8 @@ pub fn system() -> Vec<Category> {
             Section { title: "Início", rows: vec![
                 r(SHOW_STEAM_GAMES, "Os jogos instalados aparecem depois dos iniciadores, com a arte da sua biblioteca.", Value::Toggle(false)),
                 r("Fundo da Início", "", choice(&["Arte do item em foco", "Só a cor do tema"])),
+                r("Fundo de boas-vindas", "", choice(&["Aurora verde", "Só a cor do tema", "Meia-noite"])),
+                r("Animar fundo de boas-vindas", "", Value::Toggle(true)),
             ]},
             Section { title: "Abertura", rows: vec![
                 r(INTRO_STYLE_ROW, "A do Console Mode é a oficial e, de vez em quando, o app abre de surpresa com uma inspirada em um console. Escolher um estilo aqui fixa esse estilo e acaba com as surpresas.", choice(&["Console Mode", "Inspirada no PS1", "Inspirada no PS2", "Inspirada no PS3", "Inspirada no PS4", "Inspirada no Xbox", "Inspirada no Xbox 360", "Inspirada no Xbox One", "Nenhuma (abre direto)"])),
@@ -559,9 +563,22 @@ impl Console {
             // hear the change right away
             if matches!(title, "Estilo" | "Volume") { self.sounds.play(Sound::Confirm); }
             // turning the opening's sound on lets you hear it
-            if title == INTRO_SOUND_ROW && self.config.intro_sound { self.sounds.play(Sound::boot_of(cm_core::boot_intro::normalize(self.config.intro_style.as_deref()))); }
+            if title == INTRO_SOUND_ROW && self.config.intro_sound { self.sounds.play(Sound::Boot); }
             self.save_config();
         }
+    }
+
+    pub(crate) fn open_gaming_home_settings(&mut self, cx: &mut Context<Self>) {
+        let Some((category, section)) = self.system.iter().enumerate().find_map(|(i, category)| {
+            category.sections.iter().position(|s| s.title == gaming_home_settings::SECTION)
+                .map(|j| (i, j))
+        }) else { return };
+        self.view = crate::home::View::Home;
+        self.exiting = None;
+        self.set_tab(2, cx);
+        self.open_category(category, cx);
+        self.nav.section = section;
+        self.nav.list_scroll.scroll_to_item(section);
     }
 
     fn open_category(&mut self, i: usize, cx: &mut Context<Self>) {
@@ -626,7 +643,7 @@ impl Console {
                 .bg(linear_gradient(160., linear_color_stop(color::accent_alpha(0.30), 0.), linear_color_stop(color::accent_alpha(0.08), 1.)))
                 .shadow(ui.raised(ui.lift_lg(), 0.2))
                 .child(ui.icon(c.icon, 110., color::ink())))
-            .child(div().mt(ui.u(34.)).mb(ui.u(14.)).text_size(ui.u(40.)).font_family(cm_ui::FONT).font_weight(FontWeight::SEMIBOLD).child(t(c.title)))
+            .child(div().mt(ui.u(34.)).mb(ui.u(14.)).text_size(ui.u(40.)).font_family(cm_ui::FONT).font_weight(FontWeight::LIGHT).child(t(c.title)))
             .child(div().max_w(ui.u(640.)).text_size(ui.u(25.)).line_height(ui.u(36.)).text_color(color::mute()).child(t(c.desc)));
         let preview = div().absolute().left(ui.u(1040.)).right(ui.u(110.)).top(ui.u(280.)).bottom(ui.u(SETTINGS_BOTTOM)).overflow_hidden()
             .child(self.settings_selection_content(ui, "category-preview", desc));
@@ -668,8 +685,10 @@ impl Console {
         let map = self.map_on() && sel == 0;
         let mut rows = div().id("settings-options").pb(ui.u(SETTINGS_EDGE_FADE)).size_full()
             .overflow_y_scroll().track_scroll(&self.nav.options_scroll).flex().flex_col().gap(ui.u(4.))
-            .child(div().text_size(ui.u(18.)).font_weight(FontWeight::SEMIBOLD).text_color(color::mute()).mt(ui.u(6.)).mb(ui.u(12.)).ml(ui.u(26.))
-                .child(SharedString::from(t(sec.title).to_uppercase())));
+            .child(div().flex().items_center().gap(ui.u(12.)).text_size(ui.u(18.)).font_weight(FontWeight::SEMIBOLD)
+                .text_color(color::mute()).mt(ui.u(6.)).mb(ui.u(12.)).ml(ui.u(26.))
+                .child(SharedString::from(t(sec.title).to_uppercase()))
+                .when(sec.title == gaming_home_settings::SECTION, |header| header.child(gaming_home_settings::experimental_tag(ui))));
         // the list of choices of the focused row (or screen), if open
         let mut dropdown = self.dropdown_view(ui, cx);
         let dd_at = self.dropdown.as_ref().filter(|d| d.section == sel).map(|d| (d.row, d.screen.is_some()));
@@ -694,6 +713,8 @@ impl Console {
                     if let Some(text) = v.text() { d = d.child(SharedString::from(shown(text).into_owned())); }
                     match v {
                         Value::Link(_) => d = d.child(ui.icon(glyph::CHEVRON_RIGHT, 26., color::mute())),
+                        Value::DisabledLink => d = d.child(ui.icon(glyph::CHEVRON_RIGHT, 26., color::mute()).opacity(0.45)),
+                        Value::Pending(_) => d = d.child(gaming_home_settings::pending_indicator(ui, i)),
                         // a list opens from here
                         Value::Choice(_, _) => d = d.child(ui.icon(if open { glyph::EXPAND_LESS } else { glyph::EXPAND_MORE }, 28., color::mute())),
                         _ => {}
@@ -857,7 +878,7 @@ fn settings_focus_shadow(ui: &Ui) -> Vec<gpui::BoxShadow> {
 }
 
 fn title(ui: &Ui, icon: char, crumb: Option<gpui::AnyElement>, name: &str) -> Div {
-    let mut t = div().absolute().left(ui.u(crate::home::ROW_X)).top(ui.u(150.)).flex().items_center().gap(ui.u(18.)).text_size(ui.u(44.)).font_family(cm_ui::FONT).font_weight(FontWeight::SEMIBOLD)
+    let mut t = div().absolute().left(ui.u(crate::home::ROW_X)).top(ui.u(150.)).flex().items_center().gap(ui.u(18.)).text_size(ui.u(44.)).font_family(cm_ui::FONT).font_weight(FontWeight::LIGHT)
         .child(ui.icon(icon, 46., color::accent()));
     if let Some(c) = crumb { t = t.child(c); }
     t.child(SharedString::from(name.to_string()))

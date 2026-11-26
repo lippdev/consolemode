@@ -91,6 +91,7 @@ Source: "{#SourceDir}\ConsoleMode2Home.Dev.sccd"; DestDir: "{app}"; Flags: ignor
 Source: "{#SourceDir}\FseAssets\*.png"; DestDir: "{app}\FseAssets"; Flags: ignoreversion
 Source: "..\docs\v2\THIRD_PARTY_NOTICES.md"; DestDir: "{app}"; DestName: "THIRD_PARTY_NOTICES.md"; Flags: ignoreversion
 Source: "..\crates\cm-ui\assets\fonts\SourceSans3-OFL.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\crates\cm-ui\assets\fonts\PlusJakartaSans-OFL.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 
 [Icons]

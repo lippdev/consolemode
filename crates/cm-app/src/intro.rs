@@ -61,7 +61,7 @@ impl Console {
         let run = self.intro_run;
         self.intro = Some(Intro { style, run, leaving: false });
         crate::startup_log(&format!("abertura: estilo {style}"));
-        if rules::should_play_sound(true, sound) { self.sounds.play(Sound::boot_of(style)); }
+        if rules::should_play_sound(true, sound) { self.sounds.play(Sound::Boot); }
         if frozen_at().is_some() { cx.notify(); return; }
         let stays = rules::minimum_shown(Some(style));
         cx.spawn(async move |this, cx| {

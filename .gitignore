@@ -15,6 +15,7 @@ _test_*.ps1
 
 # Scripts de experimento/debug (nao fazem parte do produto)
 build/Test-*.ps1
+!build/Test-ConsoleMode2Installer.ps1
 build/Fix-*.ps1
 build/Run-Diagnostics.ps1
 build/Restore-SetupNow.ps1

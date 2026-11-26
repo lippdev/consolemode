@@ -2,7 +2,7 @@
 
 A 2.0 é **outro produto** em alpha, separado da 1.7 (ver [PLANO.md](PLANO.md)). Este arquivo descreve
 os nomes que o atualizador da 2.0 procura e como preparar uma build interna. O workflow da 2.0
-compila e testa a branch `v2-config`. O instalador para uso interno é gerado localmente e anexado ao rascunho.
+compila e testa a branch `v2-config` e verifica o ciclo de instalação e remoção em um runner Windows. No repositório público, distribua o instalador interno somente pelo rascunho com acesso de escrita.
 
 ## O que o app procura (canal alpha)
 
@@ -87,7 +87,7 @@ para um `.ico` com 16, 24, 32, 48, 64, 128 e 256 px (Pillow: `Image.open(png).sa
 
 ## Guardar uma alpha como rascunho
 
-1. Faça o build no Windows a partir do commit testado pelo workflow **Console Mode 2 Alpha Build**.
+1. Em um checkout limpo do commit testado pelo workflow **Console Mode 2 Alpha Build**, execute `.\build\Publish-ConsoleMode2.ps1 -Target Installer`. Guarde o SHA do commit junto ao checksum do instalador.
 2. Instale o Setup em um PC de teste e siga o checklist de entrega em [../TESTING.md](../TESTING.md).
 3. Em **Releases**, crie um rascunho apontando para o SHA exato do commit da build e use como tag proposta
    a versão do `Cargo.toml` com prefixo `v` (por exemplo, `v2.0.0-alpha.0`). Marque a opção de pré-lançamento.

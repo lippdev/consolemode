@@ -14,7 +14,7 @@ use windows::{
 };
 use winreg::{
     RegKey,
-    enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE},
+    enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ, KEY_WRITE},
 };
 
 const NAME: &str = "lippdev.ConsoleMode2Alpha.Home";
@@ -40,6 +40,7 @@ pub struct Status {
     pub package_files: bool,
     pub registered: bool,
     pub selected: bool,
+    pub can_restore_home: bool,
     pub running_as_home: bool,
 }
 
@@ -47,8 +48,8 @@ pub struct Status {
 struct Apartment;
 
 impl Apartment {
-    fn enter() -> Result<Self, String> {
-        unsafe { RoInitialize(RO_INIT_MULTITHREADED) }.map_err(|e| e.to_string())?;
+    fn enter() -> windows::core::Result<Self> {
+        unsafe { RoInitialize(RO_INIT_MULTITHREADED) }?;
         Ok(Self)
     }
 }
@@ -56,6 +57,24 @@ impl Apartment {
 impl Drop for Apartment {
     fn drop(&mut self) {
         unsafe { RoUninitialize() }
+    }
+}
+
+// GPUI can dispatch background work on an existing STA.
+fn with_mta<T: Send + 'static>(operation: fn() -> Result<T, String>) -> Result<T, String> {
+    const CHANGED_MODE: HRESULT = HRESULT(0x80010106_u32 as i32);
+    match Apartment::enter() {
+        Ok(_apartment) => operation(),
+        Err(error) if error.code() == CHANGED_MODE => std::thread::Builder::new()
+            .name("cm2-home-deployment".into())
+            .spawn(move || {
+                let _apartment = Apartment::enter().map_err(|e| e.to_string())?;
+                operation()
+            })
+            .map_err(|e| e.to_string())?
+            .join()
+            .map_err(|_| "A thread de registro da Home foi interrompida".to_owned())?,
+        Err(error) => Err(error.to_string()),
     }
 }
 
@@ -92,15 +111,84 @@ fn developer_mode() -> bool {
         .is_ok_and(|enabled| enabled == 1)
 }
 
-fn home_selected() -> Result<bool, String> {
-    let selection = RegKey::predef(HKEY_CURRENT_USER)
-        .open_subkey(r"Software\Microsoft\Windows\CurrentVersion\GamingConfiguration")
-        .and_then(|key| key.get_value::<String, _>("GamingHomeApp"));
-    match selection {
-        Ok(selection) => Ok(selection.eq_ignore_ascii_case(AUMID)),
-        Err(e) if e.kind() == ErrorKind::NotFound => Ok(false),
-        Err(e) => Err(e.to_string()),
+const HOME_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\GamingConfiguration";
+const HOME_VALUE: &str = "GamingHomeApp";
+const BACKUP_KEY: &str = r"Software\lippdev\ConsoleMode2Alpha";
+const BACKUP_VALUE: &str = "PreviousGamingHome";
+
+// A missing registry value and an existing empty string must round-trip separately.
+fn encode_previous(previous: Option<&str>) -> String {
+    previous.map_or_else(|| "-".to_owned(), |value| format!("+{value}"))
+}
+
+fn decode_previous(encoded: &str) -> Result<Option<&str>, String> {
+    if encoded == "-" { return Ok(None); }
+    encoded.strip_prefix('+').map(Some).ok_or_else(|| "CM2_FSE_INVALID_BACKUP".into())
+}
+
+fn saved_home() -> Result<Option<String>, String> {
+    match RegKey::predef(HKEY_CURRENT_USER).open_subkey(BACKUP_KEY)
+        .and_then(|key| key.get_value(BACKUP_VALUE)) {
+        Ok(value) => Ok(Some(value)),
+        Err(error) if error.kind() == ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error.to_string()),
     }
+}
+
+pub fn select_home() -> Result<(), String> {
+    with_mta(|| {
+        if !registered_here_in_mta()? { return Err("CM2_FSE_REGISTER_THIS_COPY".into()); }
+        let previous = selected_home().map_err(|e| e.to_string())?;
+        if previous.as_deref().is_some_and(|value| value.eq_ignore_ascii_case(AUMID)) { return Ok(()); }
+        let user = RegKey::predef(HKEY_CURRENT_USER);
+        let (backup, _) = user.create_subkey(BACKUP_KEY).map_err(|e| e.to_string())?;
+        backup.set_value(BACKUP_VALUE, &encode_previous(previous.as_deref())).map_err(|e| e.to_string())?;
+        let (config, _) = user.create_subkey(HOME_KEY).map_err(|e| e.to_string())?;
+        config.set_value(HOME_VALUE, &AUMID).map_err(|e| e.to_string())?;
+        // Desktop builds can replace this value asynchronously as soon as the write returns.
+        // Check again on the deployment worker before confirming selection to the user.
+        std::thread::sleep(std::time::Duration::from_millis(600));
+        if home_selected()? { return Ok(()); }
+        if selected_home().map_err(|e| e.to_string())? == previous {
+            backup.delete_value(BACKUP_VALUE).map_err(|e| e.to_string())?;
+        }
+        Err("CM2_FSE_HOME_SELECTION_CHANGED".into())
+    })
+}
+
+pub fn restore_home() -> Result<(), String> {
+    if !home_selected()? { return Err("CM2_FSE_HOME_SELECTION_CHANGED".into()); }
+    let saved = saved_home()?.ok_or("CM2_FSE_NO_PREVIOUS_HOME")?;
+    let previous = decode_previous(&saved)?;
+    restore_session_home(previous).map_err(|e| e.to_string())?;
+    if selected_home().map_err(|e| e.to_string())?.as_deref() != previous {
+        return Err("CM2_FSE_HOME_SELECTION_CHANGED".into());
+    }
+    RegKey::predef(HKEY_CURRENT_USER).open_subkey_with_flags(BACKUP_KEY, KEY_WRITE)
+        .and_then(|key| key.delete_value(BACKUP_VALUE)).map_err(|e| e.to_string())
+}
+
+pub fn selected_home() -> std::io::Result<Option<String>> {
+    let result = RegKey::predef(HKEY_CURRENT_USER).open_subkey(HOME_KEY)
+        .and_then(|key| key.get_value(HOME_VALUE));
+    match result {
+        Ok(selection) => Ok(Some(selection)),
+        Err(error) if error.kind() == ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error),
+    }
+}
+
+fn home_selected() -> Result<bool, String> {
+    selected_home().map(|selection| selection.is_some_and(|s| s.eq_ignore_ascii_case(AUMID)))
+        .map_err(|error| error.to_string())
+}
+
+pub fn restore_session_home(previous: Option<&str>) -> std::io::Result<()> {
+    // Never overwrite a different Home set while the launcher was running.
+    if !selected_home()?.is_some_and(|s| s.eq_ignore_ascii_case(AUMID)) { return Ok(()); }
+    let key = RegKey::predef(HKEY_CURRENT_USER).open_subkey_with_flags(HOME_KEY, KEY_READ | KEY_WRITE)?;
+    if let Some(previous) = previous { key.set_value(HOME_VALUE, &previous) }
+    else { key.delete_value(HOME_VALUE) }
 }
 
 fn running_as_home() -> Result<bool, String> {
@@ -134,15 +222,18 @@ fn packages(manager: &PackageManager) -> Result<Vec<Package>, String> {
     Ok(result)
 }
 
-pub fn status() -> Result<Status, String> {
-    let _apartment = Apartment::enter()?;
+pub fn status() -> Result<Status, String> { with_mta(status_in_mta) }
+
+fn status_in_mta() -> Result<Status, String> {
     let manager = PackageManager::new().map_err(|e| e.to_string())?;
+    let selected = home_selected()?;
     Ok(Status {
         compatible_build: compatible_build(),
         developer_mode: developer_mode(),
         package_files: package_files(&install_root()?),
         registered: !packages(&manager)?.is_empty(),
-        selected: home_selected()?,
+        selected,
+        can_restore_home: selected && saved_home()?.is_some_and(|value| decode_previous(&value).is_ok()),
         running_as_home: running_as_home()?,
     })
 }
@@ -151,7 +242,9 @@ fn path_uri(path: &Path) -> windows::core::Result<Uri> {
     Uri::CreateUri(&HSTRING::from(path.as_os_str()))
 }
 
-pub fn register() -> Result<(), String> {
+pub fn register() -> Result<(), String> { with_mta(register_in_mta) }
+
+fn register_in_mta() -> Result<(), String> {
     if !compatible_build() {
         return Err("CM2_FSE_UNSUPPORTED_BUILD".to_owned());
     }
@@ -163,7 +256,6 @@ pub fn register() -> Result<(), String> {
         return Err("CM2_FSE_PACKAGE_FILES_MISSING".to_owned());
     }
 
-    let _apartment = Apartment::enter()?;
     let manager = PackageManager::new().map_err(|e| e.to_string())?;
     match packages(&manager)?.as_slice() {
         [] => {}
@@ -204,8 +296,9 @@ fn installed_at(package: &Package, root: &Path) -> bool {
     })
 }
 
-pub fn unregister() -> Result<(), String> {
-    let _apartment = Apartment::enter()?;
+pub fn unregister() -> Result<(), String> { with_mta(unregister_in_mta) }
+
+fn unregister_in_mta() -> Result<(), String> {
     if running_as_home()? {
         return Err("CM2_FSE_CLOSE_HOME_BEFORE_REMOVAL".to_owned());
     }
@@ -235,9 +328,10 @@ pub fn open_settings() -> bool {
     crate::launch::open("ms-settings:gaming-fullscreen")
 }
 
-fn registered_here() -> Result<bool, String> {
+fn registered_here() -> Result<bool, String> { with_mta(registered_here_in_mta) }
+
+fn registered_here_in_mta() -> Result<bool, String> {
     let root = install_root()?;
-    let _apartment = Apartment::enter()?;
     let manager = PackageManager::new().map_err(|e| e.to_string())?;
     Ok(packages(&manager)?
         .iter()
@@ -249,6 +343,8 @@ pub fn cli_exit_code(arg: &str) -> Option<i32> {
     let result = match arg {
         "--fse-status" => status().map(|s| println!("{s:?}")),
         "--fse-register" => register(),
+        "--fse-select" => select_home(),
+        "--fse-restore-home" => restore_home(),
         "--fse-remove" => unregister(),
         "--fse-uninstall-check" => match registered_here() {
             Ok(registered) => return Some(if registered { 2 } else { 0 }),
@@ -267,7 +363,27 @@ pub fn cli_exit_code(arg: &str) -> Option<i32> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn sta_callers_dispatch_deployment_to_an_mta() {
+        use windows::Win32::System::WinRT::RO_INIT_SINGLETHREADED;
+        std::thread::spawn(|| {
+            unsafe { super::RoInitialize(RO_INIT_SINGLETHREADED) }.unwrap();
+            let _apartment = super::Apartment;
+            let current = std::thread::current().id();
+            let worker = super::with_mta(|| Ok(std::thread::current().id())).unwrap();
+            assert_ne!(current, worker);
+        }).join().unwrap();
+    }
+
     use super::*;
+
+    #[test]
+    fn previous_home_round_trips_including_missing_and_empty() {
+        for previous in [None, Some(""), Some("Xbox!App"), Some("+")] {
+            assert_eq!(decode_previous(&encode_previous(previous)).unwrap(), previous);
+        }
+        assert!(decode_previous("invalid").is_err());
+    }
 
     #[test]
     fn package_and_side_by_side_identities_match() {

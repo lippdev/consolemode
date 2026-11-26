@@ -37,6 +37,10 @@ pub fn load(sections: &mut [Section], c: &Config) {
             (CHECK_AT_START, Value::Toggle(on)) => *on = c.check_updates,
             ("Limite de FPS", Value::Choice(o, i)) => *i = pick(o, &if c.fps_limit == 0 { "Sem limite".to_string() } else { c.fps_limit.to_string() }),
             ("Layout dos botões", Value::Choice(o, i)) => *i = pick(o, match c.controller_layout.as_str() { "playstation" => "PlayStation", "xbox" => "Xbox", _ => "Automático" }),
+            ("Fundo de boas-vindas", Value::Choice(o, i)) => *i = pick(o, match c.welcome_background.as_str() {
+                "theme" => "Só a cor do tema", "midnight" => "Meia-noite", _ => "Aurora verde",
+            }),
+            ("Animar fundo de boas-vindas", Value::Toggle(on)) => *on = c.welcome_motion,
             ("Tema", Value::Choice(o, i)) => *i = pick(o, match c.theme.as_str() { "ambar" => "Âmbar", "jade" => "Jade", _ => "Lua" }),
             ("Idioma", Value::Choice(o, i)) => *i = pick(o, language_label(&c.app_language)),
             (tv::PROVIDER_ROW, Value::Choice(o, i)) => *i = pick(o, tv::provider_label(&c.tv.provider)),
@@ -75,6 +79,10 @@ pub fn store(title: &str, value: &Value, c: &mut Config) -> bool {
         (t, Value::Toggle(on)) if t == CHECK_AT_START => c.check_updates = *on,
         ("Limite de FPS", Value::Choice(o, i)) => c.fps_limit = o[*i].parse().unwrap_or(0),
         ("Layout dos botões", Value::Choice(o, i)) => c.controller_layout = match o[*i] { "PlayStation" => "playstation", "Xbox" => "xbox", _ => "auto" }.into(),
+        ("Fundo de boas-vindas", Value::Choice(o, i)) => c.welcome_background = match o[*i] {
+            "Só a cor do tema" => "theme", "Meia-noite" => "midnight", _ => "aurora",
+        }.into(),
+        ("Animar fundo de boas-vindas", Value::Toggle(on)) => c.welcome_motion = *on,
         ("Tema", Value::Choice(o, i)) => c.theme = match o[*i] { "Âmbar" => "ambar", "Jade" => "jade", _ => "lua" }.into(),
         ("Idioma", Value::Choice(o, i)) => c.app_language = language_code(o[*i]).into(),
         (tv::PROVIDER_ROW, Value::Choice(o, i)) => c.tv.provider = tv::provider_value(o[*i]).into(),

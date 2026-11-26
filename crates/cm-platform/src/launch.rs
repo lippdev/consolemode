@@ -9,10 +9,10 @@ use windows::{
         Graphics::Gdi::{GetMonitorInfoW, MONITOR_DEFAULTTONEAREST, MONITORINFO, MonitorFromWindow},
         System::Diagnostics::ToolHelp::{CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW, TH32CS_SNAPPROCESS},
         UI::{
-            Input::KeyboardAndMouse::{KEYEVENTF_KEYUP, VK_F11, VK_LWIN, keybd_event},
+            Input::KeyboardAndMouse::{KEYEVENTF_KEYUP, VK_F11, VK_LWIN, VK_MENU, VK_RETURN, keybd_event},
             Shell::ShellExecuteW,
             WindowsAndMessaging::{
-                EnumWindows, GetClassNameW, GetWindowRect, GetWindowTextW, GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible,
+                EnumWindows, GetClassNameW, GetForegroundWindow, GetWindowRect, GetWindowTextW, GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible,
                 PostMessageW, SW_SHOWNORMAL, SetWindowPos, HWND_TOP, SWP_NOSIZE, SWP_NOZORDER, WM_CLOSE,
             },
         },
@@ -234,8 +234,21 @@ pub fn big_picture_window() -> Option<Win> {
     let is_steam = |pid: u32| names.iter().any(|(p, n)| *p == pid && (n == "steamwebhelper" || n == "steam"));
     windows()
         .into_iter()
-        .filter(|w| w.title.to_ascii_lowercase().contains("big picture") || (w.class == "SDL_app" && is_steam(w.pid) && is_fullscreen(w)))
+        .filter(|w| is_steam(w.pid) && (w.title.to_ascii_lowercase().contains("big picture") || (w.class == "SDL_app" && is_fullscreen(w))))
         .max_by_key(|w| w.area() + if w.title.to_ascii_lowercase().contains("big picture") { 1_000_000_000 } else { 0 })
+}
+
+/// Use Steam's native Big Picture fullscreen shortcut only on its foreground window.
+pub fn fullscreen_big_picture(window: &Win) -> bool {
+    if is_fullscreen(window) { return true; }
+    unsafe {
+        if GetForegroundWindow() != window.handle() { return false; }
+        keybd_event(VK_MENU.0 as u8, 0, Default::default(), 0);
+        keybd_event(VK_RETURN.0 as u8, 0, Default::default(), 0);
+        keybd_event(VK_RETURN.0 as u8, 0, KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU.0 as u8, 0, KEYEVENTF_KEYUP, 0);
+    }
+    true
 }
 
 /// Windows of a process (by exe name), largest first.
